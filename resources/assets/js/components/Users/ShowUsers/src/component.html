@@ -1,0 +1,643 @@
+
+<div class="alert alert-success" transition="success" v-if="success">
+	utilizador adicionado com sucesso
+</div>
+
+<div class="row">
+	<div class="col-md-8">
+		<label class="checkbox-inline"><input type="checkbox" id="john" value="John" v-model="showColumn.username">User Name</label>
+		<label class="checkbox-inline"><input type="checkbox" id="jack" value="Jack" v-model="showColumn.gender">Genero</label>
+		<label class="checkbox-inline"><input type="checkbox" id="jack" value="Jack" v-model="showColumn.age">Idade</label>
+		<label class="checkbox-inline"><input type="checkbox" id="mike" value="Mike" v-model="showColumn.state">Ilha</label>
+		<label class="checkbox-inline"><input type="checkbox" id="mike" value="Mike" v-model="showColumn.council">Concelho</label>
+		<label class="checkbox-inline"><input type="checkbox" id="mike" value="Mike" v-model="showColumn.parish">Freguezia</label>
+		<label class="checkbox-inline"><input type="checkbox" id="mike" value="Mike" v-model="showColumn.created_at">Data</label>
+	</div>
+
+	<div class="col-md-4 pull-left">
+		<div class="input-group">
+			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
+			<input v-model="filter.term" type="text" class="form-control" placeholder="Filtrar dados da tabela" aria-describedby="basic-addon1">
+		</div>
+	</div>
+</div>
+
+<hr>
+
+<div class="row">
+	<div class="col-md-12">
+		<button @click="clearField" class="btn btn-secondary pull-left" name="button" data-toggle="modal" data-target="#modal-create-user"><i class="fa fa-plus"></i> Criar Novo</button>&nbsp;&nbsp;&nbsp;&nbsp;
+		<button class="btn btn-secondary" name="button"><i class="fa fa-print"></i> Imprimir</button>
+	</div>
+</div>
+
+<br>
+<div class="row">
+	<div class="col-md-12">
+		<!-- <button class="btn btn-secondary pull-right" name="button" data-toggle="modal" data-target="#modal-create-user"><i class="fa fa-plus" aria-hidden="true"></i></button> -->
+		<div class='table-responsive'>
+			<table class='table table-striped table-hover table-condensed'>
+				<thead>
+					<tr>
+						<th>
+							<i :class = "{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+							<a href="#" @click = "doSort($event, 'name')">Nome Completo</a>
+						</th>
+						<th class="info" v-if="showColumn.username">
+							<i :class = "{'fa-sort-amount-asc': sortColumn == 'username' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'username' &&   sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+							<a href="#" @click = "doSort($event, 'username')">Nome do Utilizador</a>
+						</th>
+						<th>
+							<i :class = "{'fa-sort-amount-asc': sortColumn == 'email' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'email' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+							<a href="#" @click = "doSort($event, 'email')">Email</a>
+						</th>
+						<th class="info" v-if="showColumn.gender">
+							<i :class = "{'fa-sort-amount-asc': sortColumn == 'gender' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'gender' &&   sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+							<a href="#" @click = "doSort($event, 'gender')">Genero</a>
+						</th>
+						<th class="info" v-if="showColumn.age">
+							<i :class = "{'fa-sort-amount-asc': sortColumn == 'age' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'age' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+							<a href="#" @click = "doSort($event, 'age')">Idade</a>
+						</th>
+
+
+						<th class="info" v-if="showColumn.state">
+							<i :class = "{'fa-sort-amount-asc': sortColumn == 'state' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'state' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+							<a href="#" @click = "doSort($event, 'state')">Ilha</a>
+						</th>
+
+						<th class="info" v-if="showColumn.council">
+							<i :class = "{'fa-sort-amount-asc': sortColumn == 'council' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'council' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+							<a href="#" @click = "doSort($event, 'council')">Conselho</a>
+						</th>
+
+						<th class="info" v-if="showColumn.parish">
+							<i :class = "{'fa-sort-amount-asc': sortColumn == 'parish' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'parish' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+							<a href="#" @click = "doSort($event, 'parish')">Freguezia</a>
+						</th>
+
+						<th>
+							<i :class = "{'fa-sort-amount-asc': sortColumn == 'zone' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'zone' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+							<a href="#" @click = "doSort($event, 'zone')">Zona do Utilizador</a>
+						</th>
+
+						<th>
+							<i :class = "{'fa-sort-amount-asc': sortColumn == 'phone' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'phone' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+							<a href="#" @click = "doSort($event, 'phone')">Tel/Movel</a>
+						</th>
+
+
+
+						<th class="info" v-if="showColumn.created_at">
+							<i :class = "{'fa-sort-amount-asc': sortColumn == 'created_at' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'created_at' &&   sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+							<a href="#" @click = "doSort($event, 'created_at')">Data</a>
+						</th>
+
+						<th>
+							<i :class = "{'fa-sort-amount-asc': sortColumn == 'status' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'status' &&   sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+							<a href="#" @click = "doSort($event, 'status')">Estado</a>
+						</th>
+
+
+						<th>
+							<i :class = "{'fa-sort-amount-asc': sortColumn == 'type' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'type' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+							<a href="#" @click = "doSort($event, 'type')">Tipo do Utilizador</a>
+						</th>
+
+						<!-- <th>Foto</th> -->
+						<!-- <th  class="text-center">Visualizar</th> -->
+
+						<th  class="text-center" colspan="3"><span><i class="fa fa-cogs"></i></span> Ação</th>
+
+
+						<th width=75  class="text-center">
+
+							<a @click = "openAllDetails" href="#">
+								<span><i data-toggle="tooltip" data-placement="left" title="Ver Todos os papeis" class="fa"  :class="{'fa-lock': openDetails.length == 0, 'fa-unlock': openDetails.length > 0}"></i></span>
+							</a>
+
+						</th>
+
+					</tr>
+				</thead>
+				<tbody  v-for="user in users | filterBy filter.term | orderBy sortColumn sortInverse">
+					<tr>
+						<td>{{ user.name }}</td>
+						<td class="info" v-if="showColumn.username">{{ user.username }}</td>
+						<td>{{ user.email }}</td>
+						<td class="info" v-if="showColumn.gender">{{ alterAgeValue(user.gender) }}</td>
+						<td class="info" v-if="showColumn.age">{{ user.age }}</td>
+						<td class="info" v-if="showColumn.state">{{ user.state }}</td>
+						<td class="info" v-if="showColumn.council">{{ user.council }}</td>
+						<td class="info" v-if="showColumn.parish">{{ user.parish }}</td>
+						<td>{{ user.zone }}</td>
+						<td>{{ user.phone }}</td>
+						<td class="info" v-if="showColumn.created_at">{{ user.created_at | formatDate 'DD/MM/YYYY' }}</td>
+
+						<!----------------------------------------------------------------------------------->
+						<td v-if="user.name != 'Admin'">
+							<button type="submit" @click = "estado_utilizador(user.id)" class='btn btn-xs' :class="{ 'btn-info': user.status, 'btn-danger': !user.status }">{{user.status ? 'Ativado' : 'Disativado'}}</button>
+						</td>
+						<td v-if="user.name == 'Admin'">
+							<button class='btn btn-success btn-xs' disabled="disabled">Admin</button>
+						</td>
+						<!----------------------------------------------------------------------------------->
+
+
+						<td  class="text-success">{{ alterTypeValue(user.type) }}</td>
+
+
+						<!-- tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt -->
+
+						<!------------------------------------------------------------------------------->
+						<td class="text-center">
+							<a href="showThisUser/{{user.id}}"><i class="fa fa-eye text-success"></i></a>
+						</td>
+						<!------------------------------------------------------------------------------->
+						 
+						<!------------------------------------------------------------------------------->
+
+						<td v-if="user.name != 'Admin'" class="text-center">  <a data-toggle="modal" data-target="#modal-edit-user" href="#"> <i class="fa fa-pencil text-primary" @click="getThisUser(user.id)"> </i></a></td>
+
+						<td v-if="user.name == 'Admin'" class="text-center">
+							<i class="fa fa-ban text-warning"></i>
+							<!-- <button class='btn btn-warning btn-xs' disabled="disabled"><i class="fa fa-ban"></i></button> -->
+						</td>
+						<!------------------------------------------------------------------------------->
+
+						<!------------------------------------------------------------------------------->
+						<td v-if="user.name != 'Admin'" class="text-center"><a data-toggle="modal" data-target="#modal-delete-user" href="#"><i class="fa fa-trash text-danger" @click="getThisUser(user.id)" ></i></a></td>
+
+						<td v-if="user.name == 'Admin'" class="text-center">
+							<i class="fa fa-ban text-warning">
+							</td>
+							<!------------------------------------------------------------------------------->
+							<!-- tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt -->
+
+
+							<!------------------------------------------------------------------------------->
+							<td v-if="user.name != 'Admin'"  width=75 class="text-center">
+								<a @click = "doOpenDetails($event, user.id)" v-show="user.roles != ''" href="#"><i data-toggle="tooltip" data-placement="left" title="Ver Papeis de utilizador" class="fa" :class="{'fa-plus-square': openDetails.indexOf(user.id) == -1, 'fa-minus-square': openDetails.indexOf(user.id) > -1}"></i></a>
+								<i class="fa fa-plus-square" v-show="user.roles == ''" style="opacity: 0.3"></i>
+							</td>
+
+							<td v-if="user.name == 'Admin'"  width=75 class="text-center">
+								<i class="fa fa-minus-square"></i>
+								<!-- <i class="fa fa-plus-square" v-show="user.roles == ''" style="opacity: 0.3"></i> -->
+							</td>
+							<!------------------------------------------------------------------------------->
+						</tr>
+
+						<!----------------------------------------------------------------------------------->
+						<tr class="info" v-show="openDetails.indexOf(user.id) > -1 && user.roles != ''">
+							<td colspan="8">
+								<ul class="det" id="detailPermission">
+									<li class="l_det"  v-for="roles in user.roles"><b>|{{ roles.display_name }}|&nbsp;&nbsp;&nbsp;</b></li>
+								</ul>
+							</td>
+							<td class="text-right" colspan="3">
+								<a href="#" class='btn btn-xs btn-default '>Gerir</a>
+							</td>
+						</tr>
+
+
+						<!-- <tr class="info">
+						<td colspan="12">
+						<ul style="list-style-type:none">
+						<li><b><i>Sola</i></b></li>
+					</ul>
+				</td>
+			</tr> -->
+
+		</tbody>
+	</table>
+	<div class="col-md-12 pull-left">
+		<!-- <Pagination :source.sync = "pagination"></Pagination> -->
+		<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
+	</div>
+</div>
+
+<!--------------------------------------------------------------------------------------------------------->
+
+<div class="modal fade" id="modal-delete-user" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button @click="clearField" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="">Eliminar Usuario</h4>
+			</div>
+			<div class="modal-body">
+				<h1>Eliminar Usuario {{newUser.name}}</h1>
+			</div>
+			<div class="modal-footer">
+				<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+				<button  @keyup.enter="deleteUser(newUser.id)" @click="deleteUser(newUser.id)" type="button" class="btn btn-default">Eliminar Usuario</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!--------------------------------------------------------------------------------------------------------->
+<!-- Modal -->
+<div id="modal-create-user" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+
+		<!-- Modal content-->
+		<div class="modal-content">
+			<div class="modal-header">
+				<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Criar Usuario</h4>
+			</div>
+			<div class="modal-body">
+				<validator name="validationew">
+					<form action="#" methods="POST">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-8">
+									<div class="form-group has-feedback">
+										<input type="text" class="form-control" name="name" placeholder="Nome Completo" v-model="newUser.name" v-validate:name="['required']"/>
+										<span class="glyphicon glyphicon-user form-control-feedback"></span>
+										<p style="color:red;" v-if="$validationew.name.required && $validationew.name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
+									</div>
+								</div>
+								<div class="col-md-4">
+									<div class="form-group has-feedback">
+										<input type="text" class="form-control" name="username" placeholder="utilizador" v-model="newUser.username" v-validate:username="['required']"/>
+										<span class="glyphicon glyphicon-user form-control-feedback"></span>
+										<p style="color:red;" v-if="$validationew.username.required && $validationew.username.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
+									</div>
+								</div>
+							</div>
+						</div>
+
+
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-4">
+									<div class="form-group has-feedback">
+										<input v-model="newUser.ic" type='number' class='form-control' placeholder='Número BI'>
+									</div>
+								</div>
+
+								<div class="col-md-8">
+									<div class="form-group has-feedback">
+										<input type="email" class="form-control" name="email" placeholder="Email" v-model="newUser.email" v-validate:email="['required']"/>
+										<span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+										<span style="color:red;" v-show="!myValidation.email" v-if="$validationew.email.required && $validationew.email.touched"><span data-toggle="tooltip" title="Este campo é obrigatório">*</span></span>&nbsp;&nbsp;&nbsp;
+										<span style="color:red;" v-if="!myValidation.email && $validationew.email.touched"><span data-toggle="tooltip" title="Recorda-se de introduzir email valido! ex exemplo@exemplo.cv">*</span></span>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-6">
+									<div class="form-group has-feedback">
+										<input type="password" class="form-control" name="password" placeholder="Password" v-model="newUser.password" v-validate:password="['required']"/>
+										<span class="glyphicon glyphicon-lock form-control-feedback"></span>
+										<p style="color:red;" v-if="$validationew.password.required && $validationew.password.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida">*</span></p>
+									</div>
+								</div>
+
+								<div class="col-md-6">
+									<div class="form-group has-feedback">
+										<input v-model="newUser.phome" type='number' class='form-control' placeholder='Introduza o Numero'>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<hr><!-------------------------------------------------------------------------------------------------------------------->
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-6">
+									<div class="form-group has-feedback">
+										<label class="radio-inline">
+											<input type="radio" id="gender" value="M" name="gender" v-model="newUser.gender"> Masculino
+										</label>
+										<label class="radio-inline">
+											<input type="radio" id="gender" name="gender" value="F" v-model="newUser.gender">Feminino
+										</label>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group has-feedback">
+										<input type="number" class="form-control" name="age" placeholder="Introduza a idade" min="20" max="50" v-model="newUser.age"/>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<hr>
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-6">
+									<div class="form-group has-feedback">
+										<select name="state" class="selectpicker form-control show-tick" v-model="newUser.state">
+											<optgroup label="Sotavento">
+												<option>Seleciona uma Ilha</option>
+												<option value="2">Maio</option>
+												<option value="1">Santiago</option>
+												<option value="3">Fogo</option>
+												<option value="4">Brava</option>
+											</optgroup>
+											<optgroup label="Barlavento">
+												<option value="5">Santo Antão</option>
+												<option value="6">São Nicolau</option>
+												<option value="7">São Vicente</option>
+												<option value="8">Sal</option>
+												<option value="9">Boa Vista</option>
+											</optgroup>
+										</select>
+									</div>
+								</div>
+
+								<div class="col-md-6">
+									<div class="form-group has-feedback">
+										<input type="text" class="form-control" name="council" placeholder="Concelho" v-model="newUser.council"/>
+										<span class="fa fa-compass form-control-feedback"></span>
+									</div>
+								</div>
+							</div>
+						</div>
+
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-6">
+									<div class="form-group has-feedback">
+										<input type="text" class="form-control" name="parish" placeholder="Fraguesia" v-model="newUser.parish"/>
+										<span class="fa fa-map-marker form-control-feedback"></span>
+									</div>
+								</div>
+
+								<div class="col-md-6">
+									<div class="form-group has-feedback">
+										<input type="text" class="form-control" name="zone" placeholder="Zona" v-model="newUser.zone"/>
+										<span class="fa fa-thumb-tack form-control-feedback"></span>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<hr><!---------------------------------------------------------------------------------------------------------------->
+
+
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-6">
+									<div class="form-group has-feedback">
+										<select name="state" class="selectpicker form-control show-tick" v-model="newUser.state">
+											<option>Seleciona o tipo de utilizador</option>
+											<option value="member">Membro</option>
+											<option value="emp">Funcionario</option>
+											<option value="trad">Comerciante</option>
+										</select>
+									</div>
+								</div>
+
+								<div class="col-md-6">
+									<div class="form-group has-feedback">
+										<select class="iform-control" v-model="newUser.roles" multiple>
+											<option value="" selected>Escolhe Papeis para este Utilizador</option>
+											<option v-for="role in roles" value="{{role.id}}">
+												{{role.display_name}}
+											</option>
+										</select>
+										<!-- <input type="text" name="" value=""> -->
+									</div>
+								</div>
+							</div>
+						</div>
+
+
+						<hr><!---------------------------------------------------------------------------------------------------------------->
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-12">
+									<div class="form-group has-feedback">
+										<textarea name="description" placeholder="Descrição do utilizador" class="form-control" rows="5" cols="40" id="description" v-model="newUser.description"></textarea>
+									</div>
+								</div>
+							</div>
+						</div>
+					</form>
+				</validator>
+			</div>
+			<div class="modal-footer">
+				<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
+
+				<button :disabled = "!$validationew.valid" @click="createUser" class="btn btn-secondary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar Dados Introduzidos</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!--------------------------------------------------------------------------------------------------------->
+
+<!-- Modal -->
+<div id="modal-edit-user" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Editar Usuario</h4>
+			</div>
+			<div class="modal-body">
+				<validator name="validation1">
+					<form methods="patch">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-8">
+									<div class="form-group has-feedback">
+										<input type="text" class="form-control" name="name" placeholder="Nome Completo" v-model="newUser.name" v-validate:name="['required']"/>
+										<span class="glyphicon glyphicon-user form-control-feedback"></span>
+										<p style="color:red;" v-if="$validationew.name.required && $validationew.name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
+									</div>
+								</div>
+								<div class="col-md-4">
+									<div class="form-group has-feedback">
+										<input type="text" class="form-control" name="username" placeholder="utilizador" v-model="newUser.username" v-validate:username="['required']"/>
+										<span class="glyphicon glyphicon-user form-control-feedback"></span>
+										<p style="color:red;" v-if="$validationew.username.required && $validationew.username.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
+									</div>
+								</div>
+							</div>
+						</div>
+
+
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-4">
+									<div class="form-group has-feedback">
+										<input v-model="newUser.ic" type='number' class='form-control' placeholder='Número BI'>
+									</div>
+								</div>
+
+								<div class="col-md-8">
+									<div class="form-group has-feedback">
+										<input type="email" class="form-control" name="email" placeholder="Email" v-model="newUser.email" v-validate:email="['required']"/>
+										<span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+										<span style="color:red;" v-show="!myValidation.email" v-if="$validationew.email.required && $validationew.email.touched"><span data-toggle="tooltip" title="Este campo é obrigatório">*</span></span>&nbsp;&nbsp;&nbsp;
+										<span style="color:red;" v-if="!myValidation.email && $validationew.email.touched"><span data-toggle="tooltip" title="Recorda-se de introduzir email valido! ex exemplo@exemplo.cv">*</span></span>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-6">
+									<div class="form-group has-feedback">
+										<input type="password" class="form-control" name="password" placeholder="Password" v-model="newUser.password" v-validate:password="['required']"/>
+										<span class="glyphicon glyphicon-lock form-control-feedback"></span>
+										<p style="color:red;" v-if="$validationew.password.required && $validationew.password.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida">*</span></p>
+									</div>
+								</div>
+
+								<div class="col-md-6">
+									<div class="form-group has-feedback">
+										<input v-model="newUser.phome" type='number' class='form-control' placeholder='Introduza o Numero'>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<hr><!-------------------------------------------------------------------------------------------------------------------->
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-6">
+									<div class="form-group has-feedback">
+										<label class="radio-inline">
+											<input type="radio" id="gender" value="M" name="gender" v-model="newUser.gender"> Masculino
+										</label>
+										<label class="radio-inline">
+											<input type="radio" id="gender" name="gender" value="F" v-model="newUser.gender">Feminino
+										</label>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group has-feedback">
+										<input type="number" class="form-control" name="age" placeholder="Introduza a idade" min="20" max="50" v-model="newUser.age"/>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<hr>
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-6">
+									<div class="form-group has-feedback">
+										<select name="state" class="selectpicker form-control show-tick" v-model="newUser.state">
+											<optgroup label="Sotavento">
+												<option>Seleciona uma Ilha</option>
+												<option value="2">Maio</option>
+												<option value="1">Santiago</option>
+												<option value="3">Fogo</option>
+												<option value="4">Brava</option>
+											</optgroup>
+											<optgroup label="Barlavento">
+												<option value="5">Santo Antão</option>
+												<option value="6">São Nicolau</option>
+												<option value="7">São Vicente</option>
+												<option value="8">Sal</option>
+												<option value="9">Boa Vista</option>
+											</optgroup>
+										</select>
+									</div>
+								</div>
+
+								<div class="col-md-6">
+									<div class="form-group has-feedback">
+										<input type="text" class="form-control" name="council" placeholder="Concelho" v-model="newUser.council"/>
+										<span class="fa fa-compass form-control-feedback"></span>
+									</div>
+								</div>
+							</div>
+						</div>
+
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-6">
+									<div class="form-group has-feedback">
+										<input type="text" class="form-control" name="parish" placeholder="Fraguesia" v-model="newUser.parish"/>
+										<span class="fa fa-map-marker form-control-feedback"></span>
+									</div>
+								</div>
+
+								<div class="col-md-6">
+									<div class="form-group has-feedback">
+										<input type="text" class="form-control" name="zone" placeholder="Zona" v-model="newUser.zone"/>
+										<span class="fa fa-thumb-tack form-control-feedback"></span>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<hr><!---------------------------------------------------------------------------------------------------------------->
+
+
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-6">
+									<div class="form-group has-feedback">
+										<select name="state" class="selectpicker form-control show-tick" v-model="newUser.state">
+											<option>Seleciona o tipo de utilizador</option>
+											<option value="member">Membro</option>
+											<option value="emp">Funcionario</option>
+											<option value="trad">Comerciante</option>
+										</select>
+									</div>
+								</div>
+
+								<div class="col-md-6">
+									<div class="form-group has-feedback">
+										<select class="iform-control" v-model="newUser.roles" multiple>
+											<option value="" selected>Escolhe Papeis para este Utilizador</option>
+											<option v-for="role in roles" value="{{role.id}}">
+												{{role.display_name}}
+											</option>
+										</select>
+										<!-- <input type="text" name="" value=""> -->
+									</div>
+								</div>
+							</div>
+						</div>
+
+
+						<hr><!---------------------------------------------------------------------------------------------------------------->
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-12">
+									<div class="form-group has-feedback">
+										<textarea name="description" placeholder="Descrição do utilizador" class="form-control" rows="5" cols="40" id="description" v-model="newUser.description"></textarea>
+									</div>
+								</div>
+							</div>
+						</div>
+					</form>
+				</validator>
+			</div>
+			<div class="modal-footer">
+				<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Close</button>
+				<button v-on:show="" @click="saveEditedUser(newUser.id)" type="button" class="btn btn-secondary"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp; Salvar as Alterações</button>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+</div>

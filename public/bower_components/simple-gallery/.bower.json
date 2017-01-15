@@ -1,0 +1,33 @@
+{
+  "name": "simple-gallery",
+  "description": "Easy gallery upload. Native. Just 2kb gzipped.",
+  "main": "lib/simple-gallery.js",
+  "authors": [
+    "Fabio Carvalho"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "gallery",
+    "images",
+    "upload",
+    "js"
+  ],
+  "homepage": "https://github.com/fccoelho7/simpleGallery.js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "_release": "ef49071988",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "ef4907198857a0dd5f3a5e5ea8d354e03b2286db"
+  },
+  "_source": "https://github.com/fccoelho7/simpleGallery.js.git",
+  "_target": "*",
+  "_originalSource": "simple-gallery-js",
+  "_direct": true
+}

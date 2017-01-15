@@ -1,0 +1,134 @@
+/*
+ * Skin: Red
+ * ---------
+ */
+.sagmma-skin .main-header .navbar {
+  background-color: #5c5f56;
+}
+.sagmma-skin .main-header .navbar .nav > li > a {
+  color: #fff;
+}
+.sagmma-skin .main-header .navbar .nav > li > a:hover,
+.sagmma-skin .main-header .navbar .nav > li > a:active,
+.sagmma-skin .main-header .navbar .nav > li > a:focus,
+.sagmma-skin .main-header .navbar .nav .open > a,
+.sagmma-skin .main-header .navbar .nav .open > a:hover,
+.sagmma-skin .main-header .navbar .nav .open > a:focus {
+  background: rgba(0, 0, 0, 0.1);
+  color: #f6f6f6;
+}
+.sagmma-skin .main-header .navbar .sidebar-toggle {
+  color: #fff;
+}
+.sagmma-skin .main-header .navbar .sidebar-toggle:hover {
+  color: #f6f6f6;
+  background: rgba(0, 0, 0, 0.1);
+}
+.sagmma-skin .main-header .navbar .sidebar-toggle {
+  color: #fff;
+}
+.sagmma-skin .main-header .navbar .sidebar-toggle:hover {
+  background-color: #4f524a;
+}
+@media (max-width: 767px) {
+  .sagmma-skin .main-header .navbar .dropdown-menu li.divider {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  .sagmma-skin .main-header .navbar .dropdown-menu li a {
+    color: #fff;
+  }
+  .sagmma-skin .main-header .navbar .dropdown-menu li a:hover {
+    background: #4f524a;
+  }
+}
+.sagmma-skin .main-header .logo {
+  background-color: #4f524a;
+  color: #fff;
+  border-bottom: 0px solid transparent;
+}
+.sagmma-skin .main-header .logo:hover {
+  background-color: #4c4f47;
+}
+.sagmma-skin .main-header li.user-header {
+  background-color: #5c5f56;
+}
+.sagmma-skin .content-header {
+  background: transparent;
+}
+.sagmma-skin .wrapper,
+.sagmma-skin .main-sidebar,
+.sagmma-skin .left-side {
+  background-color: #f1f1f1;
+}
+.sagmma-skin .user-panel > .info,
+.sagmma-skin .user-panel > .info > a {
+  color: #fff;
+}
+.sagmma-skin .sidebar-menu > li.header {
+  color: #ffffff;
+  background: #e7e7e7;
+}
+.sagmma-skin .sidebar-menu > li > a {
+  border-left: 3px solid transparent;
+}
+.sagmma-skin .sidebar-menu > li:hover > a,
+.sagmma-skin .sidebar-menu > li.active > a {
+  color: #000;
+  background: #e7e7e7;
+  border-left-color: #5c5f56;
+}
+.sagmma-skin .sidebar-menu > li > .treeview-menu {
+  margin: 0 1px;
+  background: #e7e7e7;
+}
+.sagmma-skin .sidebar a {
+  color: #444;
+}
+.sagmma-skin .sidebar a:hover {
+  text-decoration: none;
+}
+.sagmma-skin .treeview-menu > li > a {
+  color: #777;
+}
+.sagmma-skin .treeview-menu > li.active > a,
+.sagmma-skin .treeview-menu > li > a:hover {
+  color: #000;
+}
+.sagmma-skin .sidebar-form {
+  border-radius: 3px;
+  border: 1px solid #ffffff;
+  margin: 10px 10px;
+}
+.sagmma-skin .sidebar-form input[type="text"],
+.sagmma-skin .sidebar-form .btn {
+  box-shadow: none;
+  background-color: #ffffff;
+  border: 1px solid transparent;
+  height: 35px;
+  -webkit-transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+}
+.sagmma-skin .sidebar-form input[type="text"] {
+  color: #666;
+  border-top-left-radius: 2px !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  border-bottom-left-radius: 2px !important;
+}
+.sagmma-skin .sidebar-form input[type="text"]:focus,
+.sagmma-skin .sidebar-form input[type="text"]:focus + .input-group-btn .btn {
+  background-color: #fff;
+  color: #666;
+}
+.sagmma-skin .sidebar-form input[type="text"]:focus + .input-group-btn .btn {
+  border-left-color: #fff;
+}
+.sagmma-skin .sidebar-form .btn {
+  color: #999;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 2px !important;
+  border-bottom-right-radius: 2px !important;
+  border-bottom-left-radius: 0 !important;
+}
+
+/*# sourceMappingURL=_all-skins.css.map */

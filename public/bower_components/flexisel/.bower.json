@@ -1,0 +1,20 @@
+{
+  "name": "flexisel",
+  "description": "A responsive jQuery carousel",
+  "main": "js/jquery.flexisel.js",
+  "version": "0.1.1",
+  "dependencies": {
+    "jquery": ">=1.8.0 < 2.0.0"
+  },
+  "homepage": "https://github.com/ethanresnick/flexisel",
+  "_release": "0.1.1",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.1.1",
+    "commit": "fd4ad61654b1ba8139d7d203c59f564189be8344"
+  },
+  "_source": "https://github.com/ethanresnick/flexisel.git",
+  "_target": "^0.1.1",
+  "_originalSource": "flexisel",
+  "_direct": true
+}

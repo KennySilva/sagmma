@@ -1,0 +1,5 @@
+suites:
+    main:
+        namespace: Sagmma
+        psr4_prefix: Sagmma
+        src_path: app

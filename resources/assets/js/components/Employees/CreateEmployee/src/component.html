@@ -1,0 +1,166 @@
+<div class="alert alert-success" transition="success" v-if="success">
+	Usuário adicionado com sucesso
+</div>
+
+<validator name="validation1">
+	<form action="#" methods="POST" @submit.prevent = "createUser">
+		<div class="row">
+			<div class="col-md-12">
+
+				<!-- Form Errors -->
+				<div class="alert alert-danger" v-if="errors.length > 0">
+					<p><strong>Whoops!</strong>Algo naõ bate!</p>
+					<br>
+					<ul>
+						<li v-for="error in errors">
+							{{ error }}
+						</li>
+					</ul>
+				</div>
+
+				<div class="col-md-6">
+					<div class="form-group has-feedback">
+						<input type="text" class="form-control" placeholder="Nome Completo" name="name" v-model="newUser.name" v-validate:name="['required']"/>
+						<span class="glyphicon glyphicon-user form-control-feedback"></span>
+						<p style="color:red;" v-if="$validation1.name.required"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
+					</div>
+				</div>
+
+				<div class="col-md-6">
+					<div class="form-group has-feedback">
+						<input type="text" class="form-control" placeholder="Usuário" name="username" v-model="newUser.username" v-validate:username="['required']"/>
+						<span class="glyphicon glyphicon-user form-control-feedback"></span>
+						<p style="color:red;" v-if="$validation1.username.required"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-12">
+				<div class="col-md-12">
+					<div class="form-group has-feedback">
+						<input type="email" class="form-control" placeholder="Email" name="email" v-model="newUser.email"/>
+						<span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+						<p style="color:red;" v-if="!myValidation.email"><span data-toggle="tooltip" title="Recorda-se de introduzir email valido! ex exemplo@exemplo.cv">*</span></p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-12">
+				<div class="col-md-6">
+					<div class="form-group has-feedback">
+						<input type="password" class="form-control" placeholder="Password" name="password" v-model="newUser.password" v-validate:password="['required']"/>
+						<span class="glyphicon glyphicon-lock form-control-feedback"></span>
+						<p style="color:red;" v-if="$validation1.password.required"><span data-toggle="tooltip" title="Este campo tem de ser preenchida">*</span></p>
+					</div>
+				</div>
+
+
+				<!-- <div class="col-md-6">
+				<div class="form-group has-feedback">
+				<input type="password" class="form-control" placeholder="Confirme o password" name="password_confirmation" v-model="newUser.password_confirmation"  v-validate:password_confirmation="['required']"/>
+				<span class="glyphicon glyphicon-log-in form-control-feedback"></span>
+				<p style="color:red;" v-if="$validation1.password_confirmation.required"><span data-toggle="tooltip" title="Este campo tem de ser preenchida">*</span></p>
+			</div>
+		</div> -->
+
+
+	</div>
+</div>
+
+<hr><!-------------------------------------------------------------------------------------------------------------------->
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="col-md-6">
+			<div class="form-group has-feedback">
+				<select name="gender" class="selectpicker  form-control" title="Selecione o sexo" v-model="newUser.gender">
+					<option value="M">Masculino</option>
+					<option value="F">Femenino</option>
+					<option value="other">Outro</option>
+				</select>
+			</div>
+		</div>
+
+		<div class="col-md-6">
+			<div class="form-group has-feedback">
+				<input type="number" class="form-control" placeholder="Introduza a idade" name="age" min="20" max="50" v-model="newUser.age"/>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="col-md-3">
+			<div class="form-group has-feedback">
+				<input type="text" class="form-control" placeholder="Ilha" name="sland" v-model="newUser.sland"/>
+				<span  class="fa fa-globe form-control-feedback"></span>
+				<p class="help-block">Introduza a ilha a qual o usario pertence</p>
+			</div>
+		</div>
+
+		<div class="col-md-3">
+			<div class="form-group has-feedback">
+				<input type="text" class="form-control" placeholder="Concelho" name="council" v-model="newUser.council"/>
+				<span class="fa fa-compass form-control-feedback"></span>
+			</div>
+		</div>
+
+		<div class="col-md-3">
+			<div class="form-group has-feedback">
+				<input type="text" class="form-control" placeholder="Freguezia" name="parish" v-model="newUser.parish"/>
+				<span class="fa fa-map-marker form-control-feedback"></span>
+			</div>
+		</div>
+
+		<div class="col-md-3">
+			<div class="form-group has-feedback">
+				<input type="text" class="form-control" placeholder="Zona" name="zone" v-model="newUser.zone"/>
+				<span class="fa fa-thumb-tack form-control-feedback"></span>
+			</div>
+		</div>
+	</div>
+</div>
+
+<hr><!---------------------------------------------------------------------------------------------------------------->
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="col-md-12">
+			<div class="form-group has-feedback">
+				<select name="type" class="selectpicker  form-control" title="Selecione o grupo para este usuario" v-model="newUser.type">
+					<option value="admin">Admin</option>
+					<option value="gest">Gest</option>
+					<option value="ta">TA</option>
+					<option value="pa">PA</option>
+					<option value="member">Menbro</option>
+				</select>
+			</div>
+		</div>
+	</div>
+</div>
+
+<hr><!---------------------------------------------------------------------------------------------------------------->
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="col-md-12">
+			<div class="form-group has-feedback">
+				<textarea name="bio" class="form-control" rows="5" cols="40" id="bio" v-model="newUser.bio" placeholder="Adciona um piquema discrição do curiculo do susuario..."></textarea>
+			</div>
+		</div>
+	</div>
+</div>
+
+<hr><!----------------------------------------------------------------------------------------------------------------->
+
+<div class="form-group">
+	<button :disabled = "!$validation1.valid" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar Dados Introduzidos</button>
+</div>
+</form>
+
+</validator>

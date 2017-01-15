@@ -1,0 +1,7 @@
+.success-transition{
+    transition: all .5s ease-in-out;
+}
+
+.success-enter, .success-leave{
+    opacity: 0;
+}

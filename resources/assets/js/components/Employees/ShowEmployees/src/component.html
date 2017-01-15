@@ -1,0 +1,575 @@
+
+
+<div class="alert alert-success" transition="success" v-if="success">
+	Funcionário adicionado com sucesso
+</div>
+
+
+<div class="row">
+
+
+	<div class="pull right col-md-8">
+		<!-- <label class="checkbox-inline"><input type="checkbox" id="" value="" v-model="showColumn.nickname">Nominho</label> -->
+		<label class="checkbox-inline"><input type="checkbox" id="" value="" v-model="showColumn.nif">NIF</label>
+		<label class="checkbox-inline"><input type="checkbox" id="" value="" v-model="showColumn.age">Nascimento</label>
+		<label class="checkbox-inline"><input type="checkbox" id="" value="" v-model="showColumn.email">Email</label>
+		<label class="checkbox-inline"><input type="checkbox" id="" value="" v-model="showColumn.echelon">Escalão</label>
+		<label class="checkbox-inline"><input type="checkbox" id="" value="" v-model="showColumn.service_beginning">Inicio Serviço</label>
+		<label class="checkbox-inline"><input type="checkbox" id="" value="" v-model="showColumn.market_id">Mercado</label>
+	</div>
+
+	<div class="col-md-4 pull-left">
+		<div class="input-group">
+			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
+			<input v-model="filter.term" type="text" class="form-control" placeholder="Filtrar dados da tabela" aria-describedby="basic-addon1">
+		</div>
+	</div>
+</div>
+
+
+<hr>
+<div class="row">
+	<div class="col-md-12">
+		<button class="btn btn-secondary pull-right" name="button" data-toggle="modal" data-target="#modal-create-employee">Criar Novo</button>
+	</div>
+</div>
+<br>
+<div class="col-md-12">
+	<div class='table-responsive'>
+		<table class='table table-striped table-hover table-condensed'>
+			<thead>
+				<tr>
+					<th>
+						<i :class = "{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+						<a href="#" @click = "doSort($event, 'name')">Nome</a>
+					</th>
+					<!-- <th class="info" v-if="showColumn.nickname">
+					<i :class = "{'fa-sort-amount-asc': sortColumn == 'nickname' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'nickname' &&   sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+					<a href="#" @click = "doSort($event, 'nickname')">Alcunha do Funcionário</a>
+				</th> -->
+				<th>
+					<i :class = "{'fa-sort-amount-asc': sortColumn == 'ic' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'ic' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+					<a href="#" @click = "doSort($event, 'ic')">BI</a>
+				</th>
+				<!-- <th class="info" v-if="showColumn.nif">
+				<i :class = "{'fa-sort-amount-asc': sortColumn == 'nif' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'nif' &&   sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+				<a href="#" @click = "doSort($event, 'nif')">NIF</a>
+			</th> -->
+			<th class="info" v-if="showColumn.age">
+				<i :class = "{'fa-sort-amount-asc': sortColumn == 'age' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'age' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+				<a href="#" @click = "doSort($event, 'age')">Idade</a>
+			</th>
+
+			<th class="info" v-if="showColumn.email">
+				<i :class = "{'fa-sort-amount-asc': sortColumn == 'email' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'email' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+				<a href="#" @click = "doSort($event, 'email')">Email</a>
+			</th>
+
+
+			<th>
+				<i :class = "{'fa-sort-amount-asc': sortColumn == 'state' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'state' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+				<a href="#" @click = "doSort($event, 'state')">Ilha</a>
+			</th>
+
+			<th class="info" v-if="showColumn.council">
+				<i :class = "{'fa-sort-amount-asc': sortColumn == 'council' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'council' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+				<a href="#" @click = "doSort($event, 'council')">Conselho</a>
+			</th>
+
+			<th class="info" v-if="showColumn.parish">
+				<i :class = "{'fa-sort-amount-asc': sortColumn == 'parish' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'parish' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+				<a href="#" @click = "doSort($event, 'parish')">Freguezia</a>
+			</th>
+
+			<th>
+				<i :class = "{'fa-sort-amount-asc': sortColumn == 'zone' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'zone' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+				<a href="#" @click = "doSort($event, 'zone')">Zona</a>
+			</th>
+
+
+
+			<th>
+				<i :class = "{'fa-sort-amount-asc': sortColumn == 'phone' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'phone' &&   sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+				<a href="#" @click = "doSort($event, 'phone')">Tel/Movel</a>
+			</th>
+
+			<th class="info" v-if="showColumn.echelon">
+				<i :class = "{'fa-sort-amount-asc': sortColumn == 'echelon' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'echelon' &&   sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+				<a href="#" @click = "doSort($event, 'echelon')">Escalão</a>
+			</th>
+			<th class="info" v-if="showColumn.service_beginning">
+				<i :class = "{'fa-sort-amount-asc': sortColumn == 'service_beginning' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'service_beginning' &&   sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+				<a href="#" @click = "doSort($event, 'service_beginning')">Inicio de Serviço</a>
+			</th>
+			<th class="info" v-if="showColumn.market_id">
+				<i :class = "{'fa-sort-amount-asc': sortColumn == 'market_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'market_id' &&   sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+				<a href="#" @click = "doSort($event, 'market_id')">Mercado</a>
+			</th>
+			<th>
+				<i :class = "{'fa-sort-amount-asc': sortColumn == 'typeofemployee_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'typeofemployee_id' &&   sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+				<a href="#" @click = "doSort($event, 'typeofemployee_id')">Tipo</a>
+			</th>
+
+			<!-- <th>Foto</th> -->
+			<th  class="text-center" colspan="2"><span><i class="fa fa-cogs"></i></span></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr v-for="employee in employees | filterBy filter.term | orderBy sortColumn sortInverse">
+			<td>{{ employee.name }}</td>
+			<!-- <td class="info" v-if="showColumn.nickname">{{ employee.nickname }}</td> -->
+			<td>{{ employee.ic }}</td>
+			<!-- <td class="info" v-if="showColumn.nif">{{ employee.nif }}</td> -->
+			<td class="info" v-if="showColumn.age">{{ employee.age }}</td>
+			<td class="info" v-if="showColumn.email">{{ employee.email }}</td>
+
+			<td>{{ employee.state }}</td>
+			<td>{{ employee.council }}</td>
+			<td>{{ employee.parish }}</td>
+			<td>{{ employee.zone }}</td>
+
+			<td>{{ employee.phone }}</td>
+			<td class="info" v-if="showColumn.echelon">{{ employee.echelon }}</td>
+			<td class="info" v-if="showColumn.service_beginning">{{ employee.service_beginning }}</td>
+			<td class="info" v-if="showColumn.market_id">{{ employee.market.name }}</td>
+			<td>{{ employee.typeofemployees.name }}</td>
+
+
+			<td align=left>  <a data-toggle="modal" data-target="#modal-edit-employee" href="#"> <i class="fa fa-pencil text-primary" @click="getThisEmployee(employee.id)" > </i></a></td>
+			<td align=right><a data-toggle="modal" data-target="#modal-delete-employee" href="#"><i class="fa fa-trash text-danger" @click="getThisEmployee(employee.id)" ></i></a></td>
+		</tr>
+	</tbody>
+</table>
+<div class="col-md-12 pull-left">
+	<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
+</div>
+</div>
+
+<!--------------------------------------------------------------------------------------------------------->
+
+<div class="modal fade" id="modal-delete-employee" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="">Eliminar Funcionário</h4>
+			</div>
+			<div class="modal-body">
+				<h1>Eliminar Funcionário {{newEmployee.name}}</h1>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+				<button  @keyup.enter="deleteEmployee(newEmployee.id)" @click="deleteEmployee(newEmployee.id)" type="button" class="btn btn-default">Eliminar Funcionário</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!--------------------------------------------------------------------------------------------------------->
+<!-- Modal -->
+<div id="modal-create-employee" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+
+		<!-- Modal content-->
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Criar Funcionário</h4>
+			</div>
+			<div class="modal-body">
+				<validator name="validationew">
+					<form action="#" methods="POST">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-12">
+									<div class="form-group has-feedback">
+										<input type="text" class="form-control" name="name" placeholder="Nome Completo" v-model="newEmployee.name" v-validate:name="['required']"/>
+										<span class="form-control-feedback"></span>
+									</div>
+
+									<!-- <div class="form-group has-feedback">
+									<input type="text" class="form-control" name="nickname" placeholder="Alcunha do funcionario" v-model="newEmployee.nickname"/>
+									<span class="form-control-feedback"></span>
+								</div> -->
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-12">
+							<div class="col-md-6">
+								<div class="form-group has-feedback">
+									<input type="text" class="form-control" name="ic" placeholder="Número de bilhete de entidade" v-model="newEmployee.ic"/>
+									<span class="form-control-feedback"></span>
+
+								</div>
+							</div>
+							<!-- <div class="col-md-6">
+							<div class="form-group has-feedback">
+							<input type="text" class="form-control" name="nif" placeholder="Numero de NIF" v-model="newEmployee.nif"/>
+							<span class="form-control-feedback"></span>
+						</div>
+					</div>
+				-->
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-12">
+				<div class="col-md-6">
+					<div class="input-group date form-group has-feedback">
+						<input type="number" class="form-control" name="age" placeholder="Introduza a Idade" v-model="newEmployee.age"/>
+						<div class="input-group-addon">
+							<span class="glyphicon glyphicon-th"></span>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-6">
+					<div class="input-group date form-group has-feedback">
+						<label class="radio-inline">
+							<input type="radio" id="gender" value="M" name="gender" v-model="newTrader.gender"> Masculino
+						</label>
+						<label class="radio-inline">
+							<input type="radio" id="gender" name="gender" value="F" v-model="newTrader.gender">Feminino
+						</label>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-12">
+				<div class="col-md-6">
+					<div class="form-group has-feedback">
+						<input type="email" class="form-control" name="email" placeholder="Email" v-model="newEmployee.email"/>
+						<span class="form-control-feedback"></span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-12">
+				<div class="col-md-4">
+					<div class="input-group date form-group has-feedback">
+						<select name="state" class="selectpicker orm-control show-tick" v-model="newEmployee.state">
+							<optgroup label="Sotavento">
+								<option>Seleciona uma Ilha</option>
+								<option value="2">Maio</option>
+								<option value="1">Santiago</option>
+								<option value="3">Fogo</option>
+								<option value="4">Brava</option>
+							</optgroup>
+							<optgroup label="Barlavento">
+								<option value="5">Santo Antão</option>
+								<option value="6">São Nicolau</option>
+								<option value="7">São Vicente</option>
+								<option value="8">Sal</option>
+								<option value="9">Boa Vista</option>
+							</optgroup>
+						</select>
+					</div>
+				</div>
+
+				<div class="col-md-4">
+					<div class="input-group date form-group has-feedback">
+						<input type="text" class="form-control" name="council" placeholder="Concelho" v-model="newEmployee.council"/>
+						<div class="input-group-addon">
+							<span class="glyphicon glyphicon-th"></span>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-4">
+					<div class="input-group date form-group has-feedback">
+						<input type="text" class="form-control" name="parish" placeholder="Freguezia" v-model="newEmployee.parish"/>
+						<div class="input-group-addon">
+							<span class="glyphicon glyphicon-th"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<hr><!---------------------------------------------------------------------------------------------------------------->
+
+
+		<div class="row">
+			<div class="col-md-12">
+				<div class="col-md-6">
+					<div class="form-group has-feedback">
+						<input type="text" class="form-control" name="zone" placeholder="Zona do funcionário" v-model="newEmployee.zone"/>
+						<span class="form-control-feedback"></span>
+					</div>
+				</div>
+
+				<div class="col-md-6">
+					<div class="form-group has-feedback">
+						<input type="number" class="form-control" name="phone" placeholder="Numero de Telenone/Movel" v-model="newEmployee.phone"/>
+						<span class="glyphicon glyphicon-lock form-control-feedback"></span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<hr><!-------------------------------------------------------------------------------------------------------------------->
+
+		<div class="row">
+			<div class="col-md-12">
+				<div class="col-md-6">
+					<div class="form-group has-feedback">
+						<select name="type" class="selectpicker  form-control" title="Selecione o escalão" v-model="newEmployee.echelon">
+							<option value="a">A</option>
+							<option value="b">B</option>
+							<option value="c">C</option>
+							<option value="d">D</option>
+							<option value="e">E</option>
+						</select>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="input-group date">
+						<input type="date" class="form-control" name="service_beginning" placeholder="Inicio de serviço do funcionário" v-model="newEmployee.service_beginning"/>
+						<div class="input-group-addon">
+							<span class="glyphicon glyphicon-th"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<hr><!---------------------------------------------------------------------------------------------------------------->
+
+
+		<div class="row">
+			<div class="col-md-12">
+				<div class="col-md-6">
+					<div class="form-group has-feedback">
+						<select class="form-control" v-model="newEmployee.market_id">
+							<option value="" selected>Seleciona o mercado</option>
+							<option v-for="market in markets" value="{{market.id}}">
+								{{market.name}}
+							</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="col-md-6">
+					<div class="form-group has-feedback">
+						<select class="form-control" v-model="newEmployee.typeofemployee_id">
+							<option value="" selected>Seleciona a categoria</option>
+							<option v-for="type in types" value="{{type.id}}">{{type.name}}</option>
+						</select>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</form>
+</validator>
+</div>
+<div class="modal-footer">
+	<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
+
+	<button :disabled = "!$validationew.valid" @click="createEmployee" class="btn btn-secondary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar Dados Introduzidos</button>
+
+</div>
+</div>
+
+</div>
+</div>
+
+<!--------------------------------------------------------------------------------------------------------->
+
+<!-- Modal -->
+<div id="modal-edit-employee" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+
+		<!-- Modal content-->
+		<div class="modal-content">
+			<div class="modal-header">
+				<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Editar Funcionário</h4>
+			</div>
+			<div class="modal-body">
+				<validator name="validation1">
+					<form methods="patch">
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-12">
+									<div class="form-group has-feedback">
+										<input type="text" class="form-control" name="name" placeholder="Nome Completo" v-model="newEmployee.name" v-validate:name="['required']"/>
+										<span class="form-control-feedback"></span>
+									</div>
+
+
+								</div>
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-6">
+									<div class="form-group has-feedback">
+										<input type="text" class="form-control" name="ic" placeholder="Número de bilhete de entidade" v-model="newEmployee.ic"/>
+										<span class="form-control-feedback"></span>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-12">
+									<div class="input-group date form-group has-feedback">
+										<input type="number" class="form-control" name="age" placeholder="Introduza a Idade" v-model="newEmployee.age"/>
+										<div class="input-group-addon">
+											<span class="glyphicon glyphicon-th"></span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-6">
+									<div class="form-group has-feedback">
+										<input type="email" class="form-control" name="email" placeholder="Email" v-model="newEmployee.email"/>
+										<span class="form-control-feedback"></span>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-4">
+									<div class="input-group date form-group has-feedback">
+										<select name="state" class="selectpicker orm-control show-tick" v-model="newEmployee.state">
+											<optgroup label="Sotavento">
+												<option>Seleciona uma Ilha</option>
+												<option value="2">Maio</option>
+												<option value="1">Santiago</option>
+												<option value="3">Fogo</option>
+												<option value="4">Brava</option>
+											</optgroup>
+											<optgroup label="Barlavento">
+												<option value="5">Santo Antão</option>
+												<option value="6">São Nicolau</option>
+												<option value="7">São Vicente</option>
+												<option value="8">Sal</option>
+												<option value="9">Boa Vista</option>
+											</optgroup>
+										</select>
+									</div>
+								</div>
+
+								<div class="col-md-4">
+									<div class="input-group date form-group has-feedback">
+										<input type="text" class="form-control" name="council" placeholder="Concelho" v-model="newEmployee.council"/>
+										<div class="input-group-addon">
+											<span class="glyphicon glyphicon-th"></span>
+										</div>
+									</div>
+								</div>
+
+								<div class="col-md-4">
+									<div class="input-group date form-group has-feedback">
+										<input type="text" class="form-control" name="parish" placeholder="Freguezia" v-model="newEmployee.parish"/>
+										<div class="input-group-addon">
+											<span class="glyphicon glyphicon-th"></span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<hr><!---------------------------------------------------------------------------------------------------------------->
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-6">
+									<div class="form-group has-feedback">
+										<input type="text" class="form-control" name="zone" placeholder="Zona do funcionário" v-model="newEmployee.zone"/>
+										<span class="form-control-feedback"></span>
+									</div>
+								</div>
+
+								<div class="col-md-6">
+									<div class="form-group has-feedback">
+										<input type="number" class="form-control" name="phone" placeholder="Numero de Telenone/Movel" v-model="newEmployee.phone"/>
+										<span class="glyphicon glyphicon-lock form-control-feedback"></span>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<hr><!-------------------------------------------------------------------------------------------------------------------->
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-6">
+									<div class="form-group has-feedback">
+										<select name="type" class="selectpicker  form-control" title="Selecione o escalão" v-model="newEmployee.echelon">
+											<option value="a">A</option>
+											<option value="b">B</option>
+											<option value="c">C</option>
+											<option value="d">D</option>
+											<option value="e">E</option>
+										</select>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="input-group date">
+										<input type="date" class="form-control" name="service_beginning" placeholder="Inicio de serviço do funcionário" v-model="newEmployee.service_beginning"/>
+										<div class="input-group-addon">
+											<span class="glyphicon glyphicon-th"></span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<hr><!---------------------------------------------------------------------------------------------------------------->
+
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-6">
+									<div class="form-group has-feedback">
+										<select class="form-control" v-model="newEmployee.market_id">
+											<option value="" selected>Seleciona o mercado</option>
+											<option v-for="market in markets" value="{{market.id}}">
+												{{market.name}}
+											</option>
+										</select>
+									</div>
+								</div>
+
+								<div class="col-md-6">
+									<div class="form-group has-feedback">
+										<select class="form-control" v-model="newEmployee.typeofemployee_id">
+											<option value="" selected>Seleciona a categoria</option>
+											<option v-for="type in types" value="{{type.id}}">{{type.name}}</option>
+										</select>
+									</div>
+								</div>
+							</div>
+						</div>
+
+					</form>
+				</validator>
+			</div>
+			<div class="modal-footer">
+				<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Close</button>
+				<button v-on:show="" @click="saveEditedEmployee(newEmployee.id)" type="button" class="btn btn-secondary"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp; Salvar as Alterações</button>
+			</div>
+		</div>
+
+	</div>
+</div>
+</div>
