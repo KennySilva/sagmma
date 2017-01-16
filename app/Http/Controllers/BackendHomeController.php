@@ -13,6 +13,10 @@ use Permission;
 class BackendHomeController extends Controller
 {
 
+    public function FunctionName()
+    {
+        return 'Estpou indo muitobem com este treta';
+    }
     public function index()
     {
         $totalUsers = User::count();

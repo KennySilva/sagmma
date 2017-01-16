@@ -4,7 +4,6 @@ body {
     /*Cor de texto do body*/
     color: #818181;
     margin: 0;
-    padding-top: 200px;
 }
 h2 {
     font-size: 24px;
@@ -537,7 +536,7 @@ font-size: 80px;
 
 /*---------------------------------------------------------------------------------------------*/
 
-
+/*
 .head-link{
     color:#818184;
 }
@@ -561,7 +560,7 @@ a.morelink {
 }
 .morecontent span {
     display: none;
-}
+}*/
 
 
 

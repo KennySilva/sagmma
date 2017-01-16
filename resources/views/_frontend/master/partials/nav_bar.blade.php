@@ -1,5 +1,5 @@
 {{-- <nav class="navbar navbar-default" data-spy="affix" data-offset-top="197"> --}}
-<nav class="main-nav navbar navbar-default">
+<nav class="navbar navbar-default navbar-fixed-top">
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
@@ -15,7 +15,7 @@
                 {{-- <li><a href="#history">HISTORIA</a></li> --}}
 
 
-                
+
 
                 <li><a href="#values">VALORES</a></li>
                 <li><a href="#gallery">GALERIA</a></li>
