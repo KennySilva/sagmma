@@ -13,32 +13,32 @@
         <div class="item active">
             <img src="img/frontend_img/slide/slide_1.jpg" alt="Placeholder">
             <div class="carousel-caption">
-                <h3>Sola</h3>
-                <p>The atmosphere in Chania has a touch of Florence and Venice.</p>
+                <h3>Espaços para Boutiques</h3>
+                <p>Boutiques no espaço interno e externo</p>
             </div>
         </div>
 
         <div class="item">
             <img src="img/frontend_img/slide/slide_2.jpg" alt="Placeholder">
             <div class="carousel-caption">
-                <h3>Chania</h3>
-                <p>The atmosphere in Chania has a touch of Florence and Venice.</p>
+                <h3>Mercado Novo de Achada Riba</h3>
+                <p>Um espaço comercial com condiçoes de melhorar condiçoes de negocios</p>
             </div>
         </div>
 
         <div class="item">
             <img src="img/frontend_img/slide/slide_3.jpg" alt="Placeholder">
             <div class="carousel-caption">
-                <h3>Flowers</h3>
-                <p>Beatiful flowers in Kolymbari, Crete.</p>
+                <h3>Piso</h3>
+                <p>A exclusividade do comercio no Conselho de Santa Catarina</p>
             </div>
         </div>
 
         <div class="item">
             <img src="img/frontend_img/slide/slide_4.jpg" alt="Placeholder">
             <div class="carousel-caption">
-                <h3>Flowers</h3>
-                <p>Beatiful flowers in Kolymbari, Crete.</p>
+                <h3>Riqueza</h3>
+                <p>Uma parte da riqueza do povo reside no Pilourinha</p>
             </div>
         </div>
 

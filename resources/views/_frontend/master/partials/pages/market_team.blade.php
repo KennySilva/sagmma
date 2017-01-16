@@ -1,7 +1,7 @@
 <div id="market_team" class="container-fluid bg-grey">
     <div class="text-center">
         <h2>Equipa da gestão do mercado</h2>
-        <h4>"Atraves da união podemos vazer mais ao favor do crescimento"</h4>
+        {{-- <h4>"Atraves da união podemos vazer mais ao favor do crescimento"</h4> --}}
     </div>
     <div class="row slideanim">
         <div class="row">
@@ -17,15 +17,29 @@
 
 
                         <div class="caption">
-                            <h3>Diretor <button class="btn btn-default btn-sm" id="" name="button">Ver Perfil</button> <a href="#" class="btn btn-default btn-sm" role="button" data-toggle="modal" data-target="#myModal">Enviar Email</a> </h3>
-                            <hr>
+                            <h3>Diretor <a href="#" class="btn btn-default btn-sm" data-toggle="modal" data-target="#perfil_diretor">Ver Perfil</a> <a href="#" class="btn btn-default btn-sm" role="button" data-toggle="modal" data-target="#myModal">Enviar Email</a> </h3>
+                            {{-- <hr>
 
-                            <p><i class="fa fa-envelope" aria-hidden="true"></i>&nbsp;&nbsp; diretor@sagmma.com</p>
-                            {{-- <p><i class="fa fa-facebook" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;&nbsp; facebook.sagmma.diretor</p>
-                            <p><i class="fa fa-phone" aria-hidden="true"></i></i>&nbsp;&nbsp;&nbsp; diretor@sagmma.com</p> --}}
+                            <p><i class="fa fa-envelope" aria-hidden="true"></i>&nbsp;&nbsp; diretor@sagmma.com</p> --}}
+                            {{-- ------------------------------------------------- --}}
+                            <div class="modal fade" id="perfil_diretor" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+                              <div class="modal-dialog">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                    <h4 class="modal-title" id=""></h4>
+                                  </div>
+                                  <div class="modal-body">
 
-
-                            <!--------------------------------------------------------------------------------------------------------------->
+                                  </div>
+                                  <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary"></button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            {{-- ------------------------------------------------- --}}
 
 
                             <div id="myModal" class="modal fade" role="dialog" tabindex="-1" data-width="760">
@@ -102,15 +116,30 @@
                         <img src="http://lorempixel.com/300/300" alt="...">
                         <div class="caption">
 
-                            <h3>Gestor  <button class="btn btn-default btn-sm" id="" name="button">Ver Perfil</button> <a href="#" class="btn btn-default btn-sm" role="button" data-toggle="modal" data-target="#myModal">Enviar Email</a> </h3>
-                            <hr>
-                            <p><i class="fa fa-envelope" aria-hidden="true"></i>&nbsp;&nbsp; diretor@sagmma.com</p>
-                            {{-- <p><i class="fa fa-facebook" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;&nbsp; facebook.sagmma.diretor</p>
-                            <p><i class="fa fa-phone" aria-hidden="true"></i></i>&nbsp;&nbsp;&nbsp; diretor@sagmma.com</p> --}}
+                            <h3>Gestor  <a href="#" class="btn btn-default btn-sm" data-toggle="modal" data-target="#perfil_gestor">Ver Perfil</a> <a href="#" class="btn btn-default btn-sm" role="button" data-toggle="modal" data-target="#myModal">Enviar Email</a> </h3>
                             {{-- <hr>
+                            <p><i class="fa fa-envelope" aria-hidden="true"></i>&nbsp;&nbsp; diretor@sagmma.com</p> --}}
+                            {{-- ------------------------------------------------------------------ --}}
 
-                            <!--------------------------------------------------------------------------------------------------------------->
-                            <p><a href="#" class="btn btn-default btn-sm" role="button" data-toggle="modal" data-target="#myModal">Enviar Email</a></p> --}}
+                            <div class="modal fade" id="perfil_gestor" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+                              <div class="modal-dialog">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                    <h4 class="modal-title" id=""></h4>
+                                  </div>
+                                  <div class="modal-body">
+
+                                  </div>
+                                  <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary"></button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {{-- ------------------------------------------------------------------ --}}
 
                             <div id="myModal" class="modal fade" role="dialog" tabindex="-1" data-width="760">
                                 <div class="modal-dialog">
