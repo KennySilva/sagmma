@@ -41,6 +41,7 @@
             <!------------------------------------------------------------------------------------------------------------------------------------>
             {{-- @if(Auth::user()->admin()) --}}
 
+
             <li class="treeview">
                 <a href="#"><i class='fa fa-line-chart'></i> <span>CONTROLO</span> <i class="fa fa-angle-left pull-right"></i></a>
                 <ul class="treeview-menu">
@@ -64,13 +65,20 @@
                         </a>
                         <ul class="treeview-menu">
                             <li><a href="{{ url('user/users') }}"><i class="fa-fw fa fa-list-alt"></i><span>Gerir Urilizadores</span></a></li>
+                            <li><a href="{{ url('user/users') }}"><i class="fa-fw fa fa-list-alt"></i><span>role permission1</span></a></li>
+
+                            @permission(['sagmma_bacdkend','redtit-user'])
+
+                            <li><a href="{{ url('user/users') }}"><i class="fa-fw fa fa-list-alt"></i><span>Role permission2</span></a></li>
+                            @endpermission
+
+
                         </ul>
                     </li>
-
                     @endrole
 
 
-                    @permission('redit-user')
+                    @permission('rediyyt-user')
                     <li class="treeview">
                         <a href="#"><i class="fa fa-users"></i><span>Permission teste</span><i class="fa fa-angle-left pull-right"></i>
                         </a>
