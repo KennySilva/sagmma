@@ -121,62 +121,58 @@
 							<form action="#" methods="POST">
 								<div class="row">
 									<div class="col-md-12">
-										<div class="col-md-12">
+										<div class="col-md-6">
 											<div class="form-group has-feedback">
-												<select class="form-control" v-model="newContract.place_id">
+												<select class="form-control input-lg" v-model="newContract.place_id">
 													<option value="" selected>Selecione o espaço</option>
 													<option v-for="place in places" value="{{place.id}}">
 														{{place.id}}
 													</option>
 												</select>
+												<span class="help-block">Selecione o espaço pretendido</span>
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<select class="form-control input-lg" v-model="newContract.trader_id">
+													<option value="" selected>O Comerciante</option>
+													<option v-for="trader in traders" value="{{trader.id}}">
+														{{trader.name}}
+													</option>
+												</select>
+												<span class="help-block">Selecione o comerciante</span>
 											</div>
 										</div>
 									</div>
 								</div>
 
-								<hr><!---------------------------------------------------------------------------------------------------------------->
-								<!-- <v-select :value.sync="selected" :options="options"></v-select> -->
-
-
+								<!-- <hr>
 
 								<div class="row">
 									<div class="col-md-12">
 										<div class="col-md-12">
 											<div class="form-group has-feedback">
-												<select class="form-control" v-model="newContract.trader_id">
-													<option value="" selected>Selecione o Comerciante</option>
-													<option v-for="trader in traders" value="{{trader.id}}">
-														{{trader.name}}
-													</option>
-												</select>
+												<input type="number" class="form-control" name="age" placeholder="Taxa" min="20" max="50" v-model="newUser.age"/>
 											</div>
 										</div>
 									</div>
-								</div>
-
-								<div class="row">
-									<div class="col-md-12">
-										<div class="col-md-12">
-											<div class="form-group has-feedback">
-												<select class="form-control" v-model="newContract.trader_id">
-													<option value="" selected>Selecione o Comerciante</option>
-													<option v-for="trader in traders" value="{{trader.id}}">
-														{{trader.name}}
-													</option>
-												</select>
-											</div>
-										</div>
-									</div>
-								</div>
+								</div> -->
 
 								<hr><!---------------------------------------------------------------------------------------------------------------->
 
 
 								<div class="row">
 									<div class="col-md-12">
-										<div class="col-md-12">
+										<div class="col-md-6">
 											<div class="form-group has-feedback">
 												<input  v-model="newContract.rate"  type='number' class='form-control input-lg' placeholder='Taxa do contrato'>
+												<span class="help-block">Introduza o valor do contrato</span>
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<input type='date' class='form-control input-lg' placeholder='Fim do Contrato'>
+												<span class="help-block">Introduza a data do término do contrato</span>
 											</div>
 										</div>
 									</div>
@@ -187,7 +183,7 @@
 					<div class="modal-footer">
 						<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
 
-						<button :disabled = "!$validationew.valid" @click="createContract" class="btn btn-secondary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar Dados Sobre este contract</button>
+						<button :disabled = "!$validationew.valid" @click="createContract" class="btn btn-secondary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar Registo</button>
 					</div>
 				</div>
 			</div>
@@ -238,7 +234,7 @@
 								</div>
 
 								<hr><!---------------------------------------------------------------------------------------------------------------->
-
+								
 								<div class="row">
 									<div class="col-md-12">
 										<div class="col-md-12">

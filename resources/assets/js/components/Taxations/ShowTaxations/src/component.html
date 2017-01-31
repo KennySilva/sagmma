@@ -121,48 +121,13 @@
 					<div class="modal-body">
 						<validator name="validationew">
 							<form action="#" methods="POST">
-								<div class="row">
-									<div class="col-md-12">
-										<div class="col-md-6">
-											<div class="form-group has-feedback">
-												<select class="form-control" v-model="newTaxation.employee_id">
-													<option value="" selected>Selecione o Funcionário</option>
-													<option v-for="employee in employees" value="{{employee.id}}">
-														{{employee.name}}
-													</option>
-												</select>
-											</div>
-										</div>
-
-										<div class="col-md-6">
-											<div class="form-group has-feedback">
-												<select class="form-control" v-model="newTaxation.place_id">
-													<option value="" selected>Selecione o Espaços</option>
-													<option v-for="place in places" value="{{place.id}}">
-														{{place.id}}
-													</option>
-												</select>
-											</div>
-										</div>
-
-									</div>
-								</div>
-
-								<hr><!---------------------------------------------------------------------------------------------------------------->
-								<!-- <v-select :value.sync="selected" :options="options"></v-select> -->
-
-
 
 								<div class="row">
 									<div class="col-md-12">
-										<div class="col-md-6">
-											<div class="form-group has-feedback">
-												<input class="form-control" type="number" name="income" value="" placeholder="Volor">
-											</div>
-										</div>
-										<div class="col-md-6">
+										<div class="col-md-12">
 											<div class="form-group has-feedback">
 												<select name="state" class="selectpicker form-control show-tick" v-model="newTaxation.type">
+													<option value="" selected>Tipo de cobrança</option>
 													<optgroup label="Cobrança na secretaria">
 														<option value="1">Minimercados</option>
 														<option value="2">Bouticks de Médio Porte</option>
@@ -179,7 +144,60 @@
 														<option value="11">Câmara de Gelo</option>
 													</optgroup>
 												</select>
+												<span class="help-block">Selecione o tipo de espaço</span>
 											</div>
+										</div>
+									</div>
+								</div>
+								<hr>
+
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<div class="form-group has-feedback">
+												<select class="form-control" v-model="newTaxation.employee_id">
+													<option value="" selected>Cobrador</option>
+													<option v-for="employee in employees" value="{{employee.id}}">
+														{{employee.name}}
+													</option>
+												</select>
+												<span class="help-block">Selecione o cobrador</span>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<div class="form-group has-feedback">
+												<select class="form-control" v-model="newTaxation.place_id">
+													<option value="" selected>Espaço</option>
+													<option v-for="place in places" value="{{place.id}}">
+														{{place.id}}
+													</option>
+												</select>
+												<span class="help-block">Qual é o espaço?</span>
+											</div>
+										</div>
+
+									</div>
+								</div>
+
+								<hr><!---------------------------------------------------------------------------------------------------------------->
+								<!-- <v-select :value.sync="selected" :options="options"></v-select> -->
+
+
+
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<div class="form-group has-feedback">
+												<!-- <input class="form-control" type="number" name="income" value="" placeholder="Valor da cobrança"> -->
+												<input type="number" class="form-control" placeholder="Valor cobrado" name="email"/>
+												<i class="fa fa-usd form-control-feedback"></i>
+											</div>
+
+											<span class="help-block">Introduza o valor cobrado</span>
 										</div>
 									</div>
 								</div>
@@ -189,7 +207,7 @@
 					<div class="modal-footer">
 						<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
 
-						<button :disabled = "!$validationew.valid" @click="createTaxation" class="btn btn-secondary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar Dados Sobre este taxation</button>
+						<button :disabled = "!$validationew.valid" @click="createTaxation" class="btn btn-secondary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar Registo</button>
 					</div>
 				</div>
 			</div>
