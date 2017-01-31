@@ -26,7 +26,7 @@
     </div>
 
     <div class="notice notice-info">
-        <strong>Login</strong>    Atentique-se para iniciara sessão.
+        <strong>Login</strong>    Atentique-se para iniciar a sessão.
     </div>
 
 
@@ -36,11 +36,10 @@
 </div><!-- /.login-logo --> --}}
 
 @if (count($errors) > 0)
-    <div class="alert alert-danger">
-        <strong>Whoops!</strong> Certifique os seus dados parace que algo não bate bem !!!<br><br>
+    <div class="alert alert-warning">
         <ul>
             @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
+                <li class="list-unstyled">{{ $error }}</li>
             @endforeach
         </ul>
     </div>
@@ -54,10 +53,12 @@
         <div class="form-group has-feedback">
             <input type="email" class="form-control" placeholder="Email" name="email"/>
             <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+
         </div>
         <div class="form-group has-feedback">
             <input type="password" class="form-control" placeholder="Password" name="password"/>
             <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+
         </div>
         <div class="row">
             <div class="col-xs-8">
@@ -88,8 +89,8 @@
         </div>
     </div><!-- /.social-auth-links -->
 
-    <a href="{{ url('/password/email') }}">Já esqueci da minha Palavra Passe</a><br>
-    <a href="{{ url('/auth/register') }}" class="text-center">Quero Criar a minha conta</a>
+    <a href="{{ url('/password/email') }}">Já esqueci da Palavra Passe</a><br>
+    <a href="{{ url('/auth/register') }}" class="text-center">Quero nova conta</a>
 
 </div><!-- /.login-box-body -->
 
