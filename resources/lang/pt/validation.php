@@ -81,7 +81,7 @@ return [
     'timezone'             => 'O campo :attribute deverá ter um fuso horário válido.',
     'unique'               => 'O valor indicado para o campo :attribute já se encontra registado.',
     'url'                  => 'O formato do URL indicado para o campo :attribute é inválido.',
-    
+
     /*
     |--------------------------------------------------------------------------
     | Custom Validation Language Lines
@@ -93,11 +93,13 @@ return [
     |
     */
 
-    'custom'               => [
-        'attribute-name' => [
-            'rule-name' => 'custom-message',
+    'custom'=> [
+        'g-recaptcha-response' => [
+            'required' => 'Xiii Não és Humano...!!',
         ],
     ],
+
+
 
     /*
     |--------------------------------------------------------------------------

@@ -25,18 +25,25 @@ class AuthController extends Controller
         // $this->middleware('auth');
         $this->middleware('guest', ['except' => 'getLogout']);
     }
-
+    // -------------------------------------------------------------------
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => 'required|max:255',
-            'username' => 'required|max:255|unique:users',
-            'ic' => 'required|max:6|unique:users',
-            'email' => 'required|email|max:255|unique:users',
-            // 'email' => 'required|email|max:255|exists:users,email,status,1|unique:users',
-            'password' => 'required|confirmed|min:6',
+            'name'                 => 'required|max:60|min:4|Alpha',
+            'username'             => 'required|max:30|min:2|unique:users',
+            'ic'                   => 'required|size:6|Integer|unique:users',
+            'email'                => 'required|email|Between:3,60|unique:users',
+            'password'             => 'required|AlphaNum|Between:4,8|confirmed',
             'g-recaptcha-response' => 'required',
         ]);
+    }
+    // -------------------------------------------------------------------
+
+    public function messages()
+    {
+        return [
+            'email.required'=>'Porra'
+        ];
     }
 
     protected function create(array $data)

@@ -6,9 +6,9 @@
 
     <link href="{{ asset('/css/bootstrap.css') }}" rel="stylesheet" type="text/css" />
     <script src='https://www.google.com/recaptcha/api.js'></script>
-
-    <link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.css" media="screen" title="no title"/>
     
+    <link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.css" media="screen" title="no title"/>
+
     <link href="/bower_components/Ionicons/css/ionicons.css" rel="stylesheet" type="text/css" />
 
     <link href="{{ asset('/css/AdminLTE.css') }}" rel="stylesheet" type="text/css" />
