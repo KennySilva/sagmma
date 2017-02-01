@@ -16,6 +16,9 @@ class ApiUsersController extends Controller
 {
     public function index()
     {
+            //
+            // $ex= User::where('name', '!=', 'Admin')->get();
+            // return $ex;
         $user = User::paginate(5);
         $user->each(function($user){
             $user->roles;
