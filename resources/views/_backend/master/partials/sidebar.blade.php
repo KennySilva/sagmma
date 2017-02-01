@@ -1,7 +1,6 @@
 <aside class="main-sidebar">
     <section class="sidebar">
 
-
         @if(Auth::check())
             <div class="user-panel">
                 <div class="pull-left image">
@@ -14,7 +13,6 @@
             </div>
         @endif
 
-
         <form action="#" method="get" class="sidebar-form">
             <div class="input-group">
                 <input type="text" name="q" class="form-control" placeholder="Procurar..."/>
@@ -23,7 +21,6 @@
                 </span>
             </div>
         </form>
-
 
         <ul class="sidebar-menu">
 
@@ -71,9 +68,7 @@
                     <li><a href="{{ url('sagmma/materials') }}"><i class='fa fa-briefcase'></i> <span>Materiais</span></a></li>
                     <li><a href="{{ url('sagmma/places') }}"><i class='fa fa-map-marker'></i> <span>Espaços</a></li>
                         <li><a href="{{ url('sagmma/traders') }}"><i class='fa fa-user'></i> <span>Comerciantes</a></li>
-
                             <li><a href="{{ url('sagmma/traders') }}"><i class='fa fa-shopping-bag'></i> <span>Promoções</a></li>
-
                             </ul>
                         </li>
                         @endrole

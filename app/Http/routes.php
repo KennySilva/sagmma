@@ -1,16 +1,5 @@
 <?php
 
-
-//Routes de testees temporarios
-// -------------------------------------------------------------------------------------
-// Entrust::routeNeedsPermission('admin/post*', 'create-postooooo');
-// Route::get('admin/post', function () {
-//     return 'OK';
-// });
-
-// Route::get('/roles-permitions', 'HomeController@rolespremitions');
-//--------------------------------------------------------------------------------------
-
 Route::get('/', function () {
     return view('_frontend.frontend');
 });
@@ -49,17 +38,12 @@ Route::post('password/reset', 'Auth\PasswordController@postReset');
 //------------------------------Authentication Social----------------------
 Route::get('social/{provider?}', 'SocialControllers\SocialController@getSocialAuth');
 Route::get('social/callback/{provider?}', 'SocialControllers\SocialController@getSocialAuthCallback');
-
-// Route::get('socialauth/facebook', 'SocialControllers\FacebookController@redirectToProvider');
-// Route::get('socialauth/facebook/callback', 'SocialControllers\FacebookController@handleProviderCallback');
-
 //----------------------------------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------------------------
-// Route::group(['prefix' => 'admin', 'middleware' => ['role:admin']], function() {
-//     Route::get('/', 'AdminController@welcome');
-//     Route::get('/manage', ['middleware' => ['permission:manage-admins'], 'uses' => 'AdminController@manageAdmins']);
-// });
+Route::group(['middleware' => ['role:amin']], function() {
+    Route::resource('/testrole', 'AdminController');
+});
 
 // 'middleware' => ['role:owner', 'role:writer'] forma de atribuir multiplos apermições tem di tem um tudo dos função pe tem acesso
 // 'middleware' => ['role:admin|root'] orma de atribuir multiplos apermições tem di tem pelo menus um função pe tem acesso
@@ -137,24 +121,22 @@ Route::group(['namespace' => 'ApiControllers'], function()
         Route::get('traderProduct', 'ApiTradersController@getProductforTrader');
         Route::get('traderType', 'ApiTradersController@getTypeforTrader');
 
-        // ----------------------------------------Api-Control (employee_material)----------------------------------
+        // ------------------------------------Api-Control (employee_material)--------------------
         Route::resource('controls', 'ApiControlsController');
         Route::get('controlEmployee', 'ApiControlsController@getEmployeeForControl');
         Route::get('controlMaterial', 'ApiControlsController@getMaterialForControl');
         Route::post('controlStatus', 'ApiControlsController@statusControlsChange');
 
-        // ----------------------------------------Api-Contract (place_trader)----------------------------------
+        // ------------------------------------Api-Contract (place_trader)--------------------
         Route::resource('contracts', 'ApiContractsController');
         Route::get('contractTrader', 'ApiContractsController@getTraderForContract');
         Route::get('contractPlace', 'ApiContractsController@getPlaceForContract');
         // Route::post('contractStatus', 'ApiControlsController@statusControlsChange');
 
-        // ----------------------------------------Api-Taxation (place_trader)----------------------------------
+        // ------------------------------------Api-Taxation (place_trader)--------------------
         Route::resource('taxations', 'ApiTaxationsController');
         Route::get('taxationEmployee', 'ApiTaxationsController@getEmployeeForTaxation');
         Route::get('taxationPlace', 'ApiTaxationsController@getPlaceForTaxation');
-
-
     });
 });
 
@@ -177,18 +159,6 @@ Route::group(['namespace' => 'Admin'], function()
         });
 
     });
-
-    // Usando middleware personalizado
-    // Route::group(['prefix' => 'user', 'middleware' => ['auth', 'admin']], function () {
-    //     Route::resource('users', 'UsersController');
-    //
-    //     // Perfil dos usuarios
-    //     Route::get('profiles', 'UsersController@profile');
-    //     Route::post('profiles', 'UsersController@update_profile');
-    // });
-
-
-
 });
 
 // -------------------------------------Sagmma-----------------------------------------------
@@ -220,25 +190,23 @@ Route::group(['namespace' => 'Sagmma'], function()
     });
 });
 
-//--------------------------------Download and PDF--------------------------------------------------
-Route::resource('/getPDF', 'PluginsControllers\PDFController@getPDF');
-
-// Impressão
-
-
-Route::get('/testprint', 'PluginsControllers\PrintController@index');
-Route::get('/printPreview', 'PluginsControllers\PrintController@printPreview');
+//--------------------------------------Download and PDF-----------------------------------------
+Route::group(['namespace' => 'PluginsControllers'], function()
+{
+    Route::group(['prefix' => 'export', 'middleware' => 'auth'], function () {
+        // -----------------------------PDF-Download---------------------------------------------
+        Route::resource('/getPDF', 'PluginsControllers\PDFController@getPDF');
+        //-------------------------------Impressão-----------------------------------------------
+        Route::get('/testprint', 'PluginsControllers\PrintController@index');
+        Route::get('/printPreview', 'PluginsControllers\PrintController@printPreview');
+        // -----------------------------Exportation----------------------------------------------
+        Route::get('/getImport', 'PluginsControllers\ExcelController@getImport');
+        Route::post('/postImport', 'PluginsControllers\ExcelController@postImport');
+    });
+});
 
 //Apresentar dados do tipo de espaço para teste
-
 Route::get('/typetest', 'Test\TypeController@index');
-
-//Exportação e impotação de xcel
-
-Route::get('/getImport', 'PluginsControllers\ExcelController@getImport');
-Route::post('/postImport', 'PluginsControllers\ExcelController@postImport');
-
-
 
 Route::get('/calendar', 'Test\CalendarController@index');
 
