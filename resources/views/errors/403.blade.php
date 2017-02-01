@@ -10,15 +10,18 @@
 <body style="margin-top: 150px;">
     <div class="container">
         <div class="col-md-4 col-md-offset-4">
-            <div class="panel panel-warning">
+            <div class="panel panel-danger">
                 <div class="panel-heading">
-                    <h1 class="panel-title text-center">Acesso Restringido</h1>
+                    <h1 class="panel-title text-center">Acesso Restringido <i class="fa fa-lock"></i></h1>
                 </div>
                 <div class="panel-body">
-                    <img class="img-responsive center-block" src="{{ asset('img/error/lock-1.png') }}" alt="">
+                    <i class="fa fa-cog fa-spin fa-3x fa-fw"></i>
+                    <span class="sr-only">Loading...</span>
+                     <img class="img-responsive center-block" src="{{ asset('img/error/lock-3.png') }}" alt="">
                 </div>
                 <strong class="text-center">
-                    <p>Não tens Acesso a esta pagina</p>
+                    <h3>{{ Auth::user()->name }}</h3>
+                    <p>Não tens Acesso a esta página</p>
                     <p>
                         <a href="/"><span class="fa fa-arrow-left">   Volatr à página de iníco</span></a>
                     </p>

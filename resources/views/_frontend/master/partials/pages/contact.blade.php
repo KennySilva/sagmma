@@ -1,5 +1,6 @@
 <div id="contact" class="container-fluid">
     <h2 class="text-center">CONTACTAR</h2>
+    <hr>
     <div class="row">
         <div class="col-sm-5">
             <h4>Mercado Municipal de Achada Riba</h4>
@@ -10,14 +11,17 @@
         </div>
         <div class="col-sm-7 slideanim">
             <div class="row">
-                <div class="col-sm-6 form-group">
-                    <input class="form-control" id="name" name="name" placeholder="Seu Nome" type="text" required>
+                <div class="col-sm-4 form-group">
+                    <input class="form-control" id="name" name="name" placeholder="Nome" type="text" required>
                 </div>
-                <div class="col-sm-6 form-group">
-                    <input class="form-control" id="email" name="email" placeholder="Seu Email" type="email" required>
+                <div class="col-sm-4 form-group">
+                    <input class="form-control" id="email" name="email" placeholder="Email" type="email" required>
+                </div>
+                <div class="col-sm-4 form-group">
+                    <input class="form-control" id="subject" name="subject" placeholder="Assunto" type="text" required>
                 </div>
             </div>
-            <textarea class="form-control" id="comments" name="comments" placeholder="Escreva aqui a sua mensagem..." rows="5"></textarea><br>
+            <textarea class="form-control" id="comments" name="comments" placeholder="Mensagem..." rows="5"></textarea><br>
             <div class="row">
                 <div class="col-sm-12 form-group">
                     <button class="btn btn-default pull-right" type="submit">Enviar</button>
