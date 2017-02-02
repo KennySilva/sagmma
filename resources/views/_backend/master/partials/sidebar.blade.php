@@ -32,11 +32,11 @@
             <li class="treeview">
                 <a href="#"><i class=' fa fa-cogs'></i><span>SISTEMA</span> <i class="fa fa-angle-left pull-right"></i></a>
                 <ul class="treeview-menu">
-                    @permission(['access-backend','manage-user'])
+                    {{-- @permission(['access-backend','manage-user']) --}}
                     <li><a href="{{ url('user/users') }}"><i class='fa fa-users'></i> <span>Utilizadores</span></a></li>
                     <li><a href="{{ url('user/permissions') }}"><i class='fa fa-hand-stop-o'></i> <span>Permissões</span></a></li>
                     <li><a href="{{ url('user/roles') }}"><i class='fa fa-dot-circle-o'></i> <span>Papéis</span></a></li>
-                    @endpermission
+                    {{-- @endpermission --}}
                 </ul>
             </li>
             @endrole

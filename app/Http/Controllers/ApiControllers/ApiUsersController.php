@@ -16,9 +16,9 @@ class ApiUsersController extends Controller
 {
     public function index()
     {
-            //
-            // $ex= User::where('name', '!=', 'Admin')->get();
-            // return $ex;
+        //
+        // $ex= User::where('name', '!=', 'Admin')->get();
+        // return $ex;
         $user = User::paginate(5);
         $user->each(function($user){
             $user->roles;
@@ -74,7 +74,7 @@ class ApiUsersController extends Controller
     {
         //
     }
-
+    
 
     public function update(Req $request, $id)
     {
@@ -85,7 +85,6 @@ class ApiUsersController extends Controller
         // return Response::json($request::all());
         User::findOrFail($id)->update($request::all());
         return Response::json($request::all());
-
     }
 
     public function destroy($id)

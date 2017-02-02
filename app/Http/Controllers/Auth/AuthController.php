@@ -15,7 +15,7 @@ class AuthController extends Controller
 {
     use AuthenticatesAndRegistersUsers, ThrottlesLogins;
 
-
+    
 
 
     // protected $redirectPath = '/dashboard';
@@ -31,7 +31,7 @@ class AuthController extends Controller
         return Validator::make($data, [
             'name'                 => 'required|max:60|min:4|Alpha',
             'username'             => 'required|max:30|min:2|unique:users',
-            'ic'                   => 'required|size:6|Integer|unique:users',
+            'ic'                   => 'required|digits:6|Integer|unique:users',
             'email'                => 'required|email|Between:3,60|unique:users',
             'password'             => 'required|AlphaNum|Between:4,8|confirmed',
             'g-recaptcha-response' => 'required',

@@ -19,9 +19,8 @@ class CreatePlaceTraderTable extends Migration
             $table->boolean('status')->default('1');
             $table->float('rate');
             $table->string('author', 50);
+            $table->date('ending_date');
             $table->timestamps();
-
-
             // Chaves estrangeiras;
             $table->foreign('place_id')->references('id')->on('places');
             $table->foreign('trader_id')->references('id')->on('traders');

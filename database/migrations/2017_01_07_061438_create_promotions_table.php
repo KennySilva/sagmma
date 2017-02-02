@@ -16,7 +16,6 @@ class CreatePromotionsTable extends Migration
             $table->increments('id');
             $table->string('name', 50);
             $table->text('description', 500);
-            $table->string('photo', 50);
             $table->date('begnning_date');
             $table->date('ending_date');
             $table->integer('trader_id')->unsigned();

@@ -85,6 +85,7 @@ return [
         //12/01/2016
         // Greggilbert\Recaptcha\RecaptchaServiceProvider::class,
         // Anhskohbo\NoCaptcha\NoCaptchaServiceProvider::class,
+        // Spatie\Analytics\AnalyticsServiceProvider::class,
 
 
     ],
@@ -143,6 +144,8 @@ return [
         'Calendar' => MaddHatter\LaravelFullcalendar\Facades\Calendar::class,
 
         // 'Recaptcha' => Greggilbert\Recaptcha\Facades\Recaptcha::class,
+
+        // 'Analytics' => Spatie\Analytics\AnalyticsFacade::class,
 
 
 

@@ -159,7 +159,6 @@ export default{
                     $('#modal-edit-user').modal('hide');
                     // console.log(response.data);
                     this.fetchUser(this.pagination.current_page);
-
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -251,7 +250,7 @@ export default{
             }else if (users == 'emp') {
                 return 'Empregado';
             }else {
-                return 'Funcionário';
+                return 'Comerciante';
             }
 
         },
