@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.css" media="screen" title="no title"/>
 
 </head>
-<body style="margin-top: 150px;">
+<body style="margin-top: 100px;">
     <div class="container">
         <div class="col-md-4 col-md-offset-4">
             <div class="panel panel-danger">
@@ -20,8 +20,14 @@
                      <img class="img-responsive center-block" src="{{ asset('img/error/lock-3.png') }}" alt="">
                 </div>
                 <strong class="text-center">
-                    <h3>{{ Auth::user()->name }}</h3>
-                    <p>Não tens Acesso a esta página</p>
+
+                    @if(Auth::check())
+                        <h3>Hei {{ Auth::user()->name }}</h3>
+                    @else
+                        <h3>Hei Utilizador</h3>
+                    @endif
+
+                    <p>Contacte Administrador para averiguar sua permissão</p>
                     <p>
                         <a href="/"><span class="fa fa-arrow-left">   Volatr à página de iníco</span></a>
                     </p>
