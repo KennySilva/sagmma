@@ -12,9 +12,10 @@ elixir(function(mix) {
 
     //--------------------------------------------------------------
     mix.scripts(['front.js'],'public/js/front/front.js');
-    
+
     //--------------------------------------------------------------
     mix.styles(['app.css'],'public/css/sagmma/app.css');
     mix.styles(['custom.css'], 'public/css/custom/custom.css');
     mix.styles(['front.css'], 'public/css/front/front.css');
+    mix.styles(['back.css'], 'public/css/back/back.css');
 });

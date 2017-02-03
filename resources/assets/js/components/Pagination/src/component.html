@@ -1,16 +1,8 @@
-<!-- <a href="#" title="Header" data-toggle="popover" data-placement="top" data-html="true" data-content="<form><input type='text'/></form>">Click</a> -->
 
 
-<div class="form-inline">
+<!-- <div class="form-inline">
 	<a @click="showInput" href="#" id="showSearchInput"><span data-toggle="tooltip" data-placement="left" title="Pagina?"><i :class="{'fa fa-search-plus': !input, 'fa fa-search-minus': input}"></i></span></a>&nbsp;&nbsp;
 	<input v-model="searchPage" v-show="input" type="number" name="name"  id="searchPage" value=""  class="form-control" min="1" max="5" style="width: 60px;" @keyup.enter="navigate($event, searchPage)">
-</div>
-<!-- <div id="popover-head" class="hide">
-Procurar pagina
-</div>
-<div id="popover-content" class="hide">
-<input v-model="searchPage" type="number"  class="form-control" @keyup.enter="navigate($event, searchPage)" min="1" max="20">
-<button  class="btn btn-sm btn-secondary-outline" type="button" name="button" @click="navigate($event, searchPage)">Ir</button>
 </div> -->
 
 <nav aria-label="Page navigation">
@@ -30,5 +22,4 @@ Procurar pagina
 			</a>
 		</li>
 	</ul>
-	<!-- <input v-model="searchPage" type="number"  class="form-control" @keyup.enter="navigate($event, searchPage)" min="1" max="5" style="width: 50px;"> -->
 </nav>

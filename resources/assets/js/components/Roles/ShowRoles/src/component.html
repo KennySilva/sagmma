@@ -15,7 +15,7 @@
 <hr>
 <div class="row">
 	<div class="col-md-12">
-		<button class="btn btn-secondary pull-right" name="button" data-toggle="modal" data-target="#modal-create-role">Criar Novo</button>
+		<button class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-role"><i class="fa fa-plus"></i> Novo</button>
 	</div>
 </div>
 <br>
@@ -67,23 +67,16 @@
 						</td>
 
 					</tr>
-					<tr class="info" v-show="openDetails.indexOf(role.id) > -1 && role.perms != ''">
-						<td colspan="4">
-							<ul class="det" id="detailPermission">
-								<li class="l_det"  v-for="perms in role.perms"><b>|{{ perms.display_name }}|&nbsp;&nbsp;&nbsp;</b></li>
+					<tr class="" v-show="openDetails.indexOf(role.id) > -1 && role.perms != ''">
+						<td colspan="6">
+							<ul class="list-inline">
+								<li><span class="label label-primary"  v-for="perms in role.perms"><b> <i class="fa fa-unlock"></i> &nbsp;{{ perms.display_name }}</b></span>&nbsp;</li>
 							</ul>
-						</td>
-						<td class="text-right" colspan="2">
-							<a href="#" class='btn btn-xs btn-default '>Gerir</a>
+
 						</td>
 					</tr>
 				</tbody>
 			</table>
-
-
-
-
-
 			<div class="col-md-12 pull-left">
 				<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
 			</div>
@@ -119,7 +112,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal">&times;</button>
-						<h4 class="modal-title">Registar role</h4>
+						<h4 class="modal-title">Criar novo Papel</h4>
 					</div>
 					<div class="modal-body">
 						<validator name="validationew">
@@ -128,8 +121,8 @@
 									<div class="col-md-12">
 										<div class="col-md-12">
 											<div class="form-group has-feedback">
-												<input type="text" class="form-control" name="name" placeholder="Nome do  role" v-model="newRole.name" v-validate:name="['required']"/>
-												<span class="glyphicon glyphicon-user form-control-feedback"></span>
+												<input type="text" class="form-control" name="name" placeholder="Nome do  papel para o sistema" v-model="newRole.name" v-validate:name="['required']"/>
+												<span class="fa fa-lock form-control-feedback"></span>
 												<p style="color:red;" v-if="$validationew.name.required && $validationew.name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
 											</div>
 										</div>
@@ -141,21 +134,19 @@
 									<div class="col-md-12">
 										<div class="col-md-12">
 											<div class="form-group has-feedback">
-												<input type="text" class="form-control" name="display_name" placeholder="Nome do  role" v-model="newRole.display_name" v-validate:display_name="['required']"/>
-												<span class="glyphicon glyphicon-user form-control-feedback"></span>
+												<input type="text" class="form-control" name="display_name" placeholder="Nome do papel para ser visualizado" v-model="newRole.display_name" v-validate:display_name="['required']"/>
+												<span class="fa fa-eye form-control-feedback"></span>
 												<p style="color:red;" v-if="$validationew.display_name.required && $validationew.display_name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
 											</div>
 										</div>
 									</div>
 								</div>
 
-
-
 								<div class="row">
 									<div class="col-md-12">
 										<div class="col-md-12">
 											<div class="form-group has-feedback">
-												<textarea name="description" placeholder="Descrição deste desta função" class="form-control" rows="5" cols="40" id="description" v-model="newRole.description"></textarea>
+												<textarea name="description" placeholder="descrição" class="form-control" rows="5" cols="40" id="description" v-model="newRole.description"></textarea>
 											</div>
 										</div>
 									</div>
@@ -168,7 +159,7 @@
 										<div class="col-md-12">
 											<div class="form-group has-feedback">
 												<select class="iform-control" v-model="newRole.permissions" multiple>
-													<option value="" selected>Escolhe Permissões prar esta função</option>
+													<option value="" selected>Escolha Permissões</option>
 													<option v-for="permission in permissions" value="{{permission.id}}">
 														{{permission.display_name}}
 													</option>
@@ -183,7 +174,7 @@
 					<div class="modal-footer">
 						<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
 
-						<button :disabled = "!$validationew.valid" @click="createRole" class="btn btn-secondary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar Dados Sobre este Função</button>
+						<button :disabled = "!$validationew.valid" @click="createRole" class="btn btn-secondary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar Registo</button>
 					</div>
 				</div>
 			</div>
@@ -198,7 +189,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
-						<h4 class="modal-title">Editar Esta função</h4>
+						<h4 class="modal-title">Editar</h4>
 					</div>
 					<div class="modal-body">
 						<validator name="validation1">
@@ -208,7 +199,7 @@
 										<div class="col-md-12">
 											<div class="form-group has-feedback">
 												<input type="text" class="form-control" name="name" v-model="newRole.name" v-validate:name="['required']"/>
-												<span class="glyphicon glyphicon-user form-control-feedback"></span>
+												<span class="fa fa-lock form-control-feedback"></span>
 												<p style="color:red;" v-if="$validation1.name.required && $validation1.name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
 											</div>
 										</div>
@@ -220,7 +211,7 @@
 										<div class="col-md-12">
 											<div class="form-group has-feedback">
 												<input type="text" class="form-control" name="display_name" v-model="newRole.display_name" v-validate:display_name="['required']"/>
-												<span class="glyphicon glyphicon-user form-control-feedback"></span>
+												<span class="fa fa-eye form-control-feedback"></span>
 												<p style="color:red;" v-if="$validation1.display_name.required && $validation1.display_name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
 											</div>
 										</div>
@@ -233,7 +224,7 @@
 									<div class="col-md-12">
 										<div class="col-md-12">
 											<div class="form-group has-feedback">
-												<textarea name="description" placeholder="Descrição desta função" class="form-control" rows="5" cols="40" id="description" v-model="newRole.description"></textarea>
+												<textarea name="description" placeholder="Descrição" class="form-control" rows="5" cols="40" id="description" v-model="newRole.description"></textarea>
 											</div>
 										</div>
 									</div>
@@ -242,11 +233,9 @@
 						</validator>
 					</div>
 					<div class="modal-footer">
-
 						<div class="col-md-12">
 							<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Close</button>
-							<button v-on:show="" @click="saveEditedRole(newRole.id)" type="button" class="btn btn-secondary"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp; Salvar as Alterações sobre esta função</button>
-
+							<button v-on:show="" @click="saveEditedRole(newRole.id)" type="button" class="btn btn-secondary"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar Edição</button>
 						</div>
 					</div>
 				</div>

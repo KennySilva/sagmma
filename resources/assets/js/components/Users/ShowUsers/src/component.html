@@ -26,8 +26,8 @@
 
 <div class="row">
 	<div class="col-md-12">
-		<button @click="clearField" class="btn btn-secondary pull-left" name="button" data-toggle="modal" data-target="#modal-create-user"><i class="fa fa-plus"></i> Criar Novo</button>&nbsp;&nbsp;&nbsp;&nbsp;
-		<button class="btn btn-secondary" name="button"><i class="fa fa-print"></i> Imprimir</button>
+		<button @click="clearField" class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-user"><i class="fa fa-plus"></i> Novo</button>&nbsp;&nbsp;&nbsp;&nbsp;
+		<button class="btn btn-primary btn-flat btn-outline" name="button"><i class="fa fa-print"></i> Imprimir</button>
 	</div>
 </div>
 
@@ -136,10 +136,10 @@
 
 						<!----------------------------------------------------------------------------------->
 						<td v-if="user.name != 'Admin'">
-							<button type="submit" @click = "estado_utilizador(user.id)" class='btn btn-xs' :class="{ 'btn-info': user.status, 'btn-danger': !user.status }">{{user.status ? 'Ativado' : 'Disativado'}}</button>
+							<button type="submit" @click = "estado_utilizador(user.id)" class='btn btn-xs btn-flat' :class="{ 'btn-info': user.status, 'btn-danger': !user.status }">{{user.status ? 'Ativado' : 'Disativado'}}</button>
 						</td>
 						<td v-if="user.name == 'Admin'">
-							<button class='btn btn-success btn-xs' disabled="disabled">Admin</button>
+							<button class='btn btn-success btn-xs btn-flat' disabled="disabled">Admin</button>
 						</td>
 						<!----------------------------------------------------------------------------------->
 

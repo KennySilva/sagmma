@@ -17,7 +17,7 @@
 <hr>
 <div class="row">
 	<div class="col-md-12">
-		<button class="btn btn-secondary pull-right" name="button" data-toggle="modal" data-target="#modal-create-permission">Criar Novo</button>
+		<button class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-permission"><i class="fa fa-plus"></i> Novo</button>
 	</div>
 </div>
 <br>
@@ -101,8 +101,8 @@
 									<div class="col-md-12">
 										<div class="col-md-12">
 											<div class="form-group has-feedback">
-												<input type="text" class="form-control" name="name" placeholder="Nome do permission" v-model="newPermission.name" v-validate:name="['required']"/>
-												<span class="glyphicon glyphicon-user form-control-feedback"></span>
+												<input type="text" class="form-control" name="name" placeholder="Nome da permissão no sistema" v-model="newPermission.name" v-validate:name="['required']"/>
+												<span class="fa fa-hand-stop-o form-control-feedback"></span>
 												<p style="color:red;" v-if="$validationew.name.required && $validationew.name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
 											</div>
 										</div>
@@ -114,8 +114,8 @@
 									<div class="col-md-12">
 										<div class="col-md-12">
 											<div class="form-group has-feedback">
-												<input type="text" class="form-control" name="display_name" placeholder="Nome do  permission" v-model="newPermission.display_name" v-validate:display_name="['required']"/>
-												<span class="glyphicon glyphicon-user form-control-feedback"></span>
+												<input type="text" class="form-control" name="display_name" placeholder="Nome da permissão a ser vizualizado" v-model="newPermission.display_name" v-validate:display_name="['required']"/>
+												<span class="fa fa-eye form-control-feedback"></span>
 												<p style="color:red;" v-if="$validationew.display_name.required && $validationew.display_name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
 											</div>
 										</div>
@@ -128,7 +128,7 @@
 									<div class="col-md-12">
 										<div class="col-md-12">
 											<div class="form-group has-feedback">
-												<textarea name="description" placeholder="Descrição deste desta função" class="form-control" rows="5" cols="40" id="description" v-model="newPermission.description"></textarea>
+												<textarea name="description" placeholder="Descrião da permissão..." class="form-control" rows="5" cols="40" id="description" v-model="newPermission.description"></textarea>
 											</div>
 										</div>
 									</div>
@@ -139,7 +139,7 @@
 					<div class="modal-footer">
 						<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
 
-						<button :disabled = "!$validationew.valid" @click="createPermission" class="btn btn-secondary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar Dados Sobre este Permissão</button>
+						<button :disabled = "!$validationew.valid" @click="createPermission" class="btn btn-secondary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar Registo</button>
 					</div>
 				</div>
 			</div>
