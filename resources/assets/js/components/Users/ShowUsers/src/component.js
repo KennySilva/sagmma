@@ -77,7 +77,7 @@ export default{
             };
         },
 
-
+        
 
         createUser: function() {
             //User input
@@ -143,6 +143,7 @@ export default{
                 this.newUser.status      = response.data.status;
                 this.newUser.type        = response.data.type;
                 this.newUser.description = response.data.description;
+                this.newUser.roles       = response.data.roles;
             }, (response) => {
                 console.log('Error');
             });

@@ -7,7 +7,7 @@
     <script src=" http://www.position-absolute.com/creation/print/jquery.printPage.js" charset="utf-8"></script>
 </head>
 <body>
-    <a class="btnPrint" href="{{URL::to('printPreview')}}">print</a>
+    <a class="btnPrint btn btn" href="{{URL::to('export/printPreview')}}">print</a>
 
     <script type="text/javascript">
     $(document).ready(function() {

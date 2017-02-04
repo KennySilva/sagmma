@@ -7,18 +7,20 @@ use Illuminate\Http\Request;
 use Sagmma\Http\Requests;
 use Sagmma\Http\Controllers\Controller;
 use PDF;
-use Typeofplace;
+// use Typeofplace;
+use User;
 
 class PrintController extends Controller
 {
-    public function index()
+    public function indexUser()
     {
-        return view('exportation.viewPrint');
+        $totalUsers = User::count();
+        return view('exportation.PrintUser', compact('totalUsers'));
     }
 
-    public function printPreview()
+    public function printUserPreview()
     {
-        $types = Typeofplace::all();
-        return view('exportation.printPreview', compact('types'));
+        $users = User::all();
+        return view('exportation.printPreview', compact('users'));
     }
 }

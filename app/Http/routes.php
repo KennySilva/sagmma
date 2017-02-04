@@ -212,8 +212,8 @@ Route::group(['namespace' => 'PluginsControllers'], function()
             // -----------------------------PDF-Download---------------------------------------------
             Route::resource('/getPDF', 'PluginsControllers\PDFController@getPDF');
             //-------------------------------Impressão-----------------------------------------------
-            Route::get('/testprint', 'PluginsControllers\PrintController@index');
-            Route::get('/printPreview', 'PluginsControllers\PrintController@printPreview');
+            Route::get('/printableUserInformation', 'PrintController@indexUser');
+            Route::get('/printUserPreview', 'PrintController@printUserPreview');
             // -----------------------------Exportation----------------------------------------------
             Route::get('/getImport', 'PluginsControllers\ExcelController@getImport');
             Route::post('/postImport', 'PluginsControllers\ExcelController@postImport');
