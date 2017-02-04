@@ -47,10 +47,10 @@
 						<i :class = "{'fa-sort-amount-asc': sortColumn == 'username' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'username' &&   sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
 						<a href="#" @click = "doSort($event, 'username')">Nome</a>
 					</th> -->
-					<th>
+					<!-- <th>
 						<i :class = "{'fa-sort-amount-asc': sortColumn == 'email' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'email' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
 						<a href="#" @click = "doSort($event, 'email')">Email</a>
-					</th>
+					</th> -->
 					<!-- <th class="info" v-if="showColumn.gender">
 					<i :class = "{'fa-sort-amount-asc': sortColumn == 'gender' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'gender' &&   sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
 					<a href="#" @click = "doSort($event, 'gender')">Genero</a>
@@ -99,10 +99,10 @@
 </th>
 
 
-<th>
+<!-- <th>
 	<i :class = "{'fa-sort-amount-asc': sortColumn == 'type' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'type' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
 	<a href="#" @click = "doSort($event, 'type')">Tipo</a>
-</th>
+</th> -->
 
 <!-- <th>Foto</th> -->
 <!-- <th  class="text-center">Visualizar</th> -->
@@ -122,10 +122,10 @@
 </thead>
 <tbody  v-for="user in users | filterBy filter.term | orderBy sortColumn sortInverse">
 	<tr>
-		<td><a href="#" data-toggle="modal" data-target="#show-user">{{ user.name }}</a></td>
+		<td><a href="#" data-toggle="modal" data-target="#show-user" @click="getThisUser(user.id)">{{ user.name }}</a></td>
 		<!-- <td><a href="#" data-toggle="tooltip modal" data-placement="top" data-target="#show-user" title="+ Sobre {{ user.name }}">{{ user.name }}</a></td> -->
 		<!-- <td class="info" v-if="showColumn.username">{{ user.username }}</td> -->
-		<td>{{ user.email }}</td>
+		<!-- <td>{{ user.email }}</td> -->
 		<!-- <td class="info" v-if="showColumn.gender">{{ alterAgeValue(user.gender) }}</td> -->
 		<!-- <td class="info" v-if="showColumn.age">{{ user.age }}</td> -->
 		<!-- <td class="info" v-if="showColumn.state">{{ user.state }}</td> -->
@@ -145,7 +145,7 @@
 		<!----------------------------------------------------------------------------------->
 
 
-		<td  class="text-success">{{ alterTypeValue(user.type) }}</td>
+		<!-- <td  class="text-success">{{ alterTypeValue(user.type) }}</td> -->
 
 
 		<!-- tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt -->
@@ -207,14 +207,109 @@
 		<!-- Modal content-->
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal">&times;</button>
-				<h4 class="modal-title">Modal Header</h4>
+				<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Info do {{ newUser.name }}</h4>
 			</div>
 			<div class="modal-body">
-				<p>Some text in the modal.</p>
+				<div class="row">
+					<div class="col-md-12">
+						<div class="col-md-6 col-md-offset-5">
+							<img src="/uploads/avatars/{{ newUser.avatar }}" alt="Imagem do Usuário" style="width: 100px; height: 100px; float: left; border-radius: 50%; margin-right: 25px" />
+						</div>
+					</div>
+				</div>
+				<hr>
+				<div class="row">
+					<div class="col-md-12">
+						<div class='table-responsive'>
+							<table class='table table-striped table-hover'>
+								<thead>
+									<tr>
+										<th class="text-center" colspan="2">INFORMAÇOES DO UTILIZADOR</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td><b>ID</b></td>
+										<td><i>{{ newUser.id }}</i></td>
+									</tr>
+									<tr>
+										<td><b>Nome</b></td>
+										<td><i>{{ newUser.name }}</i></td>
+									</tr>
+									<tr>
+										<td><b>Utilizador</b></td>
+										<td><span class="label label-info"><i>{{ newUser.username }}</i></span></td>
+									</tr>
+									<tr>
+										<td><b>Sexo</b></td>
+										<td><i>{{ alterGenderValue(newUser.gender) }}</i></td>
+									</tr>
+									<tr>
+										<td><b>BI</b></td>
+										<td><span class="label label-info"><i>{{ newUser.ic }}</i></span></td>
+
+									</tr>
+									<tr>
+										<td><b>Idade</b></td>
+										<td><i>{{ newUser.age }}</i></td>
+									</tr>
+									<tr>
+										<td><b>Email</b></td>
+										<td><span class="label label-info"><i>{{ newUser.email }}</i></span></td>
+
+									</tr>
+									<tr>
+										<td><b>Telefone</b></td>
+										<td><span class="label" :class="{ 'label-info': newUser.phone, 'none': !newUser.phone }"><i>{{ newUser.phone }}</i></span></td>
+
+									</tr>
+									<tr>
+										<td><b>Ilha</b></td>
+										<td><i>{{ alterStateValue(newUser.state) }}</i></td>
+									</tr>
+									<tr>
+										<td><b>Concelho</b></td>
+										<td><i>{{ newUser.council }}</i></td>
+									</tr>
+									<tr>
+										<td><b>Freguesia</b></td>
+										<td><i>{{ newUser.parish }}</i></td>
+									</tr>
+									<tr>
+										<td><b>Zona</b></td>
+										<td><i>{{ newUser.zone }}</i></td>
+									</tr>
+									<tr>
+										<td><b>Tipo</b></td>
+										<td><span class="label label-primary"><i>{{ alterTypeValue(newUser.type) }}</i></span></td>
+
+									</tr>
+									<tr>
+										<td><b>Estado</b></td>
+										<td><span class='label' :class="{ 'label-info': newUser.status, 'label-danger': !newUser.status }"><i>{{newUser.status ? 'Ativado' : 'Disativado'}}</i></span></td>
+									</tr>
+									<tr>
+										<td><b>Descrição</b></td>
+										<td><i>{{ newUser.description }}</i></td>
+									</tr>
+									<tr>
+										<td><b>Data da criação</b></td>
+										<td><i>{{ user.created_at | formatDate 'DD/MM/YYYY' }}</i></td>
+									</tr>
+									<tr>
+										<td><b>Data de atualização</b></td>
+										<td><i>{{ user.updated_at | formatDate 'DD/MM/YYYY' }}</i></td>
+									</tr>
+
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 			</div>
 		</div>
 

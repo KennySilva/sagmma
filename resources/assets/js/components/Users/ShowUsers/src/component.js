@@ -77,7 +77,7 @@ export default{
             };
         },
 
-        
+
 
         createUser: function() {
             //User input
@@ -143,6 +143,7 @@ export default{
                 this.newUser.status      = response.data.status;
                 this.newUser.type        = response.data.type;
                 this.newUser.description = response.data.description;
+                this.newUser.avatar = response.data.avatar;
                 this.newUser.roles       = response.data.roles;
             }, (response) => {
                 console.log('Error');
@@ -232,13 +233,13 @@ export default{
 
         // --------------------------------------------------------------------------------------------
 
-        alterAgeValue: function(users) {
+        alterGenderValue: function(users) {
             if (users == 'M') {
                 return 'Masculino';
             }else if (users == 'F') {
                 return 'Feminino';
             }else {
-                return 'Outros';
+                return 'Não Especificado';
             }
 
         },
@@ -252,6 +253,31 @@ export default{
                 return 'Empregado';
             }else {
                 return 'Comerciante';
+            }
+
+        },
+
+        alterStateValue: function(users) {
+            if (users == 1) {
+                return 'Santiago';
+            }else if (users == 2) {
+                return 'Maio';
+            }else if (users == 3) {
+                return 'Fogo';
+            }else if (users == 4) {
+                return 'Brava';
+            }else if (users == 5) {
+                return 'Santo Antão';
+            }else if (users == 6) {
+                return 'São Niculau';
+            }else if (users == 7) {
+                return 'São Vicente';
+            }else if (users == 8) {
+                return 'Sal';
+            }else if (users == 9) {
+                return 'Boa Vista';
+            }else {
+                return 'Santa Luzia';
             }
 
         },
