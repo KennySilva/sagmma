@@ -5,11 +5,7 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateTypeofemployeesTable extends Migration
 {
-    /**
-    * Run the migrations.
-    *
-    * @return void
-    */
+
     public function up()
     {
         Schema::create('typeofemployees', function (Blueprint $table) {
@@ -19,11 +15,6 @@ class CreateTypeofemployeesTable extends Migration
         });
     }
 
-    /**
-    * Reverse the migrations.
-    *
-    * @return void
-    */
     public function down()
     {
         Schema::drop('typeofemployees');

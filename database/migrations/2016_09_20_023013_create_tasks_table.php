@@ -5,11 +5,7 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateTasksTable extends Migration
 {
-    /**
-    * Run the migrations.
-    *
-    * @return void
-    */
+
     public function up()
     {
         Schema::create('tasks', function (Blueprint $table) {
@@ -25,11 +21,6 @@ class CreateTasksTable extends Migration
         });
     }
 
-    /**
-    * Reverse the migrations.
-    *
-    * @return void
-    */
     public function down()
     {
         Schema::drop('tasks');

@@ -5,11 +5,7 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateEmployeesTable extends Migration
 {
-    /**
-    * Run the migrations.
-    *
-    * @return void
-    */
+
     public function up()
     {
         Schema::create('employees', function (Blueprint $table) {
@@ -26,23 +22,16 @@ class CreateEmployeesTable extends Migration
             $table->string('phone', 8)->unique();
             $table->enum('echelon', ['A', 'B', 'C', 'D', 'E']);
             $table->date('service_beginning');
-            $table->integer('market_id')->unsigned();
             $table->integer('typeofemployee_id')->unsigned();
             $table->string('photo', 50);
             $table->text('description', 255)->nullable();
             $table->timestamps();
 
             //chaves
-            $table->foreign('market_id')->references('id')->on('markets')->onDelete('cascade');
             $table->foreign('typeofemployee_id')->references('id')->on('typeofemployees')->onDelete('cascade');
         });
     }
 
-    /**
-    * Reverse the migrations.
-    *
-    * @return void
-    */
     public function down()
     {
         Schema::drop('employees');

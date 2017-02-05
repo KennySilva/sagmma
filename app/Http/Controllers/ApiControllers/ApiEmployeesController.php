@@ -20,7 +20,7 @@ class ApiEmployeesController extends Controller
     {
         $employee = Employee::paginate(5);
         $employee->each(function($employee){
-            $employee->market;
+            // $employee->market;
             $employee->typeofemployees;
         });
         return $employee;
@@ -28,7 +28,7 @@ class ApiEmployeesController extends Controller
 
     public function create()
     {}
-        
+
         public function store(EmployeesRequest $request)
         {
             $employee                    = new Employee($request->all());
@@ -44,7 +44,7 @@ class ApiEmployeesController extends Controller
             $employee->phone             = $request->phone;
             $employee->echelon           = $request->echelon;
             $employee->service_beginning = $request->service_beginning;
-            $employee->market_id         = $request->market_id;
+            // $employee->market_id         = $request->market_id;
             $employee->typeofemployee_id = $request->typeofemployee_id;
             $employee->photo             = $request->photo;
             $employee->description       = $request->description;

@@ -3,27 +3,27 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateEmployeeMaterialTable extends Migration
+class CreateEmployeeMarketTable extends Migration
 {
 
     public function up()
     {
-        Schema::create('employee_material', function (Blueprint $table) {
+        Schema::create('employee_market', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('employee_id')->unsigned();
-            $table->integer('material_id')->unsigned();
-            $table->boolean('status')->default('1');
+            $table->integer('market_id')->unsigned();
             $table->string('author', 50);
             $table->timestamps();
 
             // Chaves estrangeiras;
             $table->foreign('employee_id')->references('id')->on('employees');
-            $table->foreign('material_id')->references('id')->on('materials');
+            $table->foreign('market_id')->references('id')->on('markets');
         });
     }
+    
 
     public function down()
     {
-        Schema::drop('employee_material');
+        Schema::drop('employee_market');
     }
 }

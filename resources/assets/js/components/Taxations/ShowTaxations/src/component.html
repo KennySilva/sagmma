@@ -129,8 +129,8 @@
 												<select name="state" class="selectpicker form-control show-tick" v-model="newTaxation.type">
 													<option value="" selected>Tipo de cobrança</option>
 													<optgroup label="Cobrança na secretaria">
-														<option value="1">Minimercados</option>
-														<option value="2">Bouticks de Médio Porte</option>
+														<option value="1">Cobrança interno</option>
+														<option value="2">Cobrança Externo</option>
 														<option value="3">Bouticks de Grande Porte Porte</option>
 														<option value="4">Pequenos restaurantes</option>
 														<option value="5">Outros</option>
@@ -193,7 +193,7 @@
 										<div class="col-md-12">
 											<div class="form-group has-feedback">
 												<!-- <input class="form-control" type="number" name="income" value="" placeholder="Valor da cobrança"> -->
-												<input type="number" class="form-control" placeholder="Valor cobrado" name="email"/>
+												<input type="number" class="form-control" placeholder="Valor cobrado" v-model="newTaxation.income" name="email"/>
 												<i class="fa fa-usd form-control-feedback"></i>
 											</div>
 

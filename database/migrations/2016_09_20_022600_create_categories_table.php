@@ -15,7 +15,7 @@ class CreateCategoriesTable extends Migration
             $table->timestamps();
         });
     }
-
+    
 
     public function down()
     {

@@ -5,11 +5,7 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreatePlacesTable extends Migration
 {
-    /**
-    * Run the migrations.
-    *
-    * @return void
-    */
+
     public function up()
     {
         Schema::create('places', function (Blueprint $table) {
@@ -25,12 +21,7 @@ class CreatePlacesTable extends Migration
             $table->foreign('typeofplace_id')->references('id')->on('typeofplaces')->onDelete('cascade');
         });
     }
-
-    /**
-    * Reverse the migrations.
-    *
-    * @return void
-    */
+    
     public function down()
     {
         Schema::drop('places');

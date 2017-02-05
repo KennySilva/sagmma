@@ -5,11 +5,7 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateTypeofplacesTable extends Migration
 {
-    /**
-    * Run the migrations.
-    *
-    * @return void
-    */
+    
     public function up()
     {
         Schema::create('typeofplaces', function (Blueprint $table) {
@@ -19,11 +15,6 @@ class CreateTypeofplacesTable extends Migration
         });
     }
 
-    /**
-    * Reverse the migrations.
-    *
-    * @return void
-    */
     public function down()
     {
         Schema::drop('typeofplaces');
