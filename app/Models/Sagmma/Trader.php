@@ -9,21 +9,20 @@ class Trader extends Model
     protected $guarded = ['id'];
 
 
-    //Relacionamentos--------------------------------------------------------------------------------------------;
+    //Relacionamentos------------------------------------------------------------------------------------;
     public function promotion()
     {
         return $this->hasMany(Promotion::class);
     }
 
-    // public function typeoftraders()
-    // {
-    //     return $this->belongsTo(Typeoftrader::class, 'typeoftrader_id', 'id');
-    // }
-
     public function places()
     {
-        return $this->belongsToMany(Place::class, 'place_trader', 'trader_id', 'place_id')->withPivot('status')->withTimestamps();
+        return $this->belongsToMany(Place::class, 'place_trader', 'trader_id', 'place_id')->withPivot('status', 'rate', 'author', 'ending_date')->withTimestamps();
     }
 
+    public function contract()
+    {
+        return $this->belongsTo(Contract::class, 'trader_id', 'id');
+    }
 
 }

@@ -13,7 +13,7 @@
         <div class="item active">
             <img src="img/frontend_img/slide/slide_1.jpg" alt="Placeholder">
             <div class="carousel-caption">
-                <h3>Espaços para Boutiques</h3>
+                <h3 style="color: white; text-shadow: black 2px 2px 2px">Espaços para Boutiques</h3>
                 <p>Boutiques no espaço interno e externo</p>
             </div>
         </div>
@@ -37,8 +37,8 @@
         <div class="item">
             <img src="img/frontend_img/slide/slide_4.jpg" alt="Placeholder">
             <div class="carousel-caption">
-                <h3>Riqueza</h3>
-                <p>Uma parte da riqueza do povo reside no Pilourinha</p>
+                <h3 style="color: white; text-shadow: black 2px 2px 2px">Riqueza</h3>
+                <p style="color: white; text-shadow: black 2px 2px 3px">Uma parte da riqueza do povo reside no Pilourinha</p>
             </div>
         </div>
 

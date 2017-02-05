@@ -16,7 +16,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     use Authenticatable, CanResetPassword;
     // use Authenticatable, Authorizable, CanResetPassword;
     use EntrustUserTrait;
-    
+
     protected $table = 'users';
 
     protected $guarded = ['id'];
@@ -24,7 +24,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     protected $hidden = ['password', 'remember_token'];
 
 
-
+    
 
 
 

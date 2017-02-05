@@ -13,11 +13,11 @@ class Material extends Model
     //Relacionamentos;
     public function employees()
     {
-        return $this->belongsToMany(Employee::class, 'employee_material', 'material_id', 'employee_id')->withPivot('status')->withTimestamps();
+        return $this->belongsToMany(Employee::class, 'employee_material', 'material_id', 'employee_id')->withPivot('status', 'author')->withTimestamps();
     }
 
     public function control()
     {
-        return $this->belongsTo(Control::class, 'id',  'employee_id');
+        return $this->belongsTo(Control::class,  'material_id',  'id');
     }
 }

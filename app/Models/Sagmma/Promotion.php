@@ -14,7 +14,7 @@ class Promotion extends Model
     //Relacionamentos--------------------------------------------------------------------------------------------;
     public function trader()
     {
-        return $this->belongsTo(Trader::class, 'trader_id', 'id');
+        return $this->belongsTo(Trader::class);
     }
 
 

@@ -16,15 +16,15 @@ class Contract extends Model
         }
         return false;
     }
-
+    
     //------------------------------------------------------------------------------
     public function places()
     {
-        return $this->hasMany(Place::class, 'id', 'place_id');
+        return $this->hasMany(Place::class, 'place_id', 'id');
     }
     public function traders()
     {
-        return $this->hasMany(Trader::class, 'id', 'trader_id');
+        return $this->hasMany(Trader::class, 'trader_id', 'id');
     }
 
 }

@@ -9,10 +9,18 @@ class Market extends Model
     protected $table = 'markets';
     protected $guarded = ['id'];
 
-    
+
     //Relacionamentos
+    // public function employees()
+    // {
+    //     return $this->hasMany(Employee::class);
+    // }
     public function employees()
     {
-        return $this->hasMany(Employee::class);
+        return $this->belongsToMany(Employee::class, 'employee_market', 'market_id', 'employee_id')->withPivot('author')->withTimestamps();
+    }
+    public function tranference()
+    {
+        return $this->belongsTo(Transference::class, 'market_id', 'id');
     }
 }

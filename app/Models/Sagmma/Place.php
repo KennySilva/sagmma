@@ -11,6 +11,16 @@ class Place extends Model
     protected $guarded = ['id'];
 
     //Relacionamentos;
+    public function taxation()
+    {
+        return $this->belongsTo(Taxaton::class, 'place_id', 'id');
+    }
+
+    public function contract()
+    {
+        return $this->belongsTo(Contract::class, 'place_id', 'id');
+    }
+
     public function typeofplace()
     {
         return $this->belongsTo(Typeofplace::class, 'typeofplace_id', 'id');
@@ -18,12 +28,12 @@ class Place extends Model
     //-------------------------------------------------------------------------------
     public function employees()
     {
-        return $this->belongsToMany(Employee::class, 'employee_place', 'place_id', 'employee_id')->withPivot('income', 'status', 'note')->withTimestamps();
+        return $this->belongsToMany(Employee::class, 'employee_place', 'place_id', 'employee_id')->withPivot('income', 'type', 'author')->withTimestamps();
     }
     //-------------------------------------------------------------------------------
     public function traders()
     {
-        return $this->belongsToMany(Trader::class, 'place_trader', 'place_id', 'trader_id')->withPivot('status')->withTimestamps();
+        return $this->belongsToMany(Trader::class, 'place_trader', 'place_id', 'trader_id')->withPivot('status', 'rate', 'author', 'ending_date')->withTimestamps();
     }
 
 }

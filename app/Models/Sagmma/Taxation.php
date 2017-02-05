@@ -4,30 +4,19 @@ namespace Sagmma\Models\Sagmma;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Control extends Model
+class Taxation extends Model
 {
-    protected $table = 'employee_material';
+    protected $table = 'employee_place';
     protected $guarded = ['id'];
 
-
-
     //------------------------------------------------------------------------------
-    public function getStatusAttribute($value)
-    {
-        if ($value) {
-            return true;
-        }
-        return false;
-    }
-
-
     public function employees()
     {
         return $this->hasMany(Employee::class, 'employee_id', 'id');
     }
-
-    public function materials()
+    public function places()
     {
-        return $this->hasMany(Material::class, 'material_id', 'id');
+        return $this->hasMany(Place::class, 'place_id', 'id');
     }
+
 }
