@@ -37,18 +37,25 @@ class ApiPromotionsController extends Controller
         // if (Auth::user()->type=='Comerciante') {
         //     $promotion->trader_id = Auth::user()->id;
         // }
+
+        // $date = date('Y-m-d');
+        // $end = $request->ending_date;
+        // if ($date > $end) {
+        //     $contract->status    = false;
+        // }else {
+        //     $contract->status    = true;
+        // }
         $promotion                = new Promotion($request->all());
         $promotion->name          = $request->name;
         $promotion->description   = $request->description;
-        $promotion->photo         = $request->photo;
         $promotion->begnning_date = $request->begnning_date;
         $promotion->ending_date   = $request->ending_date;
-        $promotion->trader_id     = $request->trader_id;
+        $promotion->trader_id     = \Auth::user()->id;
         $promotion->product_id    = $request->product_id;
         $promotion->status    = $request->status;
         // $promotion->author        = Auth::user()->name;
         $promotion->save();
-
+        
     }
 
 

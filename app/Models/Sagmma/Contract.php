@@ -16,7 +16,7 @@ class Contract extends Model
         }
         return false;
     }
-    
+
     //------------------------------------------------------------------------------
     public function places()
     {

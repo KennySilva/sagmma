@@ -19,18 +19,16 @@ class ApiControlsController extends Controller
     public function index()
     {
         $control = Control::paginate(5);
-
         $control->each(function($control){
             $control->employees;
             $control->materials;
         });
         return $control;
-
     }
 
     public function create()
     {
-        
+
     }
 
     public function store(ControlsRequest $request)

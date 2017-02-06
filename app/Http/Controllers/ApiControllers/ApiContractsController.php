@@ -20,13 +20,11 @@ class ApiContractsController extends Controller
     public function index()
     {
         $contract = Contract::paginate(5);
-
         $contract->each(function($contract){
             $contract->places;
             $contract->traders;
         });
         return $contract;
-
     }
 
     public function create()
@@ -37,11 +35,21 @@ class ApiContractsController extends Controller
     public function store(ContractsRequest $request)
     {
         $contract            = new Contract($request->all());
+
+        // $date = date('Y-m-d');
+        // $end = $request->ending_date;
+        // if ($date > $end) {
+        //     $contract->status    = false;
+        // }else {
+        //     $contract->status    = true;
+        // }
+
         $contract->place_id  = $request->place_id;
         $contract->trader_id = $request->trader_id;
-        $contract->status    = $request->status;
+        $contract->status    = true;
         $contract->rate      = $request->rate;
         $contract->author    = Auth::user()->name;
+        $contract->ending_date      = $request->ending_date;
         $contract->save();
 
     }

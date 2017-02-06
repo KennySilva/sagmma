@@ -39,7 +39,7 @@ class ApiPlacesController extends Controller
             $place->save();
         }
 
-
+        
         public function show($id)
         {
             $place = Place::findOrFail($id);

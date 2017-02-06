@@ -10,7 +10,6 @@ use Sagmma\Http\Controllers\Controller;
 use Sagmma\Http\Requests\SagmmaRequests\EmployeesRequest;
 use Employee;
 use Typeofemployee;
-use Market;
 use Response;
 use Input;
 
@@ -20,7 +19,6 @@ class ApiEmployeesController extends Controller
     {
         $employee = Employee::paginate(5);
         $employee->each(function($employee){
-            // $employee->market;
             $employee->typeofemployees;
         });
         return $employee;
@@ -44,11 +42,11 @@ class ApiEmployeesController extends Controller
             $employee->phone             = $request->phone;
             $employee->echelon           = $request->echelon;
             $employee->service_beginning = $request->service_beginning;
-            // $employee->market_id         = $request->market_id;
             $employee->typeofemployee_id = $request->typeofemployee_id;
             $employee->photo             = $request->photo;
             $employee->description       = $request->description;
             $employee->save();
+            $employee->markets()->sync($request->markets);
         }
 
 
@@ -78,15 +76,6 @@ class ApiEmployeesController extends Controller
         {
             $market = Market::all();
             return $market;
-            // return Response::json($market);
-
-            // $market = Market::all(['id','name']);
-            // return $market->map(function ($market) {
-            //     return [
-            //         'text'              => $market->name,
-            //         'value'             => $market->id,
-            //     ];
-            // })->toArray();
 
         }
 

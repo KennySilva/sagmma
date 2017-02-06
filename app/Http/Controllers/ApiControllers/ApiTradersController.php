@@ -46,13 +46,9 @@ class ApiTradersController extends Controller
             $trader->parish          = $request->parish;
             $trader->zone            = $request->zone;
             $trader->phone           = $request->phone;
-            // $trader->status          = $request->status;
             $trader->photo           = $request->photo;
             $trader->description     = $request->description;
-            // $trader->product_id      = $request->product_id;
-            // $trader->typeoftrader_id = $request->typeoftrader_id;
             $trader->save();
-
         }
 
 
@@ -79,17 +75,5 @@ class ApiTradersController extends Controller
             return Trader::destroy($id);
         }
 
-        public function getProductforTrader()
-        {
-            $product = Product::all();
-            return $product;
-
-
-        }
-
-        public function getTypeForTrader()
-        {
-            $typeoftrader = Typeoftrader::all();
-            return $typeoftrader;
-        }
+        
     }

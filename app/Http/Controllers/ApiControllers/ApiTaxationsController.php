@@ -36,12 +36,12 @@ class ApiTaxationsController extends Controller
 
     public function store(TaxationsRequest $request)
     {
-        $taxation            = new Taxation($request->all());
-        $taxation->employee_id  = $request->employee_id;
-        $taxation->place_id = $request->place_id;
-        $taxation->income = $request->income;
-        $taxation->type = $request->type;
-        $taxation->author    = Auth::user()->name;
+        $taxation              = new Taxation($request->all());
+        $taxation->employee_id = $request->employee_id;
+        $taxation->place_id    = $request->place_id;
+        $taxation->income      = $request->income;
+        $taxation->type        = $request->type;
+        $taxation->author      = Auth::user()->name;
         $taxation->save();
 
     }

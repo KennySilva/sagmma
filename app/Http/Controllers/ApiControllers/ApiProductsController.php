@@ -29,8 +29,9 @@ class ApiProductsController extends Controller
         $product              = new Product($request->all());
         $product->name        = $request->name;
         $product->price        = $request->price;
-        $product->description = $request->description;
         $product->photo       = $request->photo;
+        $product->description = $request->description;   ->author = \Auth::user()->name;
+        $product->author = \Auth::user()->name;
         $product->save();
     }
 

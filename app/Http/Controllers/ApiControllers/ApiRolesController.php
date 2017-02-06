@@ -21,9 +21,6 @@ class ApiRolesController extends Controller
             $role->perms;
         });
         return $role;
-
-
-
     }
 
     public function create()
