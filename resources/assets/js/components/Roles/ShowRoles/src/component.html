@@ -69,8 +69,8 @@
 					</tr>
 					<tr class="" v-show="openDetails.indexOf(role.id) > -1 && role.perms != ''">
 						<td colspan="6">
-							<ul class="list-inline">
-								<li><span class="label label-primary"  v-for="perms in role.perms"><b> <i class="fa fa-unlock"></i> &nbsp;{{ perms.display_name }}</b></span>&nbsp;</li>
+							<ul class="list-unstyled list-group-flush" v-for="perms in role.perms">
+								<li><span class="label label-primary"><b> <i class="fa fa-unlock"></i> &nbsp;{{ perms.display_name }}</b></span>&nbsp;</li>
 							</ul>
 
 						</td>

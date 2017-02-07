@@ -52,7 +52,7 @@ class ApiUsersController extends Controller
         $user->status      = $request->status;
         $user->type        = $request->type;
         $user->description = $request->description;
-        $user->avatar      = $request->avatar;
+        $user->avatar      = 'default.png';
         $user->save();
         $user->roles()->sync($request->roles);
 
@@ -74,7 +74,7 @@ class ApiUsersController extends Controller
     {
         //
     }
-    
+
 
     public function update(Req $request, $id)
     {
