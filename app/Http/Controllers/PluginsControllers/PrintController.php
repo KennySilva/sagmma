@@ -27,8 +27,8 @@ class PrintController extends Controller
     // --------------------------------Employee------------------------------------------------------
     public function indexEmployee()
     {
-        $totaEmployees = Employee::count();
-        return view('exportation.PrintEmployee', compact('totaEmployees'));
+        $totalEmployees = Employee::count();
+        return view('exportation.PrintEmployee', compact('totalEmployees'));
     }
     public function printEmployeePreview()
     {

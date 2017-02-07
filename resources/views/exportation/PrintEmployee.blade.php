@@ -17,7 +17,7 @@
             <span class="info-box-icon bg-blue"><i class="fa fa-print"></i></span>
             <div class="info-box-content">
                 <span class="info-box-text">Funciionários</span>
-                <span class="info-box-number">Estas Preste a imprimir {{ $totalEmployees }} Funciionários</span>
+                <span class="info-box-number">Estas Preste a imprimir {{ $totalEmployees }} Funcionários</span>
             </div>
         </div>
     </div>

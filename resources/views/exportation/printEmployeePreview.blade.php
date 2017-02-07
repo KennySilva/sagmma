@@ -23,6 +23,7 @@
                                 <th>Telefone</th>
                                 <th>Idade</th>
                                 <th>Morada</th>
+                                <th>Tipo de Funlcionário</th>
                                 <th>Data de Registo</th>
                             </tr>
                         </thead>
@@ -35,6 +36,7 @@
                                     <td>{{$employee->phone}}</td>
                                     <td>{{$employee->age}}</td>
                                     <td>{{$employee->zone}}</td>
+                                    <td>{{$employee->typeofemployees->name }}</td>
                                     <td>{{$employee->created_at}}</td>
                                 </tr>
                             @endforeach

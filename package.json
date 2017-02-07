@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "new-component": "cd resources/assets/js/components/Taxation && vue init boudydegeer/vue-component-webpack"
+    "new-component": "cd resources/assets/js/components/Places && vue init boudydegeer/vue-component-webpack"
   },
   "devDependencies": {
     "babel-preset-stage-2": "^6.18.0",
