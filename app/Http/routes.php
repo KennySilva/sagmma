@@ -118,7 +118,9 @@ Route::group(['namespace' => 'ApiControllers'], function()
 
             // ----------------------------------------Api-employee----------------------------------
             Route::resource('employees', 'ApiEmployeesController');
-            Route::get('employeeMarket', 'ApiEmployeesController@getMarketforEmployee');
+            Route::get('marketEmployee', 'ApiEmployeesController@getMarketforEmployee');
+
+            // Route::get('employeeMarket', 'ApiEmployeesController@getMarketforEmployee');
             Route::get('employeeType', 'ApiEmployeesController@getTypeforEmployee');
 
             // ----------------------------------------Api-traders----------------------------------
@@ -214,6 +216,9 @@ Route::group(['namespace' => 'PluginsControllers'], function()
             //-------------------------------Impressão-----------------------------------------------
             Route::get('/printableUserInformation', 'PrintController@indexUser');
             Route::get('/printUserPreview', 'PrintController@printUserPreview');
+            // --------------------------------------------------------------------------------------
+            Route::get('/printableEmployeeInformation', 'PrintController@indexEmployee');
+            Route::get('/printEmployeePreview', 'PrintController@printEmployeePreview');
             // -----------------------------Exportation----------------------------------------------
             Route::get('/getImport', 'PluginsControllers\ExcelController@getImport');
             Route::post('/postImport', 'PluginsControllers\ExcelController@postImport');

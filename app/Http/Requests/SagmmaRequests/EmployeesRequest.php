@@ -14,13 +14,10 @@ class EmployeesRequest extends Request
     public function rules()
     {
         return [
-            'name'              => 'min   :4|max   :50|required',
-            'nickname'          => 'min   :3|max   :20|required',
-            'ic'                => 'size  :6|required|unique:employees',
-            'nif'               => 'size  :11|required|unique:employees',
-            'birth_date'        => 'required|date',
+            'name'              => 'required|max:60|min:4',
+            'ic'                => 'required|digits:6|Integer|unique:users',
             'email'             => 'unique:employees|email',
-            'phone'             => 'size  :7|unique:employees',
+            'phone'             => 'digits:7|unique:employees',
             'service_beginning' => 'date',
         ];
     }

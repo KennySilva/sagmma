@@ -94,7 +94,7 @@ class ApiUsersController extends Controller
 
     public function showThisUser($id)
     {
-        return view('test');
+        return view('test');  
     }
 
     public function estado_utilizador(Request $request)

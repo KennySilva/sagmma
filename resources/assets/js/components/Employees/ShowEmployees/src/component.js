@@ -7,15 +7,8 @@ export default{
     data(){
         return {
             showColumn: {
-                nickname: '',
                 ic: '',
-                nif: '',
-                age: '',
-                email: '',
-                phone: '',
-                echelon: '',
                 service_beginning: '',
-                market_id: '',
             },
             newEmployee: {
                 name              : '',
@@ -30,10 +23,11 @@ export default{
                 phone             : '',
                 echelon           : '',
                 service_beginning : '',
-                market_id         : '',
                 typeofemployee_id : '',
                 photo             : '',
                 description       : '',
+                markets           : [],
+
             },
 
 
@@ -72,6 +66,8 @@ export default{
                 typeofemployee_id : '',
                 photo             : '',
                 description       : '',
+                markets           : [],
+
             };
         },
 
@@ -131,6 +127,7 @@ export default{
                 this.newEmployee.market_id         = response.data.market_id;
                 this.newEmployee.typeofemployee_id = response.data.typeofemployee_id;
                 this.newEmployee.description       = response.data.description;
+                this.newEmployee.markets           = response.data.markets;
             }, (response) => {
                 console.log('Error');
             });
@@ -168,13 +165,13 @@ export default{
             });
         },
 
-        employeeMarket: function() {
-            this.$http.get('http://localhost:8000/api/v1/employeeMarket').then((response) => {
-                this.$set('markets', response.data);
-            }, (response) => {
-                console.log("Ocorreu um erro na operação");
-            });
-        },
+        // employeeMarket: function() {
+        //     this.$http.get('http://localhost:8000/api/v1/employeeMarket').then((response) => {
+        //         this.$set('markets', response.data);
+        //     }, (response) => {
+        //         console.log("Ocorreu um erro na operação");
+        //     });
+        // },
 
         employeeType: function() {
             this.$http.get('http://localhost:8000/api/v1/employeeType').then((response) => {
@@ -184,8 +181,49 @@ export default{
             });
         },
 
+        alterGenderValue: function(employee) {
+            if (employee == 'M') {
+                return 'Masculino';
+            }else if (employee == 'F') {
+                return 'Feminino';
+            }else {
+                return 'Não Especificado';
+            }
 
+        },
+        alterStateValue: function(employee) {
+            if (employee == 1) {
+                return 'Santiago';
+            }else if (employee == 2) {
+                return 'Maio';
+            }else if (employee == 3) {
+                return 'Fogo';
+            }else if (employee == 4) {
+                return 'Brava';
+            }else if (employee == 5) {
+                return 'Santo Antão';
+            }else if (employee == 6) {
+                return 'São Niculau';
+            }else if (employee == 7) {
+                return 'São Vicente';
+            }else if (employee == 8) {
+                return 'Sal';
+            }else if (employee == 9) {
+                return 'Boa Vista';
+            }else {
+                return 'Santa Luzia';
+            }
 
+        },
+
+        // -------------------------Metodo de suporte---------------------------------------------------
+        marketEmployee: function() {
+            this.$http.get('http://localhost:8000/api/v1/marketEmployee').then((response) => {
+                this.$set('markets', response.data);
+            }, (response) => {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
         // --------------------------------------------------------------------------------------------
 
         doSort: function(ev, column) {
@@ -202,24 +240,6 @@ export default{
 
         // --------------------------------------------------------------------------------------------
 
-        // statusEmployeesChange: function(employeeStatus) {
-        //     var postData = {id: employeeStatus};
-        //
-        //     this.$http.post('http://localhost:8000/api/v1/employee/', postData).then((response) => {
-        //         console.log(response.status);
-        //         console.log(response.data);
-        //         if (response.status == 200) {
-        //             this.fetchEmployee(this.pagination.current_page);
-        //         }
-        //     }, (response) => {
-        //         console.log("Ocorreu um erro na operação");
-        //     });
-        // },
-
-
-        // --------------------------------------------------------------------------------------------
-
-
         // Outros funções
         navigate (page) {
             this.fetchEmployee(page);
@@ -231,7 +251,7 @@ export default{
 
     ready () {
         this.fetchEmployee(this.pagination.current_Page)
-        this.employeeMarket()
+        this.marketEmployee()
         this.employeeType()
 
     },

@@ -5,6 +5,7 @@ Vue.use(require('vue-validator'));
 // Vue.use(require('vue-select'));
 // Vue.use(require('vue-router'));
 
+
 var moment  = require('moment');
 
 Vue.filter('formatDate', function(value, formatString) {

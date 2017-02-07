@@ -17,7 +17,7 @@
 	<div class="col-md-4 pull-left">
 		<div class="input-group">
 			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
-			<input v-model="filter.term" type="text" class="form-control" placeholder="Filtrar dados da tabela" aria-describedby="basic-addon1">
+			<input v-model="filter.term" type="text" class="form-control" placeholder="Filtrar..." aria-describedby="basic-addon1">
 		</div>
 	</div>
 </div>
@@ -423,8 +423,8 @@
 								</div>
 								<div class="col-md-6">
 									<div class="form-group has-feedback">
-										<input type="number" class="form-control" name="age" placeholder="Introduza a idade" min="20" max="50" v-model="newUser.age"/>
-										<span class="fa fa-calendar form-control-feedback"></span>
+										<input type="number" class="form-control" name="age" placeholder="Idade" min="20" max="50" v-model="newUser.age"/>
+										<span class="fa fa-birthday-cake form-control-feedback"></span>
 									</div>
 								</div>
 							</div>

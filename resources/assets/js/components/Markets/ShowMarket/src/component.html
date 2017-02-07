@@ -133,7 +133,7 @@
 					<h5>Eliminar - <span class="text-uppercase">{{newMarket.name}}</span></h5>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+					<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
 					<button  @keyup.enter="deleteMarket(newMarket.id)" @click="deleteMarket(newMarket.id)" type="button" class="btn btn-danger">Eliminar Mercado</button>
 				</div>
 			</div>

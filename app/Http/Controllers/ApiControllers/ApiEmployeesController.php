@@ -9,6 +9,7 @@ use Sagmma\Http\Requests;
 use Sagmma\Http\Controllers\Controller;
 use Sagmma\Http\Requests\SagmmaRequests\EmployeesRequest;
 use Employee;
+use Market;
 use Typeofemployee;
 use Response;
 use Input;
@@ -20,6 +21,7 @@ class ApiEmployeesController extends Controller
         $employee = Employee::paginate(5);
         $employee->each(function($employee){
             $employee->typeofemployees;
+            $employee->markets;
         });
         return $employee;
     }
@@ -29,7 +31,7 @@ class ApiEmployeesController extends Controller
 
         public function store(EmployeesRequest $request)
         {
-            $employee                    = new Employee($request->all());
+            $employee                    = new Employee();
             $employee->name              = $request->name;
             $employee->ic                = $request->ic;
             $employee->age               = $request->age;
@@ -48,7 +50,6 @@ class ApiEmployeesController extends Controller
             $employee->save();
             $employee->markets()->sync($request->markets);
         }
-
 
         public function show($id)
         {
@@ -74,8 +75,8 @@ class ApiEmployeesController extends Controller
 
         public function getMarketforEmployee()
         {
-            $market = Market::all();
-            return $market;
+            $markets = Market::all();
+            return $markets;
 
         }
 

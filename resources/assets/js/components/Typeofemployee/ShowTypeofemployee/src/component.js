@@ -32,15 +32,21 @@ export default{
     // ---------------------------------------------------------------------------------
 
     methods: {
+        clearField: function(){
+            this.newMarket = {
+                id         : '',
+                name       : '',
+                location   : '',
+                description: '',
+                logo       : ''
+            };
+        },
+
         createTypeofemployee: function() {
             var typeofemployee = this.newTypeofemployee;
 
             //Clear form input
-            this.newTypeofemployee = {
-                id         : '',
-                name       : '',
-                description: '',
-            };
+            this.clearField();
 
             this.$http.post('http://localhost:8000/api/v1/typeofemployees/', typeofemployee).then((response) => {
                 if (response.status == 200) {
@@ -89,11 +95,8 @@ export default{
         saveEditedTypeofemployee: function(id) {
             var typeofemployee = this.newTypeofemployee;
 
-            this.newTypeofemployee = {
-                id         : '',
-                name       : '',
-                description: '',
-            };
+            this.clearField();
+
 
             this.$http.patch('http://localhost:8000/api/v1/typeofemployees/'+ id, typeofemployee).then((response) => {
                 if (response.status == 200) {
