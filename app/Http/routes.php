@@ -101,9 +101,6 @@ Route::group(['namespace' => 'ApiControllers'], function()
             // ----------------------------------------Api-Markets----------------------------------
             Route::resource('markets', 'ApiMarketsController');
 
-            // ----------------------------------------Api-Typeoftraders---------------------------
-            Route::resource('typeoftraders', 'ApiTypeoftradersController');
-
             // ----------------------------------------Api-Typeofemployees------------------------------
             Route::resource('typeofemployees', 'ApiTypeofemployeesController');
 
@@ -125,8 +122,6 @@ Route::group(['namespace' => 'ApiControllers'], function()
 
             // ----------------------------------------Api-traders----------------------------------
             Route::resource('traders', 'ApiTradersController');
-            Route::get('traderProduct', 'ApiTradersController@getProductforTrader');
-            Route::get('traderType', 'ApiTradersController@getTypeforTrader');
 
             // ------------------------------------Api-Control (employee_material)--------------------
             Route::resource('controls', 'ApiControlsController');
@@ -152,6 +147,8 @@ Route::group(['namespace' => 'ApiControllers'], function()
             Route::get('placeType', 'ApiPlacesController@getTypeForPlace');
             Route::post('placeStatus', 'ApiPlacesController@placeStatus');
 
+            // ----------------------------------------Api-promotions----------------------------------
+            Route::resource('promotions', 'ApiPromotionsController');
         });
     });
 });
@@ -185,8 +182,6 @@ Route::group(['namespace' => 'Sagmma'], function()
         Route::group(['middleware' => ['permission:admin']], function () {//Adicionar os restantes papeis
             // ----------------------------------------Markets----------------------------------
             Route::resource('markets', 'MarketsController');
-            // ----------------------------------------Markets----------------------------------
-            Route::resource('typeoftraders', 'TypeoftradersController');
             // ---------------------------------------Employee----------------------------------
             Route::resource('typeofemployees', 'TypeofemployeesController');
             // -----------------------------------------palce-----------------------------------
@@ -209,6 +204,9 @@ Route::group(['namespace' => 'Sagmma'], function()
             });
             // -----------------------------------------Places-----------------------------------
             Route::resource('places', 'PlacesController');
+
+            // -----------------------------------------promotions-----------------------------------
+            Route::resource('promotions', 'PromotionsController');
         });
     });
 });

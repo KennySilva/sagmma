@@ -27,6 +27,8 @@ export default{
                 photo             : '',
                 description       : '',
                 markets           : [],
+                get_email         : '',
+                get_password      : '',
 
             },
 

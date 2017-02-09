@@ -68,7 +68,7 @@
                     <li><a href="{{ url('sagmma/materials') }}"><i class='fa fa-briefcase'></i> <span>Materiais</span></a></li>
                     <li><a href="{{ url('sagmma/places') }}"><i class='fa fa-map-marker'></i> <span>Espaços</a></li>
                         <li><a href="{{ url('sagmma/traders') }}"><i class='fa fa-user'></i> <span>Comerciantes</a></li>
-                            <li><a href="{{ url('sagmma/traders') }}"><i class='fa fa-shopping-bag'></i> <span>Promoções</a></li>
+                            <li><a href="{{ url('sagmma/promotions') }}"><i class='fa fa-shopping-bag'></i> <span>Promoções</a></li>
                             </ul>
                         </li>
                         @endrole

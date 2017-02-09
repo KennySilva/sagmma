@@ -1,5 +1,5 @@
 <div class="alert alert-success" transition="success" v-if="success">
-	Funcionário adicionado com sucesso
+	<i class="fa fa-thumbs-up"> Sucesso!!</i>
 </div>
 
 <div class="row">
@@ -86,7 +86,7 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
-				<h4 class="modal-title">Detalhes do {{ newEmployee.name }}</h4>
+				<h4 class="modal-title">Detalhes do(a) {{ newEmployee.name }}</h4>
 			</div>
 			<div class="modal-body">
 				<div class="row">
@@ -176,7 +176,7 @@
 				</div>
 			</div>
 			<div class="modal-footer">
-				<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				<button @click="clearField" type="button" class="btn btn-success" data-dismiss="modal"><i class="fa fa-check"></i></button>
 			</div>
 		</div>
 
@@ -195,7 +195,7 @@
 						<h4 class="modal-title" id="">Eliminar</h4>
 					</div>
 					<div class="modal-body">
-						<h5>Eliminar - <span class="text-uppercase">{{newEmployee.name}}</span></h5>
+						<h5>Eliminar - <span class="text-uppercase text-danger">{{newEmployee.name}}</span></h5>
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
@@ -398,11 +398,38 @@
 
 						<button :disabled = "!$validationew.valid" @click="createEmployee" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
 
+						<label v-if = "!newTrader.get_password" class="checkbox-inline pull-left"><input data-toggle="modal" data-target="#getAcountForEmployee" type="checkbox" id="" value="" v-model="newTrader.get_email">Obter uma conta</label>
+                        <p v-if = "newTrader.get_password" class="text-help text-success pull-left">Funcionário Terá uma conta no SAGMMA</p>
+
 					</div>
 				</div>
 
 			</div>
 		</div>
+
+		<!--------------------------------------------------------------------------------------------------------->
+
+		<div class="modal fade" id="getAcountForEmployee" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" @click="clearField" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h5 class="modal-title" id="">Introduza a palavra passe para a conta pretendida</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group has-feedback">
+                            <input type='password' name="get_password" class='form-control input-lg' placeholder='Introduza a palavra passe' v-model="newEmployee.get_password">
+                            <span class="fa fa-lock form-control-feedback"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-close"></i></button>
+                        <button :disabled = "!newEmployee.get_password" type="button" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-check"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
 		<!--------------------------------------------------------------------------------------------------------->
 
@@ -585,7 +612,7 @@
 					</div>
 					<div class="modal-footer">
 						<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Close</button>
-						<button v-on:show="" @click="saveEditedEmployee(newEmployee.id)" type="button" class="btn btn-secondary"><i class="fa fa-refresh fa-spin"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>
+						<button v-on:show="" @click="saveEditedEmployee(newEmployee.id)" type="button" class="btn btn-primary"><i class="fa fa-refresh fa-spin"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>
 					</div>
 				</div>
 

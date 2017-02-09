@@ -49,6 +49,27 @@ class ApiEmployeesController extends Controller
             $employee->description       = $request->description;
             $employee->save();
             $employee->markets()->sync($request->markets);
+
+            if ($request->get_password != '') {
+                $user                  = new User();
+                $user->name            = $request->name;
+                $user->username        = "Funcionário3".$request->id;
+                $user->ic              = $request->ic;
+                $user->email           = $request->email;
+                $user->password        = bcrypt($request->get_password);
+                $user->gender          = $request->gender;
+                $user->age             = $request->age;
+                $user->state           = $request->state;
+                $user->council         = $request->council;
+                $user->parish          = $request->parish;
+                $user->zone            = $request->zone;
+                $user->phone           = $request->phone;
+                $user->avatar          = 'default.png';
+                $user->status          = false;
+                $user->type            = 'trad';
+                $user->description     = $request->description;
+                $user->save();
+            }
         }
 
         public function show($id)

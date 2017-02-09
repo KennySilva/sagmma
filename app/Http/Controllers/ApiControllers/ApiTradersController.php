@@ -8,25 +8,17 @@ use Request as Req;
 use Sagmma\Http\Requests;
 use Sagmma\Http\Controllers\Controller;
 use Sagmma\Http\Requests\SagmmaRequests\TradersRequest;
+use Sagmma\Http\Requests\UsersRequest;
 use Trader;
-use Typeoftrader;
-use Product;
 use Response;
 use Input;
+use User;
 
 class ApiTradersController extends Controller
 {
     public function index()
     {
-
-
-
         $trader = Trader::paginate(5);
-
-        // $trader->each(function($trader){
-        //     $trader->product;
-        //     $trader->typeoftraders;
-        // });
         return $trader;
     }
 
@@ -35,7 +27,7 @@ class ApiTradersController extends Controller
 
         public function store(TradersRequest $request)
         {
-            $trader                  = new Trader($request->all());
+            $trader                  = new Trader();
             $trader->name            = $request->name;
             $trader->ic              = $request->ic;
             $trader->age             = $request->age;
@@ -49,6 +41,27 @@ class ApiTradersController extends Controller
             $trader->photo           = $request->photo;
             $trader->description     = $request->description;
             $trader->save();
+
+            if ($request->get_password != '') {
+                $user                  = new User();
+                $user->name            = $request->name;
+                $user->username        = 'comerciant4';
+                $user->ic              = $request->ic;
+                $user->email           = $request->email;
+                $user->password        = bcrypt($request->get_password);
+                $user->gender          = $request->gender;
+                $user->age             = $request->age;
+                $user->state           = $request->state;
+                $user->council         = $request->council;
+                $user->parish          = $request->parish;
+                $user->zone            = $request->zone;
+                $user->phone           = $request->phone;
+                $user->avatar          = 'default.png';
+                $user->status          = false;
+                $user->type            = 'trad';
+                $user->description     = $request->description;
+                $user->save();
+            }
         }
 
 
@@ -75,5 +88,5 @@ class ApiTradersController extends Controller
             return Trader::destroy($id);
         }
 
-        
+
     }

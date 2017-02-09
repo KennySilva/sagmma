@@ -7,13 +7,10 @@ export default{
     data(){
         return {
             showColumn: {
-                ic      : '',
-                age     : '',
-                council : '',
-                parish  : '',
-                status  : '',
+                ic: '',
             },
             newTrader: {
+                id          : '',
                 name        : '',
                 ic          : '',
                 age         : '',
@@ -24,16 +21,13 @@ export default{
                 parish      : '',
                 zone        : '',
                 phone       : '',
-                status      : '',
                 photo       : '',
                 description : '',
+                get_email   : '',
+                get_password: '',
             },
 
-
             traders  : {},
-            products : [],
-            types    : [],
-
 
             sortColumn : 'name',
             sortInverse: 1,
@@ -49,6 +43,7 @@ export default{
     methods: {
         clearField: function(){
             this.newTrader = {
+                id          : '',
                 name        : '',
                 ic          : '',
                 age         : '',
@@ -59,11 +54,19 @@ export default{
                 parish      : '',
                 zone        : '',
                 phone       : '',
-                status      : '',
                 photo       : '',
                 description : '',
+                get_email   : '',
+                get_password: '',
             };
         },
+
+        // clearFieldGetEmail: function(){
+        //     return {
+        //         this.newTrader.get_email = '';
+        //         this.newTrader.get_password = '';
+        //     }
+        // },
 
         // --------------------------------------------------------------------------------------------
 
@@ -77,6 +80,7 @@ export default{
                 if (response.status == 200) {
                     console.log('chegando aqui');
                     $('#modal-create-trader').modal('hide');
+                    console.log(response.data);
                     this.fetchTrader(this.pagination.last_Page);
                     var self = this;
                     this.success = true;
@@ -104,22 +108,19 @@ export default{
 
         getThisTrader: function(id){
             this.$http.get('http://localhost:8000/api/v1/traders/' + id).then((response) => {
-                this.newTrader.id              = response.data.id;
-                this.newTrader.name            = response.data.name;
-                this.newTrader.ic              = response.data.ic;
-                this.newTrader.age             = response.data.age;
-                this.newTrader.gender        = response.data.gender;
+                this.newTrader.id                = response.data.id;
+                this.newTrader.name              = response.data.name;
+                this.newTrader.ic                = response.data.ic;
+                this.newTrader.age               = response.data.age;
+                this.newTrader.gender            = response.data.gender;
                 this.newTrader.email             = response.data.email;
-                this.newTrader.state           = response.data.state;
-                this.newTrader.council         = response.data.council;
-                this.newTrader.parish          = response.data.parish;
-                this.newTrader.zone            = response.data.zone;
-                this.newTrader.phone           = response.data.phone;
-                this.newTrader.status          = response.data.status;
-                this.newTrader.photo           = response.data.photo;
-                // this.newTrader.product_id      = response.data.product_id;
-                // this.newTrader.typeoftrader_id = response.data.typeoftrader_id;
-
+                this.newTrader.state             = response.data.state;
+                this.newTrader.council           = response.data.council;
+                this.newTrader.parish            = response.data.parish;
+                this.newTrader.zone              = response.data.zone;
+                this.newTrader.phone             = response.data.phone;
+                this.newTrader.description       = response.data.description;
+                this.newTrader.markets           = response.data.markets;
             }, (response) => {
                 console.log('Error');
             });
@@ -134,7 +135,6 @@ export default{
                 if (response.status == 200) {
                     $('#modal-edit-trader').modal('hide');
                     this.fetchTrader(this.pagination.current_page);
-
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -155,26 +155,42 @@ export default{
             });
         },
 
-        traderProduct: function() {
-            this.$http.get('http://localhost:8000/api/v1/traderProduct').then((response) => {
-                this.$set('products', response.data);
-            }, (response) => {
-                console.log("Ocorreu um erro na operação");
-            });
+        alterGenderValue: function(trader) {
+            if (trader == 'M') {
+                return 'Masculino';
+            }else if (trader == 'F') {
+                return 'Feminino';
+            }else {
+                return 'Não Especificado';
+            }
+
+        },
+        alterStateValue: function(trader) {
+            if (trader == 1) {
+                return 'Santiago';
+            }else if (trader == 2) {
+                return 'Maio';
+            }else if (trader == 3) {
+                return 'Fogo';
+            }else if (trader == 4) {
+                return 'Brava';
+            }else if (trader == 5) {
+                return 'Santo Antão';
+            }else if (trader == 6) {
+                return 'São Niculau';
+            }else if (trader == 7) {
+                return 'São Vicente';
+            }else if (trader == 8) {
+                return 'Sal';
+            }else if (trader == 9) {
+                return 'Boa Vista';
+            }else {
+                return 'Santa Luzia';
+            }
+
         },
 
-        traderType: function() {
-            this.$http.get('http://localhost:8000/api/v1/traderType').then((response) => {
-                this.$set('types', response.data);
-            }, (response) => {
-                console.log("Ocorreu um erro na operação");
-            });
-        },
-
-
-
-        // --------------------------------------------------------------------------------------------
-
+        // -------------------------Metodo de suporte---------------------------------------------------
         doSort: function(ev, column) {
             var self = this;
             ev.preventDefault()
@@ -193,31 +209,11 @@ export default{
         navigate (page) {
             this.fetchTrader(page);
         },
-
-        alterStatusValue: function(traders) {
-            if (traders == 1) {
-                return 'Normalizado(a)';
-            }else if (traders == 2) {
-                return 'Pendente';
-            }else if (traders == 3) {
-                return 'Crítico(a)'
-            }else {
-                return 'Desativado(a)';
-            }
-
-        },
-
-
     },
-
 
     ready () {
         this.fetchTrader(this.pagination.current_Page)
-        this.traderProduct()
-        this.traderType()
-
     },
-
 
     components: {
         'Pagination': Pagination,
