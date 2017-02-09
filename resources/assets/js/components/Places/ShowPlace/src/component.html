@@ -1,12 +1,14 @@
-
 <div class="alert alert-success" transition="success" v-if="success">
-	Material adicionado com sucesso
+	<i class="fa fa-thumbs-up"> Sucesso!!</i>
 </div>
 
-
-
 <div class="row">
-	<div class="col-md-4 pull-right">
+	<div class="pull right col-md-8">
+		<label class="checkbox-inline"><input type="checkbox" id="" value="" v-model="showColumn.price">Valor</label>
+		<label class="checkbox-inline"><input type="checkbox" id="" value="" v-model="showColumn.typeofplace_id">Tipo</label>
+	</div>
+
+	<div class="col-md-4 pull-left">
 		<div class="input-group">
 			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
 			<input v-model="filter.term" type="text" class="form-control" placeholder="Filtrar..." aria-describedby="basic-addon1">
@@ -15,36 +17,53 @@
 </div>
 
 <hr>
+
 <div class="row">
 	<div class="col-md-12">
-		<button class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-material"><i class="fa fa-plus"></i> Novo</button>
+		<button @click="clearField" class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-place"><i class="fa fa-plus"></i> Novo</button>&nbsp;&nbsp;
+		<a class="btn btn-primary btn-flat btn-outline" href="/export/printablePlaceInformation"><i class="fa fa-print"></i> Imprimir</a>
 	</div>
 </div>
+
 <br>
+
 <div class="row">
 	<div class="col-md-12">
 		<div class='table-responsive'>
-			<table class='table table-striped table-hover table-success'>
+			<table class='table table-striped table-hover table-condensed'>
 				<thead>
 					<tr>
 						<th>
 							<i :class = "{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
 							<a href="#" @click = "doSort($event, 'name')">Nome</a>
 						</th>
+						<th class="info" v-if="showColumn.price">
+							<i :class = "{'fa-sort-amount-asc': sortColumn == 'price' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'price' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+							<a href="#" @click = "doSort($event, 'price')">Valor</a>
+						</th>
 						<th>
-							<i :class = "{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
-							<a href="#" @click = "doSort($event, 'description')">Descrição</a>
+							<i :class = "{'fa-sort-amount-asc': sortColumn == 'status' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'status' &&   sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+							<a href="#" @click = "doSort($event, 'status')">Estado</a>
 						</th>
 
+						<th class="info" v-if="showColumn.typeofplace_id">
+							<i :class = "{'fa-sort-amount-asc': sortColumn == 'typeofplace_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'typeofplace_id' &&   sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+							<a href="#" @click = "doSort($event, 'typeofplace_id')">Tipo</a>
+						</th>
 						<th  class="text-center" colspan="2"><span><i class="fa fa-cogs"></i></span></th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr v-for="material in materials | filterBy filter.term | orderBy sortColumn sortInverse">
-						<td>{{ material.name }}</td>
-						<td>{{ material.description }}</td>
-						<td align=left>  <a data-toggle="modal" data-target="#modal-edit-material" href="#"> <i class="fa fa-pencil text-primary" @click="getThisMaterial(material.id)" > </i></a></td>
-						<td align=right><a data-toggle="modal" data-target="#modal-delete-material" href="#"><i class="fa fa-trash text-danger" @click="getThisMaterial(material.id)"></i></a></td>
+					<tr v-for="place in places | filterBy filter.term | orderBy sortColumn sortInverse">
+						<td><a href="#" data-toggle="modal" data-target="#show-place" @click="getThisPlace(place.id)">{{ place.name }}</a></td>
+						<td class="info" v-if="showColumn.price">{{ place.price }} ECV</td>
+						<td>
+							<button type="submit" @click = "placeStatus(place.id)" class='btn btn-xs btn-flat' :class="{ 'btn-info': place.status, 'btn-danger': !place.status }">{{place.status ? 'Ativado' : 'Disativado'}}</button>
+						</td>
+						<td class="info" v-if="showColumn.typeofplace_id">{{ place.typeofplace.name }}</td>
+
+						<td align=left>  <a data-toggle="modal" data-target="#modal-edit-place" href="#"> <i class="fa fa-pencil text-primary" @click="getThisPlace(place.id)" > </i></a></td>
+						<td align=right><a data-toggle="modal" data-target="#modal-delete-place" href="#"><i class="fa fa-trash text-danger" @click="getThisPlace(place.id)" ></i></a></td>
 					</tr>
 				</tbody>
 			</table>
@@ -54,121 +73,265 @@
 		</div>
 
 		<!--------------------------------------------------------------------------------------------------------->
-
-		<div class="modal fade" id="modal-delete-material" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button @click="clearField" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-						<h4 class="modal-title" id="">Eliminar</h4>
-					</div>
-					<div class="modal-body">
-						<h5>Eliminar - <span class="text-uppercase text-danger">{{newMaterial.name}}</span></h5>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-						<button  @keyup.enter="deleteMaterial(newMaterial.id)" @click="deleteMaterial(newMaterial.id)" type="button" class="btn btn-danger">Eliminar</button>
-					</div>
-				</div>
-			</div>
-		</div>
-
-
-		<!--------------------------------------------------------------------------------------------------------->
-		<!-- Modal -->
-		<div id="modal-create-material" class="modal fade" role="dialog">
+		<div id="show-place" class="modal fade" role="dialog">
 			<div class="modal-dialog">
 
 				<!-- Modal content-->
 				<div class="modal-content">
 					<div class="modal-header">
 						<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
-						<h4 class="modal-title">Registar</h4>
+						<h4 class="modal-title">Detalhes do {{ newPlace.name }}</h4>
 					</div>
 					<div class="modal-body">
-						<validator name="validationew">
-							<form action="#" methods="POST">
-								<div class="row">
-									<div class="col-md-12">
-										<div class="col-md-12">
-											<div class="form-group has-feedback">
-												<input type="text" class="form-control" name="name" placeholder="Nome do  material" v-model="newMaterial.name" v-validate:name="['required']"/>
-												<span class="fa fa-circle form-control-feedback"></span>
-												<p style="color:red;" v-if="$validationew.name.required && $validationew.name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
-											</div>
-										</div>
-									</div>
-								</div>
+						<div class="row">
+							<div class="col-md-12">
+								<div class='table-responsive'>
+									<table class='table table-striped table-hover'>
+										<thead>
+											<tr>
+												<th class="text-center" colspan="2">INFORMAÇOES DO FUNCIONÁRIO</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td><b>ID</b></td>
+												<td><i>{{ newPlace.id }}</i></td>
+											</tr>
+											<tr>
+												<td><b>Nome</b></td>
+												<td><i>{{ newPlace.name }}</i></td>
+											</tr>
+											<tr>
+												<td><b>Demensão</b></td>
+												<td><i>{{ newPlace.dimension }} mm</i></td>
+											</tr>
+											<tr>
+												<td><b>Valor</b></td>
+												<td><span class="label label-info"><i>{{ newPlace.price }} ECV</i></span></td>
 
-								<hr><!---------------------------------------------------------------------------------------------------------------->
+											</tr>
 
-								<div class="row">
-									<div class="col-md-12">
-										<div class="col-md-12">
-											<div class="form-group has-feedback">
-												<textarea name="description" placeholder="Descrição deste Mescado" class="form-control" rows="5" cols="40" id="description" v-model="newMaterial.description"></textarea>
-											</div>
-										</div>
-									</div>
-								</div>
-							</form>
-						</validator>
-					</div>
-					<div class="modal-footer">
-						<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
+											<tr>
+												<td><b>Estado</b></td>
+												<td><span class="label" :class="{ 'label-info': newPlace.status, 'label-danger': !newPlace.status }"><i>{{newPlace.status ? 'Ativado' : 'Disativado'}}</i></span></td>
+											</tr>
 
-						<button :disabled = "!$validationew.valid" @click="createMaterial" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp; Guardar</button>
+											<!-- <tr>
+											<td><b>Tipo</b></td>
+											<td><i>{{ newPlace.typename }}</i></td>
+										</tr> -->
+
+
+										<tr>
+											<td><b>Descrição</b></td>
+											<td><i>{{ newPlace.description }}</i></td>
+										</tr>
+
+										<tr>
+											<td><b>Data da criação</b></td>
+											<td><i>{{ place.created_at | formatDate 'DD/MM/YYYY' }}</i></td>
+										</tr>
+										<tr>
+											<td><b>Data de atualização</b></td>
+											<td><i>{{ place.updated_at | formatDate 'DD/MM/YYYY' }}</i></td>
+										</tr>
+
+									</tbody>
+								</table>
+							</div>
+						</div>
 					</div>
 				</div>
+				<div class="modal-footer">
+					<button @click="clearField" type="button" class="btn btn-success" data-dismiss="modal"><i class="fa fa-check"></i></button>
+				</div>
 			</div>
+
 		</div>
+	</div>
 
-		<!--------------------------------------------------------------------------------------------------------->
 
-		<!-- Modal -->
-		<div id="modal-edit-material" class="modal fade" role="dialog">
-			<div class="modal-dialog">
-				<!-- Modal content-->
-				<div class="modal-content">
-					<div class="modal-header">
-						<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
-						<h4 class="modal-title">Editar</h4>
-					</div>
-					<div class="modal-body">
-						<validator name="validation1">
-							<form methods="patch">
-								<div class="row">
-									<div class="col-md-12">
-										<div class="col-md-12">
-											<div class="form-group has-feedback">
-												<input type="text" class="form-control" name="name" v-model="newMaterial.name" v-validate:name="['required']"/>
-												<span class="fa fa-circle form-control-feedback"></span>
-												<p style="color:red;" v-if="$validation1.name.required && $validation1.name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
-											</div>
-										</div>
-									</div>
-								</div>
 
-								<hr><!---------------------------------------------------------------------------------------------------------------->
+	<!--------------------------------------------------------------------------------------------------------->
 
-								<div class="row">
-									<div class="col-md-12">
-										<div class="col-md-12">
-											<div class="form-group has-feedback">
-												<textarea name="description" placeholder="Descrição deste Mescado" class="form-control" rows="5" cols="40" id="description" v-model="newMaterial.description"></textarea>
-											</div>
-										</div>
-									</div>
-								</div>
-							</form>
-						</validator>
-					</div>
-					<div class="modal-footer">
-						<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Close</button>
-						<button v-on:show="" @click="saveEditedMaterial(newMaterial.id)" type="button" class="btn btn-primary"><i class="fa fa-refresh fa-spin"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>
-					</div>
+	<div class="modal fade" id="modal-delete-place" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="">Eliminar</h4>
+				</div>
+				<div class="modal-body">
+					<h5>Eliminar - <span class="text-uppercase text-danger">{{newPlace.name}}</span></h5>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+					<button  @keyup.enter="deletePlace(newPlace.id)" @click="deletePlace(newPlace.id)" type="button" class="btn btn-danger">Eliminar</button>
 				</div>
 			</div>
 		</div>
 	</div>
+
+
+	<!--------------------------------------------------------------------------------------------------------->
+	<!-- Modal -->
+	<div id="modal-create-place" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Registar</h4>
+				</div>
+				<div class="modal-body">
+					<validator name="validationew">
+						<form action="#" methods="POST">
+							<div class="row">
+								<div class="col-md-12">
+									<div class="col-md-12">
+										<div class="form-group has-feedback">
+											<input type="text" class="form-control" name="name" placeholder="Nome" v-model="newPlace.name" v-validate:name="['required']"/>
+											<span class="fa fa-map-pin form-control-feedback"></span>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-md-12">
+									<div class="col-md-6">
+										<div class="form-group has-feedback">
+											<input type="number" class="form-control" name="price" placeholder="Valor" v-model="newPlace.price"/>
+											<span class="fa fa-usd form-control-feedback"></span>
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="form-group has-feedback">
+											<input type="number" class="form-control" name="dimension" placeholder="Dimensão" v-model="newPlace.dimension"/>
+											<span class="form-control-feedback">mm</span>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<hr>
+
+							<div class="row">
+								<div class="col-md-12">
+									<div class="col-md-12">
+										<div class="form-group has-feedback">
+											<select class="form-control" v-model="newPlace.typeofplace_id">
+												<option value="" selected>Tipo de Espaço</option>
+												<option v-for="type in types" value="{{type.id}}">{{type.name}}</option>
+											</select>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-md-12">
+									<div class="col-md-12">
+										<div class="form-group has-feedback">
+											<textarea name="description" placeholder="Descrição..." class="form-control" rows="5" cols="40" id="description" v-model="newPlace.description"></textarea>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</form>
+					</validator>
+				</div>
+				<div class="modal-footer">
+					<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
+
+					<button :disabled = "!$validationew.valid" @click="createPlace" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
+
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<!--------------------------------------------------------------------------------------------------------->
+
+	<!-- Modal -->
+	<div id="modal-edit-place" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Editar</h4>
+				</div>
+				<div class="modal-body">
+					<validator name="validation1">
+						<form methods="patch">
+
+							<div class="row">
+								<div class="col-md-12">
+									<div class="col-md-12">
+										<div class="form-group has-feedback">
+											<input type="text" class="form-control" name="name" placeholder="Nome" v-model="newPlace.name" v-validate:name="['required']"/>
+											<span class="fa fa-user form-control-feedback"></span>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-md-12">
+									<div class="col-md-6">
+										<div class="form-group has-feedback">
+											<input type="number" class="form-control" name="price" placeholder="Valor" v-model="newPlace.price"/>
+											<span class="fa fa-envelope form-control-feedback"></span>
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="form-group has-feedback">
+											<input type="number" class="form-control" name="dimension" placeholder="Dimensão" v-model="newPlace.dimension"/>
+											<span class="fa fa-phone form-control-feedback"></span>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<hr>
+
+							<div class="row">
+								<div class="col-md-12">
+									<div class="col-md-12">
+										<div class="form-group has-feedback">
+											<select class="form-control" v-model="newPlace.typeofplace_id">
+												<option value="" selected>Tipo de Espaço</option>
+												<option v-for="type in types" value="{{type.id}}">{{type.name}}</option>
+											</select>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-md-12">
+									<div class="col-md-12">
+										<div class="form-group has-feedback">
+											<textarea name="description" placeholder="Descrição..." class="form-control" rows="5" cols="40" id="description" v-model="newPlace.description"></textarea>
+										</div>
+									</div>
+								</div>
+							</div>
+						</form>
+					</validator>
+				</div>
+				<div class="modal-footer">
+					<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Close</button>
+					<button v-on:show="" @click="saveEditedPlace(newPlace.id)" type="button" class="btn btn-secondary"><i class="fa fa-refresh fa-spin"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>
 </div>

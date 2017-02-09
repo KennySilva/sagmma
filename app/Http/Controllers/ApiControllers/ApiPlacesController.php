@@ -33,13 +33,13 @@ class ApiPlacesController extends Controller
             $place->name           = $request->name;
             $place->dimension      = $request->dimension;
             $place->price          = $request->price;
-            $place->description    = $request->dstatusescription;
+            $place->description    = $request->description;
             $place->status         = $request->status;
             $place->typeofplace_id = $request->typeofplace_id;
             $place->save();
         }
 
-        
+
         public function show($id)
         {
             $place = Place::findOrFail($id);
@@ -68,4 +68,18 @@ class ApiPlacesController extends Controller
             $typeofplace = Typeofplace::all();
             return $typeofplace;
         }
+
+        public function placeStatus(Request $request)
+        {
+            $id  = $request->id;
+            $place = Place::find($id);
+            if ($place->status == true) {
+                $place->status = false;
+            }else {
+                $place->status = true;
+            }
+            $place->save();
+            return response($place, 200);
+        }
+
     }

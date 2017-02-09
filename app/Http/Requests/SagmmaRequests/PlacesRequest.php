@@ -17,7 +17,6 @@ class PlacesRequest extends Request
             'name'           => 'max         :20|required',
             'dimension'      => 'required|max:10',
             'price'          => 'required|max:10',
-            'status'         => 'required',
             'typeofplace_id' => 'required',
         ];
     }

@@ -10,6 +10,14 @@ class Place extends Model
 
     protected $guarded = ['id'];
 
+    public function getStatusAttribute($value)
+    {
+        if ($value) {
+            return true;
+        }
+        return false;
+    }
+
     //Relacionamentos;
     public function taxation()
     {

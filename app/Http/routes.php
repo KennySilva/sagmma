@@ -147,6 +147,11 @@ Route::group(['namespace' => 'ApiControllers'], function()
             Route::get('taxationEmployee', 'ApiTaxationsController@getEmployeeForTaxation');
             Route::get('taxationPlace', 'ApiTaxationsController@getPlaceForTaxation');
 
+            // ----------------------------------------Api-place----------------------------------
+            Route::resource('places', 'ApiPlacesController');
+            Route::get('placeType', 'ApiPlacesController@getTypeForPlace');
+            Route::post('placeStatus', 'ApiPlacesController@placeStatus');
+
         });
     });
 });
@@ -190,9 +195,9 @@ Route::group(['namespace' => 'Sagmma'], function()
             Route::resource('materials', 'MaterialsController');
             // -----------------------------------------products-----------------------------------
             Route::resource('products', 'ProductsController');
-            // -----------------------------------------products-----------------------------------
-            Route::resource('employees', 'EmployeesController');
             // -----------------------------------------Employees-----------------------------------
+            Route::resource('employees', 'EmployeesController');
+            // -----------------------------------------Traders-----------------------------------
             Route::resource('traders', 'TradersController');
             // -----------------------------------------controls-----------------------------------
             Route::resource('controls', 'ControlsController');
@@ -202,6 +207,8 @@ Route::group(['namespace' => 'Sagmma'], function()
             Route::group(['middleware' => ['permission:admin']], function () {//Adicionar os restantes papeis
                 Route::resource('contracts', 'ContractsController');
             });
+            // -----------------------------------------Places-----------------------------------
+            Route::resource('places', 'PlacesController');
         });
     });
 });

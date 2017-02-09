@@ -1,52 +1,67 @@
 import Pagination from '../../../Pagination/src/Component.vue'
-
+// import vSelect from "vue-select"
 export default{
+    name: 'ShowPlaces',
 
-    name: 'show-material',
 
     data(){
         return {
-            newMaterial: {
-                id         : '',
-                name       : '',
-                description: '',
+            showColumn: {
+                ic: '',
+                typeofplace_id: '',
+            },
+            newPlace: {
+                id            : '',
+                name            : '',
+                price           : '',
+                dimension       : '',
+                status          : '',
+                typeofplace_id : '',
+                description     : '',
             },
 
-            materials: {},
-            sortColumn: 'name',
+
+            places  : {},
+            types      : [],
+
+
+            sortColumn : 'name',
             sortInverse: 1,
-            filter: {
-                term: ''
+            filter     : {
+                term   : ''
             },
-            pagination: {},
-            success: false,
+            pagination : {},
+            success    : false,
         }
     },
 
-    // ---------------------------------------------------------------------------------
-
-    ready () {
-        this.fetchMaterial(1);
-    },
-
-    // ---------------------------------------------------------------------------------
 
     methods: {
-        createMaterial: function() {
-            var material = this.newMaterial;
+        clearField: function(){
+            this.newPlace = {
+                name            : '',
+                price           : '',
+                dimension       : '',
+                status          : '',
+                typeofplace_id : '',
+                description     : '',
+            };
+        },
+
+        // --------------------------------------------------------------------------------------------
+
+        createPlace: function() {
+            //Place input
+            var place = this.newPlace;
 
             //Clear form input
-            this.newMaterial = {
-                id         : '',
-                name       : '',
-                description: '',
-            };
-            this.$http.post('http://localhost:8000/api/v1/materials/', material).then((response) => {
+            this.clearField();
+            this.$http.post('http://localhost:8000/api/v1/places/', place).then((response) => {
                 if (response.status == 200) {
                     console.log('chegando aqui');
-                    $('#modal-create-material').modal('hide');
-                    // console.log(response.data);
-                    this.fetchMaterial();
+                    $('#modal-create-place').modal('hide');
+                    console.log(response.data);
+                    this.fetchPlace(this.pagination.last_Page);
                     var self = this;
                     this.success = true;
                     setTimeout(function() {
@@ -60,24 +75,27 @@ export default{
 
         // --------------------------------------------------------------------------------------------
 
-        fetchMaterial: function(page) {
-            this.$http.get('http://localhost:8000/api/v1/materials?page='+page).then((response) => {
-                this.$set('materials', response.data.data)
-                this.$set('pagination', response.data)
+        fetchPlace: function(page) {
+            this.$http.get('http://localhost:8000/api/v1/places?page='+page).then((response) => {
+                this.$set('places', response.data.data);
+                this.$set('pagination', response.data);
             }, (response) => {
-                console.log("Ocorreu um erro na operação")
+                console.log("Ocorreu um erro na operação");
             });
         },
 
         // --------------------------------------------------------------------------------------------
 
-        getThisMaterial: function(id){
-            this.$http.get('http://localhost:8000/api/v1/materials/' + id).then((response) => {
-                this.newMaterial.id       = response.data.id;
-                this.newMaterial.name     = response.data.name;
-                this.newMaterial.location = response.data.location;
-                this.newMaterial.description    = response.data.description;
-                this.newMaterial.logo   = response.data.logo;
+        getThisPlace: function(id){
+            this.$http.get('http://localhost:8000/api/v1/places/' + id).then((response) => {
+                this.newPlace.id             = response.data.id;
+                this.newPlace.name           = response.data.name;
+                this.newPlace.price          = response.data.price;
+                this.newPlace.dimension      = response.data.dimension;
+                this.newPlace.status         = response.data.status;
+                this.newPlace.typeofplace_id = response.data.typeofplace_id;
+                this.newPlace.description    = response.data.description;
+                // this.newPlace.typename       = response.data.typeofplace.name;
             }, (response) => {
                 console.log('Error');
             });
@@ -85,20 +103,15 @@ export default{
 
         // --------------------------------------------------------------------------------------------
 
-        saveEditedMaterial: function(id) {
-            var material = this.newMaterial;
-
-            this.newMaterial = {
-                id         : '',
-                name       : '',
-                description: '',
-            };
-
-            this.$http.patch('http://localhost:8000/api/v1/materials/'+ id, material).then((response) => {
+        saveEditedPlace: function(id) {
+            var place = this.newPlace;
+            this.clearField();
+            this.$http.patch('http://localhost:8000/api/v1/places/'+ id, place).then((response) => {
                 if (response.status == 200) {
-                    $('#modal-edit-material').modal('hide');
+                    $('#modal-edit-place').modal('hide');
                     // console.log(response.data);
-                    this.fetchMaterial();
+                    this.fetchPlace(this.pagination.current_page);
+
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -107,19 +120,42 @@ export default{
 
         // --------------------------------------------------------------------------------------------
 
-        deleteMaterial: function(id) {
-            this.$http.delete('http://localhost:8000/api/v1/materials/'+ id).then((response) => {
-                $('#modal-delete-material').modal('hide');
+
+        deletePlace: function(id) {
+            this.$http.delete('http://localhost:8000/api/v1/places/'+ id).then((response) => {
+                $('#modal-delete-place').modal('hide');
                 if (response.status == 200) {
                     // console.log(response.data);
-                    this.fetchMaterial();
+                    this.fetchPlace();
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
             });
         },
 
-        // --------------------------------------------------------------------------------------------
+        placeType: function() {
+            this.$http.get('http://localhost:8000/api/v1/placeType').then((response) => {
+                this.$set('types', response.data);
+            }, (response) => {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+        placeStatus: function(placeStatus) {
+            var postData = {id: placeStatus};
+
+            this.$http.post('http://localhost:8000/api/v1/placeStatus/', postData).then((response) => {
+                console.log(response.status);
+                console.log(response.data);
+                if (response.status == 200) {
+                    this.fetchPlace(this.pagination.current_page);
+                }
+            }, (response) => {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+        // -------------------------Metodo de suporte---------------------------------------------------
 
         doSort: function(ev, column) {
             var self = this;
@@ -130,33 +166,28 @@ export default{
             }else {
                 self.sortInverse = 1
             }
+            // console.log(ev);
         },
 
         // --------------------------------------------------------------------------------------------
 
         // Outros funções
         navigate (page) {
-            this.fetchMaterial(page);
+            this.fetchPlace(page);
         },
 
-        clearField: function(){
-            this.newMaterial = {
-                id         : '',
-                name       : '',
-                description: '',
-            };
-        },
 
     },
 
-    // ---------------------------------------------------------------------------------
 
-    computed: {
+    ready () {
+        this.fetchPlace(this.pagination.current_Page)
+        this.placeType()
+
     },
 
-    // ---------------------------------------------------------------------------------
 
     components: {
         'Pagination': Pagination,
-    },
+    }
 }
