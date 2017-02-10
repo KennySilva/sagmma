@@ -1,0 +1,622 @@
+<div class="alert alert-success" transition="success" v-if="success">
+	<i class="fa fa-thumbs-up"> Sucesso!!</i>
+</div>
+
+<div class="row">
+	<div class="pull right col-md-8">
+		<label class="checkbox-inline"><input type="checkbox" id="" value="" v-model="showColumn.ic">BI</label>
+		<label class="checkbox-inline"><input type="checkbox" id="" value="" v-model="showColumn.service_beginning">Inicio Serviço</label>
+	</div>
+
+	<div class="col-md-4 pull-left">
+		<div class="input-group">
+			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
+			<input v-model="filter.term" type="text" class="form-control" placeholder="Filtrar..." aria-describedby="basic-addon1">
+		</div>
+	</div>
+</div>
+
+<hr>
+
+<div class="row">
+	<div class="col-md-12">
+		<button @click="clearField" class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-employee"><i class="fa fa-plus"></i> Novo</button>&nbsp;&nbsp;
+		<a class="btn btn-primary btn-flat btn-outline" href="/export/printableEmployeeInformation"><i class="fa fa-print"></i> Imprimir</a>
+	</div>
+</div>
+
+<br>
+
+<div class="row">
+	<div class="col-md-12">
+		<div class='table-responsive'>
+			<table class='table table-striped table-hover table-condensed'>
+				<thead>
+					<tr>
+						<th>
+							<i :class = "{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+							<a href="#" @click = "doSort($event, 'name')">Nome</a>
+						</th>
+						<th class="info" v-if="showColumn.ic">
+							<i :class = "{'fa-sort-amount-asc': sortColumn == 'ic' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'ic' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+							<a href="#" @click = "doSort($event, 'ic')">BI</a>
+						</th>
+						<th>
+							<i :class = "{'fa-sort-amount-asc': sortColumn == 'phone' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'phone' &&   sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+							<a href="#" @click = "doSort($event, 'phone')">Telefone</a>
+						</th>
+
+						<th>
+							<i :class = "{'fa-sort-amount-asc': sortColumn == 'typeofemployee_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'typeofemployee_id' &&   sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+							<a href="#" @click = "doSort($event, 'typeofemployee_id')">Tipo</a>
+						</th>
+
+						<th class="info" v-if="showColumn.service_beginning">
+							<i :class = "{'fa-sort-amount-asc': sortColumn == 'service_beginning' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'service_beginning' &&   sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+							<a href="#" @click = "doSort($event, 'service_beginning')">Inicio de Serviço</a>
+						</th>
+
+
+						<th  class="text-center" colspan="2"><span><i class="fa fa-cogs"></i></span></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="employee in employees | filterBy filter.term | orderBy sortColumn sortInverse">
+						<td><a href="#" data-toggle="modal" data-target="#show-employee" @click="getThisEmployee(employee.id)">{{ employee.name }}</a></td>
+						<td class="info" v-if="showColumn.ic">{{ employee.ic }}</td>
+						<td>{{ employee.phone }}</td>
+						<td>{{ employee.typeofemployees.name }}</td>
+						<td class="info" v-if="showColumn.service_beginning">{{ employee.service_beginning }}</td>
+
+						<td align=left>  <a data-toggle="modal" data-target="#modal-edit-employee" href="#"> <i class="fa fa-pencil text-primary" @click="getThisEmployee(employee.id)" > </i></a></td>
+						<td align=right><a data-toggle="modal" data-target="#modal-delete-employee" href="#"><i class="fa fa-trash text-danger" @click="getThisEmployee(employee.id)" ></i></a></td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="col-md-12 pull-left">
+				<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
+			</div>
+		</div>
+
+		<!--------------------------------------------------------------------------------------------------------->
+		<div id="show-employee" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+
+		<!-- Modal content-->
+		<div class="modal-content">
+			<div class="modal-header">
+				<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Detalhes do(a) {{ newEmployee.name }}</h4>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-md-12">
+						<div class='table-responsive'>
+							<table class='table table-striped table-hover'>
+								<thead>
+									<tr>
+										<th class="text-center" colspan="2">INFORMAÇOES DO FUNCIONÁRIO</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td><b>ID</b></td>
+										<td><i>{{ newEmployee.id }}</i></td>
+									</tr>
+									<tr>
+										<td><b>Nome</b></td>
+										<td><i>{{ newEmployee.name }}</i></td>
+									</tr>
+									<tr>
+										<td><b>BI</b></td>
+										<td><span class="label label-info"><i>{{ newEmployee.ic }}</i></span></td>
+
+									</tr>
+									<tr>
+										<td><b>Idade</b></td>
+										<td><i>{{ newEmployee.age }}</i></td>
+									</tr>
+									<tr>
+										<td><b>Sexo</b></td>
+										<td><i>{{ alterGenderValue(newEmployee.gender) }}</i></td>
+									</tr>
+									<tr>
+										<td><b>Email</b></td>
+										<td><span class="label label-info"><i>{{ newEmployee.email }}</i></span></td>
+
+									</tr>
+									<tr>
+										<td><b>Ilha</b></td>
+										<td><i>{{ alterStateValue(newEmployee.state) }}</i></td>
+									</tr>
+									<tr>
+										<td><b>Concelho</b></td>
+										<td><i>{{ newEmployee.council }}</i></td>
+									</tr>
+									<tr>
+										<td><b>Freguesia</b></td>
+										<td><i>{{ newEmployee.parish }}</i></td>
+									</tr>
+									<tr>
+										<td><b>Zona</b></td>
+										<td><i>{{ newEmployee.zone }}</i></td>
+									</tr>
+
+									<tr>
+										<td><b>Telefone</b></td>
+										<td><span class="label" :class="{ 'label-info': newEmployee.phone, 'none': !newEmployee.phone }"><i>{{ newEmployee.phone }}</i></span></td>
+
+									</tr>
+									<tr>
+										<td><b>Escalão</b></td>
+										<td><i>{{ newEmployee.echelon }}</i></td>
+									</tr>
+									<!-- <tr>
+										<td><b>Tipo</b></td>
+										<td><span class="label label-primary"><i>{{ newEmployee.typeofemployees.name }}</i></span></td>
+
+									</tr> -->
+									<tr>
+										<td><b>Descrição</b></td>
+										<td><i>{{ newEmployee.description }}</i></td>
+									</tr>
+									<tr>
+										<td><b>Data da criação</b></td>
+										<td><i>{{ employee.created_at | formatDate 'DD/MM/YYYY' }}</i></td>
+									</tr>
+									<tr>
+										<td><b>Data de atualização</b></td>
+										<td><i>{{ employee.updated_at | formatDate 'DD/MM/YYYY' }}</i></td>
+									</tr>
+
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button @click="clearField" type="button" class="btn btn-success" data-dismiss="modal"><i class="fa fa-check"></i></button>
+			</div>
+		</div>
+
+	</div>
+</div>
+
+
+
+		<!--------------------------------------------------------------------------------------------------------->
+
+		<div class="modal fade" id="modal-delete-employee" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="">Eliminar</h4>
+					</div>
+					<div class="modal-body">
+						<h5>Eliminar - <span class="text-uppercase text-danger">{{newEmployee.name}}</span></h5>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+						<button  @keyup.enter="deleteEmployee(newEmployee.id)" @click="deleteEmployee(newEmployee.id)" type="button" class="btn btn-danger">Eliminar</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<!--------------------------------------------------------------------------------------------------------->
+		<!-- Modal -->
+		<div id="modal-create-employee" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Registar</h4>
+					</div>
+					<div class="modal-body">
+						<validator name="validationew">
+							<form action="#" methods="POST">
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-8">
+											<div class="form-group has-feedback">
+												<input type="text" class="form-control" name="name" placeholder="Nome" v-model="newEmployee.name" v-validate:name="['required']"/>
+												<span class="fa fa-user form-control-feedback"></span>
+											</div>
+										</div>
+										<div class="col-md-4">
+											<div class="form-group has-feedback">
+												<input type="number" class="form-control" name="ic" placeholder="Número BI" v-model="newEmployee.ic"/>
+												<span class="fa fa-id-card form-control-feedback"></span>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-8">
+											<div class="form-group has-feedback">
+												<input type="email" class="form-control" name="email" placeholder="Email" v-model="newEmployee.email"/>
+												<span class="fa fa-envelope form-control-feedback"></span>
+											</div>
+										</div>
+										<div class="col-md-4">
+											<div class="form-group has-feedback">
+												<input type="number" class="form-control" name="phone" placeholder="Telefone" v-model="newEmployee.phone"/>
+												<span class="fa fa-phone form-control-feedback"></span>
+											</div>
+										</div>
+									</div>
+								</div>
+
+
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-2">
+											<div class="form-group has-feedback">
+												<label class="radio-inline">
+													<input type="radio" id="gender" value="M" name="gender" v-model="newEmployee.gender"> <i class="fa fa-male"></i>
+												</label>
+												<label class="radio-inline">
+													<input type="radio" id="gender" name="gender" value="F" v-model="newEmployee.gender"><i class="fa fa-female"></i>
+												</label>
+											</div>
+										</div>
+
+										<div class="col-md-10 pull-right">
+											<div class="form-group has-feedback">
+												<input type="number" class="form-control" name="age" placeholder="Idade" v-model="newEmployee.age"/>
+												<span class="fa fa-birthday-cake form-control-feedback"></span>
+											</div>
+										</div>
+									</div>
+								</div>
+								<hr>
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<select name="state" class="selectpicker form-control show-tick" v-model="newEmployee.state">
+													<optgroup label="Sotavento">
+														<option>Selecione Ilha</option>
+														<option value="2">Maio</option>
+														<option value="1">Santiago</option>
+														<option value="3">Fogo</option>
+														<option value="4">Brava</option>
+													</optgroup>
+													<optgroup label="Barlavento">
+														<option value="5">Santo Antão</option>
+														<option value="6">São Nicolau</option>
+														<option value="7">São Vicente</option>
+														<option value="8">Sal</option>
+														<option value="9">Boa Vista</option>
+													</optgroup>
+												</select>
+											</div>
+										</div>
+
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<input type="text" class="form-control" name="council" placeholder="Concelho" v-model="newEmployee.council"/>
+												<span class="fa fa-compass form-control-feedback"></span>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<input type="text" class="form-control" name="parish" placeholder="Freguezia" v-model="newEmployee.parish"/>
+												<span class="fa fa-map-marker form-control-feedback"></span>
+											</div>
+										</div>
+
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<input type="text" class="form-control" name="zone" placeholder="Zona" v-model="newEmployee.zone"/>
+												<span class="fa fa-thumb-tack form-control-feedback"></span>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<hr><!-------------------------------------------------------------------------------------------------------------------->
+
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<input type="date" class="form-control" name="service_beginning" placeholder="Inicio de serviço" v-model="newEmployee.service_beginning"/>
+												<span class="fa fa-calendar form-control-feedback"></span>
+												<p class="text-help">Data de inicio de serviço</p>
+											</div>
+										</div>
+
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<select name="type" class="selectpicker  form-control" title="Escalão" v-model="newEmployee.echelon">
+													<option value="a">A</option>
+													<option value="b">B</option>
+													<option value="c">C</option>
+													<option value="d">D</option>
+													<option value="e">E</option>
+												</select>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<hr><!---------------------------------------------------------------------------------------------------------------->
+
+
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<select class="form-control" v-model="newEmployee.typeofemployee_id">
+													<option value="" selected>Tipo de funcionário</option>
+													<option v-for="type in types" value="{{type.id}}">{{type.name}}</option>
+												</select>
+											</div>
+										</div>
+
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<select class="form-control" v-model="newEmployee.markets" multiple>
+													<option value="" selected>Mercado</option>
+													<option v-for="market in markets" value="{{market.id}}">
+														{{market.name}}
+													</option>
+												</select>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<div class="form-group has-feedback">
+												<textarea name="description" placeholder="Descrição..." class="form-control" rows="5" cols="40" id="description" v-model="newEmployee.description"></textarea>
+											</div>
+										</div>
+									</div>
+								</div>
+
+							</form>
+						</validator>
+					</div>
+					<div class="modal-footer">
+						<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
+
+						<button :disabled = "!$validationew.valid" @click="createEmployee" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
+
+						<label v-if = "!newTrader.get_password" class="checkbox-inline pull-left"><input data-toggle="modal" data-target="#getAcountForEmployee" type="checkbox" id="" value="" v-model="newTrader.get_email">Obter uma conta</label>
+                        <p v-if = "newTrader.get_password" class="text-help text-success pull-left">Funcionário Terá uma conta no SAGMMA</p>
+
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+		<!--------------------------------------------------------------------------------------------------------->
+
+		<div class="modal fade" id="getAcountForEmployee" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" @click="clearField" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h5 class="modal-title" id="">Introduza a palavra passe para a conta pretendida</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group has-feedback">
+                            <input type='password' name="get_password" class='form-control input-lg' placeholder='Introduza a palavra passe' v-model="newEmployee.get_password">
+                            <span class="fa fa-lock form-control-feedback"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-close"></i></button>
+                        <button :disabled = "!newEmployee.get_password" type="button" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-check"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+		<!--------------------------------------------------------------------------------------------------------->
+
+		<!-- Modal -->
+		<div id="modal-edit-employee" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Editar</h4>
+					</div>
+					<div class="modal-body">
+						<validator name="validation1">
+							<form methods="patch">
+
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-8">
+											<div class="form-group has-feedback">
+												<input type="text" class="form-control" name="name" placeholder="Nome" v-model="newEmployee.name" v-validate:name="['required']"/>
+												<span class="fa fa-user form-control-feedback"></span>
+											</div>
+										</div>
+										<div class="col-md-4">
+											<div class="form-group has-feedback">
+												<input type="number" class="form-control" name="ic" placeholder="Número BI" v-model="newEmployee.ic"/>
+												<span class="fa fa-id-card form-control-feedback"></span>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-8">
+											<div class="form-group has-feedback">
+												<input type="email" class="form-control" name="email" placeholder="Email" v-model="newEmployee.email"/>
+												<span class="fa fa-envelope form-control-feedback"></span>
+											</div>
+										</div>
+										<div class="col-md-4">
+											<div class="form-group has-feedback">
+												<input type="number" class="form-control" name="phone" placeholder="Telefone" v-model="newEmployee.phone"/>
+												<span class="fa fa-phone form-control-feedback"></span>
+											</div>
+										</div>
+									</div>
+								</div>
+
+
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-2">
+											<div class="form-group has-feedback">
+												<label class="radio-inline">
+													<input type="radio" id="gender" value="M" name="gender" v-model="newEmployee.gender"> <i class="fa fa-male"></i>
+												</label>
+												<label class="radio-inline">
+													<input type="radio" id="gender" name="gender" value="F" v-model="newEmployee.gender"><i class="fa fa-female"></i>
+												</label>
+											</div>
+										</div>
+
+										<div class="col-md-10 pull-right">
+											<div class="form-group has-feedback">
+												<input type="number" class="form-control" name="age" placeholder="Idade" v-model="newEmployee.age"/>
+												<span class="fa fa-birthday-cake form-control-feedback"></span>
+											</div>
+										</div>
+									</div>
+								</div>
+								<hr>
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<select name="state" class="selectpicker form-control show-tick" v-model="newEmployee.state">
+													<optgroup label="Sotavento">
+														<option>Selecione Ilha</option>
+														<option value="2">Maio</option>
+														<option value="1">Santiago</option>
+														<option value="3">Fogo</option>
+														<option value="4">Brava</option>
+													</optgroup>
+													<optgroup label="Barlavento">
+														<option value="5">Santo Antão</option>
+														<option value="6">São Nicolau</option>
+														<option value="7">São Vicente</option>
+														<option value="8">Sal</option>
+														<option value="9">Boa Vista</option>
+													</optgroup>
+												</select>
+											</div>
+										</div>
+
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<input type="text" class="form-control" name="council" placeholder="Concelho" v-model="newEmployee.council"/>
+												<span class="fa fa-compass form-control-feedback"></span>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<input type="text" class="form-control" name="parish" placeholder="Freguezia" v-model="newEmployee.parish"/>
+												<span class="fa fa-map-marker form-control-feedback"></span>
+											</div>
+										</div>
+
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<input type="text" class="form-control" name="zone" placeholder="Zona" v-model="newEmployee.zone"/>
+												<span class="fa fa-thumb-tack form-control-feedback"></span>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<hr><!-------------------------------------------------------------------------------------------------------------------->
+
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<input type="date" class="form-control" name="service_beginning" placeholder="Inicio de serviço" v-model="newEmployee.service_beginning"/>
+												<span class="fa fa-calendar form-control-feedback"></span>
+												<p class="text-help">Data de inicio de serviço</p>
+											</div>
+										</div>
+
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<select name="type" class="selectpicker  form-control" title="Escalão" v-model="newEmployee.echelon">
+													<option value="a">A</option>
+													<option value="b">B</option>
+													<option value="c">C</option>
+													<option value="d">D</option>
+													<option value="e">E</option>
+												</select>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<hr><!---------------------------------------------------------------------------------------------------------------->
+
+
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<div class="form-group has-feedback">
+												<select class="form-control" v-model="newEmployee.typeofemployee_id">
+													<option value="" selected>Tipo de funcionário</option>
+													<option v-for="type in types" value="{{type.id}}">{{type.name}}</option>
+												</select>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<div class="form-group has-feedback">
+												<textarea name="description" placeholder="Descrição do utilizador" class="form-control" rows="5" cols="40" id="description" v-model="newEmployee.description"></textarea>
+											</div>
+										</div>
+									</div>
+								</div>
+
+
+							</form>
+						</validator>
+					</div>
+					<div class="modal-footer">
+						<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Close</button>
+						<button v-on:show="" @click="saveEditedEmployee(newEmployee.id)" type="button" class="btn btn-primary"><i class="fa fa-refresh fa-spin"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>
