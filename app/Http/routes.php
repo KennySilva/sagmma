@@ -231,6 +231,17 @@ Route::group(['namespace' => 'PluginsControllers'], function()
     });
 });
 
+
+Route::group(['namespace' => 'Web'], function()
+{
+    Route::group(['prefix' => 'front'], function () {
+        //-------------------------------Impressão-----------------------------------------------
+        Route::get('/traderinfo', 'FrontTraderController@index');
+
+    });
+});
+
+
 //Apresentar dados do tipo de espaço para teste
 Route::get('/typetest', 'Test\TypeController@index');
 
