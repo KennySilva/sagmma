@@ -16,7 +16,7 @@ class Promotion extends Model
     {
         return $this->belongsTo(Trader::class);
     }
-
+    
 
     public function product()
     {

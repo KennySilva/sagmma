@@ -32,15 +32,19 @@ export default{
     // ---------------------------------------------------------------------------------
 
     methods: {
-        createTypeofplace: function() {
-            var typeofplace = this.newTypeofplace;
-
-            //Clear form input
+        clearField: function(){
             this.newTypeofplace = {
                 id         : '',
                 name       : '',
                 description: '',
             };
+        },
+
+        createTypeofplace: function() {
+            var typeofplace = this.newTypeofplace;
+
+            //Clear form input
+            this.clearField();
             this.$http.post('http://localhost:8000/api/v1/typeofplaces/', typeofplace).then((response) => {
                 if (response.status == 200) {
                     console.log('chegando aqui');
@@ -87,11 +91,7 @@ export default{
         saveEditedTypeofplace: function(id) {
             var typeofplace = this.newTypeofplace;
 
-            this.newTypeofplace = {
-                id         : '',
-                name       : '',
-                description: '',
-            };
+            this.clearField();
 
             this.$http.patch('http://localhost:8000/api/v1/typeofplaces/'+ id, typeofplace).then((response) => {
                 if (response.status == 200) {
@@ -103,7 +103,7 @@ export default{
                 console.log("Ocorreu um erro na operação");
             });
         },
-        
+
         // --------------------------------------------------------------------------------------------
 
         deleteTypeofplace: function(id) {
@@ -138,13 +138,7 @@ export default{
             this.fetchTypeofplace(page);
         },
 
-        clearField: function(){
-            this.newTypeofplace = {
-                id         : '',
-                name       : '',
-                description: '',
-            };
-        },
+
 
     },
 

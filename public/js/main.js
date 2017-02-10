@@ -39125,6 +39125,10 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _defineProperty2 = require('babel-runtime/helpers/defineProperty');
+
+var _defineProperty3 = _interopRequireDefault(_defineProperty2);
+
 var _Component = require('../../../Pagination/src/Component.vue');
 
 var _Component2 = _interopRequireDefault(_Component);
@@ -39142,7 +39146,8 @@ exports.default = {
                 name: '',
                 price: '',
                 description: '',
-                photo: ''
+                photo: '',
+                author: ''
             },
 
             products: {},
@@ -39166,20 +39171,26 @@ exports.default = {
 
     // ---------------------------------------------------------------------------------
 
-    methods: {
+    methods: (0, _defineProperty3.default)({
+        clearField: function clearField() {
+            this.newProduct = {
+                id: '',
+                name: '',
+                price: '',
+                description: '',
+                photo: '',
+                author: ''
+            };
+        },
+
         createProduct: function createProduct() {
             var _this = this;
 
             var product = this.newProduct;
 
             //Clear form input
-            this.newProduct = {
-                id: '',
-                name: '',
-                price: '',
-                description: '',
-                photo: ''
-            };
+            this.clearField();
+
             this.$http.post('http://localhost:8000/api/v1/products/', product).then(function (response) {
                 if (response.status == 200) {
                     console.log('chegando aqui');
@@ -39219,6 +39230,7 @@ exports.default = {
                 _this3.newProduct.price = response.data.price;
                 _this3.newProduct.description = response.data.description;
                 _this3.newProduct.photo = response.data.photo;
+                _this3.newProduct.author = response.data.author;
             }, function (response) {
                 console.log('Error');
             });
@@ -39231,14 +39243,7 @@ exports.default = {
 
             var product = this.newProduct;
 
-            this.newProduct = {
-                id: '',
-                name: '',
-                description: '',
-                photo: ''
-
-            };
-
+            this.clearField();
             this.$http.patch('http://localhost:8000/api/v1/products/' + id, product).then(function (response) {
                 if (response.status == 200) {
                     $('#modal-edit-product').modal('hide');
@@ -39255,6 +39260,7 @@ exports.default = {
         deleteProduct: function deleteProduct(id) {
             var _this5 = this;
 
+            this.clearField();
             this.$http.delete('http://localhost:8000/api/v1/products/' + id).then(function (response) {
                 $('#modal-delete-product').modal('hide');
                 if (response.status == 200) {
@@ -39284,20 +39290,16 @@ exports.default = {
         // Outros funções
         navigate: function navigate(page) {
             this.fetchProduct(page);
-        },
-
-
-        clearField: function clearField() {
-            this.newProduct = {
-                id: '',
-                name: '',
-                description: '',
-                photo: ''
-
-            };
         }
+    }, 'clearField', function clearField() {
+        this.newProduct = {
+            id: '',
+            name: '',
+            description: '',
+            photo: ''
 
-    },
+        };
+    }),
 
     // ---------------------------------------------------------------------------------
 
@@ -39310,9 +39312,9 @@ exports.default = {
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success>Produto adicionado com sucesso</div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=\"Filtrar dados da tabela\" aria-describedby=basic-addon1></div></div></div><hr><div class=row><div class=col-md-12><button class=\"btn btn-secondary pull-right\" name=button data-toggle=modal data-target=#modal-create-product>Criar Novo</button></div></div><br><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome do Producto</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'price' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'price' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'price')\">Nome do Producto</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'description')\">Descriçãos</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"product in products | filterBy filter.term | orderBy sortColumn sortInverse\"><td>{{ product.name }}<td>{{ product.price }}<td>{{ product.description }}<td align=left><a data-toggle=modal data-target=#modal-edit-product href=#><i class=\"fa fa-pencil text-primary\" @click=getThisProduct(product.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-product href=#><i class=\"fa fa-trash text-danger\" @click=getThisProduct(product.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div class=\"modal fade\" id=modal-delete-product tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar product</h4></div><div class=modal-body><h1>Eliminar product {{newProduct.name}}</h1></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteProduct(newProduct.id) @click=deleteProduct(newProduct.id) type=button class=\"btn btn-default\">Eliminar product</button></div></div></div></div><div id=modal-create-product class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar product</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=\"Nome do  product\" v-model=newProduct.name v-validate:name=\"['required']\"> <span class=\"glyphicon glyphicon-user form-control-feedback\"></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=number class=form-control name=price placeholder=\"Preço do  product\" v-model=newProduct.price v-validate:name=\"['required']\"></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=\"Descrição deste Mescado\" class=form-control rows=5 cols=40 id=description v-model=newProduct.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createProduct class=\"btn btn-secondary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar Dados deste product</button></div></div></div></div><div id=modal-edit-product class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar Este product</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=\"Nome do  product\" v-model=newProduct.name v-validate:name=\"['required']\"> <span class=\"glyphicon glyphicon-user form-control-feedback\"></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=number class=form-control name=price placeholder=\"Preço do  product\" v-model=newProduct.price v-validate:name=\"['required']\"></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=\"Descrição deste Mescado\" class=form-control rows=5 cols=40 id=description v-model=newProduct.description></textarea></div></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedProduct(newProduct.id) type=button class=\"btn btn-secondary\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp; Salvar as Alterações sobre este product</button></div></div></div></div></div>"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success><i class=\"fa fa-thumbs-up\">Sucesso!!</i></div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=row><div class=col-md-12><button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-product><i class=\"fa fa-plus\"></i> Novo</button></div></div><br><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'price' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'price' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'price')\">Preço</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'description')\">Descrição</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"product in products | filterBy filter.term | orderBy sortColumn sortInverse\"><td><a href=# data-toggle=modal data-target=#show-product @click=getThisProduct(product.id)>{{ product.name }}</a><td>{{ product.price }}<td>{{ product.description }}<td align=left><a data-toggle=modal data-target=#modal-edit-product href=#><i class=\"fa fa-pencil text-primary\" @click=getThisProduct(product.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-product href=#><i class=\"fa fa-trash text-danger\" @click=getThisProduct(product.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div id=show-product class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Detalhes do {{ newProduct.name }}</h4></div><div class=modal-body><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover\"><thead><tr><th class=text-center colspan=2>INFORMAÇOES DO PRODUTO<tbody><tr><td><b>ID</b><td><i>{{ newProduct.id }}</i><tr><td><b>Nome</b><td><i>{{ newProduct.name }}</i><tr><td><b>Preço</b><td><span class=\"label label-info\"><i>{{ newProduct.price }}</i></span><tr><td><b>Responsável</b><td><i>{{ newProduct.author }}</i><tr><td><b>Descrição</b><td><i>{{ newProduct.description }}</i><tr><td><b>Data da criação</b><td><i>{{ product.created_at | formatDate 'DD/MM/YYYY' }}</i><tr><td><b>Data de atualização</b><td><i>{{ product.updated_at | formatDate 'DD/MM/YYYY' }}</i></table></div></div></div></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-primary\" data-dismiss=modal><i class=\"fa fa-check\"></i></button></div></div></div></div><div class=\"modal fade\" id=modal-delete-product tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar</h4></div><div class=modal-body><h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newProduct.name}}</span></h5></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteProduct(newProduct.id) @click=deleteProduct(newProduct.id) type=button class=\"btn btn-danger\">Eliminar</button></div></div></div></div><div id=modal-create-product class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=Nome v-model=newProduct.name v-validate:name=\"['required']\"> <span class=\"fa fa-shopping-basket form-control-feedback\"></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=number class=form-control name=price placeholder=Preço v-model=newProduct.price v-validate:price=\"['required']\"> <span class=\"fa fa-usd form-control-feedback\">00</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newProduct.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createProduct class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button></div></div></div></div><div id=modal-edit-product class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=Nome v-model=newProduct.name v-validate:name=\"['required']\"> <span class=\"fa fa-shopping-basket form-control-feedback\"></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=number class=form-control name=price placeholder=Preço v-model=newProduct.price v-validate:name=\"['required']\"> <span class=\"fa fa-usd form-control-feedback\">00</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newProduct.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedProduct(newProduct.id) type=button class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button></div></div></div></div></div></div>"
 
-},{"../../../Pagination/src/Component.vue":115,"vueify/lib/insert-css":109}],119:[function(require,module,exports){
+},{"../../../Pagination/src/Component.vue":115,"babel-runtime/helpers/defineProperty":14,"vueify/lib/insert-css":109}],119:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
@@ -40254,17 +40256,21 @@ exports.default = {
     // ---------------------------------------------------------------------------------
 
     methods: {
+        clearField: function clearField() {
+            this.newTypeofplace = {
+                id: '',
+                name: '',
+                description: ''
+            };
+        },
+
         createTypeofplace: function createTypeofplace() {
             var _this = this;
 
             var typeofplace = this.newTypeofplace;
 
             //Clear form input
-            this.newTypeofplace = {
-                id: '',
-                name: '',
-                description: ''
-            };
+            this.clearField();
             this.$http.post('http://localhost:8000/api/v1/typeofplaces/', typeofplace).then(function (response) {
                 if (response.status == 200) {
                     console.log('chegando aqui');
@@ -40315,11 +40321,7 @@ exports.default = {
 
             var typeofplace = this.newTypeofplace;
 
-            this.newTypeofplace = {
-                id: '',
-                name: '',
-                description: ''
-            };
+            this.clearField();
 
             this.$http.patch('http://localhost:8000/api/v1/typeofplaces/' + id, typeofplace).then(function (response) {
                 if (response.status == 200) {
@@ -40366,17 +40368,7 @@ exports.default = {
         // Outros funções
         navigate: function navigate(page) {
             this.fetchTypeofplace(page);
-        },
-
-
-        clearField: function clearField() {
-            this.newTypeofplace = {
-                id: '',
-                name: '',
-                description: ''
-            };
         }
-
     },
 
     // ---------------------------------------------------------------------------------
@@ -40390,7 +40382,7 @@ exports.default = {
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success><i class=\"fa fa-thumbs-up\">Sucesso!!!</i></div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=col-md-12><button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-typeofplace><i class=\"fa fa-plus\"></i> Novo</button></div><br><br><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'description')\">Descrição</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"typeofplace in typeofplaces | filterBy filter.term | orderBy sortColumn sortInverse\"><td>{{ typeofplace.name }}<td>{{ typeofplace.description }}<td align=left><a data-toggle=modal data-target=#modal-edit-typeofplace href=#><i class=\"fa fa-pencil text-primary\" @click=getThisTypeofplace(typeofplace.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-typeofplace href=#><i class=\"fa fa-trash text-danger\" @click=getThisTypeofplace(typeofplace.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div class=\"modal fade\" id=modal-delete-typeofplace tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar tipo de espaço</h4></div><div class=modal-body><h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newTypeofplace.name}}</span></h5></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteTypeofplace(newTypeofplace.id) @click=deleteTypeofplace(newTypeofplace.id) type=button class=\"btn btn-danger\">Eliminar</button></div></div></div></div><div id=modal-create-typeofplace class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=\"Nome do tipo de espaço\" v-model=newTypeofplace.name v-validate:name=\"['required']\"> <span class=form-control-feedback></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newTypeofplace.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createTypeofplace class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button></div></div></div></div><div id=modal-edit-typeofplace class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name v-model=newTypeofplace.name v-validate:name=\"['required']\"> <span class=form-control-feedback></span><p style=color:red v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newTypeofplace.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedTypeofplace(newTypeofplace.id) type=button class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button></div></div></div></div></div>"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success><i class=\"fa fa-thumbs-up\">Sucesso!!!</i></div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=col-md-12><button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-typeofplace><i class=\"fa fa-plus\"></i> Novo</button></div><br><br><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'description')\">Descrição</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"typeofplace in typeofplaces | filterBy filter.term | orderBy sortColumn sortInverse\"><td>{{ typeofplace.name }}<td>{{ typeofplace.description }}<td align=left><a data-toggle=modal data-target=#modal-edit-typeofplace href=#><i class=\"fa fa-pencil text-primary\" @click=getThisTypeofplace(typeofplace.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-typeofplace href=#><i class=\"fa fa-trash text-danger\" @click=getThisTypeofplace(typeofplace.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div class=\"modal fade\" id=modal-delete-typeofplace tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar</h4></div><div class=modal-body><h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newTypeofplace.name}}</span></h5></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteTypeofplace(newTypeofplace.id) @click=deleteTypeofplace(newTypeofplace.id) type=button class=\"btn btn-danger\">Eliminar</button></div></div></div></div><div id=modal-create-typeofplace class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=\"Nome do tipo de espaço\" v-model=newTypeofplace.name v-validate:name=\"['required']\"> <span class=form-control-feedback></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newTypeofplace.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createTypeofplace class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button></div></div></div></div><div id=modal-edit-typeofplace class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name v-model=newTypeofplace.name v-validate:name=\"['required']\"> <span class=form-control-feedback></span><p style=color:red v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newTypeofplace.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedTypeofplace(newTypeofplace.id) type=button class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button></div></div></div></div></div>"
 
 },{"../../../Pagination/src/Component.vue":115,"vueify/lib/insert-css":109}],124:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")

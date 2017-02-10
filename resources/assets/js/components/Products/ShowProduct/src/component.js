@@ -12,6 +12,7 @@ export default{
                 price      : '',
                 description: '',
                 photo      : '',
+                author      : '',
             },
 
             products: {},
@@ -34,17 +35,23 @@ export default{
     // ---------------------------------------------------------------------------------
 
     methods: {
-        createProduct: function() {
-            var product = this.newProduct;
-
-            //Clear form input
+        clearField: function(){
             this.newProduct = {
                 id         : '',
                 name       : '',
                 price      : '',
                 description: '',
                 photo      : '',
+                author      : '',
             };
+        },
+
+        createProduct: function() {
+            var product = this.newProduct;
+
+            //Clear form input
+            this.clearField();
+
             this.$http.post('http://localhost:8000/api/v1/products/', product).then((response) => {
                 if (response.status == 200) {
                     console.log('chegando aqui');
@@ -79,9 +86,10 @@ export default{
             this.$http.get('http://localhost:8000/api/v1/products/' + id).then((response) => {
                 this.newProduct.id          = response.data.id;
                 this.newProduct.name        = response.data.name;
-                this.newProduct.price        = response.data.price;
+                this.newProduct.price       = response.data.price;
                 this.newProduct.description = response.data.description;
                 this.newProduct.photo       = response.data.photo;
+                this.newProduct.author      = response.data.author;
             }, (response) => {
                 console.log('Error');
             });
@@ -92,14 +100,7 @@ export default{
         saveEditedProduct: function(id) {
             var product = this.newProduct;
 
-            this.newProduct = {
-                id         : '',
-                name       : '',
-                description: '',
-                photo      : '',
-
-            };
-
+            this.clearField();
             this.$http.patch('http://localhost:8000/api/v1/products/'+ id, product).then((response) => {
                 if (response.status == 200) {
                     $('#modal-edit-product').modal('hide');
@@ -114,6 +115,7 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         deleteProduct: function(id) {
+            this.clearField();
             this.$http.delete('http://localhost:8000/api/v1/products/'+ id).then((response) => {
                 $('#modal-delete-product').modal('hide');
                 if (response.status == 200) {

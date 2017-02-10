@@ -52,10 +52,9 @@ class ApiPromotionsController extends Controller
         $promotion->ending_date   = $request->ending_date;
         $promotion->trader_id     = \Auth::user()->id;
         $promotion->product_id    = $request->product_id;
-        $promotion->status    = $request->status;
-        // $promotion->author        = Auth::user()->name;
+        $promotion->status        = false;
         $promotion->save();
-        
+
     }
 
 

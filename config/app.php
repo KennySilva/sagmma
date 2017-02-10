@@ -2,19 +2,13 @@
 
 return [
 
-
-
     'debug' => env('APP_DEBUG', false),
-
 
     'url' => 'http://localhost',
 
-
     'timezone' => 'UTC',
 
-
     'locale' => 'pt',
-
 
     'fallback_locale' => 'en',
 
@@ -22,9 +16,7 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
-
     'log' => env('APP_LOG', 'single'),
-
 
     'providers' => [
 
@@ -172,7 +164,8 @@ return [
         'Typeofplace'    => Sagmma\Models\Sagmma\Typeofplace   ::class,
         'Employee'       => Sagmma\Models\Sagmma\Employee      ::class,
         'Control'        => Sagmma\Models\Sagmma\Control       ::class,
-        'Contract'       => Sagmma\Models\Sagmma\Contract       ::class,
+        'Contract'       => Sagmma\Models\Sagmma\Contract      ::class,
+        'Promotion'      => Sagmma\Models\Sagmma\Promotion     ::class,
         'Occupation'     => Sagmma\Models\Sys\Occupation       ::class,
         'Charge'         => Sagmma\Models\Sys\Charge           ::class,
 

@@ -14,7 +14,7 @@ class PromotionsRequest extends Request
     public function rules()
     {
         return [
-            'name'        => 'min:4|max:128|required|unique:promotions',
+            'name'        => 'min:4|max:128|required',
             'trader_id'   => 'required',
             'product_id'  => 'required',
             'description' => 'min:4|max:500',
