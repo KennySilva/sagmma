@@ -1,7 +1,7 @@
 import Pagination from '../../../Pagination/src/Component.vue'
 // import vSelect from "vue-select"
 export default{
-    name: 'ShowEmployees',
+    name: 'ShowPromotion',
 
 
     data(){
@@ -10,32 +10,21 @@ export default{
                 ic: '',
                 service_beginning: '',
             },
-            newEmployee: {
-                name              : '',
-                ic                : '',
-                age               : '',
-                gender            : '',
-                email             : '',
-                state             : '',
-                council           : '',
-                parish            : '',
-                zone              : '',
-                phone             : '',
-                echelon           : '',
-                service_beginning : '',
-                typeofemployee_id : '',
-                photo             : '',
-                description       : '',
-                markets           : [],
-                get_email         : '',
-                get_password      : '',
-
+            newPromotion: {
+                id            : '',
+                name          : '',
+                begnning_date : '',
+                ending_date   : '',
+                trader_id     : '',
+                product_id    : '',
+                status        : '',
+                description   : '',
             },
 
 
-            employees  : {},
-            markets    : [],
-            types      : [],
+            promotions  : {},
+            traders    : [],
+            products      : [],
 
 
             sortColumn : 'name',
@@ -51,42 +40,32 @@ export default{
 
     methods: {
         clearField: function(){
-            this.newEmployee = {
-                name              : '',
-                ic                : '',
-                age               : '',
-                gender            : '',
-                email             : '',
-                state             : '',
-                council           : '',
-                parish            : '',
-                zone              : '',
-                phone             : '',
-                echelon           : '',
-                service_beginning : '',
-                market_id         : '',
-                typeofemployee_id : '',
-                photo             : '',
-                description       : '',
-                markets           : [],
-
+            this.newPromotion = {
+                id            : '',
+                name          : '',
+                begnning_date : '',
+                ending_date   : '',
+                trader_id     : '',
+                product_id    : '',
+                status        : '',
+                description   : '',
             };
         },
 
         // --------------------------------------------------------------------------------------------
 
-        createEmployee: function() {
-            //Employee input
-            var employee = this.newEmployee;
+        createPromotion: function() {
+            //Promotion input
+            var promotion = this.newPromotion;
 
             //Clear form input
             this.clearField();
-            this.$http.post('http://localhost:8000/api/v1/employees/', employee).then((response) => {
+            this.$http.post('http://localhost:8000/api/v1/promotions/', promotion).then((response) => {
                 if (response.status == 200) {
                     console.log('chegando aqui');
-                    $('#modal-create-employee').modal('hide');
+                    $('#modal-create-promotion').modal('hide');
                     console.log(response.data);
-                    this.fetchEmployee(this.pagination.last_Page);
+                    this.fetchPromotion(this.pagination.last_Page);
                     var self = this;
                     this.success = true;
                     setTimeout(function() {
@@ -100,9 +79,9 @@ export default{
 
         // --------------------------------------------------------------------------------------------
 
-        fetchEmployee: function(page) {
-            this.$http.get('http://localhost:8000/api/v1/employees?page='+page).then((response) => {
-                this.$set('employees', response.data.data);
+        fetchPromotion: function(page) {
+            this.$http.get('http://localhost:8000/api/v1/promotions?page='+page).then((response) => {
+                this.$set('promotions', response.data.data);
                 this.$set('pagination', response.data);
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -111,25 +90,16 @@ export default{
 
         // --------------------------------------------------------------------------------------------
 
-        getThisEmployee: function(id){
-            this.$http.get('http://localhost:8000/api/v1/employees/' + id).then((response) => {
-                this.newEmployee.id                = response.data.id;
-                this.newEmployee.name              = response.data.name;
-                this.newEmployee.ic                = response.data.ic;
-                this.newEmployee.age               = response.data.age;
-                this.newEmployee.gender            = response.data.gender;
-                this.newEmployee.email             = response.data.email;
-                this.newEmployee.state             = response.data.state;
-                this.newEmployee.council           = response.data.council;
-                this.newEmployee.parish            = response.data.parish;
-                this.newEmployee.zone              = response.data.zone;
-                this.newEmployee.phone             = response.data.phone;
-                this.newEmployee.echelon           = response.data.echelon;
-                this.newEmployee.service_beginning = response.data.service_beginning;
-                this.newEmployee.market_id         = response.data.market_id;
-                this.newEmployee.typeofemployee_id = response.data.typeofemployee_id;
-                this.newEmployee.description       = response.data.description;
-                this.newEmployee.markets           = response.data.markets;
+        getThisPromotion: function(id){
+            this.$http.get('http://localhost:8000/api/v1/promotions/' + id).then((response) => {
+                this.newPromotion.id            = response.data.id;
+                this.newPromotion.name          = response.data.name;
+                this.newPromotion.begnning_date = response.data.begnning_date;
+                this.newPromotion.ending_date   = response.data.ending_date;
+                this.newPromotion.trader_id     = response.data.trader_id;
+                this.newPromotion.product_id    = response.data.product_id;
+                this.newPromotion.status        = response.data.status;
+                this.newPromotion.description   = response.data.description;
             }, (response) => {
                 console.log('Error');
             });
@@ -137,14 +107,14 @@ export default{
 
         // --------------------------------------------------------------------------------------------
 
-        saveEditedEmployee: function(id) {
-            var employee = this.newEmployee;
+        saveEditedPromotion: function(id) {
+            var promotion = this.newPromotion;
             this.clearField();
-            this.$http.patch('http://localhost:8000/api/v1/employees/'+ id, employee).then((response) => {
+            this.$http.patch('http://localhost:8000/api/v1/promotions/'+ id, promotion).then((response) => {
                 if (response.status == 200) {
-                    $('#modal-edit-employee').modal('hide');
+                    $('#modal-edit-promotion').modal('hide');
                     // console.log(response.data);
-                    this.fetchEmployee(this.pagination.current_page);
+                    this.fetchPromotion(this.pagination.current_page);
 
                 }
             }, (response) => {
@@ -155,78 +125,50 @@ export default{
         // --------------------------------------------------------------------------------------------
 
 
-        deleteEmployee: function(id) {
-            this.$http.delete('http://localhost:8000/api/v1/employees/'+ id).then((response) => {
-                $('#modal-delete-employee').modal('hide');
+        deletePromotion: function(id) {
+            this.$http.delete('http://localhost:8000/api/v1/promotions/'+ id).then((response) => {
+                $('#modal-delete-promotion').modal('hide');
                 if (response.status == 200) {
                     // console.log(response.data);
-                    this.fetchEmployee();
+                    this.fetchPromotion();
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
             });
         },
 
-        // employeeMarket: function() {
-        //     this.$http.get('http://localhost:8000/api/v1/employeeMarket').then((response) => {
-        //         this.$set('markets', response.data);
-        //     }, (response) => {
-        //         console.log("Ocorreu um erro na operação");
-        //     });
-        // },
-
-        employeeType: function() {
-            this.$http.get('http://localhost:8000/api/v1/employeeType').then((response) => {
-                this.$set('types', response.data);
+        promotionTrader: function() {
+            this.$http.get('http://localhost:8000/api/v1/promotionTrader').then((response) => {
+                this.$set('traders', response.data);
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
             });
         },
 
-        alterGenderValue: function(employee) {
-            if (employee == 'M') {
-                return 'Masculino';
-            }else if (employee == 'F') {
-                return 'Feminino';
-            }else {
-                return 'Não Especificado';
-            }
-
+        promotionProduct: function() {
+            this.$http.get('http://localhost:8000/api/v1/promotionProduct').then((response) => {
+                this.$set('products', response.data);
+            }, (response) => {
+                console.log("Ocorreu um erro na operação");
+            });
         },
-        alterStateValue: function(employee) {
-            if (employee == 1) {
-                return 'Santiago';
-            }else if (employee == 2) {
-                return 'Maio';
-            }else if (employee == 3) {
-                return 'Fogo';
-            }else if (employee == 4) {
-                return 'Brava';
-            }else if (employee == 5) {
-                return 'Santo Antão';
-            }else if (employee == 6) {
-                return 'São Niculau';
-            }else if (employee == 7) {
-                return 'São Vicente';
-            }else if (employee == 8) {
-                return 'Sal';
-            }else if (employee == 9) {
-                return 'Boa Vista';
-            }else {
-                return 'Santa Luzia';
-            }
 
+        promotionStatus: function(status) {
+            var postData = {id: status};
+
+            this.$http.post('http://localhost:8000/api/v1/promotionStatus/', postData).then((response) => {
+                console.log(response.status);
+                console.log(response.data);
+                if (response.status == 200) {
+                    this.fetchPromotion(this.pagination.current_page);
+                }
+            }, (response) => {
+                console.log("Ocorreu um erro na operação");
+            });
         },
+
 
         // -------------------------Metodo de suporte---------------------------------------------------
-        marketEmployee: function() {
-            this.$http.get('http://localhost:8000/api/v1/marketEmployee').then((response) => {
-                this.$set('markets', response.data);
-            }, (response) => {
-                console.log("Ocorreu um erro na operação");
-            });
-        },
-        // --------------------------------------------------------------------------------------------
 
         doSort: function(ev, column) {
             var self = this;
@@ -244,7 +186,7 @@ export default{
 
         // Outros funções
         navigate (page) {
-            this.fetchEmployee(page);
+            this.fetchPromotion(page);
         },
 
 
@@ -252,9 +194,9 @@ export default{
 
 
     ready () {
-        this.fetchEmployee(this.pagination.current_Page)
-        this.marketEmployee()
-        this.employeeType()
+        this.fetchPromotion(this.pagination.current_Page)
+        this.promotionTrader()
+        this.promotionProduct()
 
     },
 

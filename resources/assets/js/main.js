@@ -57,7 +57,7 @@ new Vue({
         //------------------------------Promotion-----------------------------------
         // 'show-promotion': require('./components/Promotion/ShowTaxations')
         // ------------------------------place-----------------------------------
-        // 'show-promotion': require('./components/Promotion/ShowTaxations')
+        'show-promotion': require('./components/Promotions/ShowPromotion'),
         // ------------------------------place-----------------------------------
         'show-place': require('./components/Places/ShowPlace')
 

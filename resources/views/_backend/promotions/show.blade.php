@@ -51,13 +51,13 @@
                             <div class="tab-pane active" id="1">
                                 <br>
                                 <!------------------------------------------------------------------------------------->
-                                {{-- <show-promotion></show-promotion> --}}
+                                <show-promotion></show-promotion>
                                 <!------------------------------------------------------------------------------------->
                             </div>
                             <div class="tab-pane" id="2">
                                 <br>
                                 <!------------------------------------------------------------------------------------->
-                                {{-- <show-product></show-product> --}}
+                                <show-product></show-product>
                                 <!-------------------------------------------------------------------------------------->
                             </div>
                         </div>
@@ -71,4 +71,11 @@
 
 @push('scripts')
     <script src="/bower_components/bootstrap-select/dist/js/bootstrap-select.js" charset="utf-8"></script>
+
+    {{-- Responsavel pro apresentar data nos navegadores como Fire Fox e EI 10 --}}
+    <script>
+    webshims.setOptions('forms-ext', {types: 'date'});
+    webshims.polyfill('forms forms-ext');
+    </script>
+
 @endpush

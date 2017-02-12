@@ -10,7 +10,7 @@ class PromotionsRequest extends Request
     {
         return true;
     }
-
+    
     public function rules()
     {
         return [

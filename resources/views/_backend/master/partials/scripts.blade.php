@@ -7,9 +7,10 @@
 <!-- AdminLTE App -->
 <script src="{{ asset('/js/app.min.js') }}" type="text/javascript"></script>
 <script src="{{ asset('/js/main.js') }}" type="text/javascript"></script>
+<script src="//cdn.jsdelivr.net/webshim/1.14.5/polyfiller.js"></script>
 {{-- <script src="{{ asset('/bower_components/vue-strap/dist/vue-strap.js') }}" type="text/javascript"></script> --}}
 
 <!-- Optionally, you can add Slimscroll and FastClick plugins.
-      Both of these plugins are recommended to enhance the
-      user experience. Slimscroll is required when using the
-      fixed layout. -->
+Both of these plugins are recommended to enhance the
+user experience. Slimscroll is required when using the
+fixed layout. -->

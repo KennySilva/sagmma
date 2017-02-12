@@ -149,6 +149,9 @@ Route::group(['namespace' => 'ApiControllers'], function()
 
             // ----------------------------------------Api-promotions----------------------------------
             Route::resource('promotions', 'ApiPromotionsController');
+            Route::get('promotionTrader', 'ApiPromotionsController@getTraderForPromotion');
+            Route::get('promotionProduct', 'ApiPromotionsController@getProductForPromotion');
+            Route::post('promotionStatus', 'ApiPromotionsController@statusPromotionsChange');
         });
     });
 });
