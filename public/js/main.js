@@ -22319,489 +22319,6 @@ for(var collections = ['NodeList', 'DOMTokenList', 'MediaList', 'StyleSheetList'
 
 }));
 },{}],104:[function(require,module,exports){
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-},{}],105:[function(require,module,exports){
-var Vue // late bind
-var map = Object.create(null)
-var shimmed = false
-var isBrowserify = false
-
-/**
- * Determine compatibility and apply patch.
- *
- * @param {Function} vue
- * @param {Boolean} browserify
- */
-
-exports.install = function (vue, browserify) {
-  if (shimmed) return
-  shimmed = true
-
-  Vue = vue
-  isBrowserify = browserify
-
-  exports.compatible = !!Vue.internalDirectives
-  if (!exports.compatible) {
-    console.warn(
-      '[HMR] vue-loader hot reload is only compatible with ' +
-      'Vue.js 1.0.0+.'
-    )
-    return
-  }
-
-  // patch view directive
-  patchView(Vue.internalDirectives.component)
-  console.log('[HMR] Vue component hot reload shim applied.')
-  // shim router-view if present
-  var routerView = Vue.elementDirective('router-view')
-  if (routerView) {
-    patchView(routerView)
-    console.log('[HMR] vue-router <router-view> hot reload shim applied.')
-  }
-}
-
-/**
- * Shim the view directive (component or router-view).
- *
- * @param {Object} View
- */
-
-function patchView (View) {
-  var unbuild = View.unbuild
-  View.unbuild = function (defer) {
-    if (!this.hotUpdating) {
-      var prevComponent = this.childVM && this.childVM.constructor
-      removeView(prevComponent, this)
-      // defer = true means we are transitioning to a new
-      // Component. Register this new component to the list.
-      if (defer) {
-        addView(this.Component, this)
-      }
-    }
-    // call original
-    return unbuild.call(this, defer)
-  }
-}
-
-/**
- * Add a component view to a Component's hot list
- *
- * @param {Function} Component
- * @param {Directive} view - view directive instance
- */
-
-function addView (Component, view) {
-  var id = Component && Component.options.hotID
-  if (id) {
-    if (!map[id]) {
-      map[id] = {
-        Component: Component,
-        views: [],
-        instances: []
-      }
-    }
-    map[id].views.push(view)
-  }
-}
-
-/**
- * Remove a component view from a Component's hot list
- *
- * @param {Function} Component
- * @param {Directive} view - view directive instance
- */
-
-function removeView (Component, view) {
-  var id = Component && Component.options.hotID
-  if (id) {
-    map[id].views.$remove(view)
-  }
-}
-
-/**
- * Create a record for a hot module, which keeps track of its construcotr,
- * instnaces and views (component directives or router-views).
- *
- * @param {String} id
- * @param {Object} options
- */
-
-exports.createRecord = function (id, options) {
-  if (typeof options === 'function') {
-    options = options.options
-  }
-  if (typeof options.el !== 'string' && typeof options.data !== 'object') {
-    makeOptionsHot(id, options)
-    map[id] = {
-      Component: null,
-      views: [],
-      instances: []
-    }
-  }
-}
-
-/**
- * Make a Component options object hot.
- *
- * @param {String} id
- * @param {Object} options
- */
-
-function makeOptionsHot (id, options) {
-  options.hotID = id
-  injectHook(options, 'created', function () {
-    var record = map[id]
-    if (!record.Component) {
-      record.Component = this.constructor
-    }
-    record.instances.push(this)
-  })
-  injectHook(options, 'beforeDestroy', function () {
-    map[id].instances.$remove(this)
-  })
-}
-
-/**
- * Inject a hook to a hot reloadable component so that
- * we can keep track of it.
- *
- * @param {Object} options
- * @param {String} name
- * @param {Function} hook
- */
-
-function injectHook (options, name, hook) {
-  var existing = options[name]
-  options[name] = existing
-    ? Array.isArray(existing)
-      ? existing.concat(hook)
-      : [existing, hook]
-    : [hook]
-}
-
-/**
- * Update a hot component.
- *
- * @param {String} id
- * @param {Object|null} newOptions
- * @param {String|null} newTemplate
- */
-
-exports.update = function (id, newOptions, newTemplate) {
-  var record = map[id]
-  // force full-reload if an instance of the component is active but is not
-  // managed by a view
-  if (!record || (record.instances.length && !record.views.length)) {
-    console.log('[HMR] Root or manually-mounted instance modified. Full reload may be required.')
-    if (!isBrowserify) {
-      window.location.reload()
-    } else {
-      // browserify-hmr somehow sends incomplete bundle if we reload here
-      return
-    }
-  }
-  if (!isBrowserify) {
-    // browserify-hmr already logs this
-    console.log('[HMR] Updating component: ' + format(id))
-  }
-  var Component = record.Component
-  // update constructor
-  if (newOptions) {
-    // in case the user exports a constructor
-    Component = record.Component = typeof newOptions === 'function'
-      ? newOptions
-      : Vue.extend(newOptions)
-    makeOptionsHot(id, Component.options)
-  }
-  if (newTemplate) {
-    Component.options.template = newTemplate
-  }
-  // handle recursive lookup
-  if (Component.options.name) {
-    Component.options.components[Component.options.name] = Component
-  }
-  // reset constructor cached linker
-  Component.linker = null
-  // reload all views
-  record.views.forEach(function (view) {
-    updateView(view, Component)
-  })
-  // flush devtools
-  if (window.__VUE_DEVTOOLS_GLOBAL_HOOK__) {
-    window.__VUE_DEVTOOLS_GLOBAL_HOOK__.emit('flush')
-  }
-}
-
-/**
- * Update a component view instance
- *
- * @param {Directive} view
- * @param {Function} Component
- */
-
-function updateView (view, Component) {
-  if (!view._bound) {
-    return
-  }
-  view.Component = Component
-  view.hotUpdating = true
-  // disable transitions
-  view.vm._isCompiled = false
-  // save state
-  var state = extractState(view.childVM)
-  // remount, make sure to disable keep-alive
-  var keepAlive = view.keepAlive
-  view.keepAlive = false
-  view.mountComponent()
-  view.keepAlive = keepAlive
-  // restore state
-  restoreState(view.childVM, state, true)
-  // re-eanble transitions
-  view.vm._isCompiled = true
-  view.hotUpdating = false
-}
-
-/**
- * Extract state from a Vue instance.
- *
- * @param {Vue} vm
- * @return {Object}
- */
-
-function extractState (vm) {
-  return {
-    cid: vm.constructor.cid,
-    data: vm.$data,
-    children: vm.$children.map(extractState)
-  }
-}
-
-/**
- * Restore state to a reloaded Vue instance.
- *
- * @param {Vue} vm
- * @param {Object} state
- */
-
-function restoreState (vm, state, isRoot) {
-  var oldAsyncConfig
-  if (isRoot) {
-    // set Vue into sync mode during state rehydration
-    oldAsyncConfig = Vue.config.async
-    Vue.config.async = false
-  }
-  // actual restore
-  if (isRoot || !vm._props) {
-    vm.$data = state.data
-  } else {
-    Object.keys(state.data).forEach(function (key) {
-      if (!vm._props[key]) {
-        // for non-root, only restore non-props fields
-        vm.$data[key] = state.data[key]
-      }
-    })
-  }
-  // verify child consistency
-  var hasSameChildren = vm.$children.every(function (c, i) {
-    return state.children[i] && state.children[i].cid === c.constructor.cid
-  })
-  if (hasSameChildren) {
-    // rehydrate children
-    vm.$children.forEach(function (c, i) {
-      restoreState(c, state.children[i])
-    })
-  }
-  if (isRoot) {
-    Vue.config.async = oldAsyncConfig
-  }
-}
-
-function format (id) {
-  var match = id.match(/[^\/]+\.vue$/)
-  return match ? match[0] : id
-}
-
-},{}],106:[function(require,module,exports){
 /*!
  * vue-resource v0.9.3
  * https://github.com/vuejs/vue-resource
@@ -24114,7 +23631,7 @@ if (typeof window !== 'undefined' && window.Vue) {
 }
 
 module.exports = plugin;
-},{}],107:[function(require,module,exports){
+},{}],105:[function(require,module,exports){
 "use strict";
 
 var _stringify = require("babel-runtime/core-js/json/stringify");
@@ -25055,86 +24572,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
   }]);
 });
 
-},{"babel-runtime/core-js/json/stringify":1,"babel-runtime/core-js/object/create":2,"babel-runtime/core-js/object/define-properties":3,"babel-runtime/core-js/object/define-property":4,"babel-runtime/core-js/object/get-own-property-descriptor":5,"babel-runtime/core-js/object/get-own-property-names":6,"babel-runtime/core-js/object/get-own-property-symbols":7,"babel-runtime/core-js/object/get-prototype-of":8,"babel-runtime/core-js/object/is-extensible":9,"babel-runtime/core-js/object/keys":10,"babel-runtime/core-js/object/prevent-extensions":11,"babel-runtime/helpers/typeof":15}],108:[function(require,module,exports){
-(function (process){
+},{"babel-runtime/core-js/json/stringify":1,"babel-runtime/core-js/object/create":2,"babel-runtime/core-js/object/define-properties":3,"babel-runtime/core-js/object/define-property":4,"babel-runtime/core-js/object/get-own-property-descriptor":5,"babel-runtime/core-js/object/get-own-property-names":6,"babel-runtime/core-js/object/get-own-property-symbols":7,"babel-runtime/core-js/object/get-prototype-of":8,"babel-runtime/core-js/object/is-extensible":9,"babel-runtime/core-js/object/keys":10,"babel-runtime/core-js/object/prevent-extensions":11,"babel-runtime/helpers/typeof":15}],106:[function(require,module,exports){
 /*!
- * vue-validator v2.1.7
+ * vue-validator v3.0.0-alpha.2 
  * (c) 2016 kazuya kawaguchi
  * Released under the MIT License.
  */
 'use strict';
 
-var babelHelpers = {};
-babelHelpers.typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-  return typeof obj;
-} : function (obj) {
-  return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
-};
+/*  */
 
-babelHelpers.classCallCheck = function (instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-};
-
-babelHelpers.createClass = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      Object.defineProperty(target, descriptor.key, descriptor);
-    }
-  }
-
-  return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) defineProperties(Constructor, staticProps);
-    return Constructor;
-  };
-}();
-
-babelHelpers.inherits = function (subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-  }
-
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      enumerable: false,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-};
-
-babelHelpers.possibleConstructorReturn = function (self, call) {
-  if (!self) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-
-  return call && (typeof call === "object" || typeof call === "function") ? call : self;
-};
-
-babelHelpers;
-/**
- * Utilties
- */
-
-// export default for holding the Vue reference
-var exports$1 = {};
-/**
- * warn
- *
- * @param {String} msg
- * @param {Error} [err]
- *
- */
-
-function warn(msg, err) {
+function warn (msg, err) {
   if (window.console) {
     console.warn('[vue-validator] ' + msg);
     if (err) {
@@ -25143,286 +24591,142 @@ function warn(msg, err) {
   }
 }
 
+/*  */
+
+// validator configrations
+var validator = {
+  classes: {}
+};
+
+var Config = function (Vue) {
+  // define Vue.config.validator configration
+  // $FlowFixMe: https://github.com/facebook/flow/issues/285
+  Object.defineProperty(Vue.config, 'validator', {
+    enumerable: true,
+    configurable: true,
+    get: function () { return validator },
+    set: function (val) { validator = val; }
+  });
+};
+
+/*  */
 /**
- * empty
- *
- * @param {Array|Object} target
- * @return {Boolean}
- */
-
-function empty(target) {
-  if (target === null || target === undefined) {
-    return true;
-  }
-
-  if (Array.isArray(target)) {
-    if (target.length > 0) {
-      return false;
-    }
-    if (target.length === 0) {
-      return true;
-    }
-  } else if (exports$1.Vue.util.isPlainObject(target)) {
-    for (var key in target) {
-      if (exports$1.Vue.util.hasOwn(target, key)) {
-        return false;
-      }
-    }
-  }
-
-  return true;
-}
-
-/**
- * each
- *
- * @param {Array|Object} target
- * @param {Function} iterator
- * @param {Object} [context]
- */
-
-function each(target, iterator, context) {
-  if (Array.isArray(target)) {
-    for (var i = 0; i < target.length; i++) {
-      iterator.call(context || target[i], target[i], i);
-    }
-  } else if (exports$1.Vue.util.isPlainObject(target)) {
-    var hasOwn = exports$1.Vue.util.hasOwn;
-    for (var key in target) {
-      if (hasOwn(target, key)) {
-        iterator.call(context || target[key], target[key], key);
-      }
-    }
-  }
-}
-
-/**
- * pull
- *
- * @param {Array} arr
- * @param {Object} item
- * @return {Object|null}
- */
-
-function pull(arr, item) {
-  var index = exports$1.Vue.util.indexOf(arr, item);
-  return ~index ? arr.splice(index, 1) : null;
-}
-
-/**
- * trigger
- *
- * @param {Element} el
- * @param {String} event
- * @param {Object} [args]
- */
-
-function trigger(el, event, args) {
-  var e = document.createEvent('HTMLEvents');
-  e.initEvent(event, true, false);
-
-  if (args) {
-    for (var prop in args) {
-      e[prop] = args[prop];
-    }
-  }
-
-  // Due to Firefox bug, events fired on disabled
-  // non-attached form controls can throw errors
-  try {
-    el.dispatchEvent(e);
-  } catch (e) {}
-}
-
-/**
- * Forgiving check for a promise
- *
- * @param {Object} p
- * @return {Boolean}
- */
-
-function isPromise(p) {
-  return p && typeof p.then === 'function';
-}
-
-/**
- * Togging classes
- *
- * @param {Element} el
- * @param {String} key
- * @param {Function} fn
- */
-
-function toggleClasses(el, key, fn) {
-  key = key.trim();
-  if (key.indexOf(' ') === -1) {
-    fn(el, key);
-    return;
-  }
-
-  var keys = key.split(/\s+/);
-  for (var i = 0, l = keys.length; i < l; i++) {
-    fn(el, keys[i]);
-  }
-}
-
-/**
- * Fundamental validate functions
+ * build-in validators
  */
 
 /**
  * required
- *
  * This function validate whether the value has been filled out.
- *
- * @param {*} val
- * @return {Boolean}
  */
-
-function required(val) {
+function required (val, arg) {
+  var isRequired = arg === undefined ? true : arg;
   if (Array.isArray(val)) {
     if (val.length !== 0) {
       var valid = true;
       for (var i = 0, l = val.length; i < l; i++) {
-        valid = required(val[i]);
-        if (!valid) {
-          break;
+        valid = required(val[i], isRequired);
+        if ((isRequired && !valid) || (!isRequired && valid)) {
+          break
         }
       }
-      return valid;
+      return valid
     } else {
-      return false;
+      return !isRequired
     }
   } else if (typeof val === 'number' || typeof val === 'function') {
-    return true;
+    return isRequired
   } else if (typeof val === 'boolean') {
-    return val;
+    return val === isRequired
   } else if (typeof val === 'string') {
-    return val.length > 0;
-  } else if (val !== null && (typeof val === 'undefined' ? 'undefined' : babelHelpers.typeof(val)) === 'object') {
-    return Object.keys(val).length > 0;
+    return isRequired ? (val.length > 0) : (val.length <= 0)
+  } else if (val !== null && typeof val === 'object') {
+    return isRequired ? (Object.keys(val).length > 0) : (Object.keys(val).length <= 0)
   } else if (val === null || val === undefined) {
-    return false;
+    return !isRequired
+  } else {
+    return !isRequired
   }
 }
 
 /**
  * pattern
- *
  * This function validate whether the value matches the regex pattern
- *
- * @param val
- * @param {String} pat
- * @return {Boolean}
  */
-
-function pattern(val, pat) {
-  if (typeof pat !== 'string') {
-    return false;
-  }
+function pattern (val, pat) {
+  if (typeof pat !== 'string') { return false }
 
   var match = pat.match(new RegExp('^/(.*?)/([gimy]*)$'));
-  if (!match) {
-    return false;
-  }
+  if (!match) { return false }
 
-  return new RegExp(match[1], match[2]).test(val);
+  return new RegExp(match[1], match[2]).test(val)
 }
 
 /**
  * minlength
- *
  * This function validate whether the minimum length.
- *
- * @param {String|Array} val
- * @param {String|Number} min
- * @return {Boolean}
  */
-
-function minlength(val, min) {
+function minlength (val, min) {
   if (typeof val === 'string') {
-    return isInteger(min, 10) && val.length >= parseInt(min, 10);
+    return isInteger(min, 10) && val.length >= parseInt(min, 10)
   } else if (Array.isArray(val)) {
-    return val.length >= parseInt(min, 10);
+    return val.length >= parseInt(min, 10)
   } else {
-    return false;
+    return false
   }
 }
 
 /**
  * maxlength
- *
  * This function validate whether the maximum length.
- *
- * @param {String|Array} val
- * @param {String|Number} max
- * @return {Boolean}
  */
-
-function maxlength(val, max) {
+function maxlength (val, max) {
   if (typeof val === 'string') {
-    return isInteger(max, 10) && val.length <= parseInt(max, 10);
+    return isInteger(max, 10) && val.length <= parseInt(max, 10)
   } else if (Array.isArray(val)) {
-    return val.length <= parseInt(max, 10);
+    return val.length <= parseInt(max, 10)
   } else {
-    return false;
+    return false
   }
 }
 
 /**
  * min
- *
  * This function validate whether the minimum value of the numberable value.
- *
- * @param {*} val
- * @param {*} arg minimum
- * @return {Boolean}
  */
-
-function min(val, arg) {
-  return !isNaN(+val) && !isNaN(+arg) && +val >= +arg;
+function min (val, arg) {
+  return !isNaN(+(val)) && !isNaN(+(arg)) && (+(val) >= +(arg))
 }
 
 /**
  * max
- *
  * This function validate whether the maximum value of the numberable value.
- *
- * @param {*} val
- * @param {*} arg maximum
- * @return {Boolean}
  */
-
-function max(val, arg) {
-  return !isNaN(+val) && !isNaN(+arg) && +val <= +arg;
+function max (val, arg) {
+  return !isNaN(+(val)) && !isNaN(+(arg)) && (+(val) <= +(arg))
 }
 
 /**
  * isInteger
- *
  * This function check whether the value of the string is integer.
- *
- * @param {String} val
- * @return {Boolean}
- * @private
  */
-
-function isInteger(val) {
-  return (/^(-?[1-9]\d*|0)$/.test(val)
-  );
+function isInteger (val) {
+  return /^(-?[1-9]\d*|0)$/.test(val)
 }
 
+
 var validators = Object.freeze({
-  required: required,
-  pattern: pattern,
-  minlength: minlength,
-  maxlength: maxlength,
-  min: min,
-  max: max
+	required: required,
+	pattern: pattern,
+	minlength: minlength,
+	maxlength: maxlength,
+	min: min,
+	max: max
 });
 
-function Asset (Vue) {
-  var extend = Vue.util.extend;
+/*  */
+var Asset = function (Vue) {
+  var ref = Vue.util;
+  var extend = ref.extend;
 
   // set global validators asset
   var assets = Object.create(null);
@@ -25433,2242 +24737,1893 @@ function Asset (Vue) {
   var strats = Vue.config.optionMergeStrategies;
   if (strats) {
     strats.validators = function (parent, child) {
-      if (!child) {
-        return parent;
-      }
-      if (!parent) {
-        return child;
-      }
+      if (!child) { return parent }
+      if (!parent) { return child }
       var ret = Object.create(null);
       extend(ret, parent);
-      for (var key in child) {
+      var key;
+      for (key in child) {
         ret[key] = child[key];
       }
-      return ret;
+      return ret
     };
   }
 
   /**
    * Register or retrieve a global validator definition.
-   *
-   * @param {String} id
-   * @param {Function} definition
    */
-
-  Vue.validator = function (id, definition) {
-    if (!definition) {
-      return Vue.options['validators'][id];
+  function validator (
+    id,
+    def
+  ) {
+    if (def === undefined) {
+      return Vue.options['validators'][id]
     } else {
-      Vue.options['validators'][id] = definition;
-    }
-  };
-}
-
-function Override (Vue) {
-  // override _init
-  var init = Vue.prototype._init;
-  Vue.prototype._init = function (options) {
-    if (!this._validatorMaps) {
-      this._validatorMaps = Object.create(null);
-    }
-    init.call(this, options);
-  };
-
-  // override _destroy
-  var destroy = Vue.prototype._destroy;
-  Vue.prototype._destroy = function () {
-    destroy.apply(this, arguments);
-    this._validatorMaps = null;
-  };
-}
-
-var VALIDATE_UPDATE = '__vue-validator-validate-update__';
-var PRIORITY_VALIDATE = 4096;
-var PRIORITY_VALIDATE_CLASS = 32;
-var REGEX_FILTER = /[^|]\|[^|]/;
-var REGEX_VALIDATE_DIRECTIVE = /^v-validate(?:$|:(.*)$)/;
-var REGEX_EVENT = /^v-on:|^@/;
-
-var classId = 0; // ID for validation class
-
-
-function ValidateClass (Vue) {
-  var vIf = Vue.directive('if');
-  var FragmentFactory = Vue.FragmentFactory;
-  var _Vue$util = Vue.util;
-  var toArray = _Vue$util.toArray;
-  var replace = _Vue$util.replace;
-  var createAnchor = _Vue$util.createAnchor;
-
-  /**
-   * `v-validate-class` directive
-   */
-
-  Vue.directive('validate-class', {
-    terminal: true,
-    priority: vIf.priority + PRIORITY_VALIDATE_CLASS,
-
-    bind: function bind() {
-      var _this = this;
-
-      var id = String(classId++);
-      this.setClassIds(this.el, id);
-
-      this.vm.$on(VALIDATE_UPDATE, this.cb = function (classIds, validation, results) {
-        if (classIds.indexOf(id) > -1) {
-          validation.updateClasses(results, _this.frag.node);
-        }
-      });
-
-      this.setupFragment();
-    },
-    unbind: function unbind() {
-      this.vm.$off(VALIDATE_UPDATE, this.cb);
-      this.teardownFragment();
-    },
-    setClassIds: function setClassIds(el, id) {
-      var childNodes = toArray(el.childNodes);
-      for (var i = 0, l = childNodes.length; i < l; i++) {
-        var element = childNodes[i];
-        if (element.nodeType === 1) {
-          var hasAttrs = element.hasAttributes();
-          var attrs = hasAttrs && toArray(element.attributes);
-          for (var k = 0, _l = attrs.length; k < _l; k++) {
-            var attr = attrs[k];
-            if (attr.name.match(REGEX_VALIDATE_DIRECTIVE)) {
-              var existingId = element.getAttribute(VALIDATE_UPDATE);
-              var value = existingId ? existingId + ',' + id : id;
-              element.setAttribute(VALIDATE_UPDATE, value);
-            }
-          }
-        }
-
-        if (element.hasChildNodes()) {
-          this.setClassIds(element, id);
-        }
+      Vue.options['validators'][id] = def;
+      if (def === null) {
+        delete Vue.options['validators']['id'];
       }
-    },
-    setupFragment: function setupFragment() {
-      this.anchor = createAnchor('v-validate-class');
-      replace(this.el, this.anchor);
-
-      this.factory = new FragmentFactory(this.vm, this.el);
-      this.frag = this.factory.create(this._host, this._scope, this._frag);
-      this.frag.before(this.anchor);
-    },
-    teardownFragment: function teardownFragment() {
-      if (this.frag) {
-        this.frag.remove();
-        this.frag = null;
-        this.factory = null;
-      }
-
-      replace(this.anchor, this.el);
-      this.anchor = null;
-    }
-  });
-}
-
-function Validate (Vue) {
-  var FragmentFactory = Vue.FragmentFactory;
-  var parseDirective = Vue.parsers.directive.parseDirective;
-  var _Vue$util = Vue.util;
-  var inBrowser = _Vue$util.inBrowser;
-  var bind = _Vue$util.bind;
-  var on = _Vue$util.on;
-  var off = _Vue$util.off;
-  var createAnchor = _Vue$util.createAnchor;
-  var replace = _Vue$util.replace;
-  var camelize = _Vue$util.camelize;
-  var isPlainObject = _Vue$util.isPlainObject;
-
-  // Test for IE10/11 textarea placeholder clone bug
-
-  function checkTextareaCloneBug() {
-    if (inBrowser) {
-      var t = document.createElement('textarea');
-      t.placeholder = 't';
-      return t.cloneNode(true).value === 't';
-    } else {
-      return false;
     }
   }
-  var hasTextareaCloneBug = checkTextareaCloneBug();
+  Vue['validator'] = validator;
+};
 
-  /**
-   * `v-validate` directive
-   */
+/*  */
 
-  Vue.directive('validate', {
-    deep: true,
-    terminal: true,
-    priority: PRIORITY_VALIDATE,
-    params: ['group', 'field', 'detect-blur', 'detect-change', 'initial', 'classes'],
+var Group = function (Vue) {
+  var ref = Vue.util;
+  var extend = ref.extend;
 
-    paramWatchers: {
-      detectBlur: function detectBlur(val, old) {
-        if (this._invalid) {
-          return;
-        }
-        this.validation.detectBlur = this.isDetectBlur(val);
-        this.validator.validate(this.field);
-      },
-      detectChange: function detectChange(val, old) {
-        if (this._invalid) {
-          return;
-        }
-        this.validation.detectChange = this.isDetectChange(val);
-        this.validator.validate(this.field);
+  return {
+    data: function data () {
+      return {
+        valid: true,
+        dirty: false,
+        touched: false,
+        modified: false,
+        results: {}
       }
     },
-
-    bind: function bind() {
-      var el = this.el;
-
-      if (process.env.NODE_ENV !== 'production' && el.__vue__) {
-        warn('v-validate="' + this.expression + '" cannot be used on an instance root element.');
-        this._invalid = true;
-        return;
-      }
-
-      if (process.env.NODE_ENV !== 'production' && (el.hasAttribute('v-if') || el.hasAttribute('v-for'))) {
-        warn('v-validate cannot be used `v-if` or `v-for` build-in terminal directive ' + 'on an element. these is wrapped with `<template>` or other tags: ' + '(e.g. <validator name="validator">' + '<template v-if="hidden">' + '<input type="text" v-validate:field1="[\'required\']">' + '</template>' + '</validator>).');
-        this._invalid = true;
-        return;
-      }
-
-      if (process.env.NODE_ENV !== 'production' && !(this.arg || this.params.field)) {
-        warn('you need specify field name for v-validate directive.');
-        this._invalid = true;
-        return;
-      }
-
-      var validatorName = this.vm.$options._validator;
-      if (process.env.NODE_ENV !== 'production' && !validatorName) {
-        warn('you need to wrap the elements to be validated in a <validator> element: ' + '(e.g. <validator name="validator">' + '<input type="text" v-validate:field1="[\'required\']">' + '</validator>).');
-        this._invalid = true;
-        return;
-      }
-
-      var raw = el.getAttribute('v-model');
-
-      var _parseModelRaw = this.parseModelRaw(raw);
-
-      var model = _parseModelRaw.model;
-      var filters = _parseModelRaw.filters;
-
-      this.model = model;
-
-      this.setupFragment();
-      this.setupValidate(validatorName, model, filters);
-      this.listen();
-    },
-    update: function update(value, old) {
-      if (!value || this._invalid) {
-        return;
-      }
-
-      if (isPlainObject(value) || old && isPlainObject(old)) {
-        this.handleObject(value, old, this.params.initial);
-      } else if (Array.isArray(value) || old && Array.isArray(old)) {
-        this.handleArray(value, old, this.params.initial);
-      }
-
-      var options = { field: this.field };
-      if (this.frag) {
-        options.el = this.frag.node;
-      }
-      this.validator.validate(options);
-    },
-    unbind: function unbind() {
-      if (this._invalid) {
-        return;
-      }
-
-      this.unlisten();
-      this.teardownValidate();
-      this.teardownFragment();
-
-      this.model = null;
-    },
-    parseModelRaw: function parseModelRaw(raw) {
-      if (REGEX_FILTER.test(raw)) {
-        var parsed = parseDirective(raw);
-        return { model: parsed.expression, filters: parsed.filters };
-      } else {
-        return { model: raw };
-      }
-    },
-    setupValidate: function setupValidate(name, model, filters) {
-      var params = this.params;
-      var validator = this.validator = this.vm._validatorMaps[name];
-
-      this.field = camelize(this.arg ? this.arg : params.field);
-
-      this.validation = validator.manageValidation(this.field, model, this.vm, this.getElementFrom(this.frag), this._scope, filters, params.initial, this.isDetectBlur(params.detectBlur), this.isDetectChange(params.detectChange));
-
-      isPlainObject(params.classes) && this.validation.setValidationClasses(params.classes);
-
-      params.group && validator.addGroupValidation(params.group, this.field);
-    },
-    listen: function listen() {
-      var model = this.model;
-      var validation = this.validation;
-      var el = this.getElementFrom(this.frag);
-
-      this.onBlur = bind(validation.listener, validation);
-      on(el, 'blur', this.onBlur);
-      if ((el.type === 'radio' || el.tagName === 'SELECT') && !model) {
-        this.onChange = bind(validation.listener, validation);
-        on(el, 'change', this.onChange);
-      } else if (el.type === 'checkbox') {
-        if (!model) {
-          this.onChange = bind(validation.listener, validation);
-          on(el, 'change', this.onChange);
-        } else {
-          this.onClick = bind(validation.listener, validation);
-          on(el, 'click', this.onClick);
-        }
-      } else {
-        if (!model) {
-          this.onInput = bind(validation.listener, validation);
-          on(el, 'input', this.onInput);
-        }
-      }
-    },
-    unlisten: function unlisten() {
-      var el = this.getElementFrom(this.frag);
-
-      if (this.onInput) {
-        off(el, 'input', this.onInput);
-        this.onInput = null;
-      }
-
-      if (this.onClick) {
-        off(el, 'click', this.onClick);
-        this.onClick = null;
-      }
-
-      if (this.onChange) {
-        off(el, 'change', this.onChange);
-        this.onChange = null;
-      }
-
-      if (this.onBlur) {
-        off(el, 'blur', this.onBlur);
-        this.onBlur = null;
-      }
-    },
-    teardownValidate: function teardownValidate() {
-      if (this.validator && this.validation) {
-        var el = this.getElementFrom(this.frag);
-
-        this.params.group && this.validator.removeGroupValidation(this.params.group, this.field);
-
-        this.validator.unmanageValidation(this.field, el);
-
-        this.validator = null;
-        this.validation = null;
-        this.field = null;
-      }
-    },
-    setupFragment: function setupFragment() {
-      this.anchor = createAnchor('v-validate');
-      replace(this.el, this.anchor);
-
-      this.factory = new FragmentFactory(this.vm, this.shimNode(this.el));
-      this.frag = this.factory.create(this._host, this._scope, this._frag);
-      this.frag.before(this.anchor);
-    },
-    teardownFragment: function teardownFragment() {
-      if (this.frag) {
-        this.frag.remove();
-        this.frag = null;
-        this.factory = null;
-      }
-
-      replace(this.anchor, this.el);
-      this.anchor = null;
-    },
-    handleArray: function handleArray(value, old, initial) {
-      var _this = this;
-
-      old && this.validation.resetValidation();
-
-      each(value, function (val) {
-        _this.validation.setValidation(val, undefined, undefined, initial);
-      });
-    },
-    handleObject: function handleObject(value, old, initial) {
-      var _this2 = this;
-
-      old && this.validation.resetValidation();
-
-      each(value, function (val, key) {
-        if (isPlainObject(val)) {
-          if ('rule' in val) {
-            var msg = 'message' in val ? val.message : null;
-            var init = 'initial' in val ? val.initial : null;
-            _this2.validation.setValidation(key, val.rule, msg, init || initial);
-          }
-        } else {
-          _this2.validation.setValidation(key, val, undefined, initial);
-        }
-      });
-    },
-    isDetectBlur: function isDetectBlur(detectBlur) {
-      return detectBlur === undefined || detectBlur === 'on' || detectBlur === true;
-    },
-    isDetectChange: function isDetectChange(detectChange) {
-      return detectChange === undefined || detectChange === 'on' || detectChange === true;
-    },
-    isInitialNoopValidation: function isInitialNoopValidation(initial) {
-      return initial === 'off' || initial === false;
-    },
-    shimNode: function shimNode(node) {
-      var ret = node;
-      if (hasTextareaCloneBug) {
-        if (node.tagName === 'TEXTAREA') {
-          ret = node.cloneNode(true);
-          ret.value = node.value;
-          var i = ret.childNodes.length;
-          while (i--) {
-            ret.removeChild(ret.childNodes[i]);
-          }
-        }
-      }
-      return ret;
-    },
-    getElementFrom: function getElementFrom(frag) {
-      return frag.single ? frag.node : frag.node.nextSibling;
-    }
-  });
-}
-
-/**
- * BaseValidation class
- */
-
-var BaseValidation = function () {
-  function BaseValidation(field, model, vm, el, scope, validator, filters, detectBlur, detectChange) {
-    babelHelpers.classCallCheck(this, BaseValidation);
-
-    this.field = field;
-    this.touched = false;
-    this.dirty = false;
-    this.modified = false;
-
-    this._modified = false;
-    this._model = model;
-    this._filters = filters;
-    this._validator = validator;
-    this._vm = vm;
-    this._el = el;
-    this._forScope = scope;
-    this._init = this._getValue(el);
-    this._validators = {};
-    this._detectBlur = detectBlur;
-    this._detectChange = detectChange;
-    this._classes = {};
-  }
-
-  BaseValidation.prototype.manageElement = function manageElement(el, initial) {
-    var _this = this;
-
-    var scope = this._getScope();
-    var model = this._model;
-
-    this._initial = initial;
-
-    var classIds = el.getAttribute(VALIDATE_UPDATE);
-    if (classIds) {
-      el.removeAttribute(VALIDATE_UPDATE);
-      this._classIds = classIds.split(',');
-    }
-
-    if (model) {
-      el.value = this._evalModel(model, this._filters);
-      this._unwatch = scope.$watch(model, function (val, old) {
-        if (val !== old) {
-          if (_this.guardValidate(el, 'input')) {
-            return;
-          }
-
-          _this.handleValidate(el, { noopable: _this._initial });
-          if (_this._initial) {
-            _this._initial = null;
-          }
-        }
-      }, { deep: true });
-    }
-  };
-
-  BaseValidation.prototype.unmanageElement = function unmanageElement(el) {
-    this._unwatch && this._unwatch();
-  };
-
-  BaseValidation.prototype.resetValidation = function resetValidation() {
-    var _this2 = this;
-
-    var keys = Object.keys(this._validators);
-    each(keys, function (key, index) {
-      _this2._validators[key] = null;
-      delete _this2._validators[key];
-    });
-  };
-
-  BaseValidation.prototype.resetValidationNoopable = function resetValidationNoopable() {
-    each(this._validators, function (descriptor, key) {
-      if (descriptor.initial && !descriptor._isNoopable) {
-        descriptor._isNoopable = true;
-      }
-    });
-  };
-
-  BaseValidation.prototype.setValidation = function setValidation(name, arg, msg, initial) {
-    var validator = this._validators[name];
-    if (!validator) {
-      validator = this._validators[name] = {};
-      validator.name = name;
-    }
-
-    validator.arg = arg;
-    if (msg) {
-      validator.msg = msg;
-    }
-
-    if (initial) {
-      validator.initial = initial;
-      validator._isNoopable = true;
-    }
-  };
-
-  BaseValidation.prototype.setValidationClasses = function setValidationClasses(classes) {
-    var _this3 = this;
-
-    each(classes, function (value, key) {
-      _this3._classes[key] = value;
-    });
-  };
-
-  BaseValidation.prototype.willUpdateFlags = function willUpdateFlags() {
-    var touched = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
-
-    touched && this.willUpdateTouched(this._el, 'blur');
-    this.willUpdateDirty(this._el);
-    this.willUpdateModified(this._el);
-  };
-
-  BaseValidation.prototype.willUpdateTouched = function willUpdateTouched(el, type) {
-    if (type && type === 'blur') {
-      this.touched = true;
-      this._fireEvent(el, 'touched');
-    }
-  };
-
-  BaseValidation.prototype.willUpdateDirty = function willUpdateDirty(el) {
-    if (!this.dirty && this._checkModified(el)) {
-      this.dirty = true;
-      this._fireEvent(el, 'dirty');
-    }
-  };
-
-  BaseValidation.prototype.willUpdateModified = function willUpdateModified(el) {
-    this.modified = this._checkModified(el);
-    if (this._modified !== this.modified) {
-      this._fireEvent(el, 'modified', { modified: this.modified });
-      this._modified = this.modified;
-    }
-  };
-
-  BaseValidation.prototype.listener = function listener(e) {
-    if (this.guardValidate(e.target, e.type)) {
-      return;
-    }
-
-    this.handleValidate(e.target, { type: e.type });
-  };
-
-  BaseValidation.prototype.handleValidate = function handleValidate(el) {
-    var _ref = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-
-    var _ref$type = _ref.type;
-    var type = _ref$type === undefined ? null : _ref$type;
-    var _ref$noopable = _ref.noopable;
-    var noopable = _ref$noopable === undefined ? false : _ref$noopable;
-
-    this.willUpdateTouched(el, type);
-    this.willUpdateDirty(el);
-    this.willUpdateModified(el);
-
-    this._validator.validate({ field: this.field, el: el, noopable: noopable });
-  };
-
-  BaseValidation.prototype.validate = function validate(cb) {
-    var _this4 = this;
-
-    var noopable = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
-    var el = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
-
-    var _ = exports$1.Vue.util;
-
-    var results = {};
-    var errors = [];
-    var valid = true;
-
-    this._runValidators(function (descriptor, name, done) {
-      var asset = _this4._resolveValidator(name);
-      var validator = null;
-      var msg = null;
-
-      if (_.isPlainObject(asset)) {
-        if (asset.check && typeof asset.check === 'function') {
-          validator = asset.check;
-        }
-        if (asset.message) {
-          msg = asset.message;
-        }
-      } else if (typeof asset === 'function') {
-        validator = asset;
-      }
-
-      if (descriptor.msg) {
-        msg = descriptor.msg;
-      }
-
-      if (noopable) {
-        results[name] = false;
-        return done();
-      }
-
-      if (descriptor._isNoopable) {
-        results[name] = false;
-        descriptor._isNoopable = null;
-        return done();
-      }
-
-      if (validator) {
-        var value = _this4._getValue(_this4._el);
-        _this4._invokeValidator(_this4._vm, validator, value, descriptor.arg, function (ret, err) {
-          if (!ret) {
-            valid = false;
-            if (err) {
-              // async error message
-              errors.push({ validator: name, message: err });
-              results[name] = err;
-            } else if (msg) {
-              var error = { validator: name };
-              error.message = typeof msg === 'function' ? msg.call(_this4._vm, _this4.field, descriptor.arg) : msg;
+    computed: {
+      invalid: function invalid () { return !this.valid },
+      pristine: function pristine () { return !this.dirty },
+      untouched: function untouched () { return !this.touched },
+      result: function result () {
+        var ret = {
+          valid: this.valid,
+          invalid: this.invalid,
+          dirty: this.dirty,
+          pristine: this.pristine,
+          touched: this.touched,
+          untouched: this.untouched,
+          modified: this.modified
+        };
+        var results = this.results;
+        this._validityKeys.forEach(function (key) {
+          ret[key] = results[key];
+          if (ret[key].errors) {
+            var errors = ret.errors || [];
+            ret[key].errors.forEach(function (error) {
               errors.push(error);
-              results[name] = error.message;
+            });
+            ret.errors = errors;
+          }
+        });
+        return ret
+      }
+    },
+    watch: {
+      results: function results (val, old) {
+        var keys = this._validityKeys;
+        var results = this.results;
+        this.valid = this.checkResults(keys, results, 'valid', true);
+        this.dirty = this.checkResults(keys, results, 'dirty', false);
+        this.touched = this.checkResults(keys, results, 'touched', false);
+        this.modified = this.checkResults(keys, results, 'modified', false);
+      }
+    },
+    created: function created () {
+      this._validities = Object.create(null);
+      this._validityWatchers = Object.create(null);
+      this._validityKeys = [];
+      this._committing = false;
+    },
+    destroyed: function destroyed () {
+      var this$1 = this;
+
+      this._validityKeys.forEach(function (key) {
+        this$1._validityWatchers[key]();
+        delete this$1._validityWatchers[key];
+        delete this$1._validities[key];
+      });
+      delete this._validityWatchers;
+      delete this._validities;
+      delete this._validityKeys;
+    },
+    methods: {
+      register: function register (name, validity) {
+        var this$1 = this;
+
+        this._validities[name] = validity;
+        this._validityKeys = Object.keys(this._validities);
+        this.setResults(name, {});
+        this.withCommit(function () {
+          this$1._validityWatchers[name] = validity.$watch('result', function (val, old) {
+            this$1.setResults(name, val);
+          }, { deep: true, immediate: true });
+        });
+      },
+      unregister: function unregister (name) {
+        var this$1 = this;
+
+        this._validityWatchers[name]();
+        delete this._validityWatchers[name];
+        delete this._validities[name];
+        this._validityKeys = Object.keys(this._validities);
+        this.withCommit(function () {
+          this$1.resetResults(name);
+        });
+      },
+      validityCount: function validityCount () {
+        return this._validityKeys.length
+      },
+      isRegistered: function isRegistered (name) {
+        return name in this._validities
+      },
+      getValidityKeys: function getValidityKeys () {
+        return this._validityKeys
+      },
+      checkResults: function checkResults (
+        keys,
+        results,
+        prop,
+        checking
+      ) {
+        var ret = checking;
+        for (var i = 0; i < keys.length; i++) {
+          var result = results[keys[i]];
+          if (result[prop] !== checking) {
+            ret = !checking;
+            break
+          }
+        }
+        return ret
+      },
+      setResults: function setResults (name, val) {
+        var this$1 = this;
+
+        var newVal = {};
+        this._validityKeys.forEach(function (key) {
+          newVal[key] = extend({}, this$1.results[key]);
+        });
+        newVal[name] = extend({}, val);
+        this.results = newVal;
+      },
+      resetResults: function resetResults (ignore) {
+        var this$1 = this;
+
+        var newVal = {};
+        this._validityKeys.forEach(function (key) {
+          if (ignore && ignore !== key) {
+            newVal[key] = extend({}, this$1.results[key]);
+          }
+        });
+        this.results = newVal;
+      },
+      withCommit: function withCommit (fn) {
+        var committing = this._committing;
+        this._committing = true;
+        fn();
+        this._committing = committing;
+      }
+    }
+  }
+};
+
+/*  */
+var ValidationClass = function (Vue) {
+  var ValidityGroup = Group(Vue);
+
+  var Validation = function Validation (options) {
+    if ( options === void 0 ) options = {};
+
+    this._result = {};
+    this._host = options.host;
+    this._named = Object.create(null);
+    this._group = Object.create(null);
+    this._validities = Object.create(null);
+    this._beginDestroy = false;
+    Vue.util.defineReactive(this._host, '$validation', this._result);
+  };
+
+  Validation.prototype.register = function register (
+    field,
+    validity,
+    options
+  ) {
+      if ( options === void 0 ) options = {};
+
+    // NOTE: lazy setup (in constructor, occured callstack recursive errors ...)
+    if (!this._validityManager) {
+      this._validityManager = new Vue(ValidityGroup);
+      this._watchValidityResult();
+    }
+
+    if (this._validities[field]) {
+      // TODO: should be output console.error
+      return
+    }
+    this._validities[field] = validity;
+
+    var named = options.named;
+      var group = options.group;
+    var groupValidity = group
+      ? this._getValidityGroup('group', group) || this._registerValidityGroup('group', group)
+      : null;
+    var namedValidity = named
+      ? this._getValidityGroup('named', named) || this._registerValidityGroup('named', named)
+      : null;
+    if (named && group && namedValidity && groupValidity) {
+      groupValidity.register(field, validity);
+      !namedValidity.isRegistered(group) && namedValidity.register(group, groupValidity);
+      !this._validityManager.isRegistered(named) && this._validityManager.register(named, namedValidity);
+    } else if (namedValidity) {
+      namedValidity.register(field, validity);
+      !this._validityManager.isRegistered(named) && this._validityManager.register(named, namedValidity);
+    } else if (groupValidity) {
+      groupValidity.register(field, validity);
+      !this._validityManager.isRegistered(group) && this._validityManager.register(group, groupValidity);
+    } else {
+      this._validityManager.register(field, validity);
+    }
+  };
+
+  Validation.prototype.unregister = function unregister (
+    field,
+    options
+  ) {
+      if ( options === void 0 ) options = {};
+
+    if (!this._validityManager) {
+      // TODO: should be output error
+      return
+    }
+
+    if (!this._validities[field]) {
+      // TODO: should be output error
+      return
+    }
+    delete this._validities[field];
+
+    var named = options.named;
+      var group = options.group;
+    var groupValidity = group ? this._getValidityGroup('group', group) : null;
+    var namedValidity = named ? this._getValidityGroup('named', named) : null;
+    if (named && group && namedValidity && groupValidity) {
+      groupValidity.unregister(field);
+      if (groupValidity.validityCount() === 0) {
+        namedValidity.isRegistered(group) && namedValidity.unregister(group);
+        this._unregisterValidityGroup('group', group);
+      }
+      if (namedValidity.validityCount() === 0) {
+        this._validityManager.isRegistered(named) && this._validityManager.unregister(named);
+        this._unregisterValidityGroup('named', named);
+      }
+    } else if (named && namedValidity) {
+      namedValidity.unregister(field);
+      if (namedValidity.validityCount() === 0) {
+        this._validityManager.isRegistered(named) && this._validityManager.unregister(named);
+        this._unregisterValidityGroup('named', named);
+      }
+    } else if (group && groupValidity) {
+      groupValidity.unregister(field);
+      if (groupValidity.validityCount() === 0) {
+        this._validityManager.isRegistered(group) && this._validityManager.unregister(group);
+        this._unregisterValidityGroup('group', group);
+      }
+    } else {
+      this._validityManager.unregister(field);
+    }
+  };
+
+  Validation.prototype.destroy = function destroy () {
+      var this$1 = this;
+
+    var validityKeys = Object.keys(this._validities);
+    var namedKeys = Object.keys(this._named);
+    var groupKeys = Object.keys(this._group);
+
+    // unregister validity
+    validityKeys.forEach(function (validityKey) {
+      groupKeys.forEach(function (groupKey) {
+        var group = this$1._getValidityGroup('group', groupKey);
+        if (group && group.isRegistered(groupKey)) {
+          group.unregister(validityKey);
+        }
+      });
+      namedKeys.forEach(function (namedKey) {
+        var named = this$1._getValidityGroup('named', namedKey);
+        if (named && named.isRegistered(validityKey)) {
+          named.unregister(validityKey);
+        }
+      });
+      if (this$1._validityManager.isRegistered(validityKey)) {
+        this$1._validityManager.unregister(validityKey);
+      }
+      delete this$1._validities[validityKey];
+    });
+
+    // unregister grouped validity
+    groupKeys.forEach(function (groupKey) {
+      namedKeys.forEach(function (namedKey) {
+        var named = this$1._getValidityGroup('named', namedKey);
+        if (named && named.isRegistered(groupKey)) {
+          named.unregister(groupKey);
+        }
+      });
+      if (this$1._validityManager.isRegistered(groupKey)) {
+        this$1._validityManager.unregister(groupKey);
+      }
+      this$1._unregisterValidityGroup('group', groupKey);
+    });
+
+    // unregister named validity
+    namedKeys.forEach(function (namedKey) {
+      if (this$1._validityManager.isRegistered(namedKey)) {
+        this$1._validityManager.unregister(namedKey);
+      }
+      this$1._unregisterValidityGroup('named', namedKey);
+    });
+
+    this._beginDestroy = true;
+  };
+
+  Validation.prototype._getValidityGroup = function _getValidityGroup (type, name) {
+    return type === 'named' ? this._named[name] : this._group[name]
+  };
+
+  Validation.prototype._registerValidityGroup = function _registerValidityGroup (type, name) {
+    var groups = type === 'named' ? this._named : this._group;
+    groups[name] = new Vue(ValidityGroup);
+    return groups[name]
+  };
+
+  Validation.prototype._unregisterValidityGroup = function _unregisterValidityGroup (type, name) {
+    var groups = type === 'named' ? this._named : this._group;
+    if (!groups[name]) {
+      // TODO: should be warn
+      return
+    }
+
+    groups[name].$destroy();
+    delete groups[name];
+  };
+
+  Validation.prototype._watchValidityResult = function _watchValidityResult () {
+      var this$1 = this;
+
+    this._watcher = this._validityManager.$watch('results', function (val, old) {
+      Vue.set(this$1._host, '$validation', val);
+      if (this$1._beginDestroy) {
+        this$1._destroyValidityMananger();
+      }
+    }, { deep: true });
+  };
+
+  Validation.prototype._unwatchValidityResult = function _unwatchValidityResult () {
+    this._watcher();
+    delete this._watcher;
+  };
+
+  Validation.prototype._destroyValidityMananger = function _destroyValidityMananger () {
+    this._unwatchValidityResult();
+    this._validityManager.$destroy();
+    this._validityManager = null;
+  };
+
+  return Validation
+};
+
+/*  */
+
+var Mixin = function (Vue) {
+  var Validation = ValidationClass(Vue);
+
+  return {
+    beforeCreate: function beforeCreate () {
+      this._validation = new Validation({ host: this });
+    }
+  }
+};
+
+/*  */
+
+var baseProps = {
+  field: {
+    type: String,
+    required: true
+  },
+  validators: {
+    type: [String, Array, Object],
+    required: true
+  },
+  group: {
+    type: String
+  },
+  multiple: {
+    type: Boolean
+  },
+  autotouch: {
+    type: String,
+    default: function () {
+      return 'on'
+    }
+  },
+  classes: {
+    type: Object,
+    default: function () {
+      return {}
+    }
+  }
+};
+
+var DEFAULT_CLASSES = {
+  valid: 'valid',
+  invalid: 'invalid',
+  touched: 'touched',
+  untouched: 'untouched',
+  pristine: 'pristine',
+  dirty: 'dirty',
+  modified: 'modified'
+};
+
+/*  */
+var States = function (Vue) {
+  var ref = Vue.util;
+  var extend = ref.extend;
+  var isPlainObject = ref.isPlainObject;
+
+  function initialStates (states, validators, init) {
+    if ( init === void 0 ) init = undefined;
+
+    if (Array.isArray(validators)) {
+      validators.forEach(function (validator) {
+        states[validator] = init;
+      });
+    } else {
+      Object.keys(validators).forEach(function (validator) {
+        var props = (validators[validator] &&
+          validators[validator]['props'] &&
+          isPlainObject(validators[validator]['props']))
+            ? validators[validator]['props']
+            : null;
+        if (props) {
+          Object.keys(props).forEach(function (prop) {
+            states[validator] = {};
+            states[validator][prop] = init;
+          });
+        } else {
+          states[validator] = init;
+        }
+      });
+    }
+  }
+
+  function getInitialResults (validators) {
+    var results = {};
+    initialStates(results, validators, undefined);
+    return results
+  }
+
+  function getInitialProgresses (validators) {
+    var progresses = {};
+    initialStates(progresses, validators, '');
+    return progresses
+  }
+
+  var props = extend({
+    child: {
+      type: Object,
+      required: true
+    },
+    value: {
+      type: Object
+    }
+  }, baseProps);
+
+  function data () {
+    var validators = nomalizeValidators(this.validators);
+    return {
+      results: getInitialResults(validators),
+      valid: true,
+      dirty: false,
+      touched: false,
+      modified: false,
+      progresses: getInitialProgresses(validators)
+    }
+  }
+
+  return {
+    props: props,
+    data: data
+  }
+};
+
+function nomalizeValidators (target) {
+  return typeof target === 'string' ? [target] : target
+}
+
+/*  */
+
+var Computed = function (Vue) {
+  var ref = Vue.util;
+  var isPlainObject = ref.isPlainObject;
+
+  function setError (
+    result,
+    field,
+    validator,
+    message,
+    prop
+  ) {
+    var error = { field: field, validator: validator };
+    if (message) {
+      error.message = message;
+    }
+    if (prop) {
+      error.prop = prop;
+    }
+    result.errors = result.errors || [];
+    result.errors.push(error);
+  }
+
+  function walkProgresses (keys, target) {
+    var progress = '';
+    for (var i = 0; i < keys.length; i++) {
+      var result = target[keys[i]];
+      if (typeof result === 'string' && result) {
+        progress = result;
+        break
+      }
+      if (isPlainObject(result)) {
+        var nestedKeys = Object.keys(result);
+        progress = walkProgresses(nestedKeys, result);
+        if (!progress) {
+          break
+        }
+      }
+    }
+    return progress
+  }
+
+  function invalid () {
+    return !this.valid
+  }
+
+  function pristine () {
+    return !this.dirty
+  }
+
+  function untouched () {
+    return !this.touched
+  }
+
+  function result () {
+    var this$1 = this;
+
+    var ret = {
+      valid: this.valid,
+      invalid: this.invalid,
+      dirty: this.dirty,
+      pristine: this.pristine,
+      touched: this.touched,
+      untouched: this.untouched,
+      modified: this.modified
+    };
+
+    var keys = this._keysCached(this._uid.toString(), this.results);
+    keys.forEach(function (validator) {
+      var result = this$1.results[validator];
+      if (typeof result === 'boolean') {
+        if (result) {
+          ret[validator] = false;
+        } else {
+          setError(ret, this$1.field, validator);
+          ret[validator] = !result;
+        }
+      } else if (typeof result === 'string') {
+        setError(ret, this$1.field, validator, result);
+        ret[validator] = result;
+      } else if (isPlainObject(result)) { // object
+        var props = Object.keys(result);
+        props.forEach(function (prop) {
+          var propRet = result[prop];
+          ret[prop] = ret[prop] || {};
+          if (typeof propRet === 'boolean') {
+            if (propRet) {
+              ret[prop][validator] = false;
             } else {
-              results[name] = !ret;
+              setError(ret, this$1.field, validator, undefined, prop);
+              ret[prop][validator] = !propRet;
             }
+          } else if (typeof propRet === 'string') {
+            setError(ret, this$1.field, validator, propRet, prop);
+            ret[prop][validator] = propRet;
           } else {
-            results[name] = !ret;
-          }
-
-          done();
-        });
-      } else {
-        done();
-      }
-    }, function () {
-      // finished
-      _this4._fireEvent(_this4._el, valid ? 'valid' : 'invalid');
-
-      var props = {
-        valid: valid,
-        invalid: !valid,
-        touched: _this4.touched,
-        untouched: !_this4.touched,
-        dirty: _this4.dirty,
-        pristine: !_this4.dirty,
-        modified: _this4.modified
-      };
-      if (!empty(errors)) {
-        props.errors = errors;
-      }
-      _.extend(results, props);
-
-      _this4.willUpdateClasses(results, el);
-
-      cb(results);
-    });
-  };
-
-  BaseValidation.prototype.resetFlags = function resetFlags() {
-    this.touched = false;
-    this.dirty = false;
-    this.modified = false;
-    this._modified = false;
-  };
-
-  BaseValidation.prototype.reset = function reset() {
-    this.resetValidationNoopable();
-    this.resetFlags();
-    this._init = this._getValue(this._el);
-  };
-
-  BaseValidation.prototype.willUpdateClasses = function willUpdateClasses(results) {
-    var _this5 = this;
-
-    var el = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
-
-    if (this._checkClassIds(el)) {
-      (function () {
-        var classIds = _this5._getClassIds(el);
-        _this5.vm.$nextTick(function () {
-          _this5.vm.$emit(VALIDATE_UPDATE, classIds, _this5, results);
-        });
-      })();
-    } else {
-      this.updateClasses(results);
-    }
-  };
-
-  BaseValidation.prototype.updateClasses = function updateClasses(results) {
-    var el = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
-
-    this._updateClasses(el || this._el, results);
-  };
-
-  BaseValidation.prototype.guardValidate = function guardValidate(el, type) {
-    if (type && type === 'blur' && !this.detectBlur) {
-      return true;
-    }
-
-    if (type && type === 'input' && !this.detectChange) {
-      return true;
-    }
-
-    if (type && type === 'change' && !this.detectChange) {
-      return true;
-    }
-
-    if (type && type === 'click' && !this.detectChange) {
-      return true;
-    }
-
-    return false;
-  };
-
-  BaseValidation.prototype._getValue = function _getValue(el) {
-    return el.value;
-  };
-
-  BaseValidation.prototype._getScope = function _getScope() {
-    return this._forScope || this._vm;
-  };
-
-  BaseValidation.prototype._getClassIds = function _getClassIds(el) {
-    return this._classIds;
-  };
-
-  BaseValidation.prototype._checkModified = function _checkModified(target) {
-    return this._init !== this._getValue(target);
-  };
-
-  BaseValidation.prototype._checkClassIds = function _checkClassIds(el) {
-    return this._getClassIds(el);
-  };
-
-  BaseValidation.prototype._fireEvent = function _fireEvent(el, type, args) {
-    trigger(el, type, args);
-  };
-
-  BaseValidation.prototype._evalModel = function _evalModel(model, filters) {
-    var scope = this._getScope();
-
-    var val = null;
-    if (filters) {
-      val = scope.$get(model);
-      return filters ? this._applyFilters(val, null, filters) : val;
-    } else {
-      val = scope.$get(model);
-      return val === undefined || val === null ? '' : val;
-    }
-  };
-
-  BaseValidation.prototype._updateClasses = function _updateClasses(el, results) {
-    this._toggleValid(el, results.valid);
-    this._toggleTouched(el, results.touched);
-    this._togglePristine(el, results.pristine);
-    this._toggleModfied(el, results.modified);
-  };
-
-  BaseValidation.prototype._toggleValid = function _toggleValid(el, valid) {
-    var _util$Vue$util = exports$1.Vue.util;
-    var addClass = _util$Vue$util.addClass;
-    var removeClass = _util$Vue$util.removeClass;
-
-    var validClass = this._classes.valid || 'valid';
-    var invalidClass = this._classes.invalid || 'invalid';
-
-    if (valid) {
-      toggleClasses(el, validClass, addClass);
-      toggleClasses(el, invalidClass, removeClass);
-    } else {
-      toggleClasses(el, validClass, removeClass);
-      toggleClasses(el, invalidClass, addClass);
-    }
-  };
-
-  BaseValidation.prototype._toggleTouched = function _toggleTouched(el, touched) {
-    var _util$Vue$util2 = exports$1.Vue.util;
-    var addClass = _util$Vue$util2.addClass;
-    var removeClass = _util$Vue$util2.removeClass;
-
-    var touchedClass = this._classes.touched || 'touched';
-    var untouchedClass = this._classes.untouched || 'untouched';
-
-    if (touched) {
-      toggleClasses(el, touchedClass, addClass);
-      toggleClasses(el, untouchedClass, removeClass);
-    } else {
-      toggleClasses(el, touchedClass, removeClass);
-      toggleClasses(el, untouchedClass, addClass);
-    }
-  };
-
-  BaseValidation.prototype._togglePristine = function _togglePristine(el, pristine) {
-    var _util$Vue$util3 = exports$1.Vue.util;
-    var addClass = _util$Vue$util3.addClass;
-    var removeClass = _util$Vue$util3.removeClass;
-
-    var pristineClass = this._classes.pristine || 'pristine';
-    var dirtyClass = this._classes.dirty || 'dirty';
-
-    if (pristine) {
-      toggleClasses(el, pristineClass, addClass);
-      toggleClasses(el, dirtyClass, removeClass);
-    } else {
-      toggleClasses(el, pristineClass, removeClass);
-      toggleClasses(el, dirtyClass, addClass);
-    }
-  };
-
-  BaseValidation.prototype._toggleModfied = function _toggleModfied(el, modified) {
-    var _util$Vue$util4 = exports$1.Vue.util;
-    var addClass = _util$Vue$util4.addClass;
-    var removeClass = _util$Vue$util4.removeClass;
-
-    var modifiedClass = this._classes.modified || 'modified';
-
-    if (modified) {
-      toggleClasses(el, modifiedClass, addClass);
-    } else {
-      toggleClasses(el, modifiedClass, removeClass);
-    }
-  };
-
-  BaseValidation.prototype._applyFilters = function _applyFilters(value, oldValue, filters, write) {
-    var resolveAsset = exports$1.Vue.util.resolveAsset;
-    var scope = this._getScope();
-
-    var filter = void 0,
-        fn = void 0,
-        args = void 0,
-        arg = void 0,
-        offset = void 0,
-        i = void 0,
-        l = void 0,
-        j = void 0,
-        k = void 0;
-    for (i = 0, l = filters.length; i < l; i++) {
-      filter = filters[i];
-      fn = resolveAsset(this._vm.$options, 'filters', filter.name);
-      if (!fn) {
-        continue;
-      }
-
-      fn = write ? fn.write : fn.read || fn;
-      if (typeof fn !== 'function') {
-        continue;
-      }
-
-      args = write ? [value, oldValue] : [value];
-      offset = write ? 2 : 1;
-      if (filter.args) {
-        for (j = 0, k = filter.args.length; j < k; j++) {
-          arg = filter.args[j];
-          args[j + offset] = arg.dynamic ? scope.$get(arg.value) : arg.value;
-        }
-      }
-
-      value = fn.apply(this._vm, args);
-    }
-
-    return value;
-  };
-
-  BaseValidation.prototype._runValidators = function _runValidators(fn, cb) {
-    var validators = this._validators;
-    var length = Object.keys(validators).length;
-
-    var count = 0;
-    each(validators, function (descriptor, name) {
-      fn(descriptor, name, function () {
-        ++count;
-        count >= length && cb();
-      });
-    });
-  };
-
-  BaseValidation.prototype._invokeValidator = function _invokeValidator(vm, validator, val, arg, cb) {
-    var future = validator.call(this, val, arg);
-    if (typeof future === 'function') {
-      // function 
-      future(function () {
-        // resolve
-        cb(true);
-      }, function (msg) {
-        // reject
-        cb(false, msg);
-      });
-    } else if (isPromise(future)) {
-      // promise
-      future.then(function () {
-        // resolve
-        cb(true);
-      }, function (msg) {
-        // reject
-        cb(false, msg);
-      }).catch(function (err) {
-        cb(false, err.message);
-      });
-    } else {
-      // sync
-      cb(future);
-    }
-  };
-
-  BaseValidation.prototype._resolveValidator = function _resolveValidator(name) {
-    var resolveAsset = exports$1.Vue.util.resolveAsset;
-    return resolveAsset(this._vm.$options, 'validators', name);
-  };
-
-  babelHelpers.createClass(BaseValidation, [{
-    key: 'vm',
-    get: function get() {
-      return this._vm;
-    }
-  }, {
-    key: 'el',
-    get: function get() {
-      return this._el;
-    }
-  }, {
-    key: 'detectChange',
-    get: function get() {
-      return this._detectChange;
-    },
-    set: function set(val) {
-      this._detectChange = val;
-    }
-  }, {
-    key: 'detectBlur',
-    get: function get() {
-      return this._detectBlur;
-    },
-    set: function set(val) {
-      this._detectBlur = val;
-    }
-  }]);
-  return BaseValidation;
-}();
-
-/**
- * CheckboxValidation class
- */
-
-var CheckboxValidation = function (_BaseValidation) {
-  babelHelpers.inherits(CheckboxValidation, _BaseValidation);
-
-  function CheckboxValidation(field, model, vm, el, scope, validator, filters, detectBlur, detectChange) {
-    babelHelpers.classCallCheck(this, CheckboxValidation);
-
-    var _this = babelHelpers.possibleConstructorReturn(this, _BaseValidation.call(this, field, model, vm, el, scope, validator, filters, detectBlur, detectChange));
-
-    _this._inits = [];
-    return _this;
-  }
-
-  CheckboxValidation.prototype.manageElement = function manageElement(el, initial) {
-    var _this2 = this;
-
-    var scope = this._getScope();
-    var item = this._addItem(el, initial);
-
-    var model = item.model = this._model;
-    if (model) {
-      var value = this._evalModel(model, this._filters);
-      if (Array.isArray(value)) {
-        this._setChecked(value, item.el);
-        item.unwatch = scope.$watch(model, function (val, old) {
-          if (val !== old) {
-            if (_this2.guardValidate(item.el, 'change')) {
-              return;
-            }
-
-            _this2.handleValidate(item.el, { noopable: item.initial });
-            if (item.initial) {
-              item.initial = null;
-            }
+            ret[prop][validator] = false;
           }
         });
       } else {
-        el.checked = value || false;
-        this._init = el.checked;
-        item.init = el.checked;
-        item.value = el.value;
-        item.unwatch = scope.$watch(model, function (val, old) {
-          if (val !== old) {
-            if (_this2.guardValidate(el, 'change')) {
-              return;
-            }
-
-            _this2.handleValidate(el, { noopable: item.initial });
-            if (item.initial) {
-              item.initial = null;
-            }
-          }
-        });
-      }
-    } else {
-      var options = { field: this.field, noopable: initial };
-      if (this._checkClassIds(el)) {
-        options.el = el;
-      }
-      this._validator.validate(options);
-    }
-  };
-
-  CheckboxValidation.prototype.unmanageElement = function unmanageElement(el) {
-    var found = -1;
-    each(this._inits, function (item, index) {
-      if (item.el === el) {
-        found = index;
-        if (item.unwatch && item.model) {
-          item.unwatch();
-          item.unwatch = null;
-          item.model = null;
-        }
+        ret[validator] = false;
       }
     });
-    if (found === -1) {
-      return;
-    }
 
-    this._inits.splice(found, 1);
-    this._validator.validate({ field: this.field });
-  };
-
-  CheckboxValidation.prototype.willUpdateFlags = function willUpdateFlags() {
-    var _this3 = this;
-
-    var touched = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
-
-    each(this._inits, function (item, index) {
-      touched && _this3.willUpdateTouched(item.el, 'blur');
-      _this3.willUpdateDirty(item.el);
-      _this3.willUpdateModified(item.el);
-    });
-  };
-
-  CheckboxValidation.prototype.reset = function reset() {
-    this.resetValidationNoopable();
-    this.resetFlags();
-    each(this._inits, function (item, index) {
-      item.init = item.el.checked;
-      item.value = item.el.value;
-    });
-  };
-
-  CheckboxValidation.prototype.updateClasses = function updateClasses(results) {
-    var _this4 = this;
-
-    var el = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
-
-    if (el) {
-      // for another element
-      this._updateClasses(el, results);
-    } else {
-      each(this._inits, function (item, index) {
-        _this4._updateClasses(item.el, results);
-      });
-    }
-  };
-
-  CheckboxValidation.prototype._addItem = function _addItem(el, initial) {
-    var item = {
-      el: el,
-      init: el.checked,
-      value: el.value,
-      initial: initial
-    };
-
-    var classIds = el.getAttribute(VALIDATE_UPDATE);
-    if (classIds) {
-      el.removeAttribute(VALIDATE_UPDATE);
-      item.classIds = classIds.split(',');
-    }
-
-    this._inits.push(item);
-    return item;
-  };
-
-  CheckboxValidation.prototype._setChecked = function _setChecked(values, el) {
-    for (var i = 0, l = values.length; i < l; i++) {
-      var value = values[i];
-      if (!el.disabled && el.value === value && !el.checked) {
-        el.checked = true;
-      }
-    }
-  };
-
-  CheckboxValidation.prototype._getValue = function _getValue(el) {
-    var _this5 = this;
-
-    if (!this._inits || this._inits.length === 0) {
-      return el.checked;
-    } else {
-      var _ret = function () {
-        var vals = [];
-        each(_this5._inits, function (item, index) {
-          item.el.checked && vals.push(item.el.value);
-        });
-        return {
-          v: vals
-        };
-      }();
-
-      if ((typeof _ret === 'undefined' ? 'undefined' : babelHelpers.typeof(_ret)) === "object") return _ret.v;
-    }
-  };
-
-  CheckboxValidation.prototype._getClassIds = function _getClassIds(el) {
-    var classIds = void 0;
-    each(this._inits, function (item, index) {
-      if (item.el === el) {
-        classIds = item.classIds;
-      }
-    });
-    return classIds;
-  };
-
-  CheckboxValidation.prototype._checkModified = function _checkModified(target) {
-    var _this6 = this;
-
-    if (this._inits.length === 0) {
-      return this._init !== target.checked;
-    } else {
-      var _ret2 = function () {
-        var modified = false;
-        each(_this6._inits, function (item, index) {
-          if (!modified) {
-            modified = item.init !== item.el.checked;
-          }
-        });
-        return {
-          v: modified
-        };
-      }();
-
-      if ((typeof _ret2 === 'undefined' ? 'undefined' : babelHelpers.typeof(_ret2)) === "object") return _ret2.v;
-    }
-  };
-
-  return CheckboxValidation;
-}(BaseValidation);
-
-/**
- * RadioValidation class
- */
-
-var RadioValidation = function (_BaseValidation) {
-  babelHelpers.inherits(RadioValidation, _BaseValidation);
-
-  function RadioValidation(field, model, vm, el, scope, validator, filters, detectBlur, detectChange) {
-    babelHelpers.classCallCheck(this, RadioValidation);
-
-    var _this = babelHelpers.possibleConstructorReturn(this, _BaseValidation.call(this, field, model, vm, el, scope, validator, filters, detectBlur, detectChange));
-
-    _this._inits = [];
-    return _this;
+    return ret
   }
 
-  RadioValidation.prototype.manageElement = function manageElement(el, initial) {
-    var _this2 = this;
-
-    var scope = this._getScope();
-    var item = this._addItem(el, initial);
-
-    var model = item.model = this._model;
-    if (model) {
-      var value = this._evalModel(model, this._filters);
-      this._setChecked(value, el, item);
-      item.unwatch = scope.$watch(model, function (val, old) {
-        if (val !== old) {
-          if (_this2.guardValidate(item.el, 'change')) {
-            return;
-          }
-
-          _this2.handleValidate(el, { noopable: item.initial });
-          if (item.initial) {
-            item.initial = null;
-          }
-        }
-      });
-    } else {
-      var options = { field: this.field, noopable: initial };
-      if (this._checkClassIds(el)) {
-        options.el = el;
-      }
-      this._validator.validate(options);
-    }
-  };
-
-  RadioValidation.prototype.unmanageElement = function unmanageElement(el) {
-    var found = -1;
-    each(this._inits, function (item, index) {
-      if (item.el === el) {
-        found = index;
-      }
-    });
-    if (found === -1) {
-      return;
-    }
-
-    this._inits.splice(found, 1);
-    this._validator.validate({ field: this.field });
-  };
-
-  RadioValidation.prototype.willUpdateFlags = function willUpdateFlags() {
-    var _this3 = this;
-
-    var touched = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
-
-    each(this._inits, function (item, index) {
-      touched && _this3.willUpdateTouched(item.el, 'blur');
-      _this3.willUpdateDirty(item.el);
-      _this3.willUpdateModified(item.el);
-    });
-  };
-
-  RadioValidation.prototype.reset = function reset() {
-    this.resetValidationNoopable();
-    this.resetFlags();
-    each(this._inits, function (item, index) {
-      item.init = item.el.checked;
-      item.value = item.el.value;
-    });
-  };
-
-  RadioValidation.prototype.updateClasses = function updateClasses(results) {
-    var _this4 = this;
-
-    var el = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
-
-    if (el) {
-      // for another element
-      this._updateClasses(el, results);
-    } else {
-      each(this._inits, function (item, index) {
-        _this4._updateClasses(item.el, results);
-      });
-    }
-  };
-
-  RadioValidation.prototype._addItem = function _addItem(el, initial) {
-    var item = {
-      el: el,
-      init: el.checked,
-      value: el.value,
-      initial: initial
-    };
-
-    var classIds = el.getAttribute(VALIDATE_UPDATE);
-    if (classIds) {
-      el.removeAttribute(VALIDATE_UPDATE);
-      item.classIds = classIds.split(',');
-    }
-
-    this._inits.push(item);
-    return item;
-  };
-
-  RadioValidation.prototype._setChecked = function _setChecked(value, el, item) {
-    if (el.value === value) {
-      el.checked = true;
-      this._init = el.checked;
-      item.init = el.checked;
-      item.value = value;
-    }
-  };
-
-  RadioValidation.prototype._getValue = function _getValue(el) {
-    var _this5 = this;
-
-    if (!this._inits || this._inits.length === 0) {
-      return el.checked;
-    } else {
-      var _ret = function () {
-        var vals = [];
-        each(_this5._inits, function (item, index) {
-          item.el.checked && vals.push(item.el.value);
-        });
-        return {
-          v: vals
-        };
-      }();
-
-      if ((typeof _ret === 'undefined' ? 'undefined' : babelHelpers.typeof(_ret)) === "object") return _ret.v;
-    }
-  };
-
-  RadioValidation.prototype._getClassIds = function _getClassIds(el) {
-    var classIds = void 0;
-    each(this._inits, function (item, index) {
-      if (item.el === el) {
-        classIds = item.classIds;
-      }
-    });
-    return classIds;
-  };
-
-  RadioValidation.prototype._checkModified = function _checkModified(target) {
-    var _this6 = this;
-
-    if (this._inits.length === 0) {
-      return this._init !== target.checked;
-    } else {
-      var _ret2 = function () {
-        var modified = false;
-        each(_this6._inits, function (item, index) {
-          if (!modified) {
-            modified = item.init !== item.el.checked;
-          }
-        });
-        return {
-          v: modified
-        };
-      }();
-
-      if ((typeof _ret2 === 'undefined' ? 'undefined' : babelHelpers.typeof(_ret2)) === "object") return _ret2.v;
-    }
-  };
-
-  return RadioValidation;
-}(BaseValidation);
-
-/**
- * SelectValidation class
- */
-
-var SelectValidation = function (_BaseValidation) {
-  babelHelpers.inherits(SelectValidation, _BaseValidation);
-
-  function SelectValidation(field, model, vm, el, scope, validator, filters, detectBlur, detectChange) {
-    babelHelpers.classCallCheck(this, SelectValidation);
-
-    var _this = babelHelpers.possibleConstructorReturn(this, _BaseValidation.call(this, field, model, vm, el, scope, validator, filters, detectBlur, detectChange));
-
-    _this._multiple = _this._el.hasAttribute('multiple');
-    return _this;
+  function progress () {
+    var ret = '';
+    ret = walkProgresses(
+      this._keysCached(this._uid.toString(), this.results),
+      this.progresses
+    );
+    return ret
   }
 
-  SelectValidation.prototype.manageElement = function manageElement(el, initial) {
-    var _this2 = this;
-
-    var scope = this._getScope();
-    var model = this._model;
-
-    this._initial = initial;
-
-    var classIds = el.getAttribute(VALIDATE_UPDATE);
-    if (classIds) {
-      el.removeAttribute(VALIDATE_UPDATE);
-      this._classIds = classIds.split(',');
-    }
-
-    if (model) {
-      var value = this._evalModel(model, this._filters);
-      var values = !Array.isArray(value) ? [value] : value;
-      this._setOption(values, el);
-      this._unwatch = scope.$watch(model, function (val, old) {
-        var values1 = !Array.isArray(val) ? [val] : val;
-        var values2 = !Array.isArray(old) ? [old] : old;
-        if (values1.slice().sort().toString() !== values2.slice().sort().toString()) {
-          if (_this2.guardValidate(el, 'change')) {
-            return;
-          }
-
-          _this2.handleValidate(el, { noopable: _this2._initial });
-          if (_this2._initial) {
-            _this2._initial = null;
-          }
-        }
-      });
-    }
-  };
-
-  SelectValidation.prototype.unmanageElement = function unmanageElement(el) {
-    this._unwatch && this._unwatch();
-  };
-
-  SelectValidation.prototype._getValue = function _getValue(el) {
-    var ret = [];
-
-    for (var i = 0, l = el.options.length; i < l; i++) {
-      var option = el.options[i];
-      if (!option.disabled && option.selected) {
-        ret.push(option.value);
-      }
-    }
-
-    return ret;
-  };
-
-  SelectValidation.prototype._setOption = function _setOption(values, el) {
-    for (var i = 0, l = values.length; i < l; i++) {
-      var value = values[i];
-      for (var j = 0, m = el.options.length; j < m; j++) {
-        var option = el.options[j];
-        if (!option.disabled && option.value === value && (!option.hasAttribute('selected') || !option.selected)) {
-          option.selected = true;
-        }
-      }
-    }
-  };
-
-  SelectValidation.prototype._checkModified = function _checkModified(target) {
-    var values = this._getValue(target).slice().sort();
-    if (this._init.length !== values.length) {
-      return true;
-    } else {
-      var inits = this._init.slice().sort();
-      return inits.toString() !== values.toString();
-    }
-  };
-
-  return SelectValidation;
-}(BaseValidation);
-
-/**
- * Validator class
- */
-
-var Validator$1 = function () {
-  function Validator(name, dir, groups, classes) {
-    var _this = this;
-
-    babelHelpers.classCallCheck(this, Validator);
-
-    this.name = name;
-
-    this._scope = {};
-    this._dir = dir;
-    this._validations = {};
-    this._checkboxValidations = {};
-    this._radioValidations = {};
-    this._groups = groups;
-    this._groupValidations = {};
-    this._events = {};
-    this._modified = false;
-    this._classes = classes;
-
-    each(groups, function (group) {
-      _this._groupValidations[group] = [];
-    });
+  return {
+    invalid: invalid,
+    pristine: pristine,
+    untouched: untouched,
+    result: result,
+    progress: progress
   }
+};
 
-  Validator.prototype.enableReactive = function enableReactive() {
-    var vm = this._dir.vm;
+/*  */
 
-    // define the validation scope
-    exports$1.Vue.util.defineReactive(vm, this.name, this._scope);
-    vm._validatorMaps[this.name] = this;
-
-    // define the validation resetting meta method to vue instance
-    this._defineResetValidation();
-
-    // define the validate manually meta method to vue instance
-    this._defineValidate();
-
-    // define manually the validation errors
-    this._defineSetValidationErrors();
-  };
-
-  Validator.prototype.disableReactive = function disableReactive() {
-    var vm = this._dir.vm;
-    vm.$setValidationErrors = null;
-    delete vm['$setValidationErrors'];
-    vm.$validate = null;
-    delete vm['$validate'];
-    vm.$resetValidation = null;
-    delete vm['$resetValidation'];
-    vm._validatorMaps[this.name] = null;
-    delete vm._validatorMaps[this.name];
-    vm[this.name] = null;
-    delete vm[this.name];
-  };
-
-  Validator.prototype.registerEvents = function registerEvents() {
-    var isSimplePath = exports$1.Vue.parsers.expression.isSimplePath;
-
-    var attrs = this._dir.el.attributes;
-    for (var i = 0, l = attrs.length; i < l; i++) {
-      var event = attrs[i].name;
-      if (REGEX_EVENT.test(event)) {
-        var value = attrs[i].value;
-        if (isSimplePath(value)) {
-          value += '.apply(this, $arguments)';
-        }
-        event = event.replace(REGEX_EVENT, '');
-        this._events[this._getEventName(event)] = this._dir.vm.$eval(value, true);
-      }
+var Render = function (Vue) {
+  return {
+    render: function render (h) {
+      return this.child
     }
+  }
+};
+
+/*  */
+
+var SingleElementClass = function (Vue) {
+  var ref = Vue.util;
+  var looseEqual = ref.looseEqual;
+
+  var SingleElement = function SingleElement (vm) {
+    this._vm = vm;
+    this.initValue = this.getValue();
+    this.attachValidity();
   };
 
-  Validator.prototype.unregisterEvents = function unregisterEvents() {
-    var _this2 = this;
-
-    each(this._events, function (handler, event) {
-      _this2._events[event] = null;
-      delete _this2._events[event];
-    });
+  SingleElement.prototype.attachValidity = function attachValidity () {
+    this._vm.$el.$validity = this._vm;
   };
 
-  Validator.prototype.manageValidation = function manageValidation(field, model, vm, el, scope, filters, initial, detectBlur, detectChange) {
-    var validation = null;
-
+  SingleElement.prototype.getValue = function getValue () {
+    var el = this._vm.$el;
     if (el.tagName === 'SELECT') {
-      validation = this._manageSelectValidation(field, model, vm, el, scope, filters, initial, detectBlur, detectChange);
-    } else if (el.type === 'checkbox') {
-      validation = this._manageCheckboxValidation(field, model, vm, el, scope, filters, initial, detectBlur, detectChange);
-    } else if (el.type === 'radio') {
-      validation = this._manageRadioValidation(field, model, vm, el, scope, filters, initial, detectBlur, detectChange);
+      return getSelectValue(el)
     } else {
-      validation = this._manageBaseValidation(field, model, vm, el, scope, filters, initial, detectBlur, detectChange);
+      if (el.type === 'checkbox') {
+        return el.checked
+      } else {
+        return el.value
+      }
     }
-
-    validation.setValidationClasses(this._classes);
-
-    return validation;
   };
 
-  Validator.prototype.unmanageValidation = function unmanageValidation(field, el) {
-    if (el.type === 'checkbox') {
-      this._unmanageCheckboxValidation(field, el);
-    } else if (el.type === 'radio') {
-      this._unmanageRadioValidation(field, el);
-    } else if (el.tagName === 'SELECT') {
-      this._unmanageSelectValidation(field, el);
+  SingleElement.prototype.checkModified = function checkModified () {
+    var el = this._vm.$el;
+    if (el.tagName === 'SELECT') {
+      return !looseEqual(this.initValue, getSelectValue(el))
     } else {
-      this._unmanageBaseValidation(field, el);
+      if (el.type === 'checkbox') {
+        return !looseEqual(this.initValue, el.checked)
+      } else {
+        return !looseEqual(this.initValue, el.value)
+      }
     }
   };
 
-  Validator.prototype.addGroupValidation = function addGroupValidation(group, field) {
-    var indexOf = exports$1.Vue.util.indexOf;
-
-    var validation = this._getValidationFrom(field);
-    var validations = this._groupValidations[group];
-
-    validations && !~indexOf(validations, validation) && validations.push(validation);
+  SingleElement.prototype.listenToucheableEvent = function listenToucheableEvent () {
+    this._vm.$el.addEventListener('focusout', this._vm.willUpdateTouched);
   };
 
-  Validator.prototype.removeGroupValidation = function removeGroupValidation(group, field) {
-    var validation = this._getValidationFrom(field);
-    var validations = this._groupValidations[group];
-
-    validations && pull(validations, validation);
+  SingleElement.prototype.unlistenToucheableEvent = function unlistenToucheableEvent () {
+    this._vm.$el.removeEventListener('focusout', this._vm.willUpdateTouched);
   };
 
-  Validator.prototype.validate = function validate() {
-    var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-
-    var _ref$el = _ref.el;
-    var el = _ref$el === undefined ? null : _ref$el;
-    var _ref$field = _ref.field;
-    var field = _ref$field === undefined ? null : _ref$field;
-    var _ref$touched = _ref.touched;
-    var touched = _ref$touched === undefined ? false : _ref$touched;
-    var _ref$noopable = _ref.noopable;
-    var noopable = _ref$noopable === undefined ? false : _ref$noopable;
-    var _ref$cb = _ref.cb;
-    var cb = _ref$cb === undefined ? null : _ref$cb;
-
-    if (!field) {
-      // all
-      each(this.validations, function (validation, key) {
-        validation.willUpdateFlags(touched);
-      });
-      this._validates(cb);
+  SingleElement.prototype.listenInputableEvent = function listenInputableEvent () {
+    var vm = this._vm;
+    var el = vm.$el;
+    if (el.tagName === 'SELECT') {
+      el.addEventListener('change', vm.handleInputable);
     } else {
-      // each field
-      this._validate(field, touched, noopable, el, cb);
-    }
-  };
-
-  Validator.prototype.setupScope = function setupScope() {
-    var _this3 = this;
-
-    this._defineProperties(function () {
-      return _this3.validations;
-    }, function () {
-      return _this3._scope;
-    });
-
-    each(this._groups, function (name) {
-      var validations = _this3._groupValidations[name];
-      var group = {};
-      exports$1.Vue.set(_this3._scope, name, group);
-      _this3._defineProperties(function () {
-        return validations;
-      }, function () {
-        return group;
-      });
-    });
-  };
-
-  Validator.prototype.waitFor = function waitFor(cb) {
-    var method = '$activateValidator';
-    var vm = this._dir.vm;
-
-    vm[method] = function () {
-      cb();
-      vm[method] = null;
-    };
-  };
-
-  Validator.prototype._defineResetValidation = function _defineResetValidation() {
-    var _this4 = this;
-
-    this._dir.vm.$resetValidation = function (cb) {
-      _this4._resetValidation(cb);
-    };
-  };
-
-  Validator.prototype._defineValidate = function _defineValidate() {
-    var _this5 = this;
-
-    this._dir.vm.$validate = function () {
-      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
-
-      var field = null;
-      var touched = false;
-      var cb = null;
-
-      each(args, function (arg, index) {
-        if (typeof arg === 'string') {
-          field = arg;
-        } else if (typeof arg === 'boolean') {
-          touched = arg;
-        } else if (typeof arg === 'function') {
-          cb = arg;
-        }
-      });
-
-      _this5.validate({ field: field, touched: touched, cb: cb });
-    };
-  };
-
-  Validator.prototype._defineSetValidationErrors = function _defineSetValidationErrors() {
-    var _this6 = this;
-
-    this._dir.vm.$setValidationErrors = function (errors) {
-      _this6._setValidationErrors(errors);
-    };
-  };
-
-  Validator.prototype._validate = function _validate(field) {
-    var touched = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
-    var noopable = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
-
-    var _this7 = this;
-
-    var el = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
-    var cb = arguments.length <= 4 || arguments[4] === undefined ? null : arguments[4];
-
-    var scope = this._scope;
-
-    var validation = this._getValidationFrom(field);
-    if (validation) {
-      validation.willUpdateFlags(touched);
-      validation.validate(function (results) {
-        exports$1.Vue.set(scope, field, results);
-        _this7._fireEvents();
-        cb && cb();
-      }, noopable, el);
-    }
-  };
-
-  Validator.prototype._validates = function _validates(cb) {
-    var _this8 = this;
-
-    var scope = this._scope;
-
-    this._runValidates(function (validation, key, done) {
-      validation.validate(function (results) {
-        exports$1.Vue.set(scope, key, results);
-        done();
-      });
-    }, function () {
-      // finished
-      _this8._fireEvents();
-      cb && cb();
-    });
-  };
-
-  Validator.prototype._getValidationFrom = function _getValidationFrom(field) {
-    return this._validations[field] || this._checkboxValidations[field] && this._checkboxValidations[field].validation || this._radioValidations[field] && this._radioValidations[field].validation;
-  };
-
-  Validator.prototype._resetValidation = function _resetValidation(cb) {
-    each(this.validations, function (validation, key) {
-      validation.reset();
-    });
-    this._validates(cb);
-  };
-
-  Validator.prototype._setValidationErrors = function _setValidationErrors(errors) {
-    var _this9 = this;
-
-    var extend = exports$1.Vue.util.extend;
-
-    // make tempolaly errors
-
-    var temp = {};
-    each(errors, function (error, index) {
-      if (!temp[error.field]) {
-        temp[error.field] = [];
-      }
-      temp[error.field].push(error);
-    });
-
-    // set errors
-    each(temp, function (values, field) {
-      var results = _this9._scope[field];
-      var newResults = {};
-
-      each(values, function (error) {
-        if (error.validator) {
-          results[error.validator] = error.message;
-        }
-      });
-
-      results.valid = false;
-      results.invalid = true;
-      results.errors = values;
-      extend(newResults, results);
-
-      var validation = _this9._getValidationFrom(field);
-      validation.willUpdateClasses(newResults, validation.el);
-
-      exports$1.Vue.set(_this9._scope, field, newResults);
-    });
-  };
-
-  Validator.prototype._manageBaseValidation = function _manageBaseValidation(field, model, vm, el, scope, filters, initial, detectBlur, detectChange) {
-    var validation = this._validations[field] = new BaseValidation(field, model, vm, el, scope, this, filters, detectBlur, detectChange);
-    validation.manageElement(el, initial);
-    return validation;
-  };
-
-  Validator.prototype._unmanageBaseValidation = function _unmanageBaseValidation(field, el) {
-    var validation = this._validations[field];
-    if (validation) {
-      validation.unmanageElement(el);
-      exports$1.Vue.delete(this._scope, field);
-      this._validations[field] = null;
-      delete this._validations[field];
-    }
-  };
-
-  Validator.prototype._manageCheckboxValidation = function _manageCheckboxValidation(field, model, vm, el, scope, filters, initial, detectBlur, detectChange) {
-    var validationSet = this._checkboxValidations[field];
-    if (!validationSet) {
-      var validation = new CheckboxValidation(field, model, vm, el, scope, this, filters, detectBlur, detectChange);
-      validationSet = { validation: validation, elements: 0 };
-      this._checkboxValidations[field] = validationSet;
-    }
-
-    validationSet.elements++;
-    validationSet.validation.manageElement(el, initial);
-    return validationSet.validation;
-  };
-
-  Validator.prototype._unmanageCheckboxValidation = function _unmanageCheckboxValidation(field, el) {
-    var validationSet = this._checkboxValidations[field];
-    if (validationSet) {
-      validationSet.elements--;
-      validationSet.validation.unmanageElement(el);
-      if (validationSet.elements === 0) {
-        exports$1.Vue.delete(this._scope, field);
-        this._checkboxValidations[field] = null;
-        delete this._checkboxValidations[field];
+      if (el.type === 'checkbox') {
+        el.addEventListener('change', vm.handleInputable);
+      } else {
+        el.addEventListener('input', vm.handleInputable);
       }
     }
   };
 
-  Validator.prototype._manageRadioValidation = function _manageRadioValidation(field, model, vm, el, scope, filters, initial, detectBlur, detectChange) {
-    var validationSet = this._radioValidations[field];
-    if (!validationSet) {
-      var validation = new RadioValidation(field, model, vm, el, scope, this, filters, detectBlur, detectChange);
-      validationSet = { validation: validation, elements: 0 };
-      this._radioValidations[field] = validationSet;
-    }
-
-    validationSet.elements++;
-    validationSet.validation.manageElement(el, initial);
-    return validationSet.validation;
-  };
-
-  Validator.prototype._unmanageRadioValidation = function _unmanageRadioValidation(field, el) {
-    var validationSet = this._radioValidations[field];
-    if (validationSet) {
-      validationSet.elements--;
-      validationSet.validation.unmanageElement(el);
-      if (validationSet.elements === 0) {
-        exports$1.Vue.delete(this._scope, field);
-        this._radioValidations[field] = null;
-        delete this._radioValidations[field];
+  SingleElement.prototype.unlistenInputableEvent = function unlistenInputableEvent () {
+    var vm = this._vm;
+    var el = vm.$el;
+    if (el.tagName === 'SELECT') {
+      el.removeEventListener('change', vm.handleInputable);
+    } else {
+      if (el.type === 'checkbox') {
+        el.removeEventListener('change', vm.handleInputable);
+      } else {
+        el.removeEventListener('input', vm.handleInputable);
       }
     }
   };
 
-  Validator.prototype._manageSelectValidation = function _manageSelectValidation(field, model, vm, el, scope, filters, initial, detectBlur, detectChange) {
-    var validation = this._validations[field] = new SelectValidation(field, model, vm, el, scope, this, filters, detectBlur, detectChange);
-    validation.manageElement(el, initial);
-    return validation;
+  return SingleElement
+};
+
+function getSelectValue (el) {
+  var value = [];
+  for (var i = 0, l = el.options.length; i < l; i++) {
+    var option = el.options[i];
+    if (!option.disabled && option.selected) {
+      value.push(option.value);
+    }
+  }
+  return value
+}
+
+/*  */
+
+var MultiElementClass = function (Vue) {
+  var ref = Vue.util;
+  var looseEqual = ref.looseEqual;
+
+  var MultiElement = function MultiElement (vm) {
+    // TODO: should be checked whether included radio or checkbox
+    this._vm = vm;
+    this.initValue = this.getValue();
+    this.attachValidity();
   };
 
-  Validator.prototype._unmanageSelectValidation = function _unmanageSelectValidation(field, el) {
-    var validation = this._validations[field];
-    if (validation) {
-      validation.unmanageElement(el);
-      exports$1.Vue.delete(this._scope, field);
-      this._validations[field] = null;
-      delete this._validations[field];
-    }
-  };
+  MultiElement.prototype.attachValidity = function attachValidity () {
+      var this$1 = this;
 
-  Validator.prototype._fireEvent = function _fireEvent(type) {
-    for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-      args[_key2 - 1] = arguments[_key2];
-    }
-
-    var handler = this._events[this._getEventName(type)];
-    handler && this._dir.vm.$nextTick(function () {
-      handler.apply(null, args);
+    this._vm.$el.$validity = this._vm;
+    this._eachItems(function (item) {
+      item.$validity = this$1._vm;
     });
   };
 
-  Validator.prototype._fireEvents = function _fireEvents() {
-    var scope = this._scope;
-
-    scope.touched && this._fireEvent('touched');
-    scope.dirty && this._fireEvent('dirty');
-
-    if (this._modified !== scope.modified) {
-      this._fireEvent('modified', scope.modified);
-      this._modified = scope.modified;
-    }
-
-    var valid = scope.valid;
-    this._fireEvent(valid ? 'valid' : 'invalid');
+  MultiElement.prototype.getValue = function getValue () {
+    return this._getCheckedValue()
   };
 
-  Validator.prototype._getEventName = function _getEventName(type) {
-    return this.name + ':' + type;
+  MultiElement.prototype.checkModified = function checkModified () {
+    return !looseEqual(this.initValue, this._getCheckedValue())
   };
 
-  Validator.prototype._defineProperties = function _defineProperties(validationsGetter, targetGetter) {
-    var _this10 = this;
+  MultiElement.prototype.listenToucheableEvent = function listenToucheableEvent () {
+      var this$1 = this;
 
-    var bind = exports$1.Vue.util.bind;
-
-    each({
-      valid: { fn: this._defineValid, arg: validationsGetter },
-      invalid: { fn: this._defineInvalid, arg: targetGetter },
-      touched: { fn: this._defineTouched, arg: validationsGetter },
-      untouched: { fn: this._defineUntouched, arg: targetGetter },
-      modified: { fn: this._defineModified, arg: validationsGetter },
-      dirty: { fn: this._defineDirty, arg: validationsGetter },
-      pristine: { fn: this._definePristine, arg: targetGetter },
-      errors: { fn: this._defineErrors, arg: validationsGetter }
-    }, function (descriptor, name) {
-      Object.defineProperty(targetGetter(), name, {
-        enumerable: true,
-        configurable: true,
-        get: function get() {
-          return bind(descriptor.fn, _this10)(descriptor.arg);
-        }
-      });
+    this._eachItems(function (item) {
+      item.addEventListener('focusout', this$1._vm.willUpdateTouched);
     });
   };
 
-  Validator.prototype._runValidates = function _runValidates(fn, cb) {
-    var length = Object.keys(this.validations).length;
+  MultiElement.prototype.unlistenToucheableEvent = function unlistenToucheableEvent () {
+      var this$1 = this;
 
-    var count = 0;
-    each(this.validations, function (validation, key) {
-      fn(validation, key, function () {
-        ++count;
-        count >= length && cb();
-      });
+    this._eachItems(function (item) {
+      item.removeEventListener('focusout', this$1._vm.willUpdateTouched);
     });
   };
 
-  Validator.prototype._walkValidations = function _walkValidations(validations, property, condition) {
-    var _this11 = this;
+  MultiElement.prototype.listenInputableEvent = function listenInputableEvent () {
+      var this$1 = this;
 
-    var hasOwn = exports$1.Vue.util.hasOwn;
-    var ret = condition;
+    this._eachItems(function (item) {
+      item.addEventListener('change', this$1._vm.handleInputable);
+    });
+  };
 
-    each(validations, function (validation, key) {
-      if (ret === !condition) {
-        return;
-      }
-      if (hasOwn(_this11._scope, validation.field)) {
-        var target = _this11._scope[validation.field];
-        if (target && target[property] === !condition) {
-          ret = !condition;
-        }
+  MultiElement.prototype.unlistenInputableEvent = function unlistenInputableEvent () {
+      var this$1 = this;
+
+    this._eachItems(function (item) {
+      item.removeEventListener('change', this$1._vm.handleInputable);
+    });
+  };
+
+  MultiElement.prototype._getCheckedValue = function _getCheckedValue () {
+    var value = [];
+    this._eachItems(function (item) {
+      if (!item.disabled && item.checked) {
+        value.push(item.value);
       }
     });
-
-    return ret;
+    return value
   };
 
-  Validator.prototype._defineValid = function _defineValid(validationsGetter) {
-    return this._walkValidations(validationsGetter(), 'valid', true);
+  MultiElement.prototype._getItems = function _getItems () {
+    return this._vm.$el.querySelectorAll('input[type="checkbox"], input[type="radio"]')
   };
 
-  Validator.prototype._defineInvalid = function _defineInvalid(scopeGetter) {
-    return !scopeGetter().valid;
+  MultiElement.prototype._eachItems = function _eachItems (cb) {
+    var items = this._getItems();
+    for (var i = 0; i < items.length; i++) {
+      cb(items[i]);
+    }
   };
 
-  Validator.prototype._defineTouched = function _defineTouched(validationsGetter) {
-    return this._walkValidations(validationsGetter(), 'touched', false);
-  };
+  return MultiElement
+};
 
-  Validator.prototype._defineUntouched = function _defineUntouched(scopeGetter) {
-    return !scopeGetter().touched;
-  };
+/*  */
 
-  Validator.prototype._defineModified = function _defineModified(validationsGetter) {
-    return this._walkValidations(validationsGetter(), 'modified', false);
-  };
+var inBrowser =
+  typeof window !== 'undefined' &&
+  Object.prototype.toString.call(window) !== '[object Object]';
+var UA = inBrowser && window.navigator.userAgent.toLowerCase();
+var isIE9 = UA && UA.indexOf('msie 9.0') > 0;
 
-  Validator.prototype._defineDirty = function _defineDirty(validationsGetter) {
-    return this._walkValidations(validationsGetter(), 'dirty', false);
-  };
+function getClass (el) {
+  var classname = el.className;
+  if (typeof classname === 'object') {
+    classname = classname.baseVal || '';
+  }
+  return classname
+}
 
-  Validator.prototype._definePristine = function _definePristine(scopeGetter) {
-    return !scopeGetter().dirty;
-  };
+function setClass (el, cls) {
+  if (isIE9 && !/svg$/.test(el.namespaceURI)) {
+    el.className = cls;
+  } else {
+    el.setAttribute('class', cls);
+  }
+}
 
-  Validator.prototype._defineErrors = function _defineErrors(validationsGetter) {
-    var _this12 = this;
+function addClass (el, cls) {
+  if (el.classList) {
+    el.classList.add(cls);
+  } else {
+    var cur = ' ' + getClass(el) + ' ';
+    if (cur.indexOf(' ' + cls + ' ') < 0) {
+      setClass(el, (cur + cls).trim());
+    }
+  }
+}
 
-    var hasOwn = exports$1.Vue.util.hasOwn;
-    var isPlainObject = exports$1.Vue.util.isPlainObject;
-    var errors = [];
+function removeClass (el, cls) {
+  if (el.classList) {
+    el.classList.remove(cls);
+  } else {
+    var cur = ' ' + getClass(el) + ' ';
+    var tar = ' ' + cls + ' ';
+    while (cur.indexOf(tar) >= 0) {
+      cur = cur.replace(tar, ' ');
+    }
+    setClass(el, cur.trim());
+  }
+  if (!el.className) {
+    el.removeAttribute('class');
+  }
+}
 
-    each(validationsGetter(), function (validation, key) {
-      if (hasOwn(_this12._scope, validation.field)) {
-        var target = _this12._scope[validation.field];
-        if (target && !empty(target.errors)) {
-          each(target.errors, function (err, index) {
-            var error = { field: validation.field };
-            if (isPlainObject(err)) {
-              if (err.validator) {
-                error.validator = err.validator;
-              }
-              error.message = err.message;
-            } else if (typeof err === 'string') {
-              error.message = err;
+function toggleClasses (el, key, fn) {
+  if (!el) { return }
+
+  key = key.trim();
+  if (key.indexOf(' ') === -1) {
+    fn(el, key);
+    return
+  }
+
+  var keys = key.split(/\s+/);
+  for (var i = 0, l = keys.length; i < l; i++) {
+    fn(el, keys[i]);
+  }
+}
+
+function memoize (fn) {
+  var cache = Object.create(null);
+  return function memoizeFn (id) {
+    var args = [], len = arguments.length - 1;
+    while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
+
+    var hit = cache[id];
+    return hit || (cache[id] = fn.apply(void 0, args))
+  }
+}
+
+/*  */
+var ComponentElementClass = function (Vue) {
+  var ref = Vue.util;
+  var looseEqual = ref.looseEqual;
+  var isPlainObject = ref.isPlainObject;
+
+  function getValidatorProps (validators) {
+    var normalized = typeof validators === 'string' ? [validators] : validators;
+    var targets = [];
+    if (isPlainObject(normalized)) {
+      Object.keys(normalized).forEach(function (validator) {
+        var props = (normalized[validator] &&
+          normalized[validator]['props'] &&
+          isPlainObject(normalized[validator]['props']))
+            ? normalized[validator]['props']
+            : null;
+        if (props) {
+          Object.keys(props).forEach(function (prop) {
+            if (!~targets.indexOf(prop)) {
+              targets.push(prop);
             }
-            errors.push(error);
           });
         }
-      }
-    });
+      });
+    }
+    return targets
+  }
 
-    return empty(errors) ? undefined : errors.sort(function (a, b) {
-      return a.field < b.field ? -1 : 1;
+  var ComponentElement = function ComponentElement (vm, vnode, validatorProps) {
+    this._vm = vm;
+    this._vnode = vnode;
+    this._validatorProps = validatorProps || memoize(getValidatorProps);
+    this.initValue = this.getValue();
+    this._watchers = [];
+    this.attachValidity();
+  };
+
+  ComponentElement.prototype.attachValidity = function attachValidity () {
+    this._vm.$el.$validity = this._vm;
+  };
+
+  ComponentElement.prototype.getValidatorProps = function getValidatorProps$1 () {
+    var vm = this._vm;
+    return this._validatorProps(vm._uid.toString(), vm.validators)
+  };
+
+  ComponentElement.prototype.getValue = function getValue () {
+      var this$1 = this;
+
+    var value = {};
+    this.getValidatorProps().forEach(function (prop) {
+      value[prop] = this$1._vnode.child[prop];
+    });
+    return value
+  };
+
+  ComponentElement.prototype.checkModified = function checkModified () {
+    return !looseEqual(this.initValue, this.getValue())
+  };
+
+  ComponentElement.prototype.listenToucheableEvent = function listenToucheableEvent () {
+    this._vm.$el.addEventListener('focusout', this._vm.willUpdateTouched);
+  };
+
+  ComponentElement.prototype.unlistenToucheableEvent = function unlistenToucheableEvent () {
+    this._vm.$el.removeEventListener('focusout', this._vm.willUpdateTouched);
+  };
+
+  ComponentElement.prototype.listenInputableEvent = function listenInputableEvent () {
+      var this$1 = this;
+
+    this.getValidatorProps().forEach(function (prop) {
+      this$1._watchers.push(this$1._vnode.child.$watch(prop, this$1._vm.watchInputable));
     });
   };
 
-  babelHelpers.createClass(Validator, [{
-    key: 'validations',
-    get: function get() {
-      var extend = exports$1.Vue.util.extend;
+  ComponentElement.prototype.unlistenInputableEvent = function unlistenInputableEvent () {
+    this._watchers.forEach(function (watcher) { watcher(); });
+    this._watchers = [];
+  };
 
-      var ret = {};
-      extend(ret, this._validations);
+  return ComponentElement
+};
 
-      each(this._checkboxValidations, function (dataset, key) {
-        ret[key] = dataset.validation;
-      });
+/*  */
+var Elements = function (Vue) {
+  var SingleElement = SingleElementClass(Vue);
+  var MultiElement = MultiElementClass(Vue);
+  var ComponentElement = ComponentElementClass(Vue);
 
-      each(this._radioValidations, function (dataset, key) {
-        ret[key] = dataset.validation;
-      });
+  return {
+    SingleElement: SingleElement,
+    MultiElement: MultiElement,
+    ComponentElement: ComponentElement
+  }
+};
 
-      return ret;
+/*  */
+var Lifecycles = function (Vue) {
+  var ref = Elements(Vue);
+  var SingleElement = ref.SingleElement;
+  var MultiElement = ref.MultiElement;
+  var ComponentElement = ref.ComponentElement;
+
+  function createValidityElement (vm, vnode) {
+    return vm.multiple
+      ? new MultiElement(vm)
+      : checkBuiltInElement(vnode)
+        ? new SingleElement(vm)
+        : checkComponentElement(vnode)
+          ? new ComponentElement(vm, vnode)
+          : null
+  }
+
+  function watchModelable (val) {
+    this.$emit('input', {
+      result: this.result,
+      progress: this.progress,
+      progresses: this.progresses
+    });
+  }
+
+  function created () {
+    this._elementable = null;
+
+    this._keysCached = memoize(function (results) {
+      return Object.keys(results)
+    });
+
+    // for event control flags
+    this._modified = false;
+
+    // watch validation raw results
+    this._watchValidationRawResults();
+
+    var validation = this.$options.propsData ? this.$options.propsData.validation : null;
+    if (validation) {
+      var instance = validation.instance;
+      var name = validation.name;
+      var group = this.group;
+      instance.register(this.field, this, { named: name, group: group });
     }
-  }]);
-  return Validator;
-}();
+  }
 
-function Validator (Vue) {
-  var FragmentFactory = Vue.FragmentFactory;
-  var vIf = Vue.directive('if');
-  var _Vue$util = Vue.util;
-  var isArray = _Vue$util.isArray;
-  var isPlainObject = _Vue$util.isPlainObject;
-  var createAnchor = _Vue$util.createAnchor;
-  var replace = _Vue$util.replace;
-  var extend = _Vue$util.extend;
-  var camelize = _Vue$util.camelize;
-
-  /**
-   * `validator` element directive
-   */
-
-  Vue.elementDirective('validator', {
-    params: ['name', 'groups', 'lazy', 'classes'],
-
-    bind: function bind() {
-      var params = this.params;
-
-      if (process.env.NODE_ENV !== 'production' && !params.name) {
-        warn('validator element requires a \'name\' attribute: ' + '(e.g. <validator name="validator1">...</validator>)');
-        return;
-      }
-
-      this.validatorName = '$' + camelize(params.name);
-      if (!this.vm._validatorMaps) {
-        throw new Error('Invalid validator management error');
-      }
-
-      var classes = {};
-      if (isPlainObject(this.params.classes)) {
-        classes = this.params.classes;
-      }
-
-      this.setupValidator(classes);
-      this.setupFragment(params.lazy);
-    },
-    unbind: function unbind() {
-      this.teardownFragment();
-      this.teardownValidator();
-    },
-    getGroups: function getGroups() {
-      var params = this.params;
-      var groups = [];
-
-      if (params.groups) {
-        if (isArray(params.groups)) {
-          groups = params.groups;
-        } else if (!isPlainObject(params.groups) && typeof params.groups === 'string') {
-          groups.push(params.groups);
-        }
-      }
-
-      return groups;
-    },
-    setupValidator: function setupValidator(classes) {
-      var validator = this.validator = new Validator$1(this.validatorName, this, this.getGroups(), classes);
-      validator.enableReactive();
-      validator.setupScope();
-      validator.registerEvents();
-    },
-    teardownValidator: function teardownValidator() {
-      this.validator.unregisterEvents();
-      this.validator.disableReactive();
-
-      if (this.validatorName) {
-        this.validatorName = null;
-        this.validator = null;
-      }
-    },
-    setupFragment: function setupFragment(lazy) {
-      var _this = this;
-
-      var vm = this.vm;
-
-      this.validator.waitFor(function () {
-        _this.anchor = createAnchor('vue-validator');
-        replace(_this.el, _this.anchor);
-        extend(vm.$options, { _validator: _this.validatorName });
-        _this.factory = new FragmentFactory(vm, _this.el.innerHTML);
-        vIf.insert.call(_this);
-      });
-
-      !lazy && vm.$activateValidator();
-    },
-    teardownFragment: function teardownFragment() {
-      vIf.unbind.call(this);
+  function destroyed () {
+    var validation = this.$options.propsData ? this.$options.propsData.validation : null;
+    if (validation) {
+      var instance = validation.instance;
+      var name = validation.name;
+      var group = this.group;
+      instance.unregister(this.field, { named: name, group: group });
     }
-  });
+
+    if (this._unwatchResultProp) {
+      this._unwatchResultProp();
+      this._unwatchResultProp = null;
+    }
+
+    if (this._unwatchProgressProp) {
+      this._unwatchProgressProp();
+      this._unwatchProgressProp = null;
+    }
+
+    this._unwatchValidationRawResults();
+
+    this._elementable.unlistenInputableEvent();
+    if (this.autotouch === 'on') {
+      this._elementable.unlistenToucheableEvent();
+    }
+    this._elementable = null;
+  }
+
+  function mounted () {
+    this._elementable = createValidityElement(this, this._vnode);
+    if (this._elementable) {
+      if (this.autotouch === 'on') {
+        this._elementable.listenToucheableEvent();
+      }
+      this._elementable.listenInputableEvent();
+    } else {
+      // TODO: should be warn
+    }
+
+    if (hasModelDirective(this.$vnode)) {
+      this._unwatchResultProp = this.$watch('result', watchModelable);
+      this._unwatchProgressProp = this.$watch('progress', watchModelable);
+    }
+
+    toggleClasses(this.$el, this.classes.untouched, addClass);
+    toggleClasses(this.$el, this.classes.pristine, addClass);
+  }
+
+  return {
+    created: created,
+    destroyed: destroyed,
+    mounted: mounted
+  }
+};
+
+function checkComponentElement (vnode) {
+  return vnode.child &&
+    vnode.componentOptions &&
+    vnode.tag &&
+    vnode.tag.match(/vue-component/)
 }
 
-function ValidatorError (Vue) {
-  /**
-   * ValidatorError component
-   */
+function checkBuiltInElement (vnode) {
+  return !vnode.child &&
+    !vnode.componentOptions &&
+    vnode.tag
+}
 
-  var error = {
-    name: 'validator-error',
+function hasModelDirective (vnode) {
+  return ((vnode && vnode.data && vnode.data.directives) || []).find(function (dir) { return dir.name === 'model'; })
+}
 
+/*  */
+
+var Event = function (Vue) {
+  function _fireEvent (type) {
+    var args = [], len = arguments.length - 1;
+    while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
+
+    (ref = this).$emit.apply(ref, [ type ].concat( args ));
+    var ref;
+  }
+
+  return {
+    _fireEvent: _fireEvent
+  }
+};
+
+/*  */
+var State = function (Vue) {
+  var ref = Vue.util;
+  var isPlainObject = ref.isPlainObject;
+
+  function getValue (options) {
+    return this._elementable.getValue()
+  }
+
+  function checkModified () {
+    return this._elementable.checkModified()
+  }
+
+  function willUpdateTouched (options) {
+    if (!this.touched) {
+      this.touched = true;
+      toggleClasses(this.$el, this.classes.touched, addClass);
+      toggleClasses(this.$el, this.classes.untouched, removeClass);
+      this._fireEvent('touched');
+    }
+  }
+
+  function willUpdateDirty () {
+    if (!this.dirty && this.checkModified()) {
+      this.dirty = true;
+      toggleClasses(this.$el, this.classes.dirty, addClass);
+      toggleClasses(this.$el, this.classes.pristine, removeClass);
+      this._fireEvent('dirty');
+    }
+  }
+
+  function willUpdateModified () {
+    var modified = this.modified = this.checkModified();
+    if (this._modified !== modified) {
+      this._modified = modified;
+      toggleClasses(this.$el, this.classes.modified, modified ? addClass : removeClass);
+      this._fireEvent('modified', modified);
+    }
+  }
+
+  function handleInputable (e) {
+    this.willUpdateDirty();
+    this.willUpdateModified();
+  }
+
+  function watchInputable (val) {
+    this.willUpdateDirty();
+    this.willUpdateModified();
+  }
+
+  function _initStates (keys, target, init) {
+    if ( init === void 0 ) init = undefined;
+
+    for (var i = 0; i < keys.length; i++) {
+      var result = target[keys[i]];
+      if (isPlainObject(result)) {
+        var nestedKeys = Object.keys(result);
+        _initStates(nestedKeys, result, init);
+      } else {
+        target[keys[i]] = init;
+      }
+    }
+  }
+
+  function reset () {
+    this._unwatchValidationRawResults();
+    var keys = this._keysCached(this._uid.toString(), this.results);
+    _initStates(keys, this.results, undefined);
+    _initStates(keys, this.progresses, '');
+    toggleClasses(this.$el, this.classes.valid, removeClass);
+    toggleClasses(this.$el, this.classes.invalid, removeClass);
+    toggleClasses(this.$el, this.classes.touched, removeClass);
+    toggleClasses(this.$el, this.classes.untouched, addClass);
+    toggleClasses(this.$el, this.classes.dirty, removeClass);
+    toggleClasses(this.$el, this.classes.pristine, addClass);
+    toggleClasses(this.$el, this.classes.modified, removeClass);
+    this.valid = true;
+    this.dirty = false;
+    this.touched = false;
+    this.modified = false;
+    this._modified = false;
+    this._watchValidationRawResults();
+  }
+
+  function _walkValid (keys, target) {
+    var valid = true;
+    for (var i = 0; i < keys.length; i++) {
+      var result = target[keys[i]];
+      if (typeof result === 'boolean' && !result) {
+        valid = false;
+        break
+      }
+      if (typeof result === 'string' && result) {
+        valid = false;
+        break
+      }
+      if (isPlainObject(result)) {
+        var nestedKeys = Object.keys(result);
+        valid = _walkValid(nestedKeys, result);
+        if (!valid) {
+          break
+        }
+      }
+    }
+    return valid
+  }
+
+  function _watchValidationRawResults () {
+    var this$1 = this;
+
+    this._unwatchResults = this.$watch('results', function (val) {
+      this$1.valid = _walkValid(
+        this$1._keysCached(this$1._uid.toString(), this$1.results),
+        this$1.results
+      );
+      if (this$1.valid) {
+        toggleClasses(this$1.$el, this$1.classes.valid, addClass);
+        toggleClasses(this$1.$el, this$1.classes.invalid, removeClass);
+      } else {
+        toggleClasses(this$1.$el, this$1.classes.valid, removeClass);
+        toggleClasses(this$1.$el, this$1.classes.invalid, addClass);
+      }
+
+      this$1._fireEvent(this$1.valid ? 'valid' : 'invalid');
+    }, { deep: true });
+  }
+
+  function _unwatchValidationRawResults () {
+    this._unwatchResults();
+    this._unwatchResults = undefined;
+    delete this._unwatchResults;
+  }
+
+  function touch () {
+    this.willUpdateTouched();
+  }
+
+  return {
+    getValue: getValue,
+    checkModified: checkModified,
+    willUpdateTouched: willUpdateTouched,
+    willUpdateDirty: willUpdateDirty,
+    willUpdateModified: willUpdateModified,
+    handleInputable: handleInputable,
+    watchInputable: watchInputable,
+    reset: reset,
+    _walkValid: _walkValid,
+    _watchValidationRawResults: _watchValidationRawResults,
+    _unwatchValidationRawResults: _unwatchValidationRawResults,
+    touch: touch
+  }
+};
+
+/*  */
+
+/**
+ * Forgiving check for a promise
+ */
+function isPromise (p) {
+  return p && typeof p.then === 'function'
+}
+
+var Validate = function (Vue) {
+  var ref = Vue.util;
+  var extend = ref.extend;
+  var isPlainObject = ref.isPlainObject;
+  var resolveAsset = ref.resolveAsset;
+
+  function _resolveValidator (name) {
+    var options = (this.child && this.child.context)
+      ? this.child.context.$options
+      : this.$options;
+    return resolveAsset(options, 'validators', name)
+  }
+
+  function _getValidateRawDescriptor (
+    validator,
+    field,
+    value
+  ) {
+    var asset = this._resolveValidator(validator);
+    if (!asset) {
+      // TODO: should be warned
+      return null
+    }
+
+    var fn = null;
+    var rule = null;
+    var msg = null;
+    if (isPlainObject(asset)) {
+      if (asset.check && typeof asset.check === 'function') {
+        fn = asset.check;
+      }
+      if (asset.message) {
+        msg = asset.message;
+      }
+    } else if (typeof asset === 'function') {
+      fn = asset;
+    } else {
+      // TODO: should be warned
+      return null
+    }
+
+    if (!fn) {
+      // TODO: should be warned
+      return null
+    }
+
+    var props = null;
+    var validators = this.validators;
+    if (isPlainObject(validators)) {
+      if (isPlainObject(validators[validator])) {
+        if (validators[validator].props && isPlainObject(validators[validator].props)) {
+          props = validators[validator].props;
+        } else {
+          if (validators[validator].rule) {
+            rule = validators[validator].rule;
+          }
+          if (validators[validator].message) {
+            msg = validators[validator].message;
+          }
+        }
+      } else {
+        rule = validators[validator];
+      }
+    }
+
+    var descriptor = { fn: fn, value: value, field: field };
+    if (rule) {
+      descriptor.rule = rule;
+    }
+    if (msg) {
+      descriptor.msg = msg;
+    }
+    if (props) {
+      descriptor.props = props;
+    }
+
+    return descriptor
+  }
+
+  function _resolveMessage (
+    field,
+    msg,
+    override
+  ) {
+    if (override) { return override }
+    return msg
+      ? typeof msg === 'function'
+        ? msg(field)
+        : msg
+      : undefined
+  }
+
+  function _invokeValidator (
+    ref,
+    value,
+    cb
+  ) {
+    var this$1 = this;
+    var fn = ref.fn;
+    var field = ref.field;
+    var rule = ref.rule;
+    var msg = ref.msg;
+
+    var future = fn.call(this.child.context, value, rule);
+    if (typeof future === 'function') { // function
+      future(function () { // resolve
+        cb(true);
+      }, function (err) { // reject
+        cb(false, this$1._resolveMessage(field, msg, err));
+      });
+    } else if (isPromise(future)) { // promise
+      future.then(function () { // resolve
+        cb(true);
+      }, function (err) { // reject
+        cb(false, this$1._resolveMessage(field, msg, err));
+      }).catch(function (err) {
+        cb(false, this$1._resolveMessage(field, msg, err.message));
+      });
+    } else { // sync
+      cb(future, future === false ? this._resolveMessage(field, msg) : undefined);
+    }
+  }
+
+  function _getValidateDescriptors (
+    validator,
+    field,
+    value
+  ) {
+    var descriptors = [];
+
+    var rawDescriptor = this._getValidateRawDescriptor(validator, this.field, value);
+    if (!rawDescriptor) { return descriptors }
+
+    if (!rawDescriptor.props) {
+      var descriptor = { name: validator };
+      extend(descriptor, rawDescriptor);
+      descriptors.push(descriptor);
+    } else {
+      var propsKeys = Object.keys(!rawDescriptor.props);
+      propsKeys.forEach(function (prop) {
+        var descriptor = {
+          fn: rawDescriptor.fn,
+          name: validator,
+          value: rawDescriptor.value[prop],
+          field: rawDescriptor.field,
+          prop: prop
+        };
+        if (rawDescriptor.props[prop].rule) {
+          descriptor.rule = rawDescriptor.props[prop].rule;
+        }
+        if (rawDescriptor.props[prop].message) {
+          descriptor.msg = rawDescriptor.props[prop].message;
+        }
+        descriptors.push(descriptor);
+      });
+    }
+
+    return descriptors
+  }
+
+  function _syncValidates (field, cb) {
+    var this$1 = this;
+
+    var validators = this._keysCached(this._uid.toString(), this.results);
+    var value = this.getValue();
+    var descriptors = [];
+    validators.forEach(function (validator) {
+      this$1._getValidateDescriptors(validator, field, value).forEach(function (desc) {
+        descriptors.push(desc);
+      });
+    });
+
+    var count = 0;
+    var len = descriptors.length;
+    descriptors.forEach(function (desc) {
+      var validator = desc.name;
+      var prop = desc.prop;
+      if ((!prop && this$1.progresses[validator]) || (prop && this$1.progresses[validator][prop])) {
+        count++;
+        if (count === len) {
+          cb(this$1._walkValid(this$1._keysCached(this$1._uid.toString(), this$1.results), this$1.results));
+        }
+        return
+      }
+
+      if (!prop) {
+        this$1.progresses[validator] = 'running';
+      } else {
+        this$1.progresses[validator][prop] = 'running';
+      }
+
+      this$1.$nextTick(function () {
+        this$1._invokeValidator(desc, desc.value, function (ret, msg) {
+          if (!prop) {
+            this$1.progresses[validator] = '';
+            this$1.results[validator] = msg || ret;
+          } else {
+            this$1.progresses[validator][prop] = '';
+            this$1.results[validator][prop] = msg || ret;
+          }
+
+          count++;
+          if (count === len) {
+            cb(this$1._walkValid(this$1._keysCached(this$1._uid.toString(), this$1.results), this$1.results));
+          }
+        });
+      });
+    });
+  }
+
+  // TODO:should be refactor!!
+  function _validate (validator, value, cb) {
+    var this$1 = this;
+
+    var descriptor = this._getValidateRawDescriptor(validator, this.field, value);
+    if (descriptor && !descriptor.props) {
+      if (this.progresses[validator]) { return false }
+      this.progresses[validator] = 'running';
+      this.$nextTick(function () {
+        this$1._invokeValidator(descriptor, descriptor.value, function (ret, msg) {
+          this$1.progresses[validator] = '';
+          this$1.results[validator] = msg || ret;
+          if (cb) {
+            this$1.$nextTick(function () {
+              cb.call(this$1, null, ret, msg);
+            });
+          } else {
+            var e = { result: ret };
+            if (msg) {
+              e['msg'] = msg;
+            }
+            this$1._fireEvent('validate', validator, e);
+          }
+        });
+      });
+    } else if (descriptor && descriptor.props) {
+      var propsKeys = Object.keys(descriptor.props);
+      propsKeys.forEach(function (prop) {
+        if (this$1.progresses[validator][prop]) { return }
+        this$1.progresses[validator][prop] = 'running';
+        var values = descriptor.value;
+        var propDescriptor = {
+          fn: descriptor.fn,
+          value: values[prop],
+          field: descriptor.field
+        };
+        if (descriptor.props[prop].rule) {
+          propDescriptor.rule = descriptor.props[prop].rule;
+        }
+        if (descriptor.props[prop].message) {
+          propDescriptor.msg = descriptor.props[prop].message;
+        }
+        this$1.$nextTick(function () {
+          this$1._invokeValidator(propDescriptor, propDescriptor.value, function (result, msg) {
+            this$1.progresses[validator][prop] = '';
+            this$1.results[validator][prop] = msg || result;
+            var e = { prop: prop, result: result };
+            if (msg) {
+              e['msg'] = msg;
+            }
+            this$1._fireEvent('validate', validator, e);
+          });
+        });
+      });
+    } else {
+      // TODO:
+      var err = new Error();
+      cb ? cb.call(this, err) : this._fireEvent('validate', validator, err);
+    }
+    return true
+  }
+
+  // TODO: should be re-design of API
+  function validate () {
+    var this$1 = this;
+    var args = [], len = arguments.length;
+    while ( len-- ) args[ len ] = arguments[ len ];
+
+    var validators;
+    var value;
+    var cb;
+    var ret = true;
+
+    if (args.length === 3) {
+      validators = [args[0]];
+      value = args[1];
+      cb = args[2];
+    } else if (args.length === 2) {
+      if (isPlainObject(args[0])) {
+        validators = [args[0].validator];
+        value = args[0].value || this.getValue();
+        cb = args[1];
+      } else {
+        validators = this._keysCached(this._uid.toString(), this.results);
+        value = args[0];
+        cb = args[1];
+      }
+    } else if (args.length === 1) {
+      validators = this._keysCached(this._uid.toString(), this.results);
+      value = this.getValue();
+      cb = args[0];
+    } else {
+      validators = this._keysCached(this._uid.toString(), this.results);
+      value = this.getValue();
+      cb = null;
+    }
+
+    if (args.length === 3 || (args.length === 2 && isPlainObject(args[0]))) {
+      ret = this._validate(validators[0], value, cb);
+    } else {
+      validators.forEach(function (validator) {
+        ret = this$1._validate(validator, value, cb);
+      });
+    }
+
+    return ret
+  }
+
+  return {
+    _resolveValidator: _resolveValidator,
+    _getValidateRawDescriptor: _getValidateRawDescriptor,
+    _getValidateDescriptors: _getValidateDescriptors,
+    _resolveMessage: _resolveMessage,
+    _invokeValidator: _invokeValidator,
+    _validate: _validate,
+    _syncValidates: _syncValidates,
+    validate: validate
+  }
+};
+
+/*  */
+
+var Methods = function (Vue) {
+  var ref = Vue.util;
+  var extend = ref.extend;
+
+  var methods = {};
+  extend(methods, Event(Vue));
+  extend(methods, State(Vue));
+  extend(methods, Validate(Vue));
+
+  return methods
+};
+
+/*  */
+
+var ValidityControl = function (Vue) {
+  var ref = Vue.util;
+  var extend = ref.extend;
+
+  var ref$1 = States(Vue);
+  var props = ref$1.props;
+  var data = ref$1.data;
+  var computed = Computed(Vue);
+  var lifecycles = Lifecycles(Vue);
+  var ref$2 = Render(Vue);
+  var render = ref$2.render;
+  var methods = Methods(Vue);
+
+  var validity = {
+    props: props,
+    data: data,
+    render: render,
+    computed: computed,
+    methods: methods
+  };
+  extend(validity, lifecycles);
+
+  return validity
+};
+
+/*  */
+var Validity = function (Vue) {
+  var ref = Vue.util;
+  var extend = ref.extend;
+
+  return {
+    functional: true,
+    props: baseProps,
+    render: function render (
+      h,
+      ref
+    ) {
+      var props = ref.props;
+      var data = ref.data;
+      var children = ref.children;
+
+      return children.map(function (child) {
+        if (!child.tag) { return child }
+        var newData = extend({}, data);
+        newData.props = extend({}, props);
+        // TODO: should be refactored
+        newData.props.classes = extend(extend(extend({}, DEFAULT_CLASSES), Vue.config.validator.classes), newData.props.classes);
+        newData.props.child = child;
+        return h('validity-control', newData)
+      })
+    }
+  }
+};
+
+/*  */
+var ValidityGroup = function (Vue) {
+  var ref = Vue.util;
+  var extend = ref.extend;
+
+  var props = extend({
+    tag: {
+      type: String,
+      default: 'fieldset'
+    }
+  }, baseProps);
+
+  return {
+    functional: true,
+    props: props,
+    render: function render (
+      h,
+      ref
+    ) {
+      var props = ref.props;
+      var data = ref.data;
+      var children = ref.children;
+
+      var child = h(props.tag, children);
+      var newData = extend({}, data);
+      newData.props = extend({}, props);
+      // TODO: should be refactored
+      newData.props.classes = extend(extend(extend({}, DEFAULT_CLASSES), Vue.config.validator.classes), newData.props.classes);
+      newData.props.child = child;
+      newData.props.multiple = true;
+      return h('validity-control', newData)
+    }
+  }
+};
+
+/*  */
+
+var Validation = function (Vue) {
+  var ref = Vue.util;
+  var extend = ref.extend;
+
+  return {
+    functional: true,
     props: {
-      field: {
-        type: String,
-        required: true
-      },
-      validator: {
+      name: {
         type: String
       },
-      message: {
+      tag: {
         type: String,
-        required: true
-      },
-      partial: {
-        type: String,
-        default: 'validator-error-default'
+        default: 'form'
       }
     },
+    render: function render (
+      h,
+      ref
+    ) {
+      var props = ref.props;
+      var data = ref.data;
+      var parent = ref.parent;
+      var children = ref.children;
+      var slots = ref.slots;
 
-    template: '<div><partial :name="partial"></partial></div>',
+      if (!parent._validation) {
+        // TODO: should be warned
+        return children
+      }
+      var tag = props.tag || 'form';
+      walkChildren(parent._validation, props.name, children);
+      var newData = extend({ attrs: {}}, data);
+      if (tag === 'form') {
+        newData.attrs.novalidate = true;
+      }
+      return h(tag, newData, children)
+    }
+  }
+};
 
-    partials: {}
-  };
-
-  // only use ValidatorError component
-  error.partials['validator-error-default'] = '<p>{{field}}: {{message}}</p>';
-
-  return error;
+function walkChildren (validation, name, children) {
+  children.forEach(function (child) {
+    if (child &&
+        child.componentOptions &&
+        child.componentOptions.propsData && child.componentOptions.tag === 'validity-control') {
+      child.componentOptions.propsData.validation = {
+        instance: validation,
+        name: name
+      };
+    }
+    child.children && walkChildren(validation, name, child.children);
+  });
 }
 
-function Errors (Vue) {
-  var _ = Vue.util;
-  var error = ValidatorError(Vue); // import ValidatorError component
+/*  */
+var Component = function (Vue) {
+  return {
+    'validity-control': ValidityControl(Vue),
+    'validity': Validity(Vue),
+    'validity-group': ValidityGroup(Vue),
+    'validation': Validation(Vue)
+  }
+};
 
-  /**
-   * ValidatorErrors component
-   */
+/*  */
+// TODO: should be defined strict type
+function mapValidation (results) {
+  var res = {};
 
-  var errors = {
-    name: 'validator-errors',
+  normalizeMap(results).forEach(function (ref) {
+    var key = ref.key;
+    var val = ref.val;
 
-    props: {
-      validation: {
-        type: Object,
-        required: true
-      },
-      group: {
-        type: String,
-        default: null
-      },
-      field: {
-        type: String,
-        default: null
-      },
-      component: {
-        type: String,
-        default: 'validator-error'
+    res[key] = function mappedValidation () {
+      var validation = this.$validation;
+      if (!this._isMounted) {
+        return null
       }
-    },
-
-    computed: {
-      errors: function errors() {
-        var _this = this;
-
-        if (this.group !== null) {
-          return this.validation[this.group].errors;
-        } else if (this.field !== null) {
-          var target = this.validation[this.field];
-          if (!target.errors) {
-            return;
-          }
-
-          return target.errors.map(function (error) {
-            var err = { field: _this.field };
-            if (_.isPlainObject(error)) {
-              if (error.validator) {
-                err.validator = error.validator;
-              }
-              err.message = error.message;
-            } else if (typeof error === 'string') {
-              err.message = error;
-            }
-            return err;
-          });
-        } else {
-          return this.validation.errors;
-        }
+      var paths = val.split('.');
+      var first = paths.shift();
+      if (first !== '$validation') {
+        warn(("unknown validation result path: " + val));
+        return null
       }
-    },
+      var path;
+      var value = validation;
+      do {
+        path = paths.shift();
+        value = value[path];
+      } while (paths.length > 0 && value !== undefined)
+      return value
+    };
+  });
 
-    template: '<template v-for="error in errors">' + '<component :is="component" :partial="partial" :field="error.field" :validator="error.validator" :message="error.message">' + '</component>' + '</template>',
-
-    components: {}
-  };
-
-  // define 'partial' prop
-  errors.props['partial'] = error.props['partial'];
-
-  // only use ValidatorErrors component
-  errors.components[error.name] = error;
-
-  // install ValidatorErrors component
-  Vue.component(errors.name, errors);
-
-  return errors;
+  return res
 }
 
-/**
- * plugin
- *
- * @param {Function} Vue
- * @param {Object} options
- */
+// TODO: should be defined strict type
+function normalizeMap (map) {
+  return Array.isArray(map)
+    ? map.map(function (key) { return ({ key: key, val: key }); })
+    : Object.keys(map).map(function (key) { return ({ key: key, val: map[key] }); })
+}
 
-function plugin(Vue) {
-  var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+/*  */
+var installed = false;
 
-  if (plugin.installed) {
+function plugin (Vue, options) {
+  if ( options === void 0 ) options = {};
+
+  if (installed) {
     warn('already installed.');
-    return;
+    return
   }
 
-  exports$1.Vue = Vue;
+  Config(Vue);
   Asset(Vue);
-  Errors(Vue);
-
-  Override(Vue);
-  Validator(Vue);
-  ValidateClass(Vue);
-  Validate(Vue);
+  installMixin(Vue);
+  installComponent(Vue);
+  installed = true;
 }
 
-plugin.version = '2.1.7';
+function installMixin (Vue) {
+  Vue.mixin(Mixin(Vue));
+}
+
+function installComponent (Vue) {
+  var components = Component(Vue);
+  Object.keys(components).forEach(function (id) {
+    Vue.component(id, components[id]);
+  });
+}
+
+plugin.mapValidation = mapValidation; // for standalone
+plugin.version = '__VERSION__';
 
 if (typeof window !== 'undefined' && window.Vue) {
   window.Vue.use(plugin);
 }
 
-module.exports = plugin;
-}).call(this,require('_process'))
-},{"_process":104}],109:[function(require,module,exports){
-(function (process,global){
+var index = {
+  install: plugin,
+  mapValidation: mapValidation
+};
+
+module.exports = index;
+
+},{}],107:[function(require,module,exports){
+(function (global){
 /*!
  * Vue.js v1.0.26
  * (c) 2016 Evan You
@@ -28612,7 +27567,7 @@ var config = Object.defineProperties({
    * Disabled by default in production builds.
    */
 
-  devtools: process.env.NODE_ENV !== 'production',
+  devtools: "production" !== 'production',
 
   /**
    * Internal flag to indicate the delimiters have been
@@ -28681,7 +27636,7 @@ var config = Object.defineProperties({
 var warn = undefined;
 var formatComponentName = undefined;
 
-if (process.env.NODE_ENV !== 'production') {
+if ("production" !== 'production') {
   (function () {
     var hasConsole = typeof console !== 'undefined';
 
@@ -28793,7 +27748,7 @@ function query(el) {
     var selector = el;
     el = document.querySelector(el);
     if (!el) {
-      process.env.NODE_ENV !== 'production' && warn('Cannot find element: ' + selector);
+      "production" !== 'production' && warn('Cannot find element: ' + selector);
     }
   }
   return el;
@@ -29218,7 +28173,7 @@ var commonTagRE = /^(div|p|span|img|a|b|i|br|ul|ol|li|h1|h2|h3|h4|h5|h6|code|pre
 var reservedTagRE = /^(slot|partial|component)$/i;
 
 var isUnknownElement = undefined;
-if (process.env.NODE_ENV !== 'production') {
+if ("production" !== 'production') {
   isUnknownElement = function (el, tag) {
     if (tag.indexOf('-') > -1) {
       // http://stackoverflow.com/a/28210364/1070244
@@ -29253,7 +28208,7 @@ function checkComponentAttr(el, options) {
       var is = hasAttrs && getIsBinding(el, options);
       if (is) {
         return is;
-      } else if (process.env.NODE_ENV !== 'production') {
+      } else if ("production" !== 'production') {
         var expectedTag = options._componentNameMap && options._componentNameMap[tag];
         if (expectedTag) {
           warn('Unknown custom element: <' + tag + '> - ' + 'did you mean <' + expectedTag + '>? ' + 'HTML is case-insensitive, remember to use kebab-case in templates.');
@@ -29334,7 +28289,7 @@ strats.data = function (parentVal, childVal, vm) {
       return parentVal;
     }
     if (typeof childVal !== 'function') {
-      process.env.NODE_ENV !== 'production' && warn('The "data" option should be a function ' + 'that returns a per-instance value in component ' + 'definitions.', vm);
+      "production" !== 'production' && warn('The "data" option should be a function ' + 'that returns a per-instance value in component ' + 'definitions.', vm);
       return parentVal;
     }
     if (!parentVal) {
@@ -29368,7 +28323,7 @@ strats.data = function (parentVal, childVal, vm) {
 
 strats.el = function (parentVal, childVal, vm) {
   if (!vm && childVal && typeof childVal !== 'function') {
-    process.env.NODE_ENV !== 'production' && warn('The "el" option should be a function ' + 'that returns a per-instance value in component ' + 'definitions.', vm);
+    "production" !== 'production' && warn('The "el" option should be a function ' + 'that returns a per-instance value in component ' + 'definitions.', vm);
     return;
   }
   var ret = childVal || parentVal;
@@ -29457,18 +28412,18 @@ function guardComponents(options) {
     var components = options.components = guardArrayAssets(options.components);
     var ids = Object.keys(components);
     var def;
-    if (process.env.NODE_ENV !== 'production') {
+    if ("production" !== 'production') {
       var map = options._componentNameMap = {};
     }
     for (var i = 0, l = ids.length; i < l; i++) {
       var key = ids[i];
       if (commonTagRE.test(key) || reservedTagRE.test(key)) {
-        process.env.NODE_ENV !== 'production' && warn('Do not use built-in or reserved HTML elements as component ' + 'id: ' + key);
+        "production" !== 'production' && warn('Do not use built-in or reserved HTML elements as component ' + 'id: ' + key);
         continue;
       }
       // record a all lowercase <-> kebab-case mapping for
       // possible custom element case error warning
-      if (process.env.NODE_ENV !== 'production') {
+      if ("production" !== 'production') {
         map[key.replace(/-/g, '').toLowerCase()] = hyphenate(key);
       }
       def = components[key];
@@ -29529,7 +28484,7 @@ function guardArrayAssets(assets) {
       asset = assets[i];
       var id = typeof asset === 'function' ? asset.options && asset.options.name || asset.id : asset.name || asset.id;
       if (!id) {
-        process.env.NODE_ENV !== 'production' && warn('Array-syntax assets must provide a "name" or "id" field.');
+        "production" !== 'production' && warn('Array-syntax assets must provide a "name" or "id" field.');
       } else {
         res[id] = asset;
       }
@@ -29552,7 +28507,7 @@ function guardArrayAssets(assets) {
 function mergeOptions(parent, child, vm) {
   guardComponents(child);
   guardProps(child);
-  if (process.env.NODE_ENV !== 'production') {
+  if ("production" !== 'production') {
     if (child.propsData && !vm) {
       warn('propsData can only be used as an instantiation option.');
     }
@@ -29608,7 +28563,7 @@ function resolveAsset(options, type, id, warnMissing) {
   assets[camelizedId = camelize(id)] ||
   // Pascal Case ID
   assets[camelizedId.charAt(0).toUpperCase() + camelizedId.slice(1)];
-  if (process.env.NODE_ENV !== 'production' && warnMissing && !res) {
+  if ("production" !== 'production' && warnMissing && !res) {
     warn('Failed to resolve ' + type.slice(0, -1) + ': ' + id, options);
   }
   return res;
@@ -30413,7 +29368,7 @@ function getPath(obj, path) {
  */
 
 var warnNonExistent;
-if (process.env.NODE_ENV !== 'production') {
+if ("production" !== 'production') {
   warnNonExistent = function (path, vm) {
     warn('You are setting a non-existent path "' + path.raw + '" ' + 'on a vm instance. Consider pre-initializing the property ' + 'with the "data" option for more reliable reactivity ' + 'and better performance.', vm);
   };
@@ -30446,7 +29401,7 @@ function setPath(obj, path, val) {
       obj = obj[key];
       if (!isObject(obj)) {
         obj = {};
-        if (process.env.NODE_ENV !== 'production' && last._isVue) {
+        if ("production" !== 'production' && last._isVue) {
           warnNonExistent(path, last);
         }
         set(last, key, obj);
@@ -30457,7 +29412,7 @@ function setPath(obj, path, val) {
       } else if (key in obj) {
         obj[key] = val;
       } else {
-        if (process.env.NODE_ENV !== 'production' && obj._isVue) {
+        if ("production" !== 'production' && obj._isVue) {
           warnNonExistent(path, obj);
         }
         set(obj, key, val);
@@ -30565,7 +29520,7 @@ function restore(str, i) {
 
 function compileGetter(exp) {
   if (improperKeywordsRE.test(exp)) {
-    process.env.NODE_ENV !== 'production' && warn('Avoid using reserved keywords in expression: ' + exp);
+    "production" !== 'production' && warn('Avoid using reserved keywords in expression: ' + exp);
   }
   // reset state
   saved.length = 0;
@@ -30593,7 +29548,7 @@ function makeGetterFn(body) {
     return new Function('scope', 'return ' + body + ';');
     /* eslint-enable no-new-func */
   } catch (e) {
-    if (process.env.NODE_ENV !== 'production') {
+    if ("production" !== 'production') {
       /* istanbul ignore if */
       if (e.toString().match(/unsafe-eval|CSP/)) {
         warn('It seems you are using the default build of Vue.js in an environment ' + 'with Content Security Policy that prohibits unsafe-eval. ' + 'Use the CSP-compliant build instead: ' + 'http://vuejs.org/guide/installation.html#CSP-compliant-build');
@@ -30619,7 +29574,7 @@ function compileSetter(exp) {
       setPath(scope, path, val);
     };
   } else {
-    process.env.NODE_ENV !== 'production' && warn('Invalid setter expression: ' + exp);
+    "production" !== 'production' && warn('Invalid setter expression: ' + exp);
   }
 }
 
@@ -30741,7 +29696,7 @@ function runBatcherQueue(queue) {
     has[id] = null;
     watcher.run();
     // in dev build, check and stop circular updates.
-    if (process.env.NODE_ENV !== 'production' && has[id] != null) {
+    if ("production" !== 'production' && has[id] != null) {
       circular[id] = (circular[id] || 0) + 1;
       if (circular[id] > config._maxUpdateCount) {
         warn('You may have an infinite update loop for watcher ' + 'with expression "' + watcher.expression + '"', watcher.vm);
@@ -30843,7 +29798,7 @@ Watcher.prototype.get = function () {
   try {
     value = this.getter.call(scope, scope);
   } catch (e) {
-    if (process.env.NODE_ENV !== 'production' && config.warnExpressionErrors) {
+    if ("production" !== 'production' && config.warnExpressionErrors) {
       warn('Error when evaluating expression ' + '"' + this.expression + '": ' + e.toString(), this.vm);
     }
   }
@@ -30879,7 +29834,7 @@ Watcher.prototype.set = function (value) {
   try {
     this.setter.call(scope, scope, value);
   } catch (e) {
-    if (process.env.NODE_ENV !== 'production' && config.warnExpressionErrors) {
+    if ("production" !== 'production' && config.warnExpressionErrors) {
       warn('Error when evaluating setter ' + '"' + this.expression + '": ' + e.toString(), this.vm);
     }
   }
@@ -30887,7 +29842,7 @@ Watcher.prototype.set = function (value) {
   var forContext = scope.$forContext;
   if (forContext && forContext.alias === this.expression) {
     if (forContext.filters) {
-      process.env.NODE_ENV !== 'production' && warn('It seems you are using two-way binding on ' + 'a v-for alias (' + this.expression + '), and the ' + 'v-for has filters. This will not work properly. ' + 'Either remove the filters or use an array of ' + 'objects and bind to object properties instead.', this.vm);
+      "production" !== 'production' && warn('It seems you are using two-way binding on ' + 'a v-for alias (' + this.expression + '), and the ' + 'v-for has filters. This will not work properly. ' + 'Either remove the filters or use an array of ' + 'objects and bind to object properties instead.', this.vm);
       return;
     }
     forContext._withLock(function () {
@@ -30968,7 +29923,7 @@ Watcher.prototype.update = function (shallow) {
     this.queued = true;
     // record before-push error stack in debug mode
     /* istanbul ignore if */
-    if (process.env.NODE_ENV !== 'production' && config.debug) {
+    if ("production" !== 'production' && config.debug) {
       this.prevError = new Error('[vue] async stack trace');
     }
     pushWatcher(this);
@@ -30997,7 +29952,7 @@ Watcher.prototype.run = function () {
       // so the full cross-tick stack trace is available.
       var prevError = this.prevError;
       /* istanbul ignore if */
-      if (process.env.NODE_ENV !== 'production' && config.debug && prevError) {
+      if ("production" !== 'production' && config.debug && prevError) {
         this.prevError = null;
         try {
           this.cb.call(this.vm, value, oldValue);
@@ -31680,7 +30635,7 @@ var vFor = {
     }
 
     if (!this.alias) {
-      process.env.NODE_ENV !== 'production' && warn('Invalid v-for expression "' + this.descriptor.raw + '": ' + 'alias is required.', this.vm);
+      "production" !== 'production' && warn('Invalid v-for expression "' + this.descriptor.raw + '": ' + 'alias is required.', this.vm);
       return;
     }
 
@@ -32034,7 +30989,7 @@ var vFor = {
       if (!cache[id]) {
         cache[id] = frag;
       } else if (trackByKey !== '$index') {
-        process.env.NODE_ENV !== 'production' && this.warnDuplicate(value);
+        "production" !== 'production' && this.warnDuplicate(value);
       }
     } else {
       id = this.id;
@@ -32042,11 +30997,11 @@ var vFor = {
         if (value[id] === null) {
           value[id] = frag;
         } else {
-          process.env.NODE_ENV !== 'production' && this.warnDuplicate(value);
+          "production" !== 'production' && this.warnDuplicate(value);
         }
       } else if (Object.isExtensible(value)) {
         def(value, id, frag);
-      } else if (process.env.NODE_ENV !== 'production') {
+      } else if ("production" !== 'production') {
         warn('Frozen v-for objects cannot be automatically tracked, make sure to ' + 'provide a track-by key.');
       }
     }
@@ -32073,7 +31028,7 @@ var vFor = {
       frag = value[this.id];
     }
     if (frag && (frag.reused || frag.fresh)) {
-      process.env.NODE_ENV !== 'production' && this.warnDuplicate(value);
+      "production" !== 'production' && this.warnDuplicate(value);
     }
     return frag;
   },
@@ -32257,7 +31212,7 @@ function getTrackByKey(index, key, value, trackByKey) {
   return trackByKey ? trackByKey === '$index' ? index : trackByKey.charAt(0).match(/\w/) ? getPath(value, trackByKey) : value[trackByKey] : key || value;
 }
 
-if (process.env.NODE_ENV !== 'production') {
+if ("production" !== 'production') {
   vFor.warnDuplicate = function (value) {
     warn('Duplicate value found in v-for="' + this.descriptor.raw + '": ' + JSON.stringify(value) + '. Use track-by="$index" if ' + 'you are expecting duplicate values.', this.vm);
   };
@@ -32281,7 +31236,7 @@ var vIf = {
       this.anchor = createAnchor('v-if');
       replace(el, this.anchor);
     } else {
-      process.env.NODE_ENV !== 'production' && warn('v-if="' + this.expression + '" cannot be ' + 'used on an instance root element.', this.vm);
+      "production" !== 'production' && warn('v-if="' + this.expression + '" cannot be ' + 'used on an instance root element.', this.vm);
       this.invalid = true;
     }
   },
@@ -32724,7 +31679,7 @@ var model = {
     // friendly warning...
     this.checkFilters();
     if (this.hasRead && !this.hasWrite) {
-      process.env.NODE_ENV !== 'production' && warn('It seems you are using a read-only filter with ' + 'v-model="' + this.descriptor.raw + '". ' + 'You might want to use a two-way filter to ensure correct behavior.', this.vm);
+      "production" !== 'production' && warn('It seems you are using a read-only filter with ' + 'v-model="' + this.descriptor.raw + '". ' + 'You might want to use a two-way filter to ensure correct behavior.', this.vm);
     }
     var el = this.el;
     var tag = el.tagName;
@@ -32736,7 +31691,7 @@ var model = {
     } else if (tag === 'TEXTAREA') {
       handler = handlers.text;
     } else {
-      process.env.NODE_ENV !== 'production' && warn('v-model does not support element type: ' + tag, this.vm);
+      "production" !== 'production' && warn('v-model does not support element type: ' + tag, this.vm);
       return;
     }
     el.__v_model = this;
@@ -32852,7 +31807,7 @@ var on$1 = {
     }
 
     if (typeof handler !== 'function') {
-      process.env.NODE_ENV !== 'production' && warn('v-on:' + this.arg + '="' + this.expression + '" expects a function value, ' + 'got ' + handler, this.vm);
+      "production" !== 'production' && warn('v-on:' + this.arg + '="' + this.expression + '" expects a function value, ' + 'got ' + handler, this.vm);
       return;
     }
 
@@ -32946,7 +31901,7 @@ var style = {
       var isImportant = importantRE.test(value) ? 'important' : '';
       if (isImportant) {
         /* istanbul ignore if */
-        if (process.env.NODE_ENV !== 'production') {
+        if ("production" !== 'production') {
           warn('It\'s probably a bad idea to use !important with inline rules. ' + 'This feature will be deprecated in a future version of Vue.');
         }
         value = value.replace(importantRE, '').trim();
@@ -33057,13 +32012,13 @@ var bind$1 = {
 
       // only allow binding on native attributes
       if (disallowedInterpAttrRE.test(attr) || attr === 'name' && (tag === 'PARTIAL' || tag === 'SLOT')) {
-        process.env.NODE_ENV !== 'production' && warn(attr + '="' + descriptor.raw + '": ' + 'attribute interpolation is not allowed in Vue.js ' + 'directives and special attributes.', this.vm);
+        "production" !== 'production' && warn(attr + '="' + descriptor.raw + '": ' + 'attribute interpolation is not allowed in Vue.js ' + 'directives and special attributes.', this.vm);
         this.el.removeAttribute(attr);
         this.invalid = true;
       }
 
       /* istanbul ignore if */
-      if (process.env.NODE_ENV !== 'production') {
+      if ("production" !== 'production') {
         var raw = attr + '="' + descriptor.raw + '": ';
         // warn src
         if (attr === 'src') {
@@ -33172,7 +32127,7 @@ var el = {
 
 var ref = {
   bind: function bind() {
-    process.env.NODE_ENV !== 'production' && warn('v-ref:' + this.arg + ' must be used on a child ' + 'component. Found on <' + this.el.tagName.toLowerCase() + '>.', this.vm);
+    "production" !== 'production' && warn('v-ref:' + this.arg + ' must be used on a child ' + 'component. Found on <' + this.el.tagName.toLowerCase() + '>.', this.vm);
   }
 };
 
@@ -33346,7 +32301,7 @@ var component = {
         this.setComponent(this.expression);
       }
     } else {
-      process.env.NODE_ENV !== 'production' && warn('cannot mount component "' + this.expression + '" ' + 'on already mounted element: ' + this.el);
+      "production" !== 'production' && warn('cannot mount component "' + this.expression + '" ' + 'on already mounted element: ' + this.el);
     }
   },
 
@@ -33510,7 +32465,7 @@ var component = {
         this.cache[this.Component.cid] = child;
       }
       /* istanbul ignore if */
-      if (process.env.NODE_ENV !== 'production' && this.el.hasAttribute('transition') && child._isFragment) {
+      if ("production" !== 'production' && this.el.hasAttribute('transition') && child._isFragment) {
         warn('Transitions will not work on a fragment instance. ' + 'Template: ' + child.$options.template, child);
       }
       return child;
@@ -33683,7 +32638,7 @@ function compileProps(el, propOptions, vm) {
     name = names[i];
     options = propOptions[name] || empty;
 
-    if (process.env.NODE_ENV !== 'production' && name === '$data') {
+    if ("production" !== 'production' && name === '$data') {
       warn('Do not use $data as prop.', vm);
       continue;
     }
@@ -33693,7 +32648,7 @@ function compileProps(el, propOptions, vm) {
     // so we need to camelize the path here
     path = camelize(name);
     if (!identRE$1.test(path)) {
-      process.env.NODE_ENV !== 'production' && warn('Invalid prop key: "' + name + '". Prop keys ' + 'must be valid identifiers.', vm);
+      "production" !== 'production' && warn('Invalid prop key: "' + name + '". Prop keys ' + 'must be valid identifiers.', vm);
       continue;
     }
 
@@ -33729,7 +32684,7 @@ function compileProps(el, propOptions, vm) {
       } else {
         prop.dynamic = true;
         // check non-settable path for two-way bindings
-        if (process.env.NODE_ENV !== 'production' && prop.mode === propBindingModes.TWO_WAY && !settablePathRE.test(value)) {
+        if ("production" !== 'production' && prop.mode === propBindingModes.TWO_WAY && !settablePathRE.test(value)) {
           prop.mode = propBindingModes.ONE_WAY;
           warn('Cannot bind two-way prop with non-settable ' + 'parent path: ' + value, vm);
         }
@@ -33737,13 +32692,13 @@ function compileProps(el, propOptions, vm) {
       prop.parentPath = value;
 
       // warn required two-way
-      if (process.env.NODE_ENV !== 'production' && options.twoWay && prop.mode !== propBindingModes.TWO_WAY) {
+      if ("production" !== 'production' && options.twoWay && prop.mode !== propBindingModes.TWO_WAY) {
         warn('Prop "' + name + '" expects a two-way binding type.', vm);
       }
     } else if ((value = getAttr(el, attr)) !== null) {
       // has literal binding!
       prop.raw = value;
-    } else if (process.env.NODE_ENV !== 'production') {
+    } else if ("production" !== 'production') {
       // check possible camelCase prop usage
       var lowerCaseName = path.toLowerCase();
       value = /[A-Z\-]/.test(name) && (el.getAttribute(lowerCaseName) || el.getAttribute(':' + lowerCaseName) || el.getAttribute('v-bind:' + lowerCaseName) || el.getAttribute(':' + lowerCaseName + '.once') || el.getAttribute('v-bind:' + lowerCaseName + '.once') || el.getAttribute(':' + lowerCaseName + '.sync') || el.getAttribute('v-bind:' + lowerCaseName + '.sync'));
@@ -33898,7 +32853,7 @@ function getPropDefaultValue(vm, prop) {
   var def = options['default'];
   // warn against non-factory defaults for Object & Array
   if (isObject(def)) {
-    process.env.NODE_ENV !== 'production' && warn('Invalid default value for prop "' + prop.name + '": ' + 'Props with type Object/Array must use a factory function ' + 'to return the default value.', vm);
+    "production" !== 'production' && warn('Invalid default value for prop "' + prop.name + '": ' + 'Props with type Object/Array must use a factory function ' + 'to return the default value.', vm);
   }
   // call factory function for non-Function types
   return typeof def === 'function' && options.type !== Function ? def.call(vm) : def;
@@ -33934,7 +32889,7 @@ function assertProp(prop, value, vm) {
     }
   }
   if (!valid) {
-    if (process.env.NODE_ENV !== 'production') {
+    if ("production" !== 'production') {
       warn('Invalid prop: type check failed for prop "' + prop.name + '".' + ' Expected ' + expectedTypes.map(formatType).join(', ') + ', got ' + formatValue(value) + '.', vm);
     }
     return false;
@@ -33942,7 +32897,7 @@ function assertProp(prop, value, vm) {
   var validator = options.validator;
   if (validator) {
     if (!validator(value)) {
-      process.env.NODE_ENV !== 'production' && warn('Invalid prop: custom validator check failed for prop "' + prop.name + '".', vm);
+      "production" !== 'production' && warn('Invalid prop: custom validator check failed for prop "' + prop.name + '".', vm);
       return false;
     }
   }
@@ -33965,7 +32920,7 @@ function coerceProp(prop, value, vm) {
   if (typeof coerce === 'function') {
     return coerce(value);
   } else {
-    process.env.NODE_ENV !== 'production' && warn('Invalid coerce for prop "' + prop.name + '": expected function, got ' + typeof coerce + '.', vm);
+    "production" !== 'production' && warn('Invalid coerce for prop "' + prop.name + '": expected function, got ' + typeof coerce + '.', vm);
     return value;
   }
 }
@@ -34172,7 +33127,7 @@ function Transition(el, id, hooks, vm) {
   // check css transition type
   this.type = hooks && hooks.type;
   /* istanbul ignore if */
-  if (process.env.NODE_ENV !== 'production') {
+  if ("production" !== 'production') {
     if (this.type && this.type !== TYPE_TRANSITION && this.type !== TYPE_ANIMATION) {
       warn('invalid CSS transition type for transition="' + this.id + '": ' + this.type, vm);
     }
@@ -34583,7 +33538,7 @@ function compile(el, options, partial) {
 
 function linkAndCapture(linker, vm) {
   /* istanbul ignore if */
-  if (process.env.NODE_ENV === 'production') {
+  if ("production" === 'production') {
     // reset directives before every capture in production
     // mode, so that when unlinking we don't need to splice
     // them out (which turns out to be a perf hit).
@@ -34653,7 +33608,7 @@ function teardownDirs(vm, dirs, destroying) {
   var i = dirs.length;
   while (i--) {
     dirs[i]._teardown();
-    if (process.env.NODE_ENV !== 'production' && !destroying) {
+    if ("production" !== 'production' && !destroying) {
       vm._directives.$remove(dirs[i]);
     }
   }
@@ -34715,7 +33670,7 @@ function compileRoot(el, options, contextOptions) {
       // non-component, just compile as a normal element.
       replacerLinkFn = compileDirectives(el.attributes, options);
     }
-  } else if (process.env.NODE_ENV !== 'production' && containerAttrs) {
+  } else if ("production" !== 'production' && containerAttrs) {
     // warn container directives for fragment instances
     var names = containerAttrs.filter(function (attr) {
       // allow vue-loader/vueify scoped css attributes
@@ -35157,7 +34112,7 @@ function compileDirectives(attrs, options) {
       arg = name;
       pushDir('bind', directives.bind, tokens);
       // warn against mixing mustaches with v-bind
-      if (process.env.NODE_ENV !== 'production') {
+      if ("production" !== 'production') {
         if (name === 'class' && Array.prototype.some.call(attrs, function (attr) {
           return attr.name === ':class' || attr.name === 'v-bind:class';
         })) {
@@ -35358,7 +34313,7 @@ function transcludeTemplate(el, options) {
     if (options.replace) {
       /* istanbul ignore if */
       if (el === document.body) {
-        process.env.NODE_ENV !== 'production' && warn('You are mounting an instance with a template to ' + '<body>. This will replace <body> entirely. You ' + 'should probably use `replace: false` here.');
+        "production" !== 'production' && warn('You are mounting an instance with a template to ' + '<body>. This will replace <body> entirely. You ' + 'should probably use `replace: false` here.');
       }
       // there are many cases where the instance must
       // become a fragment instance: basically anything that
@@ -35387,7 +34342,7 @@ function transcludeTemplate(el, options) {
       return el;
     }
   } else {
-    process.env.NODE_ENV !== 'production' && warn('Invalid template option: ' + template);
+    "production" !== 'production' && warn('Invalid template option: ' + template);
   }
 }
 
@@ -35454,7 +34409,7 @@ function resolveSlots(vm, content) {
       (contents[name] || (contents[name] = [])).push(el);
     }
     /* eslint-enable no-cond-assign */
-    if (process.env.NODE_ENV !== 'production' && getBindAttr(el, 'slot')) {
+    if ("production" !== 'production' && getBindAttr(el, 'slot')) {
       warn('The "slot" attribute must be static.', vm.$parent);
     }
   }
@@ -35544,7 +34499,7 @@ function stateMixin (Vue) {
     var el = options.el;
     var props = options.props;
     if (props && !el) {
-      process.env.NODE_ENV !== 'production' && warn('Props will not be compiled if no `el` option is ' + 'provided at instantiation.', this);
+      "production" !== 'production' && warn('Props will not be compiled if no `el` option is ' + 'provided at instantiation.', this);
     }
     // make sure to convert string selectors into element now
     el = options.el = query(el);
@@ -35562,7 +34517,7 @@ function stateMixin (Vue) {
     var data = this._data = dataFn ? dataFn() : {};
     if (!isPlainObject(data)) {
       data = {};
-      process.env.NODE_ENV !== 'production' && warn('data functions should return an object.', this);
+      "production" !== 'production' && warn('data functions should return an object.', this);
     }
     var props = this._props;
     // proxy data on instance
@@ -35577,7 +34532,7 @@ function stateMixin (Vue) {
       //    template prop present
       if (!props || !hasOwn(props, key)) {
         this._proxy(key);
-      } else if (process.env.NODE_ENV !== 'production') {
+      } else if ("production" !== 'production') {
         warn('Data field "' + key + '" is already defined ' + 'as a prop. To provide default value for a prop, use the "default" ' + 'prop option; if you want to pass prop values to an instantiation ' + 'call, use the "propsData" option.', this);
       }
     }
@@ -35830,7 +34785,7 @@ function eventsMixin (Vue) {
       if (method) {
         vm[action](key, method, options);
       } else {
-        process.env.NODE_ENV !== 'production' && warn('Unknown method: "' + handler + '" when ' + 'registering callback for ' + action + ': "' + key + '".', vm);
+        "production" !== 'production' && warn('Unknown method: "' + handler + '" when ' + 'registering callback for ' + action + ': "' + key + '".', vm);
       }
     } else if (handler && type === 'object') {
       register(vm, action, key, handler.handler, handler);
@@ -35958,7 +34913,7 @@ function Directive(descriptor, vm, el, host, scope, frag) {
   this._scope = scope;
   this._frag = frag;
   // store directives on node in dev mode
-  if (process.env.NODE_ENV !== 'production' && this.el) {
+  if ("production" !== 'production' && this.el) {
     this.el._vue_directives = this.el._vue_directives || [];
     this.el._vue_directives.push(this);
   }
@@ -36136,7 +35091,7 @@ Directive.prototype.set = function (value) {
     this._withLock(function () {
       this._watcher.set(value);
     });
-  } else if (process.env.NODE_ENV !== 'production') {
+  } else if ("production" !== 'production') {
     warn('Directive.set() can only be used inside twoWay' + 'directives.');
   }
 };
@@ -36199,7 +35154,7 @@ Directive.prototype._teardown = function () {
         unwatchFns[i]();
       }
     }
-    if (process.env.NODE_ENV !== 'production' && this.el) {
+    if ("production" !== 'production' && this.el) {
       this.el._vue_directives.$remove(this);
     }
     this.vm = this.el = this._watcher = this._listeners = null;
@@ -36532,7 +35487,7 @@ function miscMixin (Vue) {
             cbs[i](res);
           }
         }, function reject(reason) {
-          process.env.NODE_ENV !== 'production' && warn('Failed to resolve async component' + (typeof value === 'string' ? ': ' + value : '') + '. ' + (reason ? '\nReason: ' + reason : ''));
+          "production" !== 'production' && warn('Failed to resolve async component' + (typeof value === 'string' ? ': ' + value : '') + '. ' + (reason ? '\nReason: ' + reason : ''));
         });
       }
     } else {
@@ -37107,7 +36062,7 @@ function lifecycleAPI (Vue) {
 
   Vue.prototype.$mount = function (el) {
     if (this._isCompiled) {
-      process.env.NODE_ENV !== 'production' && warn('$mount() should be called only once.', this);
+      "production" !== 'production' && warn('$mount() should be called only once.', this);
       return;
     }
     el = query(el);
@@ -37614,7 +36569,7 @@ function installGlobalAPI (Vue) {
       return extendOptions._Ctor;
     }
     var name = extendOptions.name || Super.options.name;
-    if (process.env.NODE_ENV !== 'production') {
+    if ("production" !== 'production') {
       if (!/^[a-zA-Z][\w-]*$/.test(name)) {
         warn('Invalid component name: "' + name + '". Component names ' + 'can only contain alphanumeric characaters and the hyphen.');
         name = null;
@@ -37705,7 +36660,7 @@ function installGlobalAPI (Vue) {
         return this.options[type + 's'][id];
       } else {
         /* istanbul ignore if */
-        if (process.env.NODE_ENV !== 'production') {
+        if ("production" !== 'production') {
           if (type === 'component' && (commonTagRE.test(id) || reservedTagRE.test(id))) {
             warn('Do not use built-in or reserved HTML elements as component ' + 'id: ' + id);
           }
@@ -37736,15 +36691,15 @@ setTimeout(function () {
   if (config.devtools) {
     if (devtools) {
       devtools.emit('init', Vue);
-    } else if (process.env.NODE_ENV !== 'production' && inBrowser && /Chrome\/\d+/.test(window.navigator.userAgent)) {
+    } else if ("production" !== 'production' && inBrowser && /Chrome\/\d+/.test(window.navigator.userAgent)) {
       console.log('Download the Vue Devtools for a better development experience:\n' + 'https://github.com/vuejs/vue-devtools');
     }
   }
 }, 0);
 
 module.exports = Vue;
-}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":104}],110:[function(require,module,exports){
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],108:[function(require,module,exports){
 var inserted = exports.cache = {}
 
 exports.insert = function (css) {
@@ -37764,9 +36719,9 @@ exports.insert = function (css) {
   return elem
 }
 
-},{}],111:[function(require,module,exports){
+},{}],109:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
-var __vueify_style__ = __vueify_insert__.insert("h1 {\n  color: #00a8ed;\n}")
+var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -37996,24 +36951,11 @@ exports.default = {
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\r\n<div class=\"alert alert-success\" transition=\"success\" v-if=\"success\">\r\n\tContrato Criado com sucesso\r\n</div>\r\n\r\n\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-4 pull-right\">\r\n\t\t<div class=\"input-group\">\r\n\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t<input v-model=\"filter.term\" type=\"text\" class=\"form-control\" placeholder=\"Filtrar dados da tabela\" aria-describedby=\"basic-addon1\">\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<button @click=\"clearField\" class=\"btn btn-secondary pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-contract\"><i class=\"fa fa-plus\"></i> Criar Novo</button>&nbsp;&nbsp;&nbsp;&nbsp;\r\n\t\t<button class=\"btn btn-secondary\" name=\"button\"><i class=\"fa fa-print\"></i> Imprimir</button>\r\n\t</div>\r\n</div>\r\n\r\n\r\n<br>\r\n\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class='table-responsive'>\r\n\t\t\t<table class='table table-striped table-hover table-condensed'>\r\n\t\t\t\t<thead>\r\n\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'place_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'place_id' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'place_id')\">Espaço</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'trader_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'trader_id' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'trader_id')\">Comerciante</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'status' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'status' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'status')\">Estado do Contrato</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'rate' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'rate' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'rate')\">Taxa</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'created_at' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'created_at' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'created_at')\">Data</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th  class=\"text-center\" colspan=\"3\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</thead>\r\n\t\t\t\t<tbody>\r\n\t\t\t\t\t<tr v-for=\"contract in contracts | filterBy filter.term | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t\t<td v-for=\"place in contract.places\">{{ place.id }}</td>\r\n\t\t\t\t\t\t<td v-for=\"trader in contract.traders\">{{ trader.name }}</td>\r\n\t\t\t\t\t\t<!------------------------------------------------------------------------------------------>\r\n\r\n\t\t\t\t\t\t<td>\r\n\t\t\t\t\t\t\t<button type=\"submit\" @click = \"statusContractsChange(contract.id)\" class='btn btn-xs' :class=\"{ 'btn-info': contract.status, 'btn-danger': !contract.status }\">{{contract.status ? 'Ativado' : 'Desativado'}}</button>\r\n\t\t\t\t\t\t</td>\r\n\t\t\t\t\t\t<!------------------------------------------------------------------------------------------>\r\n\t\t\t\t\t\t<td>{{ contract.rate }}</td>\r\n\t\t\t\t\t\t<td>{{ contract.created_at | formatDate 'DD/MM/YYYY' }}</td>\r\n\t\t\t\t\t\t<td align=center>  <a data-toggle=\"modal\" data-target=\"#modal-edit-contract\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisContract(contract.id)\" > </i></a></td>\r\n\t\t\t\t\t\t<td align=center><a data-toggle=\"modal\" data-target=\"#modal-delete-contract\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisContract(contract.id)\"></i></a></td>\r\n\r\n\t\t\t\t\t\t<td align=center><a href=\"#\"><i class=\"fa fa-print text-info\" @click=\"getThisContract(contract.id)\"></i></a></td>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</tbody>\r\n\t\t\t</table>\r\n\t\t\t<div class=\"col-md-12 pull-left\">\r\n\t\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<div class=\"modal fade\" id=\"modal-delete-contract\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar Registo</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<h1>Eliminar este registo</h1>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Cancelar</button>\r\n\t\t\t\t\t\t<button  @keyup.enter=\"deleteContract(newContract.id)\" @click=\"deleteContract(newContract.id)\" type=\"button\" class=\"btn btn-default\">Eliminar  contract</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-create-contract\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Criar Registo</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control input-lg\" v-model=\"newContract.place_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Selecione o espaço</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"place in places\" value=\"{{place.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{place.id}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"help-block\">Selecione o espaço pretendido</span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control input-lg\" v-model=\"newContract.trader_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>O Comerciante</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"trader in traders\" value=\"{{trader.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{trader.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"help-block\">Selecione o comerciante</span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<!-- <hr>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"number\" class=\"form-control\" name=\"age\" placeholder=\"Taxa\" min=\"20\" max=\"50\" v-model=\"newUser.age\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div> -->\r\n\r\n\t\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input  v-model=\"newContract.rate\"  type='number' class='form-control input-lg' placeholder='Taxa do contrato'>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"help-block\">Introduza o valor do contrato</span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type='date' class='form-control input-lg' placeholder='Fim do Contrato'>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"help-block\">Introduza a data do término do contrato</span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createContract\" class=\"btn btn-secondary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar Registo</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-edit-contract\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Editar Este contrato</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t\t<form action=\"#\" methods=\"patch\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newContract.place_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Selecione o Espaço</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"place in places\" value=\"{{place.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{place.id}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newContract.trader_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Selecione o Comerciante</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"trader in traders\" value=\"{{trader.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{trader.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input  v-model=\"newContract.rate\"  type='number' class='form-control input-lg' placeholder='Taxa do contrato'>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedContract(newContract.id)\" type=\"button\" class=\"btn btn-secondary\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp; Salvar as Alterações sobre este contrato</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n"
-if (module.hot) {(function () {  module.hot.accept()
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), true)
-  if (!hotAPI.compatible) return
-  module.hot.dispose(function () {
-    __vueify_insert__.cache["h1 {\n  color: #00a8ed;\n}"] = false
-    document.head.removeChild(__vueify_style__)
-  })
-  if (!module.hot.data) {
-    hotAPI.createRecord("_v-7218e706", module.exports)
-  } else {
-    hotAPI.update("_v-7218e706", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
-  }
-})()}
-},{"../../../Pagination/src/Component.vue":116,"vue":109,"vue-hot-reload-api":105,"vue-select":107,"vueify/lib/insert-css":110}],112:[function(require,module,exports){
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success>Contrato Criado com sucesso</div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=\"Filtrar dados da tabela\" aria-describedby=basic-addon1></div></div></div><hr><div class=row><div class=col-md-12><button @click=clearField class=\"btn btn-secondary pull-left\" name=button data-toggle=modal data-target=#modal-create-contract><i class=\"fa fa-plus\"></i> Criar Novo</button>&nbsp;&nbsp;&nbsp;&nbsp; <button class=\"btn btn-secondary\" name=button><i class=\"fa fa-print\"></i> Imprimir</button></div></div><br><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'place_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'place_id' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'place_id')\">Espaço</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'trader_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'trader_id' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'trader_id')\">Comerciante</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'status' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'status' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'status')\">Estado do Contrato</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'rate' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'rate' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'rate')\">Taxa</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'created_at' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'created_at' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'created_at')\">Data</a><th class=text-center colspan=3><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"contract in contracts | filterBy filter.term | orderBy sortColumn sortInverse\"><td v-for=\"place in contract.places\">{{ place.id }}<td v-for=\"trader in contract.traders\">{{ trader.name }}<td><button type=submit @click=statusContractsChange(contract.id) class=\"btn btn-xs\" :class=\"{ 'btn-info': contract.status, 'btn-danger': !contract.status }\">{{contract.status ? 'Ativado' : 'Desativado'}}</button><td>{{ contract.rate }}<td>{{ contract.created_at | formatDate 'DD/MM/YYYY' }}<td align=center><a data-toggle=modal data-target=#modal-edit-contract href=#><i class=\"fa fa-pencil text-primary\" @click=getThisContract(contract.id)></i></a><td align=center><a data-toggle=modal data-target=#modal-delete-contract href=#><i class=\"fa fa-trash text-danger\" @click=getThisContract(contract.id)></i></a><td align=center><a href=#><i class=\"fa fa-print text-info\" @click=getThisContract(contract.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div class=\"modal fade\" id=modal-delete-contract tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar Registo</h4></div><div class=modal-body><h1>Eliminar este registo</h1></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteContract(newContract.id) @click=deleteContract(newContract.id) type=button class=\"btn btn-default\">Eliminar contract</button></div></div></div></div><div id=modal-create-contract class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Criar Registo</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><select class=\"form-control input-lg\" v-model=newContract.place_id><option value=\"\" selected>Selecione o espaço<option v-for=\"place in places\" value={{place.id}}>{{place.id}}</select><span class=help-block>Selecione o espaço pretendido</span></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><select class=\"form-control input-lg\" v-model=newContract.trader_id><option value=\"\" selected>O Comerciante<option v-for=\"trader in traders\" value={{trader.id}}>{{trader.name}}</select><span class=help-block>Selecione o comerciante</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input v-model=newContract.rate type=number class=\"form-control input-lg\" placeholder=\"Taxa do contrato\"> <span class=help-block>Introduza o valor do contrato</span></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=date class=\"form-control input-lg\" placeholder=\"Fim do Contrato\"> <span class=help-block>Introduza a data do término do contrato</span></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createContract class=\"btn btn-secondary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar Registo</button></div></div></div></div><div id=modal-edit-contract class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar Este contrato</h4></div><div class=modal-body><validator name=validationew><form action=# methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=form-control v-model=newContract.place_id><option value=\"\" selected>Selecione o Espaço<option v-for=\"place in places\" value={{place.id}}>{{place.id}}</select></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=form-control v-model=newContract.trader_id><option value=\"\" selected>Selecione o Comerciante<option v-for=\"trader in traders\" value={{trader.id}}>{{trader.name}}</select></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input v-model=newContract.rate type=number class=\"form-control input-lg\" placeholder=\"Taxa do contrato\"></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedContract(newContract.id) type=button class=\"btn btn-secondary\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp; Salvar as Alterações sobre este contrato</button></div></div></div></div></div></div>"
+
+},{"../../../Pagination/src/Component.vue":114,"vue-select":105,"vueify/lib/insert-css":108}],110:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
-var __vueify_style__ = __vueify_insert__.insert("h1 {\n  color: #00a8ed;\n}")
+var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -38223,24 +37165,11 @@ exports.default = {
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\r\n<div class=\"alert alert-success\" transition=\"success\" v-if=\"success\">\r\n\tControl adicionado com sucesso\r\n</div>\r\n\r\n\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-4 pull-right\">\r\n\t\t<div class=\"input-group\">\r\n\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t<input v-model=\"filter.term\" type=\"text\" class=\"form-control\" placeholder=\"Filtrar dados da tabela\" aria-describedby=\"basic-addon1\">\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n<div class=\"col-md-12\">\r\n\t<button @click=\"clearField\" class=\"btn btn-secondary pull-right\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-control\">Criar Novo</button>\r\n</div>\r\n<br><br>\r\n\r\n<div class=\"col-md-12\">\r\n\t<div class='table-responsive'>\r\n\t\t<table class='table table-striped table-hover table-condensed'>\r\n\t\t\t<thead>\r\n\t\t\t\t<tr>\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'employee_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'employee_id' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'employee_id')\">Funcionário(a)</a>\r\n\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'material_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'material_id' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'material_id')\">Material</a>\r\n\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'status' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'status' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'status')\">Estado</a>\r\n\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'created_at' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'created_at' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'created_at')\">Data</a>\r\n\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n\t\t\t\t</tr>\r\n\t\t\t</thead>\r\n\t\t\t<tbody>\r\n\t\t\t\t<tr v-for=\"control in controls | filterBy filter.term | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t<td v-for=\"emp in control.employees\">{{ emp.name }}</td>\r\n\t\t\t\t\t<td v-for=\"mat in control.materials\">{{ mat.name }}</td>\r\n\t\t\t\t\t<!------------------------------------------------------------------------------------------>\r\n\t\t\t\t\t<td>\r\n\t\t\t\t\t\t<button :disabled=\"control.status\" type=\"submit\" @click = \"statusControlsChange(control.id)\" class='btn btn-xs' :class=\"{ 'btn-info': control.status, 'btn-danger': !control.status }\">{{control.status ? 'Confirmado' : 'Pendente'}}</button>\r\n\t\t\t\t\t</td>\r\n\t\t\t\t\t<!------------------------------------------------------------------------------------------>\r\n\t\t\t\t\t<td>{{ control.created_at }}</td>\r\n\t\t\t\t\t<td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-control\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisControl(control.id)\" > </i></a></td>\r\n\t\t\t\t\t<td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-control\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisControl(control.id)\"></i></a></td>\r\n\t\t\t\t</tr>\r\n\t\t\t</tbody>\r\n\t\t</table>\r\n\t\t<div class=\"col-md-12 pull-left\">\r\n\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t<div class=\"modal fade\" id=\"modal-delete-control\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t<div class=\"modal-dialog\">\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar Registo</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<h1>Eliminar este registo</h1>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Cancelar</button>\r\n\t\t\t\t\t<button  @keyup.enter=\"deleteControl(newControl.id)\" @click=\"deleteControl(newControl.id)\" type=\"button\" class=\"btn btn-default\">Eliminar  control</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\t<!-- Modal -->\r\n\t<div id=\"modal-create-control\" class=\"modal fade\" role=\"dialog\">\r\n\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t<!-- Modal content-->\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\">Criar Registo</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newControl.employee_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Selecione o funcionario(a)</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"employee in employees\" value=\"{{employee.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t{{employee.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newControl.material_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Selecione o material</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"material in materials\" value=\"{{material.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t{{material.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</form>\r\n\t\t\t\t\t</validator>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createControl\" class=\"btn btn-secondary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar Dados Sobre este control</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t<!-- Modal -->\r\n\t<div id=\"modal-edit-control\" class=\"modal fade\" role=\"dialog\">\r\n\t\t<div class=\"modal-dialog\">\r\n\t\t\t<!-- Modal content-->\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\">Editar Este control</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t<form action=\"#\" methods=\"patch\">\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newControl.employee_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Selecione o funcionario(a)</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"employee in employees\" value=\"{{employee.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t{{employee.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newControl.material_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Selecione o material</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"material in materials\" value=\"{{material.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t{{material.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</form>\r\n\t\t\t\t\t</validator>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedControl(newControl.id)\" type=\"button\" class=\"btn btn-secondary\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp; Salvar as Alterações sobre este control</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n"
-if (module.hot) {(function () {  module.hot.accept()
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), true)
-  if (!hotAPI.compatible) return
-  module.hot.dispose(function () {
-    __vueify_insert__.cache["h1 {\n  color: #00a8ed;\n}"] = false
-    document.head.removeChild(__vueify_style__)
-  })
-  if (!module.hot.data) {
-    hotAPI.createRecord("_v-47dda98d", module.exports)
-  } else {
-    hotAPI.update("_v-47dda98d", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
-  }
-})()}
-},{"../../../Pagination/src/Component.vue":116,"vue":109,"vue-hot-reload-api":105,"vueify/lib/insert-css":110}],113:[function(require,module,exports){
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success>Control adicionado com sucesso</div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=\"Filtrar dados da tabela\" aria-describedby=basic-addon1></div></div></div><hr><div class=col-md-12><button @click=clearField class=\"btn btn-secondary pull-right\" name=button data-toggle=modal data-target=#modal-create-control>Criar Novo</button></div><br><br><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'employee_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'employee_id' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'employee_id')\">Funcionário(a)</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'material_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'material_id' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'material_id')\">Material</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'status' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'status' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'status')\">Estado</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'created_at' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'created_at' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'created_at')\">Data</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"control in controls | filterBy filter.term | orderBy sortColumn sortInverse\"><td v-for=\"emp in control.employees\">{{ emp.name }}<td v-for=\"mat in control.materials\">{{ mat.name }}<td><button :disabled=control.status type=submit @click=statusControlsChange(control.id) class=\"btn btn-xs\" :class=\"{ 'btn-info': control.status, 'btn-danger': !control.status }\">{{control.status ? 'Confirmado' : 'Pendente'}}</button><td>{{ control.created_at }}<td align=left><a data-toggle=modal data-target=#modal-edit-control href=#><i class=\"fa fa-pencil text-primary\" @click=getThisControl(control.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-control href=#><i class=\"fa fa-trash text-danger\" @click=getThisControl(control.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div class=\"modal fade\" id=modal-delete-control tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar Registo</h4></div><div class=modal-body><h1>Eliminar este registo</h1></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteControl(newControl.id) @click=deleteControl(newControl.id) type=button class=\"btn btn-default\">Eliminar control</button></div></div></div></div><div id=modal-create-control class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Criar Registo</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=form-control v-model=newControl.employee_id><option value=\"\" selected>Selecione o funcionario(a)<option v-for=\"employee in employees\" value={{employee.id}}>{{employee.name}}</select></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=form-control v-model=newControl.material_id><option value=\"\" selected>Selecione o material<option v-for=\"material in materials\" value={{material.id}}>{{material.name}}</select></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createControl class=\"btn btn-secondary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar Dados Sobre este control</button></div></div></div></div><div id=modal-edit-control class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar Este control</h4></div><div class=modal-body><validator name=validationew><form action=# methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=form-control v-model=newControl.employee_id><option value=\"\" selected>Selecione o funcionario(a)<option v-for=\"employee in employees\" value={{employee.id}}>{{employee.name}}</select></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=form-control v-model=newControl.material_id><option value=\"\" selected>Selecione o material<option v-for=\"material in materials\" value={{material.id}}>{{material.name}}</select></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedControl(newControl.id) type=button class=\"btn btn-secondary\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp; Salvar as Alterações sobre este control</button></div></div></div></div></div>"
+
+},{"../../../Pagination/src/Component.vue":114,"vueify/lib/insert-css":108}],111:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
-var __vueify_style__ = __vueify_insert__.insert("h1 {\n  color: #00a8ed;\n}")
+var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -38520,24 +37449,11 @@ exports.default = {
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=\"success\" v-if=\"success\">\r\n\t<i class=\"fa fa-thumbs-up\"> Sucesso!!</i>\r\n</div>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"pull right col-md-8\">\r\n\t\t<label class=\"checkbox-inline\"><input type=\"checkbox\" id=\"\" value=\"\" v-model=\"showColumn.ic\">BI</label>\r\n\t\t<label class=\"checkbox-inline\"><input type=\"checkbox\" id=\"\" value=\"\" v-model=\"showColumn.service_beginning\">Inicio Serviço</label>\r\n\t</div>\r\n\r\n\t<div class=\"col-md-4 pull-left\">\r\n\t\t<div class=\"input-group\">\r\n\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t<input v-model=\"filter.term\" type=\"text\" class=\"form-control\" placeholder=\"Filtrar...\" aria-describedby=\"basic-addon1\">\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<button @click=\"clearField\" class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-employee\"><i class=\"fa fa-plus\"></i> Novo</button>&nbsp;&nbsp;\r\n\t\t<a class=\"btn btn-primary btn-flat btn-outline\" href=\"/export/printableEmployeeInformation\"><i class=\"fa fa-print\"></i> Imprimir</a>\r\n\t</div>\r\n</div>\r\n\r\n<br>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class='table-responsive'>\r\n\t\t\t<table class='table table-striped table-hover table-condensed'>\r\n\t\t\t\t<thead>\r\n\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'name')\">Nome</a>\r\n\t\t\t\t\t\t</th>\r\n\t\t\t\t\t\t<th class=\"info\" v-if=\"showColumn.ic\">\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'ic' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'ic' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'ic')\">BI</a>\r\n\t\t\t\t\t\t</th>\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'phone' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'phone' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'phone')\">Telefone</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'typeofemployee_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'typeofemployee_id' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'typeofemployee_id')\">Tipo</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th class=\"info\" v-if=\"showColumn.service_beginning\">\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'service_beginning' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'service_beginning' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'service_beginning')\">Inicio de Serviço</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\r\n\t\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</thead>\r\n\t\t\t\t<tbody>\r\n\t\t\t\t\t<tr v-for=\"employee in employees | filterBy filter.term | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t\t<td><a href=\"#\" data-toggle=\"modal\" data-target=\"#show-employee\" @click=\"getThisEmployee(employee.id)\">{{ employee.name }}</a></td>\r\n\t\t\t\t\t\t<td class=\"info\" v-if=\"showColumn.ic\">{{ employee.ic }}</td>\r\n\t\t\t\t\t\t<td>{{ employee.phone }}</td>\r\n\t\t\t\t\t\t<td>{{ employee.typeofemployees.name }}</td>\r\n\t\t\t\t\t\t<td class=\"info\" v-if=\"showColumn.service_beginning\">{{ employee.service_beginning }}</td>\r\n\r\n\t\t\t\t\t\t<td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-employee\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisEmployee(employee.id)\" > </i></a></td>\r\n\t\t\t\t\t\t<td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-employee\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisEmployee(employee.id)\" ></i></a></td>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</tbody>\r\n\t\t\t</table>\r\n\t\t\t<div class=\"col-md-12 pull-left\">\r\n\t\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<div id=\"show-employee\" class=\"modal fade\" role=\"dialog\">\r\n\t<div class=\"modal-dialog\">\r\n\r\n\t\t<!-- Modal content-->\r\n\t\t<div class=\"modal-content\">\r\n\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t<h4 class=\"modal-title\">Detalhes do(a) {{ newEmployee.name }}</h4>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t<div class='table-responsive'>\r\n\t\t\t\t\t\t\t<table class='table table-striped table-hover'>\r\n\t\t\t\t\t\t\t\t<thead>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<th class=\"text-center\" colspan=\"2\">INFORMAÇOES DO FUNCIONÁRIO</th>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t</thead>\r\n\t\t\t\t\t\t\t\t<tbody>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>ID</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><i>{{ newEmployee.id }}</i></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Nome</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><i>{{ newEmployee.name }}</i></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>BI</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><span class=\"label label-info\"><i>{{ newEmployee.ic }}</i></span></td>\r\n\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Idade</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><i>{{ newEmployee.age }}</i></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Sexo</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><i>{{ alterGenderValue(newEmployee.gender) }}</i></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Email</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><span class=\"label label-info\"><i>{{ newEmployee.email }}</i></span></td>\r\n\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Ilha</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><i>{{ alterStateValue(newEmployee.state) }}</i></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Concelho</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><i>{{ newEmployee.council }}</i></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Freguesia</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><i>{{ newEmployee.parish }}</i></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Zona</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><i>{{ newEmployee.zone }}</i></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Telefone</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><span class=\"label\" :class=\"{ 'label-info': newEmployee.phone, 'none': !newEmployee.phone }\"><i>{{ newEmployee.phone }}</i></span></td>\r\n\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Escalão</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><i>{{ newEmployee.echelon }}</i></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<!-- <tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Tipo</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><span class=\"label label-primary\"><i>{{ newEmployee.typeofemployees.name }}</i></span></td>\r\n\r\n\t\t\t\t\t\t\t\t\t</tr> -->\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Descrição</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><i>{{ newEmployee.description }}</i></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Data da criação</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><i>{{ employee.created_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Data de atualização</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><i>{{ employee.updated_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t</tbody>\r\n\t\t\t\t\t\t\t</table>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-success\" data-dismiss=\"modal\"><i class=\"fa fa-check\"></i></button>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t</div>\r\n</div>\r\n\r\n\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<div class=\"modal fade\" id=\"modal-delete-employee\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newEmployee.name}}</span></h5>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\">Cancelar</button>\r\n\t\t\t\t\t\t<button  @keyup.enter=\"deleteEmployee(newEmployee.id)\" @click=\"deleteEmployee(newEmployee.id)\" type=\"button\" class=\"btn btn-danger\">Eliminar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-create-employee\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Registar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-8\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome\" v-model=\"newEmployee.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-user form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-4\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"number\" class=\"form-control\" name=\"ic\" placeholder=\"Número BI\" v-model=\"newEmployee.ic\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-id-card form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-8\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"email\" class=\"form-control\" name=\"email\" placeholder=\"Email\" v-model=\"newEmployee.email\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-envelope form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-4\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"number\" class=\"form-control\" name=\"phone\" placeholder=\"Telefone\" v-model=\"newEmployee.phone\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-phone form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-2\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<label class=\"radio-inline\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"radio\" id=\"gender\" value=\"M\" name=\"gender\" v-model=\"newEmployee.gender\"> <i class=\"fa fa-male\"></i>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</label>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<label class=\"radio-inline\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"radio\" id=\"gender\" name=\"gender\" value=\"F\" v-model=\"newEmployee.gender\"><i class=\"fa fa-female\"></i>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</label>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-10 pull-right\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"number\" class=\"form-control\" name=\"age\" placeholder=\"Idade\" v-model=\"newEmployee.age\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-birthday-cake form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<hr>\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select name=\"state\" class=\"selectpicker form-control show-tick\" v-model=\"newEmployee.state\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<optgroup label=\"Sotavento\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option>Selecione Ilha</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"2\">Maio</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"1\">Santiago</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"3\">Fogo</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"4\">Brava</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</optgroup>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<optgroup label=\"Barlavento\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"5\">Santo Antão</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"6\">São Nicolau</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"7\">São Vicente</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"8\">Sal</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"9\">Boa Vista</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</optgroup>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"council\" placeholder=\"Concelho\" v-model=\"newEmployee.council\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-compass form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"parish\" placeholder=\"Freguezia\" v-model=\"newEmployee.parish\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-map-marker form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"zone\" placeholder=\"Zona\" v-model=\"newEmployee.zone\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-thumb-tack form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!-------------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"date\" class=\"form-control\" name=\"service_beginning\" placeholder=\"Inicio de serviço\" v-model=\"newEmployee.service_beginning\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-calendar form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p class=\"text-help\">Data de inicio de serviço</p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select name=\"type\" class=\"selectpicker  form-control\" title=\"Escalão\" v-model=\"newEmployee.echelon\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"a\">A</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"b\">B</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"c\">C</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"d\">D</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"e\">E</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newEmployee.typeofemployee_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Tipo de funcionário</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"type in types\" value=\"{{type.id}}\">{{type.name}}</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newEmployee.markets\" multiple>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Mercado</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"market in markets\" value=\"{{market.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{market.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newEmployee.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createEmployee\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button>\r\n\r\n\t\t\t\t\t\t<label v-if = \"!newTrader.get_password\" class=\"checkbox-inline pull-left\"><input data-toggle=\"modal\" data-target=\"#getAcountForEmployee\" type=\"checkbox\" id=\"\" value=\"\" v-model=\"newTrader.get_email\">Obter uma conta</label>\r\n                        <p v-if = \"newTrader.get_password\" class=\"text-help text-success pull-left\">Funcionário Terá uma conta no SAGMMA</p>\r\n\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<div class=\"modal fade\" id=\"getAcountForEmployee\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n            <div class=\"modal-dialog\">\r\n                <div class=\"modal-content\">\r\n                    <div class=\"modal-header\">\r\n                        <button type=\"button\" @click=\"clearField\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n                        <h5 class=\"modal-title\" id=\"\">Introduza a palavra passe para a conta pretendida</h5>\r\n                    </div>\r\n                    <div class=\"modal-body\">\r\n                        <div class=\"form-group has-feedback\">\r\n                            <input type='password' name=\"get_password\" class='form-control input-lg' placeholder='Introduza a palavra passe' v-model=\"newEmployee.get_password\">\r\n                            <span class=\"fa fa-lock form-control-feedback\"></span>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"modal-footer\">\r\n                        <button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-close\"></i></button>\r\n                        <button :disabled = \"!newEmployee.get_password\" type=\"button\" class=\"btn btn-primary\" data-dismiss=\"modal\"><i class=\"fa fa-check\"></i></button>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n        </div>\r\n\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-edit-employee\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Editar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validation1\">\r\n\t\t\t\t\t\t\t<form methods=\"patch\">\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-8\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome\" v-model=\"newEmployee.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-user form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-4\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"number\" class=\"form-control\" name=\"ic\" placeholder=\"Número BI\" v-model=\"newEmployee.ic\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-id-card form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-8\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"email\" class=\"form-control\" name=\"email\" placeholder=\"Email\" v-model=\"newEmployee.email\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-envelope form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-4\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"number\" class=\"form-control\" name=\"phone\" placeholder=\"Telefone\" v-model=\"newEmployee.phone\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-phone form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-2\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<label class=\"radio-inline\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"radio\" id=\"gender\" value=\"M\" name=\"gender\" v-model=\"newEmployee.gender\"> <i class=\"fa fa-male\"></i>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</label>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<label class=\"radio-inline\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"radio\" id=\"gender\" name=\"gender\" value=\"F\" v-model=\"newEmployee.gender\"><i class=\"fa fa-female\"></i>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</label>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-10 pull-right\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"number\" class=\"form-control\" name=\"age\" placeholder=\"Idade\" v-model=\"newEmployee.age\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-birthday-cake form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<hr>\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select name=\"state\" class=\"selectpicker form-control show-tick\" v-model=\"newEmployee.state\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<optgroup label=\"Sotavento\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option>Selecione Ilha</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"2\">Maio</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"1\">Santiago</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"3\">Fogo</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"4\">Brava</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</optgroup>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<optgroup label=\"Barlavento\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"5\">Santo Antão</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"6\">São Nicolau</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"7\">São Vicente</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"8\">Sal</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"9\">Boa Vista</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</optgroup>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"council\" placeholder=\"Concelho\" v-model=\"newEmployee.council\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-compass form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"parish\" placeholder=\"Freguezia\" v-model=\"newEmployee.parish\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-map-marker form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"zone\" placeholder=\"Zona\" v-model=\"newEmployee.zone\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-thumb-tack form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!-------------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"date\" class=\"form-control\" name=\"service_beginning\" placeholder=\"Inicio de serviço\" v-model=\"newEmployee.service_beginning\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-calendar form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p class=\"text-help\">Data de inicio de serviço</p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select name=\"type\" class=\"selectpicker  form-control\" title=\"Escalão\" v-model=\"newEmployee.echelon\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"a\">A</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"b\">B</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"c\">C</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"d\">D</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"e\">E</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newEmployee.typeofemployee_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Tipo de funcionário</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"type in types\" value=\"{{type.id}}\">{{type.name}}</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição do utilizador\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newEmployee.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedEmployee(newEmployee.id)\" type=\"button\" class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n"
-if (module.hot) {(function () {  module.hot.accept()
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), true)
-  if (!hotAPI.compatible) return
-  module.hot.dispose(function () {
-    __vueify_insert__.cache["h1 {\n  color: #00a8ed;\n}"] = false
-    document.head.removeChild(__vueify_style__)
-  })
-  if (!module.hot.data) {
-    hotAPI.createRecord("_v-791e8745", module.exports)
-  } else {
-    hotAPI.update("_v-791e8745", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
-  }
-})()}
-},{"../../../Pagination/src/Component.vue":116,"vue":109,"vue-hot-reload-api":105,"vueify/lib/insert-css":110}],114:[function(require,module,exports){
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success><i class=\"fa fa-thumbs-up\">Sucesso!!</i></div><div class=row><div class=\"pull right col-md-8\"><label class=checkbox-inline><input type=checkbox v-model=showColumn.ic>BI</label><label class=checkbox-inline><input type=checkbox v-model=showColumn.service_beginning>Inicio Serviço</label></div><div class=\"col-md-4 pull-left\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=row><div class=col-md-12><button @click=clearField class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-employee><i class=\"fa fa-plus\"></i> Novo</button>&nbsp;&nbsp; <a class=\"btn btn-primary btn-flat btn-outline\" href=/export/printableEmployeeInformation><i class=\"fa fa-print\"></i> Imprimir</a></div></div><br><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome</a><th class=info v-if=showColumn.ic><i :class=\"{'fa-sort-amount-asc': sortColumn == 'ic' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'ic' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'ic')\">BI</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'phone' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'phone' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'phone')\">Telefone</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'typeofemployee_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'typeofemployee_id' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'typeofemployee_id')\">Tipo</a><th class=info v-if=showColumn.service_beginning><i :class=\"{'fa-sort-amount-asc': sortColumn == 'service_beginning' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'service_beginning' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'service_beginning')\">Inicio de Serviço</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"employee in employees | filterBy filter.term | orderBy sortColumn sortInverse\"><td><a href=# data-toggle=modal data-target=#show-employee @click=getThisEmployee(employee.id)>{{ employee.name }}</a><td class=info v-if=showColumn.ic>{{ employee.ic }}<td>{{ employee.phone }}<td>{{ employee.typeofemployees.name }}<td class=info v-if=showColumn.service_beginning>{{ employee.service_beginning }}<td align=left><a data-toggle=modal data-target=#modal-edit-employee href=#><i class=\"fa fa-pencil text-primary\" @click=getThisEmployee(employee.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-employee href=#><i class=\"fa fa-trash text-danger\" @click=getThisEmployee(employee.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div id=show-employee class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Detalhes do(a) {{ newEmployee.name }}</h4></div><div class=modal-body><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover\"><thead><tr><th class=text-center colspan=2>INFORMAÇOES DO FUNCIONÁRIO<tbody><tr><td><b>ID</b><td><i>{{ newEmployee.id }}</i><tr><td><b>Nome</b><td><i>{{ newEmployee.name }}</i><tr><td><b>BI</b><td><span class=\"label label-info\"><i>{{ newEmployee.ic }}</i></span><tr><td><b>Idade</b><td><i>{{ newEmployee.age }}</i><tr><td><b>Sexo</b><td><i>{{ alterGenderValue(newEmployee.gender) }}</i><tr><td><b>Email</b><td><span class=\"label label-info\"><i>{{ newEmployee.email }}</i></span><tr><td><b>Ilha</b><td><i>{{ alterStateValue(newEmployee.state) }}</i><tr><td><b>Concelho</b><td><i>{{ newEmployee.council }}</i><tr><td><b>Freguesia</b><td><i>{{ newEmployee.parish }}</i><tr><td><b>Zona</b><td><i>{{ newEmployee.zone }}</i><tr><td><b>Telefone</b><td><span class=label :class=\"{ 'label-info': newEmployee.phone, 'none': !newEmployee.phone }\"><i>{{ newEmployee.phone }}</i></span><tr><td><b>Escalão</b><td><i>{{ newEmployee.echelon }}</i><tr><td><b>Descrição</b><td><i>{{ newEmployee.description }}</i><tr><td><b>Data da criação</b><td><i>{{ employee.created_at | formatDate 'DD/MM/YYYY' }}</i><tr><td><b>Data de atualização</b><td><i>{{ employee.updated_at | formatDate 'DD/MM/YYYY' }}</i></table></div></div></div></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-success\" data-dismiss=modal><i class=\"fa fa-check\"></i></button></div></div></div></div><div class=\"modal fade\" id=modal-delete-employee tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar</h4></div><div class=modal-body><h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newEmployee.name}}</span></h5></div><div class=modal-footer><button type=button class=\"btn btn-secondary\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteEmployee(newEmployee.id) @click=deleteEmployee(newEmployee.id) type=button class=\"btn btn-danger\">Eliminar</button></div></div></div></div><div id=modal-create-employee class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-8><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=Nome v-model=newEmployee.name v-validate:name=\"['required']\"> <span class=\"fa fa-user form-control-feedback\"></span></div></div><div class=col-md-4><div class=\"form-group has-feedback\"><input type=number class=form-control name=ic placeholder=\"Número BI\" v-model=newEmployee.ic> <span class=\"fa fa-id-card form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-8><div class=\"form-group has-feedback\"><input type=email class=form-control name=email placeholder=Email v-model=newEmployee.email> <span class=\"fa fa-envelope form-control-feedback\"></span></div></div><div class=col-md-4><div class=\"form-group has-feedback\"><input type=number class=form-control name=phone placeholder=Telefone v-model=newEmployee.phone> <span class=\"fa fa-phone form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-2><div class=\"form-group has-feedback\"><label class=radio-inline><input type=radio id=gender value=M name=gender v-model=newEmployee.gender> <i class=\"fa fa-male\"></i></label><label class=radio-inline><input type=radio id=gender name=gender value=F v-model=newEmployee.gender><i class=\"fa fa-female\"></i></label></div></div><div class=\"col-md-10 pull-right\"><div class=\"form-group has-feedback\"><input type=number class=form-control name=age placeholder=Idade v-model=newEmployee.age> <span class=\"fa fa-birthday-cake form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><select name=state class=\"selectpicker form-control show-tick\" v-model=newEmployee.state><optgroup label=Sotavento><option>Selecione Ilha<option value=2>Maio<option value=1>Santiago<option value=3>Fogo<option value=4>Brava<optgroup label=Barlavento><option value=5>Santo Antão<option value=6>São Nicolau<option value=7>São Vicente<option value=8>Sal<option value=9>Boa Vista</select></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=council placeholder=Concelho v-model=newEmployee.council> <span class=\"fa fa-compass form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=parish placeholder=Freguezia v-model=newEmployee.parish> <span class=\"fa fa-map-marker form-control-feedback\"></span></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=zone placeholder=Zona v-model=newEmployee.zone> <span class=\"fa fa-thumb-tack form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input type=date class=form-control name=service_beginning placeholder=\"Inicio de serviço\" v-model=newEmployee.service_beginning> <span class=\"fa fa-calendar form-control-feedback\"></span><p class=text-help>Data de inicio de serviço</div></div><div class=col-md-6><div class=\"form-group has-feedback\"><select name=type class=\"selectpicker form-control\" title=Escalão v-model=newEmployee.echelon><option value=a>A<option value=b>B<option value=c>C<option value=d>D<option value=e>E</select></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><select class=form-control v-model=newEmployee.typeofemployee_id><option value=\"\" selected>Tipo de funcionário<option v-for=\"type in types\" value={{type.id}}>{{type.name}}</select></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><select class=form-control v-model=newEmployee.markets multiple><option value=\"\" selected>Mercado<option v-for=\"market in markets\" value={{market.id}}>{{market.name}}</select></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newEmployee.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createEmployee class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button><label v-if=!newTrader.get_password class=\"checkbox-inline pull-left\"><input data-toggle=modal data-target=#getAcountForEmployee type=checkbox v-model=newTrader.get_email>Obter uma conta</label><p v-if=newTrader.get_password class=\"text-help text-success pull-left\">Funcionário Terá uma conta no SAGMMA</div></div></div></div><div class=\"modal fade\" id=getAcountForEmployee tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button @click=clearField class=close data-dismiss=modal aria-hidden=true>&times;</button><h5 class=modal-title>Introduza a palavra passe para a conta pretendida</h5></div><div class=modal-body><div class=\"form-group has-feedback\"><input type=password name=get_password class=\"form-control input-lg\" placeholder=\"Introduza a palavra passe\" v-model=newEmployee.get_password> <span class=\"fa fa-lock form-control-feedback\"></span></div></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-close\"></i></button> <button :disabled=!newEmployee.get_password type=button class=\"btn btn-primary\" data-dismiss=modal><i class=\"fa fa-check\"></i></button></div></div></div></div><div id=modal-edit-employee class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-8><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=Nome v-model=newEmployee.name v-validate:name=\"['required']\"> <span class=\"fa fa-user form-control-feedback\"></span></div></div><div class=col-md-4><div class=\"form-group has-feedback\"><input type=number class=form-control name=ic placeholder=\"Número BI\" v-model=newEmployee.ic> <span class=\"fa fa-id-card form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-8><div class=\"form-group has-feedback\"><input type=email class=form-control name=email placeholder=Email v-model=newEmployee.email> <span class=\"fa fa-envelope form-control-feedback\"></span></div></div><div class=col-md-4><div class=\"form-group has-feedback\"><input type=number class=form-control name=phone placeholder=Telefone v-model=newEmployee.phone> <span class=\"fa fa-phone form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-2><div class=\"form-group has-feedback\"><label class=radio-inline><input type=radio id=gender value=M name=gender v-model=newEmployee.gender> <i class=\"fa fa-male\"></i></label><label class=radio-inline><input type=radio id=gender name=gender value=F v-model=newEmployee.gender><i class=\"fa fa-female\"></i></label></div></div><div class=\"col-md-10 pull-right\"><div class=\"form-group has-feedback\"><input type=number class=form-control name=age placeholder=Idade v-model=newEmployee.age> <span class=\"fa fa-birthday-cake form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><select name=state class=\"selectpicker form-control show-tick\" v-model=newEmployee.state><optgroup label=Sotavento><option>Selecione Ilha<option value=2>Maio<option value=1>Santiago<option value=3>Fogo<option value=4>Brava<optgroup label=Barlavento><option value=5>Santo Antão<option value=6>São Nicolau<option value=7>São Vicente<option value=8>Sal<option value=9>Boa Vista</select></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=council placeholder=Concelho v-model=newEmployee.council> <span class=\"fa fa-compass form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=parish placeholder=Freguezia v-model=newEmployee.parish> <span class=\"fa fa-map-marker form-control-feedback\"></span></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=zone placeholder=Zona v-model=newEmployee.zone> <span class=\"fa fa-thumb-tack form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input type=date class=form-control name=service_beginning placeholder=\"Inicio de serviço\" v-model=newEmployee.service_beginning> <span class=\"fa fa-calendar form-control-feedback\"></span><p class=text-help>Data de inicio de serviço</div></div><div class=col-md-6><div class=\"form-group has-feedback\"><select name=type class=\"selectpicker form-control\" title=Escalão v-model=newEmployee.echelon><option value=a>A<option value=b>B<option value=c>C<option value=d>D<option value=e>E</select></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=form-control v-model=newEmployee.typeofemployee_id><option value=\"\" selected>Tipo de funcionário<option v-for=\"type in types\" value={{type.id}}>{{type.name}}</select></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=\"Descrição do utilizador\" class=form-control rows=5 cols=40 id=description v-model=newEmployee.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedEmployee(newEmployee.id) type=button class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button></div></div></div></div></div></div>"
+
+},{"../../../Pagination/src/Component.vue":114,"vueify/lib/insert-css":108}],112:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
-var __vueify_style__ = __vueify_insert__.insert("h1 {\n  color: #00a8ed;\n}")
+var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -38722,24 +37638,11 @@ exports.default = {
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\r\n<div class=\"alert alert-success\" transition=\"success\" v-if=\"success\">\r\n\tMercado Criado Com Sucesso\r\n</div>\r\n\r\n\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-4 pull-right\">\r\n\t\t<div class=\"input-group\">\r\n\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t<input v-model=\"filter.term\" type=\"text\" class=\"form-control\" placeholder=\"Filtrar...\" aria-describedby=\"basic-addon1\">\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n<div class=\"col-md-12\">\r\n\t<button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-market\"><i class=\"fa fa-plus\"></i> Novo</button>\r\n</div>\r\n<br><br>\r\n\r\n<div class=\"col-md-12\">\r\n\t<div class='table-responsive'>\r\n\t\t<table class='table table-striped table-hover table-success'>\r\n\t\t\t<thead>\r\n\t\t\t\t<tr>\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'name')\">Nome</a>\r\n\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'location' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'location' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'location')\">Localização</a>\r\n\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t<!-- <th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'description')\">Descrição</a>\r\n\t\t\t\t\t</th> -->\r\n\r\n\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n\t\t\t\t</tr>\r\n\t\t\t</thead>\r\n\t\t\t<tbody>\r\n\t\t\t\t<tr v-for=\"market in markets | filterBy filter.term | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t<td><a href=\"#\" data-toggle=\"modal\" data-target=\"#show-market\" @click=\"getThisMarket(market.id)\">{{ market.name }}</a></td>\r\n\t\t\t\t\t<td>{{ market.location }}</td>\r\n\t\t\t\t\t<!-- <td>{{ market.description }}</td> -->\r\n\t\t\t\t\t<td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-market\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisMarket(market.id)\" > </i></a></td>\r\n\t\t\t\t\t<td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-market\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisMarket(market.id)\"></i></a></td>\r\n\t\t\t\t</tr>\r\n\t\t\t</tbody>\r\n\t\t</table>\r\n\t\t<div class=\"col-md-12 pull-left\">\r\n\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n<div id=\"show-market\" class=\"modal fade\" role=\"dialog\">\r\n\t<div class=\"modal-dialog\">\r\n\r\n\t\t<!-- Modal content-->\r\n\t\t<div class=\"modal-content\">\r\n\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t<h4 class=\"modal-title\">Detalhes do {{ newMarket.name }}</h4>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t<div class='table-responsive'>\r\n\t\t\t\t\t\t\t<table class='table table-striped table-hover'>\r\n\t\t\t\t\t\t\t\t<thead>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<th class=\"text-center\" colspan=\"2\">INFORMAÇOES DO MERCADO</th>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t</thead>\r\n\t\t\t\t\t\t\t\t<tbody>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>ID</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><i>{{ newMarket.id }}</i></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Nome</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><i>{{ newMarket.name }}</i></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Localização</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><span class=\"label label-info\"><i>{{ newMarket.location }}</i></span></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Descrição</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><i>{{ newMarket.description }}</i></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Data da criação</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><i>{{ market.created_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Data de atualização</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><i>{{ market.updated_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t</tbody>\r\n\t\t\t\t\t\t\t</table>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-primary\" data-dismiss=\"modal\"><i class=\"fa fa-check\"></i></button>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t</div>\r\n</div>\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t<div class=\"modal fade\" id=\"modal-delete-market\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t<div class=\"modal-dialog\">\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<h5>Eliminar - <span class=\"text-uppercase\">{{newMarket.name}}</span></h5>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\">Cancelar</button>\r\n\t\t\t\t\t<button  @keyup.enter=\"deleteMarket(newMarket.id)\" @click=\"deleteMarket(newMarket.id)\" type=\"button\" class=\"btn btn-danger\">Eliminar Mercado</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\t<!-- Modal -->\r\n\t<div id=\"modal-create-market\" class=\"modal fade\" role=\"dialog\">\r\n\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t<!-- Modal content-->\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\">Registar Mercado</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome do Mercado\" v-model=\"newMarket.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-university form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"location\" placeholder=\"Localização\" v-model=\"newMarket.location\" v-validate:location=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-thumb-tack form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.location.required && $validationew.location.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição do Mercado\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newMarket.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</form>\r\n\t\t\t\t\t</validator>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-outline-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createMarket\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t<!-- Modal -->\r\n\t<div id=\"modal-edit-market\" class=\"modal fade\" role=\"dialog\">\r\n\t\t<div class=\"modal-dialog\">\r\n\t\t\t<!-- Modal content-->\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\">Editar Mercado</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<validator name=\"validation1\">\r\n\t\t\t\t\t\t<form methods=\"patch\">\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" v-model=\"newMarket.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-university form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"location\" v-model=\"newMarket.location\" v-validate:location=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-thumb-tack form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validation1.location.required && $validation1.location.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição do Mescado\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newMarket.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</form>\r\n\t\t\t\t\t</validator>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\t\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedMarket(newMarket.id)\" type=\"button\" class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n"
-if (module.hot) {(function () {  module.hot.accept()
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), true)
-  if (!hotAPI.compatible) return
-  module.hot.dispose(function () {
-    __vueify_insert__.cache["h1 {\n  color: #00a8ed;\n}"] = false
-    document.head.removeChild(__vueify_style__)
-  })
-  if (!module.hot.data) {
-    hotAPI.createRecord("_v-f96b79a8", module.exports)
-  } else {
-    hotAPI.update("_v-f96b79a8", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
-  }
-})()}
-},{"../../../Pagination/src/Component.vue":116,"vue":109,"vue-hot-reload-api":105,"vueify/lib/insert-css":110}],115:[function(require,module,exports){
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success>Mercado Criado Com Sucesso</div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=col-md-12><button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-market><i class=\"fa fa-plus\"></i> Novo</button></div><br><br><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-success\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'location' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'location' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'location')\">Localização</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"market in markets | filterBy filter.term | orderBy sortColumn sortInverse\"><td><a href=# data-toggle=modal data-target=#show-market @click=getThisMarket(market.id)>{{ market.name }}</a><td>{{ market.location }}<td align=left><a data-toggle=modal data-target=#modal-edit-market href=#><i class=\"fa fa-pencil text-primary\" @click=getThisMarket(market.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-market href=#><i class=\"fa fa-trash text-danger\" @click=getThisMarket(market.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div id=show-market class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Detalhes do {{ newMarket.name }}</h4></div><div class=modal-body><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover\"><thead><tr><th class=text-center colspan=2>INFORMAÇOES DO MERCADO<tbody><tr><td><b>ID</b><td><i>{{ newMarket.id }}</i><tr><td><b>Nome</b><td><i>{{ newMarket.name }}</i><tr><td><b>Localização</b><td><span class=\"label label-info\"><i>{{ newMarket.location }}</i></span><tr><td><b>Descrição</b><td><i>{{ newMarket.description }}</i><tr><td><b>Data da criação</b><td><i>{{ market.created_at | formatDate 'DD/MM/YYYY' }}</i><tr><td><b>Data de atualização</b><td><i>{{ market.updated_at | formatDate 'DD/MM/YYYY' }}</i></table></div></div></div></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-primary\" data-dismiss=modal><i class=\"fa fa-check\"></i></button></div></div></div></div><div class=\"modal fade\" id=modal-delete-market tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar</h4></div><div class=modal-body><h5>Eliminar - <span class=text-uppercase>{{newMarket.name}}</span></h5></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteMarket(newMarket.id) @click=deleteMarket(newMarket.id) type=button class=\"btn btn-danger\">Eliminar Mercado</button></div></div></div></div><div id=modal-create-market class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar Mercado</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=\"Nome do Mercado\" v-model=newMarket.name v-validate:name=\"['required']\"> <span class=\"fa fa-university form-control-feedback\"></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=location placeholder=Localização v-model=newMarket.location v-validate:location=\"['required']\"> <span class=\"fa fa-thumb-tack form-control-feedback\"></span><p style=color:red v-if=\"$validationew.location.required && $validationew.location.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=\"Descrição do Mercado\" class=form-control rows=5 cols=40 id=description v-model=newMarket.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><div class=col-md-12><div class=col-md-12><button type=button class=\"btn btn-outline-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createMarket class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button></div></div></div></div></div></div><div id=modal-edit-market class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar Mercado</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name v-model=newMarket.name v-validate:name=\"['required']\"> <span class=\"fa fa-university form-control-feedback\"></span><p style=color:red v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=location v-model=newMarket.location v-validate:location=\"['required']\"> <span class=\"fa fa-thumb-tack form-control-feedback\"></span><p style=color:red v-if=\"$validation1.location.required && $validation1.location.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=\"Descrição do Mescado\" class=form-control rows=5 cols=40 id=description v-model=newMarket.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button v-on:show=\"\" @click=saveEditedMarket(newMarket.id) type=button class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button></div></div></div></div></div>"
+
+},{"../../../Pagination/src/Component.vue":114,"vueify/lib/insert-css":108}],113:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
-var __vueify_style__ = __vueify_insert__.insert("h1 {\n  color: #00a8ed;\n}")
+var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -38923,24 +37826,11 @@ exports.default = {
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\r\n<div class=\"alert alert-success\" transition=\"success\" v-if=\"success\">\r\n\tMaterial adicionado com sucesso\r\n</div>\r\n\r\n\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-4 pull-right\">\r\n\t\t<div class=\"input-group\">\r\n\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t<input v-model=\"filter.term\" type=\"text\" class=\"form-control\" placeholder=\"Filtrar...\" aria-describedby=\"basic-addon1\">\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-material\"><i class=\"fa fa-plus\"></i> Novo</button>\r\n\t</div>\r\n</div>\r\n<br>\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class='table-responsive'>\r\n\t\t\t<table class='table table-striped table-hover table-success'>\r\n\t\t\t\t<thead>\r\n\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'name')\">Nome</a>\r\n\t\t\t\t\t\t</th>\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'description')\">Descrição</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</thead>\r\n\t\t\t\t<tbody>\r\n\t\t\t\t\t<tr v-for=\"material in materials | filterBy filter.term | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t\t<td>{{ material.name }}</td>\r\n\t\t\t\t\t\t<td>{{ material.description }}</td>\r\n\t\t\t\t\t\t<td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-material\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisMaterial(material.id)\" > </i></a></td>\r\n\t\t\t\t\t\t<td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-material\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisMaterial(material.id)\"></i></a></td>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</tbody>\r\n\t\t\t</table>\r\n\t\t\t<div class=\"col-md-12 pull-left\">\r\n\t\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<div class=\"modal fade\" id=\"modal-delete-material\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newMaterial.name}}</span></h5>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\">Cancelar</button>\r\n\t\t\t\t\t\t<button  @keyup.enter=\"deleteMaterial(newMaterial.id)\" @click=\"deleteMaterial(newMaterial.id)\" type=\"button\" class=\"btn btn-danger\">Eliminar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-create-material\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Registar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome do  material\" v-model=\"newMaterial.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-circle form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição deste Mescado\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newMaterial.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createMaterial\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp; Guardar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-edit-material\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Editar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validation1\">\r\n\t\t\t\t\t\t\t<form methods=\"patch\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" v-model=\"newMaterial.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-circle form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição deste Mescado\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newMaterial.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedMaterial(newMaterial.id)\" type=\"button\" class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n"
-if (module.hot) {(function () {  module.hot.accept()
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), true)
-  if (!hotAPI.compatible) return
-  module.hot.dispose(function () {
-    __vueify_insert__.cache["h1 {\n  color: #00a8ed;\n}"] = false
-    document.head.removeChild(__vueify_style__)
-  })
-  if (!module.hot.data) {
-    hotAPI.createRecord("_v-1c4fc57c", module.exports)
-  } else {
-    hotAPI.update("_v-1c4fc57c", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
-  }
-})()}
-},{"../../../Pagination/src/Component.vue":116,"vue":109,"vue-hot-reload-api":105,"vueify/lib/insert-css":110}],116:[function(require,module,exports){
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success>Material adicionado com sucesso</div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=row><div class=col-md-12><button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-material><i class=\"fa fa-plus\"></i> Novo</button></div></div><br><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-success\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'description')\">Descrição</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"material in materials | filterBy filter.term | orderBy sortColumn sortInverse\"><td>{{ material.name }}<td>{{ material.description }}<td align=left><a data-toggle=modal data-target=#modal-edit-material href=#><i class=\"fa fa-pencil text-primary\" @click=getThisMaterial(material.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-material href=#><i class=\"fa fa-trash text-danger\" @click=getThisMaterial(material.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div class=\"modal fade\" id=modal-delete-material tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar</h4></div><div class=modal-body><h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newMaterial.name}}</span></h5></div><div class=modal-footer><button type=button class=\"btn btn-secondary\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteMaterial(newMaterial.id) @click=deleteMaterial(newMaterial.id) type=button class=\"btn btn-danger\">Eliminar</button></div></div></div></div><div id=modal-create-material class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=\"Nome do  material\" v-model=newMaterial.name v-validate:name=\"['required']\"> <span class=\"fa fa-circle form-control-feedback\"></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=\"Descrição deste Mescado\" class=form-control rows=5 cols=40 id=description v-model=newMaterial.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createMaterial class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp; Guardar</button></div></div></div></div><div id=modal-edit-material class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name v-model=newMaterial.name v-validate:name=\"['required']\"> <span class=\"fa fa-circle form-control-feedback\"></span><p style=color:red v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=\"Descrição deste Mescado\" class=form-control rows=5 cols=40 id=description v-model=newMaterial.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedMaterial(newMaterial.id) type=button class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button></div></div></div></div></div></div>"
+
+},{"../../../Pagination/src/Component.vue":114,"vueify/lib/insert-css":108}],114:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
-var __vueify_style__ = __vueify_insert__.insert("h1 {\n  color: #00a8ed;\n}")
+var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -39075,24 +37965,11 @@ exports.default = {
     components: {}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\r\n\r\n<!-- <div class=\"form-inline\">\r\n\t<a @click=\"showInput\" href=\"#\" id=\"showSearchInput\"><span data-toggle=\"tooltip\" data-placement=\"left\" title=\"Pagina?\"><i :class=\"{'fa fa-search-plus': !input, 'fa fa-search-minus': input}\"></i></span></a>&nbsp;&nbsp;\r\n\t<input v-model=\"searchPage\" v-show=\"input\" type=\"number\" name=\"name\"  id=\"searchPage\" value=\"\"  class=\"form-control\" min=\"1\" max=\"5\" style=\"width: 60px;\" @keyup.enter=\"navigate($event, searchPage)\">\r\n</div> -->\r\n\r\n<nav aria-label=\"Page navigation\">\r\n\t<ul class=\"pagination\">\r\n\t\t<li :class=\"{ disabled: source.current_page == 1}\" v-if=\"!(source.current_page == 1)\">\r\n\t\t\t<a href=\"#\" aria-label=\"Previous\"  @click=\"nextPrev($event, source.current_page-1)\">\r\n\t\t\t\t<span aria-hidden=\"true\">&laquo;</span>\r\n\t\t\t</a>\r\n\t\t</li>\r\n\t\t<li v-for=\"page in pages\" track-by=\"$index\" :class=\"{ active: source.current_page == page }\">\r\n\t\t\t<span  id=\"sear\" v-if=\"page == '...'\">{{ page }}</span>\r\n\t\t\t<a v-if=\"page != '...'\" href=\"#\" @click=\"navigate($event, page)\">{{ page }}</a>\r\n\t\t</li>\r\n\t\t<li :class=\"{ disabled: source.current_page == this.source.last_page}\" v-if=\"!(source.current_page == this.source.last_page)\">\r\n\t\t\t<a href=\"#\" aria-label=\"Next\" @click=\"nextPrev($event, source.current_page+1)\">\r\n\t\t\t\t<span aria-hidden=\"true\">&raquo;</span>\r\n\t\t\t</a>\r\n\t\t</li>\r\n\t</ul>\r\n</nav>\r\n"
-if (module.hot) {(function () {  module.hot.accept()
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), true)
-  if (!hotAPI.compatible) return
-  module.hot.dispose(function () {
-    __vueify_insert__.cache["h1 {\n  color: #00a8ed;\n}"] = false
-    document.head.removeChild(__vueify_style__)
-  })
-  if (!module.hot.data) {
-    hotAPI.createRecord("_v-5673fc70", module.exports)
-  } else {
-    hotAPI.update("_v-5673fc70", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
-  }
-})()}
-},{"vue":109,"vue-hot-reload-api":105,"vueify/lib/insert-css":110}],117:[function(require,module,exports){
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<nav aria-label=\"Page navigation\"><ul class=pagination><li :class=\"{ disabled: source.current_page == 1}\" v-if=\"!(source.current_page == 1)\"><a href=# aria-label=Previous @click=\"nextPrev($event, source.current_page-1)\"><span aria-hidden=true>&laquo;</span></a><li v-for=\"page in pages\" track-by=$index :class=\"{ active: source.current_page == page }\"><span id=sear v-if=\"page == '...'\">{{ page }}</span> <a v-if=\"page != '...'\" href=# @click=\"navigate($event, page)\">{{ page }}</a><li :class=\"{ disabled: source.current_page == this.source.last_page}\" v-if=\"!(source.current_page == this.source.last_page)\"><a href=# aria-label=Next @click=\"nextPrev($event, source.current_page+1)\"><span aria-hidden=true>&raquo;</span></a></ul></nav>"
+
+},{"vueify/lib/insert-css":108}],115:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
-var __vueify_style__ = __vueify_insert__.insert("h1 {\n  color: #00a8ed;\n}")
+var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -39279,24 +38156,11 @@ exports.default = {
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\r\n<div class=\"alert alert-success\" transition=\"success\" v-if=\"success\">\r\n\tPermissão Adicionado com sucesso\r\n</div>\r\n\r\n\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-4 pull-right\">\r\n\t\t<div class=\"input-group\">\r\n\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t<input v-model=\"filter.term\" type=\"text\" class=\"form-control\" placeholder=\"Filtrar dados da tabela\" aria-describedby=\"basic-addon1\">\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-permission\"><i class=\"fa fa-plus\"></i> Novo</button>\r\n\t</div>\r\n</div>\r\n<br>\r\n\r\n<div class=\"row\">\r\n\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class='table-responsive'>\r\n\t\t\t<table class='table table-striped table-hover table-condensed'>\r\n\t\t\t\t<thead>\r\n\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'name')\">Nome da Permissão</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'display_name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'display_name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'display_name')\">Label</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'description')\">Descriçãos</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</thead>\r\n\t\t\t\t<tbody>\r\n\t\t\t\t\t<tr v-for=\"permission in permissions | filterBy filter.term | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t\t<td>{{ permission.name }}</td>\r\n\t\t\t\t\t\t<td>{{ permission.display_name }}</td>\r\n\t\t\t\t\t\t<td>{{ permission.description }}</td>\r\n\t\t\t\t\t\t<td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-permission\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisPermission(permission.id)\" > </i></a></td>\r\n\t\t\t\t\t\t<td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-permission\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisPermission(permission.id)\"></i></a></td>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</tbody>\r\n\t\t\t</table>\r\n\t\t\t<div class=\"col-md-12 pull-left\">\r\n\t\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<div class=\"modal fade\" id=\"modal-delete-permission\" tabindex=\"-1\" permission=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar Permissão</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<h1>Eliminar Permissão {{newPermission.name}}</h1>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Cancelar</button>\r\n\t\t\t\t\t\t<button  @keyup.enter=\"deletePermission(newPermission.id)\" @click=\"deletePermission(newPermission.id)\" type=\"button\" class=\"btn btn-default\">Eliminar  Permissão</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-create-permission\" class=\"modal fade\" permission=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Registar permission</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome da permissão no sistema\" v-model=\"newPermission.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-hand-stop-o form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"display_name\" placeholder=\"Nome da permissão a ser vizualizado\" v-model=\"newPermission.display_name\" v-validate:display_name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-eye form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.display_name.required && $validationew.display_name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrião da permissão...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newPermission.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createPermission\" class=\"btn btn-secondary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar Registo</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-edit-permission\" class=\"modal fade\" permission=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Editar Esta função</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validation1\">\r\n\t\t\t\t\t\t\t<form methods=\"patch\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" v-model=\"newPermission.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"glyphicon glyphicon-user form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"display_name\" v-model=\"newPermission.display_name\" v-validate:display_name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"glyphicon glyphicon-user form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validation1.display_name.required && $validation1.display_name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição desta função\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newPermission.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedPermission(newPermission.id)\" type=\"button\" class=\"btn btn-secondary\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp; Salvar as Alterações sobre esta função</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n"
-if (module.hot) {(function () {  module.hot.accept()
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), true)
-  if (!hotAPI.compatible) return
-  module.hot.dispose(function () {
-    __vueify_insert__.cache["h1 {\n  color: #00a8ed;\n}"] = false
-    document.head.removeChild(__vueify_style__)
-  })
-  if (!module.hot.data) {
-    hotAPI.createRecord("_v-8728de9c", module.exports)
-  } else {
-    hotAPI.update("_v-8728de9c", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
-  }
-})()}
-},{"../../../Pagination/src/Component.vue":116,"vue":109,"vue-hot-reload-api":105,"vueify/lib/insert-css":110}],118:[function(require,module,exports){
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success>Permissão Adicionado com sucesso</div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=\"Filtrar dados da tabela\" aria-describedby=basic-addon1></div></div></div><hr><div class=row><div class=col-md-12><button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-permission><i class=\"fa fa-plus\"></i> Novo</button></div></div><br><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome da Permissão</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'display_name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'display_name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'display_name')\">Label</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'description')\">Descriçãos</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"permission in permissions | filterBy filter.term | orderBy sortColumn sortInverse\"><td>{{ permission.name }}<td>{{ permission.display_name }}<td>{{ permission.description }}<td align=left><a data-toggle=modal data-target=#modal-edit-permission href=#><i class=\"fa fa-pencil text-primary\" @click=getThisPermission(permission.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-permission href=#><i class=\"fa fa-trash text-danger\" @click=getThisPermission(permission.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div class=\"modal fade\" id=modal-delete-permission tabindex=-1 permission=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar Permissão</h4></div><div class=modal-body><h1>Eliminar Permissão {{newPermission.name}}</h1></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deletePermission(newPermission.id) @click=deletePermission(newPermission.id) type=button class=\"btn btn-default\">Eliminar Permissão</button></div></div></div></div><div id=modal-create-permission class=\"modal fade\" permission=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar permission</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=\"Nome da permissão no sistema\" v-model=newPermission.name v-validate:name=\"['required']\"> <span class=\"fa fa-hand-stop-o form-control-feedback\"></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=display_name placeholder=\"Nome da permissão a ser vizualizado\" v-model=newPermission.display_name v-validate:display_name=\"['required']\"> <span class=\"fa fa-eye form-control-feedback\"></span><p style=color:red v-if=\"$validationew.display_name.required && $validationew.display_name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=\"Descrião da permissão...\" class=form-control rows=5 cols=40 id=description v-model=newPermission.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createPermission class=\"btn btn-secondary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar Registo</button></div></div></div></div><div id=modal-edit-permission class=\"modal fade\" permission=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar Esta função</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name v-model=newPermission.name v-validate:name=\"['required']\"> <span class=\"glyphicon glyphicon-user form-control-feedback\"></span><p style=color:red v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=display_name v-model=newPermission.display_name v-validate:display_name=\"['required']\"> <span class=\"glyphicon glyphicon-user form-control-feedback\"></span><p style=color:red v-if=\"$validation1.display_name.required && $validation1.display_name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=\"Descrição desta função\" class=form-control rows=5 cols=40 id=description v-model=newPermission.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedPermission(newPermission.id) type=button class=\"btn btn-secondary\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp; Salvar as Alterações sobre esta função</button></div></div></div></div></div></div>"
+
+},{"../../../Pagination/src/Component.vue":114,"vueify/lib/insert-css":108}],116:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
-var __vueify_style__ = __vueify_insert__.insert("h1 {\r\n  color: #00a8ed;\r\n}")
+var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -39506,24 +38370,11 @@ exports.default = {
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=\"success\" v-if=\"success\">\r\n\t<i class=\"fa fa-thumbs-up\"> Sucesso!!</i>\r\n</div>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"pull right col-md-8\">\r\n\t\t<label class=\"checkbox-inline\"><input type=\"checkbox\" id=\"\" value=\"\" v-model=\"showColumn.price\">Valor</label>\r\n\t\t<label class=\"checkbox-inline\"><input type=\"checkbox\" id=\"\" value=\"\" v-model=\"showColumn.typeofplace_id\">Tipo</label>\r\n\t</div>\r\n\r\n\t<div class=\"col-md-4 pull-left\">\r\n\t\t<div class=\"input-group\">\r\n\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t<input v-model=\"filter.term\" type=\"text\" class=\"form-control\" placeholder=\"Filtrar...\" aria-describedby=\"basic-addon1\">\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<button @click=\"clearField\" class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-place\"><i class=\"fa fa-plus\"></i> Novo</button>&nbsp;&nbsp;\r\n\t\t<a class=\"btn btn-primary btn-flat btn-outline\" href=\"/export/printablePlaceInformation\"><i class=\"fa fa-print\"></i> Imprimir</a>\r\n\t</div>\r\n</div>\r\n\r\n<br>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class='table-responsive'>\r\n\t\t\t<table class='table table-striped table-hover table-condensed'>\r\n\t\t\t\t<thead>\r\n\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'name')\">Nome</a>\r\n\t\t\t\t\t\t</th>\r\n\t\t\t\t\t\t<th class=\"info\" v-if=\"showColumn.price\">\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'price' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'price' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'price')\">Valor</a>\r\n\t\t\t\t\t\t</th>\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'status' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'status' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'status')\">Estado</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th class=\"info\" v-if=\"showColumn.typeofplace_id\">\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'typeofplace_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'typeofplace_id' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'typeofplace_id')\">Tipo</a>\r\n\t\t\t\t\t\t</th>\r\n\t\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</thead>\r\n\t\t\t\t<tbody>\r\n\t\t\t\t\t<tr v-for=\"place in places | filterBy filter.term | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t\t<td><a href=\"#\" data-toggle=\"modal\" data-target=\"#show-place\" @click=\"getThisPlace(place.id)\">{{ place.name }}</a></td>\r\n\t\t\t\t\t\t<td class=\"info\" v-if=\"showColumn.price\">{{ place.price }} ECV</td>\r\n\t\t\t\t\t\t<td>\r\n\t\t\t\t\t\t\t<button type=\"submit\" @click = \"placeStatus(place.id)\" class='btn btn-xs btn-flat' :class=\"{ 'btn-info': place.status, 'btn-danger': !place.status }\">{{place.status ? 'Ativado' : 'Disativado'}}</button>\r\n\t\t\t\t\t\t</td>\r\n\t\t\t\t\t\t<td class=\"info\" v-if=\"showColumn.typeofplace_id\">{{ place.typeofplace.name }}</td>\r\n\r\n\t\t\t\t\t\t<td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-place\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisPlace(place.id)\" > </i></a></td>\r\n\t\t\t\t\t\t<td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-place\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisPlace(place.id)\" ></i></a></td>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</tbody>\r\n\t\t\t</table>\r\n\t\t\t<div class=\"col-md-12 pull-left\">\r\n\t\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<div id=\"show-place\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Detalhes do {{ newPlace.name }}</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class='table-responsive'>\r\n\t\t\t\t\t\t\t\t\t<table class='table table-striped table-hover'>\r\n\t\t\t\t\t\t\t\t\t\t<thead>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<th class=\"text-center\" colspan=\"2\">INFORMAÇOES DO FUNCIONÁRIO</th>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t</thead>\r\n\t\t\t\t\t\t\t\t\t\t<tbody>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>ID</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newPlace.id }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Nome</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newPlace.name }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Demensão</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newPlace.dimension }} mm</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Valor</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><span class=\"label label-info\"><i>{{ newPlace.price }} ECV</i></span></td>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Estado</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><span class=\"label\" :class=\"{ 'label-info': newPlace.status, 'label-danger': !newPlace.status }\"><i>{{newPlace.status ? 'Ativado' : 'Disativado'}}</i></span></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t<!-- <tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<td><b>Tipo</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newPlace.typename }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t</tr> -->\r\n\r\n\r\n\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<td><b>Descrição</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newPlace.description }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<td><b>Data da criação</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ place.created_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<td><b>Data de atualização</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ place.updated_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t\t</tbody>\r\n\t\t\t\t\t\t\t\t</table>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-success\" data-dismiss=\"modal\"><i class=\"fa fa-check\"></i></button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\r\n\t\t</div>\r\n\t</div>\r\n\r\n\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t<div class=\"modal fade\" id=\"modal-delete-place\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t<div class=\"modal-dialog\">\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newPlace.name}}</span></h5>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\">Cancelar</button>\r\n\t\t\t\t\t<button  @keyup.enter=\"deletePlace(newPlace.id)\" @click=\"deletePlace(newPlace.id)\" type=\"button\" class=\"btn btn-danger\">Eliminar</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\t<!-- Modal -->\r\n\t<div id=\"modal-create-place\" class=\"modal fade\" role=\"dialog\">\r\n\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t<!-- Modal content-->\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\">Registar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome\" v-model=\"newPlace.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-map-pin form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"number\" class=\"form-control\" name=\"price\" placeholder=\"Valor\" v-model=\"newPlace.price\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-usd form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"number\" class=\"form-control\" name=\"dimension\" placeholder=\"Dimensão\" v-model=\"newPlace.dimension\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"form-control-feedback\">mm</span>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<hr>\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newPlace.typeofplace_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Tipo de Espaço</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"type in types\" value=\"{{type.id}}\">{{type.name}}</option>\r\n\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newPlace.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t</form>\r\n\t\t\t\t\t</validator>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createPlace\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button>\r\n\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\r\n\t\t</div>\r\n\t</div>\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t<!-- Modal -->\r\n\t<div id=\"modal-edit-place\" class=\"modal fade\" role=\"dialog\">\r\n\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t<!-- Modal content-->\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\">Editar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<validator name=\"validation1\">\r\n\t\t\t\t\t\t<form methods=\"patch\">\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome\" v-model=\"newPlace.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-user form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"number\" class=\"form-control\" name=\"price\" placeholder=\"Valor\" v-model=\"newPlace.price\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-envelope form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"number\" class=\"form-control\" name=\"dimension\" placeholder=\"Dimensão\" v-model=\"newPlace.dimension\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-phone form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<hr>\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newPlace.typeofplace_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Tipo de Espaço</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"type in types\" value=\"{{type.id}}\">{{type.name}}</option>\r\n\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newPlace.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</form>\r\n\t\t\t\t\t</validator>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedPlace(newPlace.id)\" type=\"button\" class=\"btn btn-secondary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n</div>\r\n"
-if (module.hot) {(function () {  module.hot.accept()
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), true)
-  if (!hotAPI.compatible) return
-  module.hot.dispose(function () {
-    __vueify_insert__.cache["h1 {\r\n  color: #00a8ed;\r\n}"] = false
-    document.head.removeChild(__vueify_style__)
-  })
-  if (!module.hot.data) {
-    hotAPI.createRecord("_v-61ef40c8", module.exports)
-  } else {
-    hotAPI.update("_v-61ef40c8", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
-  }
-})()}
-},{"../../../Pagination/src/Component.vue":116,"vue":109,"vue-hot-reload-api":105,"vueify/lib/insert-css":110}],119:[function(require,module,exports){
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success><i class=\"fa fa-thumbs-up\">Sucesso!!</i></div><div class=row><div class=\"pull right col-md-8\"><label class=checkbox-inline><input type=checkbox v-model=showColumn.price>Valor</label><label class=checkbox-inline><input type=checkbox v-model=showColumn.typeofplace_id>Tipo</label></div><div class=\"col-md-4 pull-left\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=row><div class=col-md-12><button @click=clearField class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-place><i class=\"fa fa-plus\"></i> Novo</button>&nbsp;&nbsp; <a class=\"btn btn-primary btn-flat btn-outline\" href=/export/printablePlaceInformation><i class=\"fa fa-print\"></i> Imprimir</a></div></div><br><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome</a><th class=info v-if=showColumn.price><i :class=\"{'fa-sort-amount-asc': sortColumn == 'price' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'price' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'price')\">Valor</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'status' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'status' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'status')\">Estado</a><th class=info v-if=showColumn.typeofplace_id><i :class=\"{'fa-sort-amount-asc': sortColumn == 'typeofplace_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'typeofplace_id' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'typeofplace_id')\">Tipo</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"place in places | filterBy filter.term | orderBy sortColumn sortInverse\"><td><a href=# data-toggle=modal data-target=#show-place @click=getThisPlace(place.id)>{{ place.name }}</a><td class=info v-if=showColumn.price>{{ place.price }} ECV<td><button type=submit @click=placeStatus(place.id) class=\"btn btn-xs btn-flat\" :class=\"{ 'btn-info': place.status, 'btn-danger': !place.status }\">{{place.status ? 'Ativado' : 'Disativado'}}</button><td class=info v-if=showColumn.typeofplace_id>{{ place.typeofplace.name }}<td align=left><a data-toggle=modal data-target=#modal-edit-place href=#><i class=\"fa fa-pencil text-primary\" @click=getThisPlace(place.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-place href=#><i class=\"fa fa-trash text-danger\" @click=getThisPlace(place.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div id=show-place class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Detalhes do {{ newPlace.name }}</h4></div><div class=modal-body><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover\"><thead><tr><th class=text-center colspan=2>INFORMAÇOES DO FUNCIONÁRIO<tbody><tr><td><b>ID</b><td><i>{{ newPlace.id }}</i><tr><td><b>Nome</b><td><i>{{ newPlace.name }}</i><tr><td><b>Demensão</b><td><i>{{ newPlace.dimension }} mm</i><tr><td><b>Valor</b><td><span class=\"label label-info\"><i>{{ newPlace.price }} ECV</i></span><tr><td><b>Estado</b><td><span class=label :class=\"{ 'label-info': newPlace.status, 'label-danger': !newPlace.status }\"><i>{{newPlace.status ? 'Ativado' : 'Disativado'}}</i></span><tr><td><b>Descrição</b><td><i>{{ newPlace.description }}</i><tr><td><b>Data da criação</b><td><i>{{ place.created_at | formatDate 'DD/MM/YYYY' }}</i><tr><td><b>Data de atualização</b><td><i>{{ place.updated_at | formatDate 'DD/MM/YYYY' }}</i></table></div></div></div></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-success\" data-dismiss=modal><i class=\"fa fa-check\"></i></button></div></div></div></div><div class=\"modal fade\" id=modal-delete-place tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar</h4></div><div class=modal-body><h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newPlace.name}}</span></h5></div><div class=modal-footer><button type=button class=\"btn btn-secondary\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deletePlace(newPlace.id) @click=deletePlace(newPlace.id) type=button class=\"btn btn-danger\">Eliminar</button></div></div></div></div><div id=modal-create-place class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=Nome v-model=newPlace.name v-validate:name=\"['required']\"> <span class=\"fa fa-map-pin form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input type=number class=form-control name=price placeholder=Valor v-model=newPlace.price> <span class=\"fa fa-usd form-control-feedback\"></span></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=number class=form-control name=dimension placeholder=Dimensão v-model=newPlace.dimension> <span class=form-control-feedback>mm</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=form-control v-model=newPlace.typeofplace_id><option value=\"\" selected>Tipo de Espaço<option v-for=\"type in types\" value={{type.id}}>{{type.name}}</select></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newPlace.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createPlace class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button></div></div></div></div><div id=modal-edit-place class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=Nome v-model=newPlace.name v-validate:name=\"['required']\"> <span class=\"fa fa-user form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input type=number class=form-control name=price placeholder=Valor v-model=newPlace.price> <span class=\"fa fa-envelope form-control-feedback\"></span></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=number class=form-control name=dimension placeholder=Dimensão v-model=newPlace.dimension> <span class=\"fa fa-phone form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=form-control v-model=newPlace.typeofplace_id><option value=\"\" selected>Tipo de Espaço<option v-for=\"type in types\" value={{type.id}}>{{type.name}}</select></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newPlace.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedPlace(newPlace.id) type=button class=\"btn btn-secondary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button></div></div></div></div></div></div>"
+
+},{"../../../Pagination/src/Component.vue":114,"vueify/lib/insert-css":108}],117:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
-var __vueify_style__ = __vueify_insert__.insert("h1 {\n  color: #00a8ed;\n}")
+var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -39717,24 +38568,11 @@ exports.default = {
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\r\n<div class=\"alert alert-success\" transition=\"success\" v-if=\"success\">\r\n\t<i class=\"fa fa-thumbs-up\"> Sucesso!!</i>\r\n</div>\r\n\r\n<!-- <pre>\r\n    {{ $data.newProduct | json }}\r\n</pre> -->\r\n\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-4 pull-right\">\r\n\t\t<div class=\"input-group\">\r\n\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t<input v-model=\"filter.term\" type=\"text\" class=\"form-control\" placeholder=\"Filtrar...\" aria-describedby=\"basic-addon1\">\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-product\"><i class=\"fa fa-plus\"></i> Novo</button>\r\n\t</div>\r\n</div>\r\n\r\n<br>\r\n<div class=\"row\">\r\n\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class='table-responsive'>\r\n\t\t\t<table class='table table-striped table-hover table-success'>\r\n\t\t\t\t<thead>\r\n\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'name')\">Nome</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'price' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'price' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'price')\">Preço</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'description')\">Descrição</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</thead>\r\n\t\t\t\t<tbody>\r\n\t\t\t\t\t<tr v-for=\"product in products | filterBy filter.term | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t\t<td><a href=\"#\" data-toggle=\"modal\" data-target=\"#show-product\" @click=\"getThisProduct(product.id)\">{{ product.name }}</a></td>\r\n\t\t\t\t\t\t<td>{{ product.price }}</td>\r\n\t\t\t\t\t\t<td>{{ product.description }}</td>\r\n\t\t\t\t\t\t<td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-product\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisProduct(product.id)\" > </i></a></td>\r\n\t\t\t\t\t\t<td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-product\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisProduct(product.id)\"></i></a></td>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</tbody>\r\n\t\t\t</table>\r\n\t\t\t<div class=\"col-md-12 pull-left\">\r\n\t\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<div id=\"show-product\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Detalhes do {{ newProduct.name }}</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class='table-responsive'>\r\n\t\t\t\t\t\t\t\t\t<table class='table table-striped table-hover'>\r\n\t\t\t\t\t\t\t\t\t\t<thead>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<th class=\"text-center\" colspan=\"2\">INFORMAÇOES DO PRODUTO</th>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t</thead>\r\n\t\t\t\t\t\t\t\t\t\t<tbody>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>ID</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newProduct.id }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Nome</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newProduct.name }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Preço</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><span class=\"label label-info\"><i>{{ newProduct.price }}</i></span></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Responsável</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newProduct.author }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Descrição</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newProduct.description }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Data da criação</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ product.created_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Data de atualização</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ product.updated_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t\t\t</tbody>\r\n\t\t\t\t\t\t\t\t\t</table>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-primary\" data-dismiss=\"modal\"><i class=\"fa fa-check\"></i></button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<div class=\"modal fade\" id=\"modal-delete-product\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newProduct.name}}</span></h5>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\">Cancelar</button>\r\n\t\t\t\t\t\t<button  @keyup.enter=\"deleteProduct(newProduct.id)\" @click=\"deleteProduct(newProduct.id)\" type=\"button\" class=\"btn btn-danger\">Eliminar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-create-product\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Registar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome\" v-model=\"newProduct.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-shopping-basket form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"number\" class=\"form-control\" name=\"price\" placeholder=\"Preço\" v-model=\"newProduct.price\" v-validate:price=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-usd form-control-feedback\">00</span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newProduct.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createProduct\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-edit-product\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Editar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validation1\">\r\n\t\t\t\t\t\t\t<form methods=\"patch\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome\" v-model=\"newProduct.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-shopping-basket form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"number\" class=\"form-control\" name=\"price\" placeholder=\"Preço\" v-model=\"newProduct.price\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-usd form-control-feedback\">00</span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newProduct.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedProduct(newProduct.id)\" type=\"button\" class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n"
-if (module.hot) {(function () {  module.hot.accept()
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), true)
-  if (!hotAPI.compatible) return
-  module.hot.dispose(function () {
-    __vueify_insert__.cache["h1 {\n  color: #00a8ed;\n}"] = false
-    document.head.removeChild(__vueify_style__)
-  })
-  if (!module.hot.data) {
-    hotAPI.createRecord("_v-4df99288", module.exports)
-  } else {
-    hotAPI.update("_v-4df99288", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
-  }
-})()}
-},{"../../../Pagination/src/Component.vue":116,"babel-runtime/helpers/defineProperty":14,"vue":109,"vue-hot-reload-api":105,"vueify/lib/insert-css":110}],120:[function(require,module,exports){
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success><i class=\"fa fa-thumbs-up\">Sucesso!!</i></div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=row><div class=col-md-12><button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-product><i class=\"fa fa-plus\"></i> Novo</button></div></div><br><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-success\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'price' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'price' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'price')\">Preço</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'description')\">Descrição</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"product in products | filterBy filter.term | orderBy sortColumn sortInverse\"><td><a href=# data-toggle=modal data-target=#show-product @click=getThisProduct(product.id)>{{ product.name }}</a><td>{{ product.price }}<td>{{ product.description }}<td align=left><a data-toggle=modal data-target=#modal-edit-product href=#><i class=\"fa fa-pencil text-primary\" @click=getThisProduct(product.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-product href=#><i class=\"fa fa-trash text-danger\" @click=getThisProduct(product.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div id=show-product class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Detalhes do {{ newProduct.name }}</h4></div><div class=modal-body><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover\"><thead><tr><th class=text-center colspan=2>INFORMAÇOES DO PRODUTO<tbody><tr><td><b>ID</b><td><i>{{ newProduct.id }}</i><tr><td><b>Nome</b><td><i>{{ newProduct.name }}</i><tr><td><b>Preço</b><td><span class=\"label label-info\"><i>{{ newProduct.price }}</i></span><tr><td><b>Responsável</b><td><i>{{ newProduct.author }}</i><tr><td><b>Descrição</b><td><i>{{ newProduct.description }}</i><tr><td><b>Data da criação</b><td><i>{{ product.created_at | formatDate 'DD/MM/YYYY' }}</i><tr><td><b>Data de atualização</b><td><i>{{ product.updated_at | formatDate 'DD/MM/YYYY' }}</i></table></div></div></div></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-primary\" data-dismiss=modal><i class=\"fa fa-check\"></i></button></div></div></div></div><div class=\"modal fade\" id=modal-delete-product tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar</h4></div><div class=modal-body><h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newProduct.name}}</span></h5></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteProduct(newProduct.id) @click=deleteProduct(newProduct.id) type=button class=\"btn btn-danger\">Eliminar</button></div></div></div></div><div id=modal-create-product class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=Nome v-model=newProduct.name v-validate:name=\"['required']\"> <span class=\"fa fa-shopping-basket form-control-feedback\"></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=number class=form-control name=price placeholder=Preço v-model=newProduct.price v-validate:price=\"['required']\"> <span class=\"fa fa-usd form-control-feedback\">00</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newProduct.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createProduct class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button></div></div></div></div><div id=modal-edit-product class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=Nome v-model=newProduct.name v-validate:name=\"['required']\"> <span class=\"fa fa-shopping-basket form-control-feedback\"></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=number class=form-control name=price placeholder=Preço v-model=newProduct.price v-validate:name=\"['required']\"> <span class=\"fa fa-usd form-control-feedback\">00</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newProduct.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedProduct(newProduct.id) type=button class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button></div></div></div></div></div></div>"
+
+},{"../../../Pagination/src/Component.vue":114,"babel-runtime/helpers/defineProperty":14,"vueify/lib/insert-css":108}],118:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
-var __vueify_style__ = __vueify_insert__.insert("h1 {\r\n  color: #00a8ed;\r\n}")
+var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -39959,24 +38797,11 @@ exports.default = {
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=\"success\" v-if=\"success\">\r\n\t<i class=\"fa fa-thumbs-up\"> Sucesso!!</i>\r\n</div>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"pull right col-md-8\">\r\n\t\t<label class=\"checkbox-inline\"><input type=\"checkbox\" id=\"\" value=\"\" v-model=\"showColumn.begnning_date\">Início</label>\r\n\t\t<label class=\"checkbox-inline\"><input type=\"checkbox\" id=\"\" value=\"\" v-model=\"showColumn.ending_date\">Término</label>\r\n\t\t<label class=\"checkbox-inline\"><input type=\"checkbox\" id=\"\" value=\"\" v-model=\"showColumn.trader_id\">Comerciante</label>\r\n\t</div>\r\n\r\n\t<div class=\"col-md-4 pull-left\">\r\n\t\t<div class=\"input-group\">\r\n\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t<input v-model=\"filter.term\" type=\"text\" class=\"form-control\" placeholder=\"Filtrar...\" aria-describedby=\"basic-addon1\">\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<button @click=\"clearField\" class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-promotion\"><i class=\"fa fa-plus\"></i> Novo</button>&nbsp;&nbsp;\r\n\t\t<!-- <a class=\"btn btn-primary btn-flat btn-outline\" href=\"/export/printablePromotionInformation\"><i class=\"fa fa-print\"></i> Imprimir</a> -->\r\n\t</div>\r\n</div>\r\n\r\n<br>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class='table-responsive'>\r\n\t\t\t<table class='table table-striped table-hover table-condensed'>\r\n\t\t\t\t<thead>\r\n\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'name')\">Nome</a>\r\n\t\t\t\t\t\t</th>\r\n\t\t\t\t\t\t<th class=\"info\" v-if=\"showColumn.begnning_date\">\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'begnning_date' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'begnning_date' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'begnning_date')\">Início</a>\r\n\t\t\t\t\t\t</th>\r\n\t\t\t\t\t\t<th class=\"info\" v-if=\"showColumn.ending_date\">\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'ending_date' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'ending_date' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'ending_date')\">Término</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th   class=\"text-center\">\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'state' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'state' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'state')\">Publicação</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\r\n\t\t\t\t\t\t<th class=\"info\" v-if=\"showColumn.trader_id\">\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'trader_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'trader_id' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'trader_id')\">Comerciante</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\r\n\t\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</thead>\r\n\t\t\t\t<tbody>\r\n\t\t\t\t\t<tr v-for=\"promotion in promotions | filterBy filter.term | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t\t<td><a href=\"#\" data-toggle=\"modal\" data-target=\"#show-promotion\" @click=\"getThisPromotion(promotion.id)\">{{ promotion.name }}</a></td>\r\n\t\t\t\t\t\t<td class=\"info\" v-if=\"showColumn.begnning_date\">{{ promotion.begnning_date }}</td>\r\n\t\t\t\t\t\t<td class=\"info\" v-if=\"showColumn.ending_date\">{{ promotion.ending_date }}</td>\r\n\r\n\r\n\t\t\t\t\t\t<!------------------------------------------------------------------------------------>\r\n\t\t\t\t\t\t<td  class=\"text-center\" v-if=\"promotion.status\">\r\n\t\t\t\t\t\t\t<button data-toggle=\"tooltip\" title=\"Despublicar esta promoção\" type=\"submit\" @click = \"promotionStatus(promotion.id)\" class='btn btn-xs btn-flat' :class=\"{ 'btn-success': promotion.status, 'btn-warning': !promotion.status }\"><i class=\"fa fa-check\"></i></button>\r\n\t\t\t\t\t\t</td>\r\n\r\n\t\t\t\t\t\t<td  class=\"text-center\" v-if=\"!promotion.status\">\r\n\t\t\t\t\t\t\t<button data-toggle=\"tooltip\" title=\"Publicar esta promoção\" type=\"submit\" @click = \"promotionStatus(promotion.id)\" class='btn btn-xs btn-flat' :class=\"{ 'btn-success': promotion.status, 'btn-warning': !promotion.status }\"><i class=\"fa fa-times\"></i></button>\r\n\t\t\t\t\t\t</td>\r\n\t\t\t\t\t\t<!------------------------------------------------------------------------------------>\r\n\r\n\r\n\t\t\t\t\t\t<td class=\"info\" v-if=\"showColumn.service_beginning\">{{ promotion.trader.name }}</td>\r\n\r\n\t\t\t\t\t\t<td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-promotion\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisPromotion(promotion.id)\" > </i></a></td>\r\n\t\t\t\t\t\t<td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-promotion\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisPromotion(promotion.id)\" ></i></a></td>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</tbody>\r\n\t\t\t</table>\r\n\t\t\t<div class=\"col-md-12 pull-left\">\r\n\t\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<div id=\"show-promotion\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Detalhes do(a) {{ newPromotion.name }}</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class='table-responsive'>\r\n\t\t\t\t\t\t\t\t\t<table class='table table-striped table-hover'>\r\n\t\t\t\t\t\t\t\t\t\t<thead>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<th class=\"text-center\" colspan=\"2\">INFORMAÇOES DE PROMOÇÃO</th>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t</thead>\r\n\t\t\t\t\t\t\t\t\t\t<tbody>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>ID</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newPromotion.id }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Nome</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newPromotion.name }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Início</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><span class=\"label label-info\"><i>{{ newPromotion.begnning_date }}</i></span></td>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Término</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newPromotion.ending_date }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Publicação</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><span class='label' :class=\"{ 'label-success': newPromotion.status, 'label-warning': !newPromotion.status }\"><i>{{newPromotion.status ? 'Publicado' : 'Aguardando'}}</i></span></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Descrição</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newPromotion.description }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Data da criação</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ promotion.created_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Data de atualização</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ promotion.updated_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t\t\t</tbody>\r\n\t\t\t\t\t\t\t\t\t</table>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-success\" data-dismiss=\"modal\"><i class=\"fa fa-check\"></i></button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<div class=\"modal fade\" id=\"modal-delete-promotion\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newPromotion.name}}</span></h5>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i> Cancelar</button>\r\n\t\t\t\t\t\t<button  @keyup.enter=\"deletePromotion(newPromotion.id)\" @click=\"deletePromotion(newPromotion.id)\" type=\"button\" class=\"btn btn-danger\"><i class=\"fa fa-trash-o\"></i> Eliminar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-create-promotion\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Registar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome\" v-model=\"newPromotion.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-user form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type='date' name=\"begnning_date\" class='form-control' placeholder='' v-model=\"newPromotion.begnning_date\" v-validate:begnning_date = \"['required']\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<!-- <span class=\"fa fa-calendar-check-o form-control-feedback\"></span> -->\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type='date' name=\"ending_date\" class='form-control' placeholder='' v-model=\"newPromotion.ending_date\"  v-validate:ending_date = \"['required']\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<!-- <span class=\"fa fa-calendar-times-o form-control-feedback\"></span> -->\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!------------------------------------------------------------>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select name=\"trader_id\" class=\"form-control\" v-model=\"newPromotion.trader_id\" v-validate:trader_id = \"['required']\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Comerciantes</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"trader in traders\" value=\"{{trader.id}}\">{{trader.name}}</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select name=\"product_id\" class=\"form-control\" v-model=\"newPromotion.product_id\" v-validate:product_id = \"['required']\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Produtos</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"product in products\" value=\"{{product.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{product.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!------------------------------------------------------------>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newPromotion.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createPromotion\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-edit-promotion\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Editar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validation1\">\r\n\t\t\t\t\t\t\t<form methods=\"patch\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome\" v-model=\"newPromotion.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-user form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type='date' class='form-control' placeholder='' v-model=\"newPromotion.begnning_date\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<!-- <span class=\"fa fa-calendar-check-o form-control-feedback\"></span> -->\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type='date' class='form-control' placeholder='' v-model=\"newPromotion.ending_date\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<!-- <span class=\"fa fa-calendar-times-o form-control-feedback\"></span> -->\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!------------------------------------------------------------>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newPromotion.trader_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Comerciantes</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"trader in traders\" value=\"{{trader.id}}\">{{trader.name}}</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newPromotion.product_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Produtos</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"product in products\" value=\"{{product.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{product.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!------------------------------------------------------------>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newPromotion.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedPromotion(newPromotion.id)\" type=\"button\" class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n"
-if (module.hot) {(function () {  module.hot.accept()
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), true)
-  if (!hotAPI.compatible) return
-  module.hot.dispose(function () {
-    __vueify_insert__.cache["h1 {\r\n  color: #00a8ed;\r\n}"] = false
-    document.head.removeChild(__vueify_style__)
-  })
-  if (!module.hot.data) {
-    hotAPI.createRecord("_v-aa575270", module.exports)
-  } else {
-    hotAPI.update("_v-aa575270", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
-  }
-})()}
-},{"../../../Pagination/src/Component.vue":116,"vue":109,"vue-hot-reload-api":105,"vueify/lib/insert-css":110}],121:[function(require,module,exports){
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success><i class=\"fa fa-thumbs-up\">Sucesso!!</i></div><div class=row><div class=\"pull right col-md-8\"><label class=checkbox-inline><input type=checkbox v-model=showColumn.begnning_date>Início</label><label class=checkbox-inline><input type=checkbox v-model=showColumn.ending_date>Término</label><label class=checkbox-inline><input type=checkbox v-model=showColumn.trader_id>Comerciante</label></div><div class=\"col-md-4 pull-left\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=row><div v-if=\"traders.length > 0 && products.length > 0\" class=col-md-12><button @click=clearField class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-promotion><i class=\"fa fa-plus\"></i> Novo</button>&nbsp;&nbsp;</div><div v-else class=col-md-12><button data-toggle=tooltip title=\"Não podes criar promoção referenciar comerciante e produtos\" type=button class=\"btn btn-danger btn-flat\"><i class=\"fa fa-minus\"></i> Novo</button>&nbsp;&nbsp;</div></div><br><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome</a><th class=info v-if=showColumn.begnning_date><i :class=\"{'fa-sort-amount-asc': sortColumn == 'begnning_date' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'begnning_date' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'begnning_date')\">Início</a><th class=info v-if=showColumn.ending_date><i :class=\"{'fa-sort-amount-asc': sortColumn == 'ending_date' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'ending_date' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'ending_date')\">Término</a><th class=text-center><i :class=\"{'fa-sort-amount-asc': sortColumn == 'state' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'state' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'state')\">Publicação</a><th class=info v-if=showColumn.trader_id><i :class=\"{'fa-sort-amount-asc': sortColumn == 'trader_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'trader_id' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'trader_id')\">Comerciante</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"promotion in promotions | filterBy filter.term | orderBy sortColumn sortInverse\"><td><a href=# data-toggle=modal data-target=#show-promotion @click=getThisPromotion(promotion.id)>{{ promotion.name }}</a><td class=info v-if=showColumn.begnning_date>{{ promotion.begnning_date }}<td class=info v-if=showColumn.ending_date>{{ promotion.ending_date }}<td class=text-center v-if=promotion.status><button data-toggle=tooltip title=\"Despublicar esta promoção\" type=submit @click=promotionStatus(promotion.id) class=\"btn btn-xs btn-flat\" :class=\"{ 'btn-success': promotion.status, 'btn-warning': !promotion.status }\"><i class=\"fa fa-check\"></i></button><td class=text-center v-if=!promotion.status><button data-toggle=tooltip title=\"Publicar esta promoção\" type=submit @click=promotionStatus(promotion.id) class=\"btn btn-xs btn-flat\" :class=\"{ 'btn-success': promotion.status, 'btn-warning': !promotion.status }\"><i class=\"fa fa-times\"></i></button><td class=info v-if=showColumn.service_beginning>{{ promotion.trader.name }}<td align=left><a data-toggle=modal data-target=#modal-edit-promotion href=#><i class=\"fa fa-pencil text-primary\" @click=getThisPromotion(promotion.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-promotion href=#><i class=\"fa fa-trash text-danger\" @click=getThisPromotion(promotion.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div id=show-promotion class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Detalhes do(a) {{ newPromotion.name }}</h4></div><div class=modal-body><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover\"><thead><tr><th class=text-center colspan=2>INFORMAÇOES DE PROMOÇÃO<tbody><tr><td><b>ID</b><td><i>{{ newPromotion.id }}</i><tr><td><b>Nome</b><td><i>{{ newPromotion.name }}</i><tr><td><b>Início</b><td><span class=\"label label-info\"><i>{{ newPromotion.begnning_date }}</i></span><tr><td><b>Término</b><td><i>{{ newPromotion.ending_date }}</i><tr><td><b>Publicação</b><td><span class=label :class=\"{ 'label-success': newPromotion.status, 'label-warning': !newPromotion.status }\"><i>{{newPromotion.status ? 'Publicado' : 'Aguardando'}}</i></span><tr><td><b>Descrição</b><td><i>{{ newPromotion.description }}</i><tr><td><b>Data da criação</b><td><i>{{ promotion.created_at | formatDate 'DD/MM/YYYY' }}</i><tr><td><b>Data de atualização</b><td><i>{{ promotion.updated_at | formatDate 'DD/MM/YYYY' }}</i></table></div></div></div></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-success\" data-dismiss=modal><i class=\"fa fa-check\"></i></button></div></div></div></div><div class=\"modal fade\" id=modal-delete-promotion tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar</h4></div><div class=modal-body><h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newPromotion.name}}</span></h5></div><div class=modal-footer><button type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i> Cancelar</button> <button @keyup.enter=deletePromotion(newPromotion.id) @click=deletePromotion(newPromotion.id) type=button class=\"btn btn-danger\"><i class=\"fa fa-trash-o\"></i> Eliminar</button></div></div></div></div><div id=modal-create-promotion class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=Nome v-model=newPromotion.name v-validate:name=\"['required']\"> <span class=\"fa fa-user form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input type=date name=begnning_date class=form-control placeholder=\"\" v-model=newPromotion.begnning_date v-validate:begnning_date=\"['required']\"><p class=text-help>Data de início da promoção</div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=date name=ending_date class=form-control placeholder=\"\" v-model=newPromotion.ending_date v-validate:ending_date=\"['required']\"><p class=text-help>Término da promoção</div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><select name=trader_id class=form-control v-model=newPromotion.trader_id v-validate:trader_id=\"['required']\"><option value=\"\" selected>Comerciantes<option v-for=\"trader in traders\" value={{trader.id}}>{{trader.name}}</select></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><select name=product_id class=form-control v-model=newPromotion.product_id v-validate:product_id=\"['required']\"><option value=\"\" selected>Produtos<option v-for=\"product in products\" value={{product.id}}>{{product.name}}</select></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newPromotion.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createPromotion class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button></div></div></div></div><div id=modal-edit-promotion class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=Nome v-model=newPromotion.name v-validate:name=\"['required']\"> <span class=\"fa fa-user form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input type=date class=form-control placeholder=\"\" v-model=newPromotion.begnning_date><p class=text-help>Data de início da promoção</div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=date class=form-control placeholder=\"\" v-model=newPromotion.ending_date><p class=text-help>Término da promoção</div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><select class=form-control v-model=newPromotion.trader_id><option value=\"\" selected>Comerciantes<option v-for=\"trader in traders\" value={{trader.id}}>{{trader.name}}</select></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><select class=form-control v-model=newPromotion.product_id><option value=\"\" selected>Produtos<option v-for=\"product in products\" value={{product.id}}>{{product.name}}</select></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newPromotion.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedPromotion(newPromotion.id) type=button class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button></div></div></div></div></div></div>"
+
+},{"../../../Pagination/src/Component.vue":114,"vueify/lib/insert-css":108}],119:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
-var __vueify_style__ = __vueify_insert__.insert("h1 {\n  color: #00a8ed;\n}")
+var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -40217,24 +39042,11 @@ exports.default = {
 
 // import from 'lodash'
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\r\n<div class=\"alert alert-success\" transition=\"success\" v-if=\"success\">\r\n\tFunção Adicionado com sucesso\r\n</div>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-4 pull-right\">\r\n\t\t<div class=\"input-group\">\r\n\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t<input v-model=\"filter.term\" type=\"text\" class=\"form-control\" placeholder=\"Filtrar dados da tabela\" aria-describedby=\"basic-addon1\">\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-role\"><i class=\"fa fa-plus\"></i> Novo</button>\r\n\t</div>\r\n</div>\r\n<br>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class='table-responsive'>\r\n\t\t\t<table class='table table-striped table-hover table-condensed'>\r\n\t\t\t\t<thead>\r\n\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'name')\">Nome do papel</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'display_name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'display_name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'display_name')\">Papel</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'description')\">Descriçãos</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n\r\n\r\n\t\t\t\t\t\t<th width=75  class=\"text-center\">\r\n\t\t\t\t\t\t\t<a @click = \"openAllDetails\" href=\"#\">\r\n\t\t\t\t\t\t\t\t<span><i data-toggle=\"tooltip\" data-placement=\"left\" title=\"Ver Todas Permissões\" class=\"fa\"  :class=\"{'fa-sign-in': openDetails.length == 0, 'fa-sign-out': openDetails.length > 0}\"></i></span>\r\n\t\t\t\t\t\t\t</a>\r\n\t\t\t\t\t\t</th>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</thead>\r\n\t\t\t\t<tbody  v-for=\"role in roles | filterBy filter.term | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t<td>{{ role.name }}</td>\r\n\t\t\t\t\t\t<td>{{ role.display_name }}</td>\r\n\t\t\t\t\t\t<td>{{ role.description }}</td>\r\n\r\n\t\t\t\t\t\t<td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-role\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisRole(role.id)\" > </i></a></td>\r\n\t\t\t\t\t\t<td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-role\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisRole(role.id)\"></i></a></td>\r\n\r\n\t\t\t\t\t\t<td width=75 class=\"text-center\">\r\n\t\t\t\t\t\t\t<a @click = \"doOpenDetails($event, role.id)\" v-show=\"role.perms != ''\" href=\"#\"><i data-toggle=\"tooltip\" data-placement=\"left\" title=\"Ver Permissões\" class=\"fa\" :class=\"{'fa-plus-square': openDetails.indexOf(role.id) == -1, 'fa-minus-square': openDetails.indexOf(role.id) > -1}\"></i></a>\r\n\t\t\t\t\t\t\t<i class=\"fa fa-plus-square\" v-show=\"role.perms == ''\" style=\"opacity: 0.3\"></i>\r\n\t\t\t\t\t\t</td>\r\n\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t\t<tr class=\"\" v-show=\"openDetails.indexOf(role.id) > -1 && role.perms != ''\">\r\n\t\t\t\t\t\t<td colspan=\"6\">\r\n\t\t\t\t\t\t\t<ul class=\"list-unstyled list-group-flush\" v-for=\"perms in role.perms\">\r\n\t\t\t\t\t\t\t\t<li><span class=\"label label-primary\"><b> <i class=\"fa fa-unlock\"></i> &nbsp;{{ perms.display_name }}</b></span>&nbsp;</li>\r\n\t\t\t\t\t\t\t</ul>\r\n\r\n\t\t\t\t\t\t</td>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</tbody>\r\n\t\t\t</table>\r\n\t\t\t<div class=\"col-md-12 pull-left\">\r\n\t\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<div class=\"modal fade\" id=\"modal-delete-role\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar Função</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<h1>Eliminar Função {{newRole.name}}</h1>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Cancelar</button>\r\n\t\t\t\t\t\t<button  @keyup.enter=\"deleteRole(newRole.id)\" @click=\"deleteRole(newRole.id)\" type=\"button\" class=\"btn btn-default\">Eliminar  Função</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-create-role\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Criar novo Papel</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome do  papel para o sistema\" v-model=\"newRole.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-lock form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"display_name\" placeholder=\"Nome do papel para ser visualizado\" v-model=\"newRole.display_name\" v-validate:display_name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-eye form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.display_name.required && $validationew.display_name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"descrição\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newRole.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select class=\"iform-control\" v-model=\"newRole.permissions\" multiple>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Escolha Permissões</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"permission in permissions\" value=\"{{permission.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{permission.display_name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createRole\" class=\"btn btn-secondary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar Registo</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-edit-role\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Editar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validation1\">\r\n\t\t\t\t\t\t\t<form methods=\"patch\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" v-model=\"newRole.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-lock form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"display_name\" v-model=\"newRole.display_name\" v-validate:display_name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-eye form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validation1.display_name.required && $validation1.display_name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newRole.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedRole(newRole.id)\" type=\"button\" class=\"btn btn-secondary\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar Edição</button>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n"
-if (module.hot) {(function () {  module.hot.accept()
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), true)
-  if (!hotAPI.compatible) return
-  module.hot.dispose(function () {
-    __vueify_insert__.cache["h1 {\n  color: #00a8ed;\n}"] = false
-    document.head.removeChild(__vueify_style__)
-  })
-  if (!module.hot.data) {
-    hotAPI.createRecord("_v-5c6d44d5", module.exports)
-  } else {
-    hotAPI.update("_v-5c6d44d5", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
-  }
-})()}
-},{"../../../Pagination/src/Component.vue":116,"lodash":102,"vue":109,"vue-hot-reload-api":105,"vueify/lib/insert-css":110}],122:[function(require,module,exports){
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success>Função Adicionado com sucesso</div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=\"Filtrar dados da tabela\" aria-describedby=basic-addon1></div></div></div><hr><div class=row><div class=col-md-12><button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-role><i class=\"fa fa-plus\"></i> Novo</button></div></div><br><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome do papel</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'display_name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'display_name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'display_name')\">Papel</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'description')\">Descriçãos</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><th width=75 class=text-center><a @click=openAllDetails href=#><span><i data-toggle=tooltip data-placement=left title=\"Ver Todas Permissões\" class=fa :class=\"{'fa-sign-in': openDetails.length == 0, 'fa-sign-out': openDetails.length > 0}\"></i></span></a><tbody v-for=\"role in roles | filterBy filter.term | orderBy sortColumn sortInverse\"><tr><td>{{ role.name }}<td>{{ role.display_name }}<td>{{ role.description }}<td align=left><a data-toggle=modal data-target=#modal-edit-role href=#><i class=\"fa fa-pencil text-primary\" @click=getThisRole(role.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-role href=#><i class=\"fa fa-trash text-danger\" @click=getThisRole(role.id)></i></a><td width=75 class=text-center><a @click=\"doOpenDetails($event, role.id)\" v-show=\"role.perms != ''\" href=#><i data-toggle=tooltip data-placement=left title=\"Ver Permissões\" class=fa :class=\"{'fa-plus-square': openDetails.indexOf(role.id) == -1, 'fa-minus-square': openDetails.indexOf(role.id) > -1}\"></i></a> <i class=\"fa fa-plus-square\" v-show=\"role.perms == ''\" style=\"opacity: 0.3\"></i><tr v-show=\"openDetails.indexOf(role.id) > -1 && role.perms != ''\"><td colspan=6><ul class=\"list-unstyled list-group-flush\" v-for=\"perms in role.perms\"><li><span class=\"label label-primary\"><b><i class=\"fa fa-unlock\"></i> &nbsp;{{ perms.display_name }}</b></span>&nbsp;</ul></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div class=\"modal fade\" id=modal-delete-role tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar Função</h4></div><div class=modal-body><h1>Eliminar Função {{newRole.name}}</h1></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteRole(newRole.id) @click=deleteRole(newRole.id) type=button class=\"btn btn-default\">Eliminar Função</button></div></div></div></div><div id=modal-create-role class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Criar novo Papel</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=\"Nome do  papel para o sistema\" v-model=newRole.name v-validate:name=\"['required']\"> <span class=\"fa fa-lock form-control-feedback\"></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=display_name placeholder=\"Nome do papel para ser visualizado\" v-model=newRole.display_name v-validate:display_name=\"['required']\"> <span class=\"fa fa-eye form-control-feedback\"></span><p style=color:red v-if=\"$validationew.display_name.required && $validationew.display_name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=descrição class=form-control rows=5 cols=40 id=description v-model=newRole.description></textarea></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=iform-control v-model=newRole.permissions multiple><option value=\"\" selected>Escolha Permissões<option v-for=\"permission in permissions\" value={{permission.id}}>{{permission.display_name}}</select></div></div></div></div></form></validator></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createRole class=\"btn btn-secondary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar Registo</button></div></div></div></div><div id=modal-edit-role class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name v-model=newRole.name v-validate:name=\"['required']\"> <span class=\"fa fa-lock form-control-feedback\"></span><p style=color:red v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=display_name v-model=newRole.display_name v-validate:display_name=\"['required']\"> <span class=\"fa fa-eye form-control-feedback\"></span><p style=color:red v-if=\"$validation1.display_name.required && $validation1.display_name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição class=form-control rows=5 cols=40 id=description v-model=newRole.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><div class=col-md-12><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedRole(newRole.id) type=button class=\"btn btn-secondary\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar Edição</button></div></div></div></div></div></div></div>"
+
+},{"../../../Pagination/src/Component.vue":114,"lodash":102,"vueify/lib/insert-css":108}],120:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
-var __vueify_style__ = __vueify_insert__.insert("h1 {\n  color: #00a8ed;\n}")
+var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -40257,13 +39069,13 @@ exports.default = {
 
     data: function data() {
         return {
-
             newTaxation: {
                 id: '',
                 employee_id: '',
                 place_id: '',
                 income: '',
-                type: ''
+                type: '',
+                created_at: ''
             },
 
             taxations: {},
@@ -40350,6 +39162,7 @@ exports.default = {
                 _this3.newTaxation.place_id = response.data.place_id;
                 _this3.newTaxation.income = response.data.income;
                 _this3.newTaxation.type = response.data.type;
+                _this3.newTaxation.created_at = response.data.created_at;
             }, function (response) {
                 console.log('Error');
             });
@@ -40443,24 +39256,11 @@ exports.default = {
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\r\n<div class=\"alert alert-success\" transition=\"success\" v-if=\"success\">\r\n\tContrato Criado com sucesso\r\n</div>\r\n\r\n\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-4 pull-right\">\r\n\t\t<div class=\"input-group\">\r\n\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t<input v-model=\"filter.term\" type=\"text\" class=\"form-control\" employeeholder=\"Filtrar dados da tabela\" aria-describedby=\"basic-addon1\">\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<button @click=\"clearField\" class=\"btn btn-secondary pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-taxation\"><i class=\"fa fa-plus\"></i> Criar Novo</button>&nbsp;&nbsp;&nbsp;&nbsp;\r\n\t\t<button class=\"btn btn-secondary\" name=\"button\"><i class=\"fa fa-print\"></i> Imprimir</button>\r\n\t</div>\r\n</div>\r\n\r\n\r\n<br>\r\n\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class='table-responsive'>\r\n\t\t\t<table class='table table-striped table-hover table-condensed'>\r\n\t\t\t\t<thead>\r\n\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'employee_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'employee_id' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'employee_id')\">Funcionário</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'place_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'place_id' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'place_id')\">Espaços</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'income' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'income' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'income')\">Valor ($)</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'type' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'type' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'type')\">Tipo de Cobrança</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'type' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'type' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'type')\">Funcionário</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'created_at' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'created_at' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'created_at')\">Data</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th  class=\"text-center\" colspan=\"3\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</thead>\r\n\t\t\t\t<tbody>\r\n\t\t\t\t\t<tr v-for=\"taxation in taxations | filterBy filter.term | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t\t<td v-for=\"employee in taxation.employees\">{{ employee.name }}</td>\r\n\t\t\t\t\t\t<td v-for=\"place in taxation.places\">{{ place.id }}</td>\r\n\r\n\t\t\t\t\t\t<td>{{ taxation.income }}</td>\r\n\t\t\t\t\t\t<td>{{ taxation.type }}</td>\r\n\t\t\t\t\t\t<td>{{ taxation.author }}</td>\r\n\t\t\t\t\t\t<td>{{ taxation.created_at }}</td>\r\n\t\t\t\t\t\t<td align=center>  <a data-toggle=\"modal\" data-target=\"#modal-edit-taxation\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisTaxation(taxation.id)\" > </i></a></td>\r\n\t\t\t\t\t\t<td align=center><a data-toggle=\"modal\" data-target=\"#modal-delete-taxation\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisTaxation(taxation.id)\"></i></a></td>\r\n\r\n\t\t\t\t\t\t<td align=center><a href=\"#\"><i class=\"fa fa-print text-info\" @click=\"getThisTaxation(taxation.id)\"></i></a></td>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</tbody>\r\n\t\t\t</table>\r\n\t\t\t<div class=\"col-md-12 pull-left\">\r\n\t\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<div class=\"modal fade\" id=\"modal-delete-taxation\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar Registo</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<h1>Eliminar este registo</h1>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Cancelar</button>\r\n\t\t\t\t\t\t<button  @keyup.enter=\"deleteTaxation(newTaxation.id)\" @click=\"deleteTaxation(newTaxation.id)\" type=\"button\" class=\"btn btn-default\">Eliminar  taxation</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-create-taxation\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Criar Registo</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select name=\"state\" class=\"selectpicker form-control show-tick\" v-model=\"newTaxation.type\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Tipo de cobrança</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<optgroup label=\"Cobrança na secretaria\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"1\">Cobrança interno</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"2\">Cobrança Externo</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"3\">Bouticks de Grande Porte Porte</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"4\">Pequenos restaurantes</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"5\">Outros</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</optgroup>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<optgroup label=\"Cobrança externo\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"6\">Espaços Externos</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"7\">Espaços Internos</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"8\">Casa de Carne</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"9\">Casa de Peixe</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"10\">Balniários</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"11\">Câmara de Gelo</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</optgroup>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"help-block\">Selecione o tipo de espaço</span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<hr>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newTaxation.employee_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Cobrador</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"employee in employees\" value=\"{{employee.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{employee.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"help-block\">Selecione o cobrador</span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newTaxation.place_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Espaço</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"place in places\" value=\"{{place.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{place.id}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"help-block\">Qual é o espaço?</span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\t\t\t\t\t\t\t\t<!-- <v-select :value.sync=\"selected\" :options=\"options\"></v-select> -->\r\n\r\n\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<!-- <input class=\"form-control\" type=\"number\" name=\"income\" value=\"\" placeholder=\"Valor da cobrança\"> -->\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"number\" class=\"form-control\" placeholder=\"Valor cobrado\" v-model=\"newTaxation.income\" name=\"email\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<i class=\"fa fa-usd form-control-feedback\"></i>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"help-block\">Introduza o valor cobrado</span>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createTaxation\" class=\"btn btn-secondary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar Registo</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-edit-taxation\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Editar Este contrato</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t\t<form action=\"#\" methods=\"patch\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newTaxation.employee_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Selecione o Funcionário</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"employee in employees\" value=\"{{employee.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{employee.id}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newTaxation.place_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Selecione o Espaços</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"place in places\" value=\"{{place.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{place.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedTaxation(newTaxation.id)\" type=\"button\" class=\"btn btn-secondary\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp; Salvar as Alterações sobre este contrato</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n"
-if (module.hot) {(function () {  module.hot.accept()
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), true)
-  if (!hotAPI.compatible) return
-  module.hot.dispose(function () {
-    __vueify_insert__.cache["h1 {\n  color: #00a8ed;\n}"] = false
-    document.head.removeChild(__vueify_style__)
-  })
-  if (!module.hot.data) {
-    hotAPI.createRecord("_v-43c58e4d", module.exports)
-  } else {
-    hotAPI.update("_v-43c58e4d", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
-  }
-})()}
-},{"../../../Pagination/src/Component.vue":116,"vue":109,"vue-hot-reload-api":105,"vue-select":107,"vueify/lib/insert-css":110}],123:[function(require,module,exports){
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success>Contrato Criado com sucesso</div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control employeeholder=\"Filtrar dados da tabela\" aria-describedby=basic-addon1></div></div></div><hr><div class=row><div class=col-md-12><button @click=clearField class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-taxation><i class=\"fa fa-plus\"></i> Novo</button>&nbsp;&nbsp;<div class=btn-group><button type=button class=\"btn btn-primary btn-flat btn-outline dropdown-toggle\" data-toggle=dropdown aria-haspopup=true aria-expanded=false><i class=\"fa fa-print\"></i> Imprimir <span class=caret></span></button><ul class=dropdown-menu><li><a href=#>Imprimir Todos</a><li><a data-toggle=modal data-target=#modal-report-date href=#>Relatório Diário</a></ul></div></div><div class=\"modal fade\" id=modal-report-date tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title><i class=\"fa fa-calendar fa-2x\"></i></h4></div><div class=modal-body><div class=form-group><label for=\"\"></label><input type=date class=form-control placeholder=\"\"><p class=help-block>Introduza data do relatório</div></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal>Close</button> <button type=button class=\"btn btn-primary\">Enviar</button></div></div></div></div></div><br><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'employee_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'employee_id' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'employee_id')\">Funcionário</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'place_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'place_id' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'place_id')\">Espaços</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'income' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'income' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'income')\">Valor ($)</a><th class=text-center colspan=3><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"taxation in taxations | filterBy filter.term | orderBy sortColumn sortInverse\"><td v-for=\"employee in taxation.employees\">{{ employee.name }}<td v-for=\"place in taxation.places\">{{ place.name }}<td>{{ taxation.income }}<td align=center><a data-toggle=modal data-target=#modal-edit-taxation href=#><i class=\"fa fa-pencil text-primary\" @click=getThisTaxation(taxation.id)></i></a><td align=center><a data-toggle=modal data-target=#modal-delete-taxation href=#><i class=\"fa fa-trash text-danger\" @click=getThisTaxation(taxation.id)></i></a><td align=center><a href=#><i class=\"fa fa-print text-info\" @click=getThisTaxation(taxation.id)></i></a></table></div><div class=\"modal fade\" id=modal-delete-taxation tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title><i class=\"text-danger fa fa-trash fa-2x\"></i></h4></div><div class=modal-body><h2 class=\"text-center text-info\">Eliminar esta Cobrança</h2></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i> Cancelar</button> <button @keyup.enter=deleteTaxation(newTaxation.id) @click=deleteTaxation(newTaxation.id) type=button class=\"btn btn-danger\"><i class=\"fa fa-trash-o\"></i> Eliminar</button></div></div></div></div><div id=modal-create-taxation class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-Registarfeedback\"><select name=state class=\"selectpicker form-control show-tick\" v-model=newTaxation.type><option value=\"\" selected>Tipo de cobrança<option value=1>Cobrança interno<option value=2>Cobrança Externo</select><span class=help-block>Selecione o tipo de espaço</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=form-control v-model=newTaxation.employee_id><option value=\"\" selected>Cobrador<option v-for=\"employee in employees\" value={{employee.id}}>{{employee.name}}</select><span class=help-block>Selecione o cobrador</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=form-control v-model=newTaxation.place_id><option value=\"\" selected>Espaço<option v-for=\"place in places\" value={{place.id}}>{{place.name}}</select><span class=help-block>Qual é o espaço?</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=number class=form-control placeholder=\"Valor cobrado\" v-model=newTaxation.income name=email> <i class=\"fa fa-usd form-control-feedback\"></i></div><span class=help-block>Introduza o valor cobrado</span></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createTaxation class=\"btn btn-secondary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar Registo</button></div></div></div></div><div id=modal-edit-taxation class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar Este contrato</h4></div><div class=modal-body><validator name=validationew><form action=# methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=form-control v-model=newTaxation.employee_id><option value=\"\" selected>Selecione o Funcionário<option v-for=\"employee in employees\" value={{employee.id}}>{{employee.id}}</select></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=form-control v-model=newTaxation.place_id><option value=\"\" selected>Selecione o Espaços<option v-for=\"place in places\" value={{place.id}}>{{place.name}}</select></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedTaxation(newTaxation.id) type=button class=\"btn btn-secondary\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp; Salvar as Alterações sobre este contrato</button></div></div></div></div></div></div>"
+
+},{"../../../Pagination/src/Component.vue":114,"vue-select":105,"vueify/lib/insert-css":108}],121:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
-var __vueify_style__ = __vueify_insert__.insert("h1 {\n  color: #00a8ed;\n}")
+var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -40700,24 +39500,11 @@ exports.default = {
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=\"success\" v-if=\"success\">\r\n    <i class=\"fa fa-thumbs-up\"> Sucesso!!</i>\r\n</div>\r\n\r\n<!-- <pre>\r\n    {{ $data.newTrader | json }}\r\n</pre> -->\r\n\r\n<div class=\"row\">\r\n    <div class=\"pull right col-md-8\">\r\n        <label class=\"checkbox-inline\"><input type=\"checkbox\" id=\"\" value=\"\" v-model=\"showColumn.ic\">BI</label>\r\n    </div>\r\n\r\n    <div class=\"col-md-4 pull-left\">\r\n        <div class=\"input-group\">\r\n            <span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n            <input v-model=\"filter.term\" type=\"text\" class=\"form-control\" placeholder=\"Filtrar...\" aria-describedby=\"basic-addon1\">\r\n        </div>\r\n    </div>\r\n</div>\r\n\r\n<hr>\r\n\r\n<div class=\"row\">\r\n    <div class=\"col-md-12\">\r\n        <button @click=\"clearField\" class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-trader\"><i class=\"fa fa-plus\"></i> Novo</button>&nbsp;&nbsp;\r\n        <a class=\"btn btn-primary btn-flat btn-outline\" href=\"/export/printableTraderInformation\"><i class=\"fa fa-print\"></i> Imprimir</a>\r\n    </div>\r\n</div>\r\n\r\n<br>\r\n\r\n<div class=\"row\">\r\n    <div class=\"col-md-12\">\r\n        <div class='table-responsive'>\r\n            <table class='table table-striped table-hover table-reflow'>\r\n                <thead>\r\n                    <tr>\r\n                        <th>\r\n                            <i :class = \"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n                            <a href=\"#\" @click = \"doSort($event, 'name')\">Nome</a>\r\n                        </th>\r\n                        <th class=\"info\" v-if=\"showColumn.ic\">\r\n                            <i :class = \"{'fa-sort-amount-asc': sortColumn == 'ic' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'ic' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n                            <a href=\"#\" @click = \"doSort($event, 'ic')\">BI</a>\r\n                        </th>\r\n                        <th>\r\n                            <i :class = \"{'fa-sort-amount-asc': sortColumn == 'phone' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'phone' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n                            <a href=\"#\" @click = \"doSort($event, 'phone')\">Telefone</a>\r\n                        </th>\r\n\r\n                        <th  class=\"text-center\" colspan=\"2\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n                    </tr>\r\n                </thead>\r\n                <tbody>\r\n                    <tr v-for=\"trader in traders | filterBy filter.term | orderBy sortColumn sortInverse\">\r\n                        <td><a href=\"#\" data-toggle=\"modal\" data-target=\"#show-trader\" @click=\"getThisTrader(trader.id)\">{{ trader.name }}</a></td>\r\n                        <td class=\"info\" v-if=\"showColumn.ic\">{{ trader.ic }}</td>\r\n                        <td>{{ trader.phone }}</td>\r\n\r\n                        <td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-trader\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisTrader(trader.id)\" > </i></a></td>\r\n                        <td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-trader\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisTrader(trader.id)\" ></i></a></td>\r\n                    </tr>\r\n                </tbody>\r\n            </table>\r\n            <div class=\"col-md-12 pull-left\">\r\n                <Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n            </div>\r\n        </div>\r\n\r\n        <!--------------------------------------------------------------------------------------------------------->\r\n        <div id=\"show-trader\" class=\"modal fade\" role=\"dialog\">\r\n            <div class=\"modal-dialog\">\r\n\r\n                <!-- Modal content-->\r\n                <div class=\"modal-content\">\r\n                    <div class=\"modal-header\">\r\n                        <button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n                        <h4 class=\"modal-title\">Detalhes do(a) {{ newTrader.name }}</h4>\r\n                    </div>\r\n                    <div class=\"modal-body\">\r\n                        <div class=\"row\">\r\n                            <div class=\"col-md-12\">\r\n                                <div class='table-responsive'>\r\n                                    <table class='table table-striped table-hover'>\r\n                                        <thead>\r\n                                            <tr>\r\n                                                <th class=\"text-center\" colspan=\"2\">INFORMAÇOES DO COMERCIANTE</th>\r\n                                            </tr>\r\n                                        </thead>\r\n                                        <tbody>\r\n                                            <tr>\r\n                                                <td><b>ID</b></td>\r\n                                                <td><i>{{ newTrader.id }}</i></td>\r\n                                            </tr>\r\n                                            <tr>\r\n                                                <td><b>Nome</b></td>\r\n                                                <td><i>{{ newTrader.name }}</i></td>\r\n                                            </tr>\r\n                                            <tr>\r\n                                                <td><b>BI</b></td>\r\n                                                <td><span class=\"label label-info\"><i>{{ newTrader.ic }}</i></span></td>\r\n\r\n                                            </tr>\r\n                                            <tr>\r\n                                                <td><b>Idade</b></td>\r\n                                                <td><i>{{ newTrader.age }}</i></td>\r\n                                            </tr>\r\n                                            <tr>\r\n                                                <td><b>Sexo</b></td>\r\n                                                <td><i>{{ alterGenderValue(newTrader.gender) }}</i></td>\r\n                                            </tr>\r\n                                            <tr>\r\n                                                <td><b>Email</b></td>\r\n                                                <td><span class=\"label label-info\"><i>{{ newTrader.email }}</i></span></td>\r\n\r\n                                            </tr>\r\n                                            <tr>\r\n                                                <td><b>Ilha</b></td>\r\n                                                <td><i>{{ alterStateValue(newTrader.state) }}</i></td>\r\n                                            </tr>\r\n                                            <tr>\r\n                                                <td><b>Concelho</b></td>\r\n                                                <td><i>{{ newTrader.council }}</i></td>\r\n                                            </tr>\r\n                                            <tr>\r\n                                                <td><b>Freguesia</b></td>\r\n                                                <td><i>{{ newTrader.parish }}</i></td>\r\n                                            </tr>\r\n                                            <tr>\r\n                                                <td><b>Zona</b></td>\r\n                                                <td><i>{{ newTrader.zone }}</i></td>\r\n                                            </tr>\r\n\r\n                                            <tr>\r\n                                                <td><b>Telefone</b></td>\r\n                                                <td><span class=\"label\" :class=\"{ 'label-info': newTrader.phone, 'none': !newTrader.phone }\"><i>{{ newTrader.phone }}</i></span></td>\r\n\r\n                                            </tr>\r\n\r\n                                            <tr>\r\n                                                <td><b>Descrição</b></td>\r\n                                                <td><i>{{ newTrader.description }}</i></td>\r\n                                            </tr>\r\n                                            <tr>\r\n                                                <td><b>Data da criação</b></td>\r\n                                                <td><i>{{ trader.created_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n                                            </tr>\r\n                                            <tr>\r\n                                                <td><b>Data de atualização</b></td>\r\n                                                <td><i>{{ trader.updated_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n                                            </tr>\r\n\r\n                                        </tbody>\r\n                                    </table>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"modal-footer\">\r\n                        <button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button>\r\n                    </div>\r\n                </div>\r\n\r\n            </div>\r\n        </div>\r\n\r\n\r\n\r\n        <!--------------------------------------------------------------------------------------------------------->\r\n\r\n        <div class=\"modal fade\" id=\"modal-delete-trader\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n            <div class=\"modal-dialog\">\r\n                <div class=\"modal-content\">\r\n                    <div class=\"modal-header\">\r\n                        <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n                        <h4 class=\"modal-title\" id=\"\">Eliminar</h4>\r\n                    </div>\r\n                    <div class=\"modal-body\">\r\n                        <h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newTrader.name}}</span></h5>\r\n                    </div>\r\n                    <div class=\"modal-footer\">\r\n                        <button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\">Cancelar</button>\r\n                        <button  @keyup.enter=\"deleteTrader(newTrader.id)\" @click=\"deleteTrader(newTrader.id)\" type=\"button\" class=\"btn btn-danger\">Eliminar</button>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n        </div>\r\n\r\n\r\n        <!--------------------------------------------------------------------------------------------------------->\r\n        <!-- Modal -->\r\n        <div id=\"modal-create-trader\" class=\"modal fade\" role=\"dialog\">\r\n            <div class=\"modal-dialog\">\r\n\r\n                <!-- Modal content-->\r\n                <div class=\"modal-content\">\r\n                    <div class=\"modal-header\">\r\n                        <button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n                        <h4 class=\"modal-title\">Registar</h4>\r\n                    </div>\r\n                    <div class=\"modal-body\">\r\n                        <validator name=\"validationew\">\r\n                            <form action=\"#\" methods=\"POST\">\r\n                                <div class=\"row\">\r\n                                    <div class=\"col-md-12\">\r\n                                        <div class=\"col-md-8\">\r\n                                            <div class=\"form-group has-feedback\">\r\n                                                <input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome\" v-model=\"newTrader.name\" v-validate:name=\"['required']\"/>\r\n                                                <span class=\"fa fa-user form-control-feedback\"></span>\r\n                                            </div>\r\n                                        </div>\r\n                                        <div class=\"col-md-4\">\r\n                                            <div class=\"form-group has-feedback\">\r\n                                                <input type=\"number\" class=\"form-control\" name=\"ic\" placeholder=\"Número BI\" v-model=\"newTrader.ic\"/>\r\n                                                <span class=\"fa fa-id-card form-control-feedback\"></span>\r\n                                            </div>\r\n                                        </div>\r\n                                    </div>\r\n                                </div>\r\n\r\n                                <div class=\"row\">\r\n                                    <div class=\"col-md-12\">\r\n                                        <div class=\"col-md-8\">\r\n                                            <div class=\"form-group has-feedback\">\r\n                                                <input type=\"email\" class=\"form-control\" name=\"email\" placeholder=\"Email\" v-model=\"newTrader.email\"/>\r\n                                                <span class=\"fa fa-envelope form-control-feedback\"></span>\r\n                                            </div>\r\n                                        </div>\r\n                                        <div class=\"col-md-4\">\r\n                                            <div class=\"form-group has-feedback\">\r\n                                                <input type=\"number\" class=\"form-control\" name=\"phone\" placeholder=\"Telefone\" v-model=\"newTrader.phone\"/>\r\n                                                <span class=\"fa fa-phone form-control-feedback\"></span>\r\n                                            </div>\r\n                                        </div>\r\n                                    </div>\r\n                                </div>\r\n\r\n\r\n                                <div class=\"row\">\r\n                                    <div class=\"col-md-12\">\r\n                                        <div class=\"col-md-2\">\r\n                                            <div class=\"form-group has-feedback\">\r\n                                                <label class=\"radio-inline\">\r\n                                                    <input type=\"radio\" id=\"gender\" value=\"M\" name=\"gender\" v-model=\"newTrader.gender\"> <i class=\"fa fa-male\"></i>\r\n                                                </label>\r\n                                                <label class=\"radio-inline\">\r\n                                                    <input type=\"radio\" id=\"gender\" name=\"gender\" value=\"F\" v-model=\"newTrader.gender\"><i class=\"fa fa-female\"></i>\r\n                                                </label>\r\n                                            </div>\r\n                                        </div>\r\n\r\n                                        <div class=\"col-md-10 pull-right\">\r\n                                            <div class=\"form-group has-feedback\">\r\n                                                <input type=\"number\" class=\"form-control\" name=\"age\" placeholder=\"Idade\" v-model=\"newTrader.age\"/>\r\n                                                <span class=\"fa fa-birthday-cake form-control-feedback\"></span>\r\n                                            </div>\r\n                                        </div>\r\n                                    </div>\r\n                                </div>\r\n                                <hr>\r\n                                <div class=\"row\">\r\n                                    <div class=\"col-md-12\">\r\n                                        <div class=\"col-md-6\">\r\n                                            <div class=\"form-group has-feedback\">\r\n                                                <select name=\"state\" class=\"selectpicker form-control show-tick\" v-model=\"newTrader.state\">\r\n                                                    <optgroup label=\"Sotavento\">\r\n                                                        <option>Selecione Ilha</option>\r\n                                                        <option value=\"2\">Maio</option>\r\n                                                        <option value=\"1\">Santiago</option>\r\n                                                        <option value=\"3\">Fogo</option>\r\n                                                        <option value=\"4\">Brava</option>\r\n                                                    </optgroup>\r\n                                                    <optgroup label=\"Barlavento\">\r\n                                                        <option value=\"5\">Santo Antão</option>\r\n                                                        <option value=\"6\">São Nicolau</option>\r\n                                                        <option value=\"7\">São Vicente</option>\r\n                                                        <option value=\"8\">Sal</option>\r\n                                                        <option value=\"9\">Boa Vista</option>\r\n                                                    </optgroup>\r\n                                                </select>\r\n                                            </div>\r\n                                        </div>\r\n\r\n                                        <div class=\"col-md-6\">\r\n                                            <div class=\"form-group has-feedback\">\r\n                                                <input type=\"text\" class=\"form-control\" name=\"council\" placeholder=\"Concelho\" v-model=\"newTrader.council\"/>\r\n                                                <span class=\"fa fa-compass form-control-feedback\"></span>\r\n                                            </div>\r\n                                        </div>\r\n                                    </div>\r\n                                </div>\r\n\r\n                                <div class=\"row\">\r\n                                    <div class=\"col-md-12\">\r\n                                        <div class=\"col-md-6\">\r\n                                            <div class=\"form-group has-feedback\">\r\n                                                <input type=\"text\" class=\"form-control\" name=\"parish\" placeholder=\"Freguezia\" v-model=\"newTrader.parish\"/>\r\n                                                <span class=\"fa fa-map-marker form-control-feedback\"></span>\r\n                                            </div>\r\n                                        </div>\r\n\r\n                                        <div class=\"col-md-6\">\r\n                                            <div class=\"form-group has-feedback\">\r\n                                                <input type=\"text\" class=\"form-control\" name=\"zone\" placeholder=\"Zona\" v-model=\"newTrader.zone\"/>\r\n                                                <span class=\"fa fa-thumb-tack form-control-feedback\"></span>\r\n                                            </div>\r\n                                        </div>\r\n                                    </div>\r\n                                </div>\r\n\r\n                                <hr><!-------------------------------------------------------------------------------------------------------------------->\r\n                                <div class=\"row\">\r\n                                    <div class=\"col-md-12\">\r\n                                        <div class=\"col-md-12\">\r\n                                            <div class=\"form-group has-feedback\">\r\n                                                <textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newTrader.description\"></textarea>\r\n                                            </div>\r\n                                        </div>\r\n                                    </div>\r\n                                </div>\r\n\r\n                            </form>\r\n                        </validator>\r\n                    </div>\r\n                    <div class=\"modal-footer\">\r\n                        <button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n                        <button :disabled = \"!$validationew.valid\" @click=\"createTrader\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button>\r\n\r\n                        <label v-if = \"!newTrader.get_password\" class=\"checkbox-inline pull-left\"><input data-toggle=\"modal\" data-target=\"#getAcountForTrader\" type=\"checkbox\" id=\"\" value=\"\" v-model=\"newTrader.get_email\">Obter uma conta</label>\r\n                        <p v-if = \"newTrader.get_password\" class=\"text-help text-success pull-left\">Comerciante Estará no SAGMMA</p>\r\n\r\n                    </div>\r\n                </div>\r\n\r\n            </div>\r\n        </div>\r\n\r\n        <!------------------------------------------------------------------------------------------------------------->\r\n        <div class=\"modal fade\" id=\"getAcountForTrader\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n            <div class=\"modal-dialog\">\r\n                <div class=\"modal-content\">\r\n                    <div class=\"modal-header\">\r\n                        <button type=\"button\" @click=\"clearField\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n                        <h5 class=\"modal-title\" id=\"\">Introduza a palavra passe para a conta pretendida</h5>\r\n                    </div>\r\n                    <div class=\"modal-body\">\r\n                        <div class=\"form-group has-feedback\">\r\n                            <input type='password' name=\"get_password\" class='form-control input-lg' placeholder='Introduza a palavra passe' v-model=\"newTrader.get_password\">\r\n                            <span class=\"fa fa-lock form-control-feedback\"></span>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"modal-footer\">\r\n                        <button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-close\"></i></button>\r\n                        <button :disabled = \"!newTrader.get_password\" type=\"button\" class=\"btn btn-primary\" data-dismiss=\"modal\"><i class=\"fa fa-check\"></i></button>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n        </div>\r\n\r\n        <!--------------------------------------------------------------------------------------------------------->\r\n\r\n        <!-- Modal -->\r\n        <div id=\"modal-edit-trader\" class=\"modal fade\" role=\"dialog\">\r\n            <div class=\"modal-dialog\">\r\n\r\n                <!-- Modal content-->\r\n                <div class=\"modal-content\">\r\n                    <div class=\"modal-header\">\r\n                        <button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n                        <h4 class=\"modal-title\">Editar</h4>\r\n                    </div>\r\n                    <div class=\"modal-body\">\r\n                        <validator name=\"validation1\">\r\n                            <form methods=\"patch\">\r\n\r\n                                <div class=\"row\">\r\n                                    <div class=\"col-md-12\">\r\n                                        <div class=\"col-md-8\">\r\n                                            <div class=\"form-group has-feedback\">\r\n                                                <input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome\" v-model=\"newTrader.name\" v-validate:name=\"['required']\"/>\r\n                                                <span class=\"fa fa-user form-control-feedback\"></span>\r\n                                            </div>\r\n                                        </div>\r\n                                        <div class=\"col-md-4\">\r\n                                            <div class=\"form-group has-feedback\">\r\n                                                <input type=\"number\" class=\"form-control\" name=\"ic\" placeholder=\"Número BI\" v-model=\"newTrader.ic\"/>\r\n                                                <span class=\"fa fa-id-card form-control-feedback\"></span>\r\n                                            </div>\r\n                                        </div>\r\n                                    </div>\r\n                                </div>\r\n\r\n                                <div class=\"row\">\r\n                                    <div class=\"col-md-12\">\r\n                                        <div class=\"col-md-8\">\r\n                                            <div class=\"form-group has-feedback\">\r\n                                                <input type=\"email\" class=\"form-control\" name=\"email\" placeholder=\"Email\" v-model=\"newTrader.email\"/>\r\n                                                <span class=\"fa fa-envelope form-control-feedback\"></span>\r\n                                            </div>\r\n                                        </div>\r\n                                        <div class=\"col-md-4\">\r\n                                            <div class=\"form-group has-feedback\">\r\n                                                <input type=\"number\" class=\"form-control\" name=\"phone\" placeholder=\"Telefone\" v-model=\"newTrader.phone\"/>\r\n                                                <span class=\"fa fa-phone form-control-feedback\"></span>\r\n                                            </div>\r\n                                        </div>\r\n                                    </div>\r\n                                </div>\r\n\r\n\r\n                                <div class=\"row\">\r\n                                    <div class=\"col-md-12\">\r\n                                        <div class=\"col-md-2\">\r\n                                            <div class=\"form-group has-feedback\">\r\n                                                <label class=\"radio-inline\">\r\n                                                    <input type=\"radio\" id=\"gender\" value=\"M\" name=\"gender\" v-model=\"newTrader.gender\"> <i class=\"fa fa-male\"></i>\r\n                                                </label>\r\n                                                <label class=\"radio-inline\">\r\n                                                    <input type=\"radio\" id=\"gender\" name=\"gender\" value=\"F\" v-model=\"newTrader.gender\"><i class=\"fa fa-female\"></i>\r\n                                                </label>\r\n                                            </div>\r\n                                        </div>\r\n\r\n                                        <div class=\"col-md-10 pull-right\">\r\n                                            <div class=\"form-group has-feedback\">\r\n                                                <input type=\"number\" class=\"form-control\" name=\"age\" placeholder=\"Idade\" v-model=\"newTrader.age\"/>\r\n                                                <span class=\"fa fa-birthday-cake form-control-feedback\"></span>\r\n                                            </div>\r\n                                        </div>\r\n                                    </div>\r\n                                </div>\r\n                                <hr>\r\n                                <div class=\"row\">\r\n                                    <div class=\"col-md-12\">\r\n                                        <div class=\"col-md-6\">\r\n                                            <div class=\"form-group has-feedback\">\r\n                                                <select name=\"state\" class=\"selectpicker form-control show-tick\" v-model=\"newTrader.state\">\r\n                                                    <optgroup label=\"Sotavento\">\r\n                                                        <option>Selecione Ilha</option>\r\n                                                        <option value=\"2\">Maio</option>\r\n                                                        <option value=\"1\">Santiago</option>\r\n                                                        <option value=\"3\">Fogo</option>\r\n                                                        <option value=\"4\">Brava</option>\r\n                                                    </optgroup>\r\n                                                    <optgroup label=\"Barlavento\">\r\n                                                        <option value=\"5\">Santo Antão</option>\r\n                                                        <option value=\"6\">São Nicolau</option>\r\n                                                        <option value=\"7\">São Vicente</option>\r\n                                                        <option value=\"8\">Sal</option>\r\n                                                        <option value=\"9\">Boa Vista</option>\r\n                                                    </optgroup>\r\n                                                </select>\r\n                                            </div>\r\n                                        </div>\r\n\r\n                                        <div class=\"col-md-6\">\r\n                                            <div class=\"form-group has-feedback\">\r\n                                                <input type=\"text\" class=\"form-control\" name=\"council\" placeholder=\"Concelho\" v-model=\"newTrader.council\"/>\r\n                                                <span class=\"fa fa-compass form-control-feedback\"></span>\r\n                                            </div>\r\n                                        </div>\r\n                                    </div>\r\n                                </div>\r\n\r\n                                <div class=\"row\">\r\n                                    <div class=\"col-md-12\">\r\n                                        <div class=\"col-md-6\">\r\n                                            <div class=\"form-group has-feedback\">\r\n                                                <input type=\"text\" class=\"form-control\" name=\"parish\" placeholder=\"Freguezia\" v-model=\"newTrader.parish\"/>\r\n                                                <span class=\"fa fa-map-marker form-control-feedback\"></span>\r\n                                            </div>\r\n                                        </div>\r\n\r\n                                        <div class=\"col-md-6\">\r\n                                            <div class=\"form-group has-feedback\">\r\n                                                <input type=\"text\" class=\"form-control\" name=\"zone\" placeholder=\"Zona\" v-model=\"newTrader.zone\"/>\r\n                                                <span class=\"fa fa-thumb-tack form-control-feedback\"></span>\r\n                                            </div>\r\n                                        </div>\r\n                                    </div>\r\n                                </div>\r\n\r\n                                <hr><!-------------------------------------------------------------------------------------------------------------------->\r\n\r\n                                <div class=\"row\">\r\n                                    <div class=\"col-md-12\">\r\n                                        <div class=\"col-md-12\">\r\n                                            <div class=\"form-group has-feedback\">\r\n                                                <textarea name=\"description\" placeholder=\"Descrição do utilizador\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newTrader.description\"></textarea>\r\n                                            </div>\r\n                                        </div>\r\n                                    </div>\r\n                                </div>\r\n\r\n\r\n                            </form>\r\n                        </validator>\r\n                    </div>\r\n                    <div class=\"modal-footer\">\r\n                        <button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n                        <button v-on:show=\"\" @click=\"saveEditedTrader(newTrader.id)\" type=\"button\" class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>\r\n                    </div>\r\n                </div>\r\n\r\n            </div>\r\n        </div>\r\n    </div>\r\n</div>\r\n"
-if (module.hot) {(function () {  module.hot.accept()
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), true)
-  if (!hotAPI.compatible) return
-  module.hot.dispose(function () {
-    __vueify_insert__.cache["h1 {\n  color: #00a8ed;\n}"] = false
-    document.head.removeChild(__vueify_style__)
-  })
-  if (!module.hot.data) {
-    hotAPI.createRecord("_v-0278ba05", module.exports)
-  } else {
-    hotAPI.update("_v-0278ba05", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
-  }
-})()}
-},{"../../../Pagination/src/Component.vue":116,"vue":109,"vue-hot-reload-api":105,"vueify/lib/insert-css":110}],124:[function(require,module,exports){
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success><i class=\"fa fa-thumbs-up\">Sucesso!!</i></div><div class=row><div class=\"pull right col-md-8\"><label class=checkbox-inline><input type=checkbox v-model=showColumn.ic>BI</label></div><div class=\"col-md-4 pull-left\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=row><div class=col-md-12><button @click=clearField class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-trader><i class=\"fa fa-plus\"></i> Novo</button>&nbsp;&nbsp; <a class=\"btn btn-primary btn-flat btn-outline\" href=/export/printableTraderInformation><i class=\"fa fa-print\"></i> Imprimir</a></div></div><br><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-reflow\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome</a><th class=info v-if=showColumn.ic><i :class=\"{'fa-sort-amount-asc': sortColumn == 'ic' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'ic' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'ic')\">BI</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'phone' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'phone' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'phone')\">Telefone</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"trader in traders | filterBy filter.term | orderBy sortColumn sortInverse\"><td><a href=# data-toggle=modal data-target=#show-trader @click=getThisTrader(trader.id)>{{ trader.name }}</a><td class=info v-if=showColumn.ic>{{ trader.ic }}<td>{{ trader.phone }}<td align=left><a data-toggle=modal data-target=#modal-edit-trader href=#><i class=\"fa fa-pencil text-primary\" @click=getThisTrader(trader.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-trader href=#><i class=\"fa fa-trash text-danger\" @click=getThisTrader(trader.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div id=show-trader class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Detalhes do(a) {{ newTrader.name }}</h4></div><div class=modal-body><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover\"><thead><tr><th class=text-center colspan=2>INFORMAÇOES DO COMERCIANTE<tbody><tr><td><b>ID</b><td><i>{{ newTrader.id }}</i><tr><td><b>Nome</b><td><i>{{ newTrader.name }}</i><tr><td><b>BI</b><td><span class=\"label label-info\"><i>{{ newTrader.ic }}</i></span><tr><td><b>Idade</b><td><i>{{ newTrader.age }}</i><tr><td><b>Sexo</b><td><i>{{ alterGenderValue(newTrader.gender) }}</i><tr><td><b>Email</b><td><span class=\"label label-info\"><i>{{ newTrader.email }}</i></span><tr><td><b>Ilha</b><td><i>{{ alterStateValue(newTrader.state) }}</i><tr><td><b>Concelho</b><td><i>{{ newTrader.council }}</i><tr><td><b>Freguesia</b><td><i>{{ newTrader.parish }}</i><tr><td><b>Zona</b><td><i>{{ newTrader.zone }}</i><tr><td><b>Telefone</b><td><span class=label :class=\"{ 'label-info': newTrader.phone, 'none': !newTrader.phone }\"><i>{{ newTrader.phone }}</i></span><tr><td><b>Descrição</b><td><i>{{ newTrader.description }}</i><tr><td><b>Data da criação</b><td><i>{{ trader.created_at | formatDate 'DD/MM/YYYY' }}</i><tr><td><b>Data de atualização</b><td><i>{{ trader.updated_at | formatDate 'DD/MM/YYYY' }}</i></table></div></div></div></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal>Close</button></div></div></div></div><div class=\"modal fade\" id=modal-delete-trader tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar</h4></div><div class=modal-body><h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newTrader.name}}</span></h5></div><div class=modal-footer><button type=button class=\"btn btn-secondary\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteTrader(newTrader.id) @click=deleteTrader(newTrader.id) type=button class=\"btn btn-danger\">Eliminar</button></div></div></div></div><div id=modal-create-trader class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-8><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=Nome v-model=newTrader.name v-validate:name=\"['required']\"> <span class=\"fa fa-user form-control-feedback\"></span></div></div><div class=col-md-4><div class=\"form-group has-feedback\"><input type=number class=form-control name=ic placeholder=\"Número BI\" v-model=newTrader.ic> <span class=\"fa fa-id-card form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-8><div class=\"form-group has-feedback\"><input type=email class=form-control name=email placeholder=Email v-model=newTrader.email> <span class=\"fa fa-envelope form-control-feedback\"></span></div></div><div class=col-md-4><div class=\"form-group has-feedback\"><input type=number class=form-control name=phone placeholder=Telefone v-model=newTrader.phone> <span class=\"fa fa-phone form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-2><div class=\"form-group has-feedback\"><label class=radio-inline><input type=radio id=gender value=M name=gender v-model=newTrader.gender> <i class=\"fa fa-male\"></i></label><label class=radio-inline><input type=radio id=gender name=gender value=F v-model=newTrader.gender><i class=\"fa fa-female\"></i></label></div></div><div class=\"col-md-10 pull-right\"><div class=\"form-group has-feedback\"><input type=number class=form-control name=age placeholder=Idade v-model=newTrader.age> <span class=\"fa fa-birthday-cake form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><select name=state class=\"selectpicker form-control show-tick\" v-model=newTrader.state><optgroup label=Sotavento><option>Selecione Ilha<option value=2>Maio<option value=1>Santiago<option value=3>Fogo<option value=4>Brava<optgroup label=Barlavento><option value=5>Santo Antão<option value=6>São Nicolau<option value=7>São Vicente<option value=8>Sal<option value=9>Boa Vista</select></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=council placeholder=Concelho v-model=newTrader.council> <span class=\"fa fa-compass form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=parish placeholder=Freguezia v-model=newTrader.parish> <span class=\"fa fa-map-marker form-control-feedback\"></span></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=zone placeholder=Zona v-model=newTrader.zone> <span class=\"fa fa-thumb-tack form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newTrader.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createTrader class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button><label v-if=!newTrader.get_password class=\"checkbox-inline pull-left\"><input data-toggle=modal data-target=#getAcountForTrader type=checkbox v-model=newTrader.get_email>Obter uma conta</label><p v-if=newTrader.get_password class=\"text-help text-success pull-left\">Comerciante Estará no SAGMMA</div></div></div></div><div class=\"modal fade\" id=getAcountForTrader tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button @click=clearField class=close data-dismiss=modal aria-hidden=true>&times;</button><h5 class=modal-title>Introduza a palavra passe para a conta pretendida</h5></div><div class=modal-body><div class=\"form-group has-feedback\"><input type=password name=get_password class=\"form-control input-lg\" placeholder=\"Introduza a palavra passe\" v-model=newTrader.get_password> <span class=\"fa fa-lock form-control-feedback\"></span></div></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-close\"></i></button> <button :disabled=!newTrader.get_password type=button class=\"btn btn-primary\" data-dismiss=modal><i class=\"fa fa-check\"></i></button></div></div></div></div><div id=modal-edit-trader class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-8><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=Nome v-model=newTrader.name v-validate:name=\"['required']\"> <span class=\"fa fa-user form-control-feedback\"></span></div></div><div class=col-md-4><div class=\"form-group has-feedback\"><input type=number class=form-control name=ic placeholder=\"Número BI\" v-model=newTrader.ic> <span class=\"fa fa-id-card form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-8><div class=\"form-group has-feedback\"><input type=email class=form-control name=email placeholder=Email v-model=newTrader.email> <span class=\"fa fa-envelope form-control-feedback\"></span></div></div><div class=col-md-4><div class=\"form-group has-feedback\"><input type=number class=form-control name=phone placeholder=Telefone v-model=newTrader.phone> <span class=\"fa fa-phone form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-2><div class=\"form-group has-feedback\"><label class=radio-inline><input type=radio id=gender value=M name=gender v-model=newTrader.gender> <i class=\"fa fa-male\"></i></label><label class=radio-inline><input type=radio id=gender name=gender value=F v-model=newTrader.gender><i class=\"fa fa-female\"></i></label></div></div><div class=\"col-md-10 pull-right\"><div class=\"form-group has-feedback\"><input type=number class=form-control name=age placeholder=Idade v-model=newTrader.age> <span class=\"fa fa-birthday-cake form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><select name=state class=\"selectpicker form-control show-tick\" v-model=newTrader.state><optgroup label=Sotavento><option>Selecione Ilha<option value=2>Maio<option value=1>Santiago<option value=3>Fogo<option value=4>Brava<optgroup label=Barlavento><option value=5>Santo Antão<option value=6>São Nicolau<option value=7>São Vicente<option value=8>Sal<option value=9>Boa Vista</select></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=council placeholder=Concelho v-model=newTrader.council> <span class=\"fa fa-compass form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=parish placeholder=Freguezia v-model=newTrader.parish> <span class=\"fa fa-map-marker form-control-feedback\"></span></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=zone placeholder=Zona v-model=newTrader.zone> <span class=\"fa fa-thumb-tack form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=\"Descrição do utilizador\" class=form-control rows=5 cols=40 id=description v-model=newTrader.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedTrader(newTrader.id) type=button class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button></div></div></div></div></div></div>"
+
+},{"../../../Pagination/src/Component.vue":114,"vueify/lib/insert-css":108}],122:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
-var __vueify_style__ = __vueify_insert__.insert("h1 {\n  color: #00a8ed;\n}")
+var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -40904,24 +39691,11 @@ exports.default = {
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\r\n<div class=\"alert alert-success\" transition=\"success\" v-if=\"success\">\r\n\tTipo de funcionário adicionado com sucesso\r\n</div>\r\n\r\n\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-4 pull-right\">\r\n\t\t<div class=\"input-group\">\r\n\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t<input v-model=\"filter.term\" type=\"text\" class=\"form-control\" placeholder=\"Filtrar...\" aria-describedby=\"basic-addon1\">\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<button @click=\"clearField\" class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-typeofemployee\"><i class=\"fa fa-plus\"></i> Novo</button>\r\n\t</div>\r\n</div>\r\n<br>\r\n<div class=\"row\">\r\n\r\n<div class=\"col-md-12\">\r\n\t<div class='table-responsive'>\r\n\t\t<table class='table table-striped table-hover table-condensed'>\r\n\t\t\t<thead>\r\n\t\t\t\t<tr>\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'name')\">Nome</a>\r\n\t\t\t\t\t</th>\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'description')\">Descrição</a>\r\n\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n\t\t\t\t</tr>\r\n\t\t\t</thead>\r\n\t\t\t<tbody>\r\n\t\t\t\t<tr v-for=\"typeofemployee in typeofemployees | filterBy filter.term | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t<td>{{ typeofemployee.name }}</td>\r\n\t\t\t\t\t<td>{{ typeofemployee.description }}</td>\r\n\t\t\t\t\t<td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-typeofemployee\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisTypeofemployee(typeofemployee.id)\" > </i></a></td>\r\n\t\t\t\t\t<td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-typeofemployee\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisTypeofemployee(typeofemployee.id)\"></i></a></td>\r\n\t\t\t\t</tr>\r\n\t\t\t</tbody>\r\n\t\t</table>\r\n\t\t<div class=\"col-md-12 pull-left\">\r\n\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t<div class=\"modal fade\" id=\"modal-delete-typeofemployee\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t<div class=\"modal-dialog\">\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<h5>Eliminar - <span class=\"text-uppercase\">{{newTypeofemployee.name}}</span></h5>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\">Cancelar</button>\r\n\t\t\t\t\t<button  @keyup.enter=\"deleteTypeofemployee(newTypeofemployee.id)\" @click=\"deleteTypeofemployee(newTypeofemployee.id)\" type=\"button\" class=\"btn btn-danger\">Eliminar</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\t<!-- Modal -->\r\n\t<div id=\"modal-create-typeofemployee\" class=\"modal fade\" role=\"dialog\">\r\n\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t<!-- Modal content-->\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\">Registar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome do tipo de funcionário\" v-model=\"newTypeofemployee.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-users form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newTypeofemployee.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</form>\r\n\t\t\t\t\t</validator>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createTypeofemployee\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t<!-- Modal -->\r\n\t<div id=\"modal-edit-typeofemployee\" class=\"modal fade\" role=\"dialog\">\r\n\t\t<div class=\"modal-dialog\">\r\n\t\t\t<!-- Modal content-->\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\">Editar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<validator name=\"validation1\">\r\n\t\t\t\t\t\t<form methods=\"patch\">\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" v-model=\"newTypeofemployee.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-users form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição deste Mescado\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newTypeofemployee.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</form>\r\n\t\t\t\t\t</validator>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\t\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedTypeofemployee(newTypeofemployee.id)\" type=\"button\" class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n</div>\r\n"
-if (module.hot) {(function () {  module.hot.accept()
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), true)
-  if (!hotAPI.compatible) return
-  module.hot.dispose(function () {
-    __vueify_insert__.cache["h1 {\n  color: #00a8ed;\n}"] = false
-    document.head.removeChild(__vueify_style__)
-  })
-  if (!module.hot.data) {
-    hotAPI.createRecord("_v-c1ff5fa6", module.exports)
-  } else {
-    hotAPI.update("_v-c1ff5fa6", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
-  }
-})()}
-},{"../../../Pagination/src/Component.vue":116,"babel-runtime/helpers/defineProperty":14,"vue":109,"vue-hot-reload-api":105,"vueify/lib/insert-css":110}],125:[function(require,module,exports){
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success>Tipo de funcionário adicionado com sucesso</div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=row><div class=col-md-12><button @click=clearField class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-typeofemployee><i class=\"fa fa-plus\"></i> Novo</button></div></div><br><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'description')\">Descrição</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"typeofemployee in typeofemployees | filterBy filter.term | orderBy sortColumn sortInverse\"><td>{{ typeofemployee.name }}<td>{{ typeofemployee.description }}<td align=left><a data-toggle=modal data-target=#modal-edit-typeofemployee href=#><i class=\"fa fa-pencil text-primary\" @click=getThisTypeofemployee(typeofemployee.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-typeofemployee href=#><i class=\"fa fa-trash text-danger\" @click=getThisTypeofemployee(typeofemployee.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div class=\"modal fade\" id=modal-delete-typeofemployee tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar</h4></div><div class=modal-body><h5>Eliminar - <span class=text-uppercase>{{newTypeofemployee.name}}</span></h5></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteTypeofemployee(newTypeofemployee.id) @click=deleteTypeofemployee(newTypeofemployee.id) type=button class=\"btn btn-danger\">Eliminar</button></div></div></div></div><div id=modal-create-typeofemployee class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=\"Nome do tipo de funcionário\" v-model=newTypeofemployee.name v-validate:name=\"['required']\"> <span class=\"fa fa-users form-control-feedback\"></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newTypeofemployee.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createTypeofemployee class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button></div></div></div></div><div id=modal-edit-typeofemployee class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name v-model=newTypeofemployee.name v-validate:name=\"['required']\"> <span class=\"fa fa-users form-control-feedback\"></span><p style=color:red v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=\"Descrição deste Mescado\" class=form-control rows=5 cols=40 id=description v-model=newTypeofemployee.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button v-on:show=\"\" @click=saveEditedTypeofemployee(newTypeofemployee.id) type=button class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button></div></div></div></div></div></div>"
+
+},{"../../../Pagination/src/Component.vue":114,"babel-runtime/helpers/defineProperty":14,"vueify/lib/insert-css":108}],123:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
-var __vueify_style__ = __vueify_insert__.insert("h1 {\n  color: #00a8ed;\n}")
+var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -41094,24 +39868,11 @@ exports.default = {
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\r\n<div class=\"alert alert-success\" transition=\"success\" v-if=\"success\">\r\n\t<i class=\"fa fa-thumbs-up\"> Sucesso!!!</i>\r\n</div>\r\n\r\n\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-4 pull-right\">\r\n\t\t<div class=\"input-group\">\r\n\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t<input v-model=\"filter.term\" type=\"text\" class=\"form-control\" placeholder=\"Filtrar...\" aria-describedby=\"basic-addon1\">\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n<div class=\"col-md-12\">\r\n\t<button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-typeofplace\"><i class=\"fa fa-plus\"></i> Novo</button>\r\n</div>\r\n<br><br>\r\n\r\n<div class=\"col-md-12\">\r\n\t<div class='table-responsive'>\r\n\t\t<table class='table table-striped table-hover table-condensed'>\r\n\t\t\t<thead>\r\n\t\t\t\t<tr>\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'name')\">Nome</a>\r\n\t\t\t\t\t</th>\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'description')\">Descrição</a>\r\n\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n\t\t\t\t</tr>\r\n\t\t\t</thead>\r\n\t\t\t<tbody>\r\n\t\t\t\t<tr v-for=\"typeofplace in typeofplaces | filterBy filter.term | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t<td>{{ typeofplace.name }}</td>\r\n\t\t\t\t\t<td>{{ typeofplace.description }}</td>\r\n\t\t\t\t\t<td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-typeofplace\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisTypeofplace(typeofplace.id)\" > </i></a></td>\r\n\t\t\t\t\t<td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-typeofplace\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisTypeofplace(typeofplace.id)\"></i></a></td>\r\n\t\t\t\t</tr>\r\n\t\t\t</tbody>\r\n\t\t</table>\r\n\t\t<div class=\"col-md-12 pull-left\">\r\n\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t<div class=\"modal fade\" id=\"modal-delete-typeofplace\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t<div class=\"modal-dialog\">\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newTypeofplace.name}}</span></h5>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Cancelar</button>\r\n\t\t\t\t\t<button  @keyup.enter=\"deleteTypeofplace(newTypeofplace.id)\" @click=\"deleteTypeofplace(newTypeofplace.id)\" type=\"button\" class=\"btn btn-danger\">Eliminar</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\t<!-- Modal -->\r\n\t<div id=\"modal-create-typeofplace\" class=\"modal fade\" role=\"dialog\">\r\n\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t<!-- Modal content-->\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\">Registar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome do tipo de espaço\" v-model=\"newTypeofplace.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newTypeofplace.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</form>\r\n\t\t\t\t\t</validator>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createTypeofplace\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t<!-- Modal -->\r\n\t<div id=\"modal-edit-typeofplace\" class=\"modal fade\" role=\"dialog\">\r\n\t\t<div class=\"modal-dialog\">\r\n\t\t\t<!-- Modal content-->\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\">Editar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<validator name=\"validation1\">\r\n\t\t\t\t\t\t<form methods=\"patch\">\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" v-model=\"newTypeofplace.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newTypeofplace.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</form>\r\n\t\t\t\t\t</validator>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedTypeofplace(newTypeofplace.id)\" type=\"button\" class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n"
-if (module.hot) {(function () {  module.hot.accept()
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), true)
-  if (!hotAPI.compatible) return
-  module.hot.dispose(function () {
-    __vueify_insert__.cache["h1 {\n  color: #00a8ed;\n}"] = false
-    document.head.removeChild(__vueify_style__)
-  })
-  if (!module.hot.data) {
-    hotAPI.createRecord("_v-3a7c6767", module.exports)
-  } else {
-    hotAPI.update("_v-3a7c6767", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
-  }
-})()}
-},{"../../../Pagination/src/Component.vue":116,"vue":109,"vue-hot-reload-api":105,"vueify/lib/insert-css":110}],126:[function(require,module,exports){
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success><i class=\"fa fa-thumbs-up\">Sucesso!!!</i></div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=col-md-12><button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-typeofplace><i class=\"fa fa-plus\"></i> Novo</button></div><br><br><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'description')\">Descrição</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"typeofplace in typeofplaces | filterBy filter.term | orderBy sortColumn sortInverse\"><td>{{ typeofplace.name }}<td>{{ typeofplace.description }}<td align=left><a data-toggle=modal data-target=#modal-edit-typeofplace href=#><i class=\"fa fa-pencil text-primary\" @click=getThisTypeofplace(typeofplace.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-typeofplace href=#><i class=\"fa fa-trash text-danger\" @click=getThisTypeofplace(typeofplace.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div class=\"modal fade\" id=modal-delete-typeofplace tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar</h4></div><div class=modal-body><h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newTypeofplace.name}}</span></h5></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteTypeofplace(newTypeofplace.id) @click=deleteTypeofplace(newTypeofplace.id) type=button class=\"btn btn-danger\">Eliminar</button></div></div></div></div><div id=modal-create-typeofplace class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=\"Nome do tipo de espaço\" v-model=newTypeofplace.name v-validate:name=\"['required']\"> <span class=form-control-feedback></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newTypeofplace.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createTypeofplace class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button></div></div></div></div><div id=modal-edit-typeofplace class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name v-model=newTypeofplace.name v-validate:name=\"['required']\"> <span class=form-control-feedback></span><p style=color:red v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newTypeofplace.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedTypeofplace(newTypeofplace.id) type=button class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button></div></div></div></div></div>"
+
+},{"../../../Pagination/src/Component.vue":114,"vueify/lib/insert-css":108}],124:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
-var __vueify_style__ = __vueify_insert__.insert("h1 {\n  color: #00a8ed;\n}")
+var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -41222,24 +39983,11 @@ exports.default = {
     components: {}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=\"success\" v-if=\"success\">\n\tUsuário adicionado com sucesso\n</div>\n\n<validator name=\"validation1\">\n\t<form action=\"#\" methods=\"POST\" @submit.prevent = \"createUser\">\n\t\t<div class=\"row\">\n\t\t\t<div class=\"col-md-12\">\n\n\t\t\t\t<!-- Form Errors -->\n\t\t\t\t<div class=\"alert alert-danger\" v-if=\"errors.length > 0\">\n\t\t\t\t\t<p><strong>Whoops!</strong>Algo naõ bate!</p>\n\t\t\t\t\t<br>\n\t\t\t\t\t<ul>\n\t\t\t\t\t\t<li v-for=\"error in errors\">\n\t\t\t\t\t\t\t{{ error }}\n\t\t\t\t\t\t</li>\n\t\t\t\t\t</ul>\n\t\t\t\t</div>\n\n\t\t\t\t<div class=\"col-md-6\">\n\t\t\t\t\t<div class=\"form-group has-feedback\">\n\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" placeholder=\"Nome Completo\" name=\"name\" v-model=\"newUser.name\" v-validate:name=\"['required']\"/>\n\t\t\t\t\t\t<span class=\"glyphicon glyphicon-user form-control-feedback\"></span>\n\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validation1.name.required\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\n\t\t\t\t<div class=\"col-md-6\">\n\t\t\t\t\t<div class=\"form-group has-feedback\">\n\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" placeholder=\"Usuário\" name=\"username\" v-model=\"newUser.username\" v-validate:username=\"['required']\"/>\n\t\t\t\t\t\t<span class=\"glyphicon glyphicon-user form-control-feedback\"></span>\n\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validation1.username.required\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<div class=\"row\">\n\t\t\t<div class=\"col-md-12\">\n\t\t\t\t<div class=\"col-md-12\">\n\t\t\t\t\t<div class=\"form-group has-feedback\">\n\t\t\t\t\t\t<input type=\"email\" class=\"form-control\" placeholder=\"Email\" name=\"email\" v-model=\"newUser.email\"/>\n\t\t\t\t\t\t<span class=\"glyphicon glyphicon-envelope form-control-feedback\"></span>\n\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"!myValidation.email\"><span data-toggle=\"tooltip\" title=\"Recorda-se de introduzir email valido! ex exemplo@exemplo.cv\">*</span></p>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<div class=\"row\">\n\t\t\t<div class=\"col-md-12\">\n\t\t\t\t<div class=\"col-md-6\">\n\t\t\t\t\t<div class=\"form-group has-feedback\">\n\t\t\t\t\t\t<input type=\"password\" class=\"form-control\" placeholder=\"Password\" name=\"password\" v-model=\"newUser.password\" v-validate:password=\"['required']\"/>\n\t\t\t\t\t\t<span class=\"glyphicon glyphicon-lock form-control-feedback\"></span>\n\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validation1.password.required\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida\">*</span></p>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\n\n\t\t\t\t<!-- <div class=\"col-md-6\">\n\t\t\t\t<div class=\"form-group has-feedback\">\n\t\t\t\t<input type=\"password\" class=\"form-control\" placeholder=\"Confirme o password\" name=\"password_confirmation\" v-model=\"newUser.password_confirmation\"  v-validate:password_confirmation=\"['required']\"/>\n\t\t\t\t<span class=\"glyphicon glyphicon-log-in form-control-feedback\"></span>\n\t\t\t\t<p style=\"color:red;\" v-if=\"$validation1.password_confirmation.required\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida\">*</span></p>\n\t\t\t</div>\n\t\t</div> -->\n\n\n\t</div>\n</div>\n\n<hr><!-------------------------------------------------------------------------------------------------------------------->\n\n<div class=\"row\">\n\t<div class=\"col-md-12\">\n\t\t<div class=\"col-md-6\">\n\t\t\t<div class=\"form-group has-feedback\">\n\t\t\t\t<select name=\"gender\" class=\"selectpicker  form-control\" title=\"Selecione o sexo\" v-model=\"newUser.gender\">\n\t\t\t\t\t<option value=\"M\">Masculino</option>\n\t\t\t\t\t<option value=\"F\">Femenino</option>\n\t\t\t\t\t<option value=\"other\">Outro</option>\n\t\t\t\t</select>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<div class=\"col-md-6\">\n\t\t\t<div class=\"form-group has-feedback\">\n\t\t\t\t<input type=\"number\" class=\"form-control\" placeholder=\"Introduza a idade\" name=\"age\" min=\"20\" max=\"50\" v-model=\"newUser.age\"/>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</div>\n\n <div class=\"row\">\n\t<div class=\"col-md-12\">\n\t\t<div class=\"col-md-3\">\n\t\t\t<div class=\"form-group has-feedback\">\n\t\t\t\t<input type=\"text\" class=\"form-control\" placeholder=\"Ilha\" name=\"sland\" v-model=\"newUser.sland\"/>\n\t\t\t\t<span  class=\"fa fa-globe form-control-feedback\"></span>\n\t\t\t\t<p class=\"help-block\">Introduza a ilha a qual o usario pertence</p>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<div class=\"col-md-3\">\n\t\t\t<div class=\"form-group has-feedback\">\n\t\t\t\t<input type=\"text\" class=\"form-control\" placeholder=\"Concelho\" name=\"council\" v-model=\"newUser.council\"/>\n\t\t\t\t<span class=\"fa fa-compass form-control-feedback\"></span>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<div class=\"col-md-3\">\n\t\t\t<div class=\"form-group has-feedback\">\n\t\t\t\t<input type=\"text\" class=\"form-control\" placeholder=\"Freguezia\" name=\"parish\" v-model=\"newUser.parish\"/>\n\t\t\t\t<span class=\"fa fa-map-marker form-control-feedback\"></span>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<div class=\"col-md-3\">\n\t\t\t<div class=\"form-group has-feedback\">\n\t\t\t\t<input type=\"text\" class=\"form-control\" placeholder=\"Zona\" name=\"zone\" v-model=\"newUser.zone\"/>\n\t\t\t\t<span class=\"fa fa-thumb-tack form-control-feedback\"></span>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</div>\n\n<hr><!---------------------------------------------------------------------------------------------------------------->\n\n<div class=\"row\">\n\t<div class=\"col-md-12\">\n\t\t<div class=\"col-md-12\">\n\t\t\t<div class=\"form-group has-feedback\">\n\t\t\t\t<select name=\"type\" class=\"selectpicker  form-control\" title=\"Selecione o grupo para este usuario\" v-model=\"newUser.type\">\n\t\t\t\t\t<option value=\"admin\">Admin</option>\n\t\t\t\t\t<option value=\"gest\">Gest</option>\n\t\t\t\t\t<option value=\"ta\">TA</option>\n\t\t\t\t\t<option value=\"pa\">PA</option>\n\t\t\t\t\t<option value=\"member\">Menbro</option>\n\t\t\t\t</select>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</div>\n\n<hr><!---------------------------------------------------------------------------------------------------------------->\n\n<div class=\"row\">\n\t<div class=\"col-md-12\">\n\t\t<div class=\"col-md-12\">\n\t\t\t<div class=\"form-group has-feedback\">\n\t\t\t\t<textarea name=\"bio\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"bio\" v-model=\"newUser.bio\" placeholder=\"Adciona um piquema discrição do curiculo do susuario...\"></textarea>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</div>\n\n<hr><!----------------------------------------------------------------------------------------------------------------->\n\n<div class=\"form-group\">\n\t<button :disabled = \"!$validation1.valid\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar Dados Introduzidos</button>\n</div>\n</form>\n\n</validator>\n"
-if (module.hot) {(function () {  module.hot.accept()
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), true)
-  if (!hotAPI.compatible) return
-  module.hot.dispose(function () {
-    __vueify_insert__.cache["h1 {\n  color: #00a8ed;\n}"] = false
-    document.head.removeChild(__vueify_style__)
-  })
-  if (!module.hot.data) {
-    hotAPI.createRecord("_v-0e08f789", module.exports)
-  } else {
-    hotAPI.update("_v-0e08f789", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
-  }
-})()}
-},{"babel-runtime/core-js/object/keys":10,"babel-runtime/helpers/typeof":15,"vue":109,"vue-hot-reload-api":105,"vueify/lib/insert-css":110}],127:[function(require,module,exports){
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success>Usuário adicionado com sucesso</div><validator name=validation1><form action=# methods=POST @submit.prevent=createUser><div class=row><div class=col-md-12><div class=\"alert alert-danger\" v-if=\"errors.length > 0\"><p><strong>Whoops!</strong>Algo naõ bate!</p><br><ul><li v-for=\"error in errors\">{{ error }}</ul></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control placeholder=\"Nome Completo\" name=name v-model=newUser.name v-validate:name=\"['required']\"> <span class=\"glyphicon glyphicon-user form-control-feedback\"></span><p style=color:red v-if=$validation1.name.required><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control placeholder=Usuário name=username v-model=newUser.username v-validate:username=\"['required']\"> <span class=\"glyphicon glyphicon-user form-control-feedback\"></span><p style=color:red v-if=$validation1.username.required><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=email class=form-control placeholder=Email name=email v-model=newUser.email> <span class=\"glyphicon glyphicon-envelope form-control-feedback\"></span><p style=color:red v-if=!myValidation.email><span data-toggle=tooltip title=\"Recorda-se de introduzir email valido! ex exemplo@exemplo.cv\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input type=password class=form-control placeholder=Password name=password v-model=newUser.password v-validate:password=\"['required']\"> <span class=\"glyphicon glyphicon-lock form-control-feedback\"></span><p style=color:red v-if=$validation1.password.required><span data-toggle=tooltip title=\"Este campo tem de ser preenchida\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><select name=gender class=\"selectpicker form-control\" title=\"Selecione o sexo\" v-model=newUser.gender><option value=M>Masculino<option value=F>Femenino<option value=other>Outro</select></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=number class=form-control placeholder=\"Introduza a idade\" name=age min=20 max=50 v-model=newUser.age></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-3><div class=\"form-group has-feedback\"><input type=text class=form-control placeholder=Ilha name=sland v-model=newUser.sland> <span class=\"fa fa-globe form-control-feedback\"></span><p class=help-block>Introduza a ilha a qual o usario pertence</div></div><div class=col-md-3><div class=\"form-group has-feedback\"><input type=text class=form-control placeholder=Concelho name=council v-model=newUser.council> <span class=\"fa fa-compass form-control-feedback\"></span></div></div><div class=col-md-3><div class=\"form-group has-feedback\"><input type=text class=form-control placeholder=Freguezia name=parish v-model=newUser.parish> <span class=\"fa fa-map-marker form-control-feedback\"></span></div></div><div class=col-md-3><div class=\"form-group has-feedback\"><input type=text class=form-control placeholder=Zona name=zone v-model=newUser.zone> <span class=\"fa fa-thumb-tack form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select name=type class=\"selectpicker form-control\" title=\"Selecione o grupo para este usuario\" v-model=newUser.type><option value=admin>Admin<option value=gest>Gest<option value=ta>TA<option value=pa>PA<option value=member>Menbro</select></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=bio class=form-control rows=5 cols=40 id=bio v-model=newUser.bio placeholder=\"Adciona um piquema discrição do curiculo do susuario...\"></textarea></div></div></div></div><hr><div class=form-group><button :disabled=!$validation1.valid class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar Dados Introduzidos</button></div></form></validator>"
+
+},{"babel-runtime/core-js/object/keys":10,"babel-runtime/helpers/typeof":15,"vueify/lib/insert-css":108}],125:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
-var __vueify_style__ = __vueify_insert__.insert("h1 {\n  color: #00a8ed;\n}")
+var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -41600,22 +40348,9 @@ exports.default = {
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\r\n<div class=\"alert alert-success\" transition=\"success\" v-if=\"success\">\r\n\tutilizador adicionado com sucesso\r\n</div>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-8\">\r\n\t\t<!-- <label class=\"checkbox-inline\"><input type=\"checkbox\" id=\"john\" value=\"John\" v-model=\"showColumn.username\">User Name</label> -->\r\n\t\t<!-- <label class=\"checkbox-inline\"><input type=\"checkbox\" id=\"jack\" value=\"Jack\" v-model=\"showColumn.gender\">Genero</label> -->\r\n\t\t<!-- <label class=\"checkbox-inline\"><input type=\"checkbox\" id=\"jack\" value=\"Jack\" v-model=\"showColumn.age\">Idade</label> -->\r\n\t\t<!-- <label class=\"checkbox-inline\"><input type=\"checkbox\" id=\"mike\" value=\"Mike\" v-model=\"showColumn.state\">Ilha</label> -->\r\n\t\t<!-- <label class=\"checkbox-inline\"><input type=\"checkbox\" id=\"mike\" value=\"Mike\" v-model=\"showColumn.council\">Concelho</label> -->\r\n\t\t<!-- <label class=\"checkbox-inline\"><input type=\"checkbox\" id=\"mike\" value=\"Mike\" v-model=\"showColumn.parish\">Freguezia</label> -->\r\n\t\t<!-- <label class=\"checkbox-inline\"><input type=\"checkbox\" id=\"mike\" value=\"Mike\" v-model=\"showColumn.created_at\">Data</label> -->\r\n\t</div>\r\n\r\n\t<div class=\"col-md-4 pull-left\">\r\n\t\t<div class=\"input-group\">\r\n\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t<input v-model=\"filter.term\" type=\"text\" class=\"form-control\" placeholder=\"Filtrar...\" aria-describedby=\"basic-addon1\">\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<button @click=\"clearField\" class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-user\"><i class=\"fa fa-plus\"></i> Novo</button>&nbsp;&nbsp;\r\n\t\t<a class=\"btn btn-primary btn-flat btn-outline\" href=\"/export/printableUserInformation\"><i class=\"fa fa-print\"></i> Imprimir</a>\r\n\t</div>\r\n</div>\r\n\r\n<br>\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<!-- <button class=\"btn btn-secondary pull-right\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-user\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i></button> -->\r\n\t\t<div class='table-responsive'>\r\n\t\t\t<table class='table table-striped table-hover table-success'>\r\n\t\t\t\t<thead>\r\n\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'name')\">Nome</a>\r\n\t\t\t\t\t\t</th>\r\n\t\t\t\t\t\t<!-- <th class=\"info\" v-if=\"showColumn.username\">\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'username' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'username' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'username')\">Nome</a>\r\n\t\t\t\t\t</th> -->\r\n\t\t\t\t\t<!-- <th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'email' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'email' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'email')\">Email</a>\r\n\t\t\t\t\t</th> -->\r\n\t\t\t\t\t<!-- <th class=\"info\" v-if=\"showColumn.gender\">\r\n\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'gender' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'gender' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'gender')\">Genero</a>\r\n\t\t\t\t</th> -->\r\n\t\t\t\t<!-- <th class=\"info\" v-if=\"showColumn.age\">\r\n\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'age' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'age' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'age')\">Idade</a>\r\n\t\t\t</th> -->\r\n\r\n\r\n\t\t\t<!-- <th class=\"info\" v-if=\"showColumn.state\">\r\n\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'state' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'state' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t<a href=\"#\" @click = \"doSort($event, 'state')\">Ilha</a>\r\n\t\t</th> -->\r\n\r\n\t\t<!-- <th class=\"info\" v-if=\"showColumn.council\">\r\n\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'council' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'council' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t<a href=\"#\" @click = \"doSort($event, 'council')\">Conselho</a>\r\n\t</th> -->\r\n\r\n\t<!-- <th class=\"info\" v-if=\"showColumn.parish\">\r\n\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'parish' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'parish' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t<a href=\"#\" @click = \"doSort($event, 'parish')\">Freguezia</a>\r\n</th> -->\r\n\r\n<!-- <th>\r\n<i :class = \"{'fa-sort-amount-asc': sortColumn == 'zone' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'zone' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n<a href=\"#\" @click = \"doSort($event, 'zone')\">Zona</a>\r\n</th> -->\r\n\r\n<th>\r\n\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'phone' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'phone' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t<a href=\"#\" @click = \"doSort($event, 'phone')\">Tel</a>\r\n</th>\r\n\r\n\r\n\r\n<!-- <th class=\"info\" v-if=\"showColumn.created_at\">\r\n<i :class = \"{'fa-sort-amount-asc': sortColumn == 'created_at' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'created_at' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n<a href=\"#\" @click = \"doSort($event, 'created_at')\">Data</a>\r\n</th> -->\r\n\r\n<th>\r\n\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'status' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'status' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t<a href=\"#\" @click = \"doSort($event, 'status')\">Estado</a>\r\n</th>\r\n\r\n\r\n<!-- <th>\r\n\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'type' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'type' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t<a href=\"#\" @click = \"doSort($event, 'type')\">Tipo</a>\r\n</th> -->\r\n\r\n<!-- <th>Foto</th> -->\r\n<!-- <th  class=\"text-center\">Visualizar</th> -->\r\n\r\n<th  class=\"text-center\" colspan=\"2\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n\r\n\r\n<th width=75  class=\"text-center\">\r\n\r\n\t<a @click = \"openAllDetails\" href=\"#\">\r\n\t\t<span><i data-toggle=\"tooltip\" data-placement=\"left\" title=\"Ver Todos os papeis\" class=\"fa\"  :class=\"{'fa-lock': openDetails.length == 0, 'fa-unlock': openDetails.length > 0}\"></i></span>\r\n\t</a>\r\n\r\n</th>\r\n\r\n</tr>\r\n</thead>\r\n<tbody  v-for=\"user in users | filterBy filter.term | orderBy sortColumn sortInverse\">\r\n\t<tr>\r\n\t\t<td><a href=\"#\" data-toggle=\"modal\" data-target=\"#show-user\" @click=\"getThisUser(user.id)\">{{ user.name }}</a></td>\r\n\t\t<!-- <td><a href=\"#\" data-toggle=\"tooltip modal\" data-placement=\"top\" data-target=\"#show-user\" title=\"+ Sobre {{ user.name }}\">{{ user.name }}</a></td> -->\r\n\t\t<!-- <td class=\"info\" v-if=\"showColumn.username\">{{ user.username }}</td> -->\r\n\t\t<!-- <td>{{ user.email }}</td> -->\r\n\t\t<!-- <td class=\"info\" v-if=\"showColumn.gender\">{{ alterAgeValue(user.gender) }}</td> -->\r\n\t\t<!-- <td class=\"info\" v-if=\"showColumn.age\">{{ user.age }}</td> -->\r\n\t\t<!-- <td class=\"info\" v-if=\"showColumn.state\">{{ user.state }}</td> -->\r\n\t\t<!-- <td class=\"info\" v-if=\"showColumn.council\">{{ user.council }}</td> -->\r\n\t\t<!-- <td class=\"info\" v-if=\"showColumn.parish\">{{ user.parish }}</td> -->\r\n\t\t<!-- <td>{{ user.zone }}</td> -->\r\n\t\t<td>{{ user.phone }}</td>\r\n\t\t<!-- <td class=\"info\" v-if=\"showColumn.created_at\">{{ user.created_at | formatDate 'DD/MM/YYYY' }}</td> -->\r\n\r\n\t\t<!----------------------------------------------------------------------------------->\r\n\t\t<td v-if=\"user.name != 'Admin'\">\r\n\t\t\t<button type=\"submit\" @click = \"estado_utilizador(user.id)\" class='btn btn-xs btn-flat' :class=\"{ 'btn-info': user.status, 'btn-danger': !user.status }\">{{user.status ? 'Ativado' : 'Disativado'}}</button>\r\n\t\t</td>\r\n\t\t<td v-if=\"user.name == 'Admin'\">\r\n\t\t\t<button class='btn btn-success btn-xs btn-flat' disabled=\"disabled\">Admin</button>\r\n\t\t</td>\r\n\t\t<!----------------------------------------------------------------------------------->\r\n\r\n\r\n\t\t<!-- <td  class=\"text-success\">{{ alterTypeValue(user.type) }}</td> -->\r\n\r\n\r\n\t\t<!-- tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt -->\r\n\r\n\t\t<!------------------------------------------------------------------------------->\r\n\t\t<!-- <td class=\"text-center\">\r\n\t\t<a href=\"showThisUser/{{user.id}}\"><i class=\"fa fa-eye text-success\"></i></a>\r\n\t</td> -->\r\n\t<!------------------------------------------------------------------------------->\r\n\r\n\t<td v-if=\"user.name != 'Admin'\" class=\"text-center\">  <a data-toggle=\"modal\" data-target=\"#modal-edit-user\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisUser(user.id)\"> </i></a></td>\r\n\r\n\t<td v-if=\"user.name == 'Admin'\" class=\"text-center\">\r\n\t\t<i class=\"fa fa-ban text-warning\"></i>\r\n\t</td>\r\n\t<!------------------------------------------------------------------------------->\r\n\r\n\t<!------------------------------------------------------------------------------->\r\n\t<td v-if=\"user.name != 'Admin'\" class=\"text-center\"><a data-toggle=\"modal\" data-target=\"#modal-delete-user\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisUser(user.id)\" ></i></a></td>\r\n\r\n\t<td v-if=\"user.name == 'Admin'\" class=\"text-center\">\r\n\t\t<i class=\"fa fa-ban text-warning\">\r\n\t\t</td>\r\n\t\t<!------------------------------------------------------------------------------->\r\n\t\t<!-- tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt -->\r\n\r\n\r\n\t\t<!------------------------------------------------------------------------------->\r\n\t\t<td v-if=\"user.name != 'Admin'\"  width=75 class=\"text-center\">\r\n\t\t\t<a @click = \"doOpenDetails($event, user.id)\" v-show=\"user.roles != ''\" href=\"#\"><i data-toggle=\"tooltip\" data-placement=\"left\" title=\"Ver Papeis de utilizador\" class=\"fa\" :class=\"{'fa-plus-square': openDetails.indexOf(user.id) == -1, 'fa-minus-square': openDetails.indexOf(user.id) > -1}\"></i></a>\r\n\t\t\t<i class=\"fa fa-plus-square\" v-show=\"user.roles == ''\" style=\"opacity: 0.3\"></i>\r\n\t\t</td>\r\n\r\n\t\t<td v-if=\"user.name == 'Admin'\"  width=75 class=\"text-center\">\r\n\t\t\t<i class=\"fa fa-minus-square\"></i>\r\n\t\t</td>\r\n\t\t<!------------------------------------------------------------------------------->\r\n\t</tr>\r\n\r\n\t<!----------------------------------------------------------------------------------->\r\n\t<tr class=\"\" v-show=\"openDetails.indexOf(user.id) > -1 && user.roles != ''\">\r\n\t\t<td colspan=\"12\">\r\n\t\t\t<span class=\"label label-primary\"  v-for=\"roles in user.roles\"><b> <i class=\"fa fa-unlock\"></i> {{ roles.display_name }}&nbsp;</b></span>\r\n\t\t\t</td\r\n\t\t</tr>\r\n\t</tbody>\r\n</table>\r\n<div class=\"col-md-12 pull-left\">\r\n\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n</div>\r\n</div>\r\n\r\n<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\r\n<div id=\"show-user\" class=\"modal fade\" role=\"dialog\">\r\n\t<div class=\"modal-dialog\">\r\n\r\n\t\t<!-- Modal content-->\r\n\t\t<div class=\"modal-content\">\r\n\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t<h4 class=\"modal-title\">Info do {{ newUser.name }}</h4>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t<div class=\"col-md-6 col-md-offset-5\">\r\n\t\t\t\t\t\t\t<img src=\"/uploads/avatars/{{ newUser.avatar }}\" alt=\"Imagem do Usuário\" style=\"width: 100px; height: 100px; float: left; border-radius: 50%; margin-right: 25px\" />\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<hr>\r\n\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t<div class='table-responsive'>\r\n\t\t\t\t\t\t\t<table class='table table-striped table-hover'>\r\n\t\t\t\t\t\t\t\t<thead>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<th class=\"text-center\" colspan=\"2\">INFORMAÇOES DO UTILIZADOR</th>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t</thead>\r\n\t\t\t\t\t\t\t\t<tbody>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>ID</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><i>{{ newUser.id }}</i></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Nome</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><i>{{ newUser.name }}</i></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Utilizador</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><span class=\"label label-info\"><i>{{ newUser.username }}</i></span></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Sexo</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><i>{{ alterGenderValue(newUser.gender) }}</i></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>BI</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><span class=\"label label-info\"><i>{{ newUser.ic }}</i></span></td>\r\n\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Idade</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><i>{{ newUser.age }}</i></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Email</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><span class=\"label label-info\"><i>{{ newUser.email }}</i></span></td>\r\n\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Telefone</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><span class=\"label\" :class=\"{ 'label-info': newUser.phone, 'none': !newUser.phone }\"><i>{{ newUser.phone }}</i></span></td>\r\n\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Ilha</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><i>{{ alterStateValue(newUser.state) }}</i></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Concelho</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><i>{{ newUser.council }}</i></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Freguesia</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><i>{{ newUser.parish }}</i></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Zona</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><i>{{ newUser.zone }}</i></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Tipo</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><span class=\"label label-primary\"><i>{{ alterTypeValue(newUser.type) }}</i></span></td>\r\n\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Estado</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><span class='label' :class=\"{ 'label-info': newUser.status, 'label-danger': !newUser.status }\"><i>{{newUser.status ? 'Ativado' : 'Disativado'}}</i></span></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Descrição</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><i>{{ newUser.description }}</i></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Data da criação</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><i>{{ user.created_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t<td><b>Data de atualização</b></td>\r\n\t\t\t\t\t\t\t\t\t\t<td><i>{{ user.updated_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t</tbody>\r\n\t\t\t\t\t\t\t</table>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t</div>\r\n</div>\r\n\r\n\r\n<div class=\"modal fade\" id=\"modal-delete-user\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t<div class=\"modal-dialog\">\r\n\t\t<div class=\"modal-content\">\r\n\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar Utilizador</h4>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t<h1>Eliminar Utilizador {{newUser.name}}</h1>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Cancelar</button>\r\n\t\t\t\t<button  @keyup.enter=\"deleteUser(newUser.id)\" @click=\"deleteUser(newUser.id)\" type=\"button\" class=\"btn btn-default\">Eliminar Utilizador</button>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n\r\n<!--------------------------------------------------------------------------------------------------------->\r\n<!-- Modal -->\r\n<div id=\"modal-create-user\" class=\"modal fade\" role=\"dialog\">\r\n\t<div class=\"modal-dialog\">\r\n\r\n\t\t<!-- Modal content-->\r\n\t\t<div class=\"modal-content\">\r\n\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t<h4 class=\"modal-title\">Criar Utilizador</h4>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-8\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome Completo\" v-model=\"newUser.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-user form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-4\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"username\" placeholder=\"utilizador\" v-model=\"newUser.username\" v-validate:username=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-user-circle form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.username.required && $validationew.username.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-8\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<input type=\"email\" class=\"form-control\" name=\"email\" placeholder=\"Email\" v-model=\"newUser.email\" v-validate:email=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-envelope form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t<span style=\"color:red;\" v-show=\"!myValidation.email\" v-if=\"$validationew.email.required && $validationew.email.touched\"><span data-toggle=\"tooltip\" title=\"Este campo é obrigatório\">*</span></span>&nbsp;&nbsp;&nbsp;\r\n\t\t\t\t\t\t\t\t\t\t<span style=\"color:red;\" v-if=\"!myValidation.email && $validationew.email.touched\"><span data-toggle=\"tooltip\" title=\"Recorda-se de introduzir email valido! ex exemplo@exemplo.cv\">*</span></span>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-4\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<input v-model=\"newUser.ic\" type='number' class='form-control' placeholder='Número BI'>\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-id-card form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<input type=\"password\" class=\"form-control\" name=\"password\" placeholder=\"Password\" v-model=\"newUser.password\" v-validate:password=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-lock form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.password.required && $validationew.password.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<input v-model=\"newUser.phone\" type='number' class='form-control' placeholder='Introduza o Numero'>\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-phone form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<hr><!-------------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<label class=\"radio-inline\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"radio\" id=\"gender\" value=\"M\" name=\"gender\" v-model=\"newUser.gender\"> Masculino\r\n\t\t\t\t\t\t\t\t\t\t</label>\r\n\t\t\t\t\t\t\t\t\t\t<label class=\"radio-inline\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"radio\" id=\"gender\" name=\"gender\" value=\"F\" v-model=\"newUser.gender\">Feminino\r\n\t\t\t\t\t\t\t\t\t\t</label>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<input type=\"number\" class=\"form-control\" name=\"age\" placeholder=\"Idade\" min=\"20\" max=\"50\" v-model=\"newUser.age\"/>\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-birthday-cake form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<hr>\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<select name=\"state\" class=\"selectpicker form-control show-tick\" v-model=\"newUser.state\">\r\n\t\t\t\t\t\t\t\t\t\t\t<optgroup label=\"Sotavento\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option>Seleciona uma Ilha</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"2\">Maio</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"1\">Santiago</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"3\">Fogo</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"4\">Brava</option>\r\n\t\t\t\t\t\t\t\t\t\t\t</optgroup>\r\n\t\t\t\t\t\t\t\t\t\t\t<optgroup label=\"Barlavento\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"5\">Santo Antão</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"6\">São Nicolau</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"7\">São Vicente</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"8\">Sal</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"9\">Boa Vista</option>\r\n\t\t\t\t\t\t\t\t\t\t\t</optgroup>\r\n\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"council\" placeholder=\"Concelho\" v-model=\"newUser.council\"/>\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-compass form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"parish\" placeholder=\"Fraguesia\" v-model=\"newUser.parish\"/>\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-map-marker form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"zone\" placeholder=\"Zona\" v-model=\"newUser.zone\"/>\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-thumb-tack form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<select name=\"state\" class=\"selectpicker form-control show-tick\" v-model=\"newUser.type\">\r\n\t\t\t\t\t\t\t\t\t\t\t<option>Seleciona o tipo de utilizador</option>\r\n\t\t\t\t\t\t\t\t\t\t\t<option value=\"member\">Membro</option>\r\n\t\t\t\t\t\t\t\t\t\t\t<option value=\"emp\">Funcionario</option>\r\n\t\t\t\t\t\t\t\t\t\t\t<option value=\"trad\">Comerciante</option>\r\n\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<select class=\"iform-control\" v-model=\"newUser.roles.name\" multiple>\r\n\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Escolhe Papeis para este Utilizador</option>\r\n\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"role in roles\" value=\"{{role.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t{{role.display_name}}\r\n\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t<!-- <input type=\"text\" name=\"\" value=\"\"> -->\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição do utilizador\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newUser.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</form>\r\n\t\t\t\t</validator>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createUser\" class=\"btn btn-secondary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar Dados Introduzidos</button>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<!--------------------------------------------------------------------------------------------------------->\r\n\r\n<!-- Modal -->\r\n<div id=\"modal-edit-user\" class=\"modal fade\" role=\"dialog\">\r\n\t<div class=\"modal-dialog\">\r\n\t\t<div class=\"modal-content\">\r\n\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t<h4 class=\"modal-title\">Editar Utilizador</h4>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t<validator name=\"validation1\">\r\n\t\t\t\t\t<form methods=\"patch\">\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-8\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome Completo\" v-model=\"newUser.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-user form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-4\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"username\" placeholder=\"utilizador\" v-model=\"newUser.username\" v-validate:username=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-user-circle form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.username.required && $validationew.username.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-8\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<input type=\"email\" class=\"form-control\" name=\"email\" placeholder=\"Email\" v-model=\"newUser.email\" v-validate:email=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-envelope form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t<span style=\"color:red;\" v-show=\"!myValidation.email\" v-if=\"$validationew.email.required && $validationew.email.touched\"><span data-toggle=\"tooltip\" title=\"Este campo é obrigatório\">*</span></span>&nbsp;&nbsp;&nbsp;\r\n\t\t\t\t\t\t\t\t\t\t<span style=\"color:red;\" v-if=\"!myValidation.email && $validationew.email.touched\"><span data-toggle=\"tooltip\" title=\"Recorda-se de introduzir email valido! ex exemplo@exemplo.cv\">*</span></span>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-4\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<input v-model=\"newUser.ic\" type='number' class='form-control' placeholder='Número BI'>\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-id-card form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<input type=\"password\" class=\"form-control\" name=\"password\" placeholder=\"Password\" v-model=\"newUser.password\" v-validate:password=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-lock form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.password.required && $validationew.password.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<input v-model=\"newUser.phone\" type='number' class='form-control' placeholder='Introduza o Numero'>\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-phone form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<hr><!-------------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<label class=\"radio-inline\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"radio\" id=\"gender\" value=\"M\" name=\"gender\" v-model=\"newUser.gender\"> Masculino\r\n\t\t\t\t\t\t\t\t\t\t</label>\r\n\t\t\t\t\t\t\t\t\t\t<label class=\"radio-inline\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"radio\" id=\"gender\" name=\"gender\" value=\"F\" v-model=\"newUser.gender\">Feminino\r\n\t\t\t\t\t\t\t\t\t\t</label>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<input type=\"number\" class=\"form-control\" name=\"age\" placeholder=\"Introduza a idade\" min=\"20\" max=\"50\" v-model=\"newUser.age\"/>\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-calendarform-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<hr>\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<select name=\"state\" class=\"selectpicker form-control show-tick\" v-model=\"newUser.state\">\r\n\t\t\t\t\t\t\t\t\t\t\t<optgroup label=\"Sotavento\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option>Seleciona uma Ilha</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"2\">Maio</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"1\">Santiago</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"3\">Fogo</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"4\">Brava</option>\r\n\t\t\t\t\t\t\t\t\t\t\t</optgroup>\r\n\t\t\t\t\t\t\t\t\t\t\t<optgroup label=\"Barlavento\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"5\">Santo Antão</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"6\">São Nicolau</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"7\">São Vicente</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"8\">Sal</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"9\">Boa Vista</option>\r\n\t\t\t\t\t\t\t\t\t\t\t</optgroup>\r\n\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"council\" placeholder=\"Concelho\" v-model=\"newUser.council\"/>\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-compass form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"parish\" placeholder=\"Fraguesia\" v-model=\"newUser.parish\"/>\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-map-marker form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"zone\" placeholder=\"Zona\" v-model=\"newUser.zone\"/>\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-thumb-tack form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<select name=\"state\" class=\"selectpicker form-control show-tick\" v-model=\"newUser.type\">\r\n\t\t\t\t\t\t\t\t\t\t\t<option>Seleciona o tipo de utilizador</option>\r\n\t\t\t\t\t\t\t\t\t\t\t<option value=\"member\">Membro</option>\r\n\t\t\t\t\t\t\t\t\t\t\t<option value=\"emp\">Funcionario</option>\r\n\t\t\t\t\t\t\t\t\t\t\t<option value=\"trad\">Comerciante</option>\r\n\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\r\n\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newUser.roles\" multiple>\r\n\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Escolhe Papeis para este Utilizador</option>\r\n\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"role in roles\" value=\"{{role.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t{{role.display_name}}\r\n\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t<!-- <input type=\"text\" name=\"\" value=\"\"> -->\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição do utilizador\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newUser.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</form>\r\n\t\t\t\t</validator>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedUser(newUser.id)\" type=\"button\" class=\"btn btn-secondary\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp; Salvar as Alterações</button>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n</div>\r\n</div>\r\n"
-if (module.hot) {(function () {  module.hot.accept()
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), true)
-  if (!hotAPI.compatible) return
-  module.hot.dispose(function () {
-    __vueify_insert__.cache["h1 {\n  color: #00a8ed;\n}"] = false
-    document.head.removeChild(__vueify_style__)
-  })
-  if (!module.hot.data) {
-    hotAPI.createRecord("_v-b2a0ffea", module.exports)
-  } else {
-    hotAPI.update("_v-b2a0ffea", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
-  }
-})()}
-},{"../../../Pagination/src/Component.vue":116,"babel-runtime/core-js/object/keys":10,"lodash":102,"vue":109,"vue-hot-reload-api":105,"vueify/lib/insert-css":110}],128:[function(require,module,exports){
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success>utilizador adicionado com sucesso</div><div class=row><div class=col-md-8></div><div class=\"col-md-4 pull-left\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=row><div class=col-md-12><button @click=clearField class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-user><i class=\"fa fa-plus\"></i> Novo</button>&nbsp;&nbsp; <a class=\"btn btn-primary btn-flat btn-outline\" href=/export/printableUserInformation><i class=\"fa fa-print\"></i> Imprimir</a></div></div><br><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-success\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'phone' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'phone' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'phone')\">Tel</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'status' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'status' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'status')\">Estado</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><th width=75 class=text-center><a @click=openAllDetails href=#><span><i data-toggle=tooltip data-placement=left title=\"Ver Todos os papeis\" class=fa :class=\"{'fa-lock': openDetails.length == 0, 'fa-unlock': openDetails.length > 0}\"></i></span></a><tbody v-for=\"user in users | filterBy filter.term | orderBy sortColumn sortInverse\"><tr><td><a href=# data-toggle=modal data-target=#show-user @click=getThisUser(user.id)>{{ user.name }}</a><td>{{ user.phone }}<td v-if=\"user.name != 'Admin'\"><button type=submit @click=estado_utilizador(user.id) class=\"btn btn-xs btn-flat\" :class=\"{ 'btn-info': user.status, 'btn-danger': !user.status }\">{{user.status ? 'Ativado' : 'Disativado'}}</button><td v-if=\"user.name == 'Admin'\"><button class=\"btn btn-success btn-xs btn-flat\" disabled>Admin</button><td v-if=\"user.name != 'Admin'\" class=text-center><a data-toggle=modal data-target=#modal-edit-user href=#><i class=\"fa fa-pencil text-primary\" @click=getThisUser(user.id)></i></a><td v-if=\"user.name == 'Admin'\" class=text-center><i class=\"fa fa-ban text-warning\"></i><td v-if=\"user.name != 'Admin'\" class=text-center><a data-toggle=modal data-target=#modal-delete-user href=#><i class=\"fa fa-trash text-danger\" @click=getThisUser(user.id)></i></a><td v-if=\"user.name == 'Admin'\" class=text-center><i class=\"fa fa-ban text-warning\"></i><td v-if=\"user.name != 'Admin'\" width=75 class=text-center><a @click=\"doOpenDetails($event, user.id)\" v-show=\"user.roles != ''\" href=#><i data-toggle=tooltip data-placement=left title=\"Ver Papeis de utilizador\" class=fa :class=\"{'fa-plus-square': openDetails.indexOf(user.id) == -1, 'fa-minus-square': openDetails.indexOf(user.id) > -1}\"></i></a> <i class=\"fa fa-plus-square\" v-show=\"user.roles == ''\" style=\"opacity: 0.3\"></i><td v-if=\"user.name == 'Admin'\" width=75 class=text-center><i class=\"fa fa-minus-square\"></i><tr v-show=\"openDetails.indexOf(user.id) > -1 && user.roles != ''\"><td colspan=12><span class=\"label label-primary\" v-for=\"roles in user.roles\"><b><i class=\"fa fa-unlock\"></i> {{ roles.display_name }}&nbsp;</b></span></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div id=show-user class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Info do {{ newUser.name }}</h4></div><div class=modal-body><div class=row><div class=col-md-12><div class=\"col-md-6 col-md-offset-5\"><img src=\"/uploads/avatars/{{ newUser.avatar }}\" alt=\"Imagem do Usuário\" style=\"width: 100px; height: 100px; float: left; border-radius: 50%; margin-right: 25px\"></div></div></div><hr><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover\"><thead><tr><th class=text-center colspan=2>INFORMAÇOES DO UTILIZADOR<tbody><tr><td><b>ID</b><td><i>{{ newUser.id }}</i><tr><td><b>Nome</b><td><i>{{ newUser.name }}</i><tr><td><b>Utilizador</b><td><span class=\"label label-info\"><i>{{ newUser.username }}</i></span><tr><td><b>Sexo</b><td><i>{{ alterGenderValue(newUser.gender) }}</i><tr><td><b>BI</b><td><span class=\"label label-info\"><i>{{ newUser.ic }}</i></span><tr><td><b>Idade</b><td><i>{{ newUser.age }}</i><tr><td><b>Email</b><td><span class=\"label label-info\"><i>{{ newUser.email }}</i></span><tr><td><b>Telefone</b><td><span class=label :class=\"{ 'label-info': newUser.phone, 'none': !newUser.phone }\"><i>{{ newUser.phone }}</i></span><tr><td><b>Ilha</b><td><i>{{ alterStateValue(newUser.state) }}</i><tr><td><b>Concelho</b><td><i>{{ newUser.council }}</i><tr><td><b>Freguesia</b><td><i>{{ newUser.parish }}</i><tr><td><b>Zona</b><td><i>{{ newUser.zone }}</i><tr><td><b>Tipo</b><td><span class=\"label label-primary\"><i>{{ alterTypeValue(newUser.type) }}</i></span><tr><td><b>Estado</b><td><span class=label :class=\"{ 'label-info': newUser.status, 'label-danger': !newUser.status }\"><i>{{newUser.status ? 'Ativado' : 'Disativado'}}</i></span><tr><td><b>Descrição</b><td><i>{{ newUser.description }}</i><tr><td><b>Data da criação</b><td><i>{{ user.created_at | formatDate 'DD/MM/YYYY' }}</i><tr><td><b>Data de atualização</b><td><i>{{ user.updated_at | formatDate 'DD/MM/YYYY' }}</i></table></div></div></div></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal>Close</button></div></div></div></div><div class=\"modal fade\" id=modal-delete-user tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar Utilizador</h4></div><div class=modal-body><h1>Eliminar Utilizador {{newUser.name}}</h1></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteUser(newUser.id) @click=deleteUser(newUser.id) type=button class=\"btn btn-default\">Eliminar Utilizador</button></div></div></div></div><div id=modal-create-user class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Criar Utilizador</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-8><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=\"Nome Completo\" v-model=newUser.name v-validate:name=\"['required']\"> <span class=\"fa fa-user form-control-feedback\"></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div><div class=col-md-4><div class=\"form-group has-feedback\"><input type=text class=form-control name=username placeholder=utilizador v-model=newUser.username v-validate:username=\"['required']\"> <span class=\"fa fa-user-circle form-control-feedback\"></span><p style=color:red v-if=\"$validationew.username.required && $validationew.username.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-8><div class=\"form-group has-feedback\"><input type=email class=form-control name=email placeholder=Email v-model=newUser.email v-validate:email=\"['required']\"> <span class=\"fa fa-envelope form-control-feedback\"></span> <span style=color:red v-show=!myValidation.email v-if=\"$validationew.email.required && $validationew.email.touched\"><span data-toggle=tooltip title=\"Este campo é obrigatório\">*</span></span>&nbsp;&nbsp;&nbsp; <span style=color:red v-if=\"!myValidation.email && $validationew.email.touched\"><span data-toggle=tooltip title=\"Recorda-se de introduzir email valido! ex exemplo@exemplo.cv\">*</span></span></div></div><div class=col-md-4><div class=\"form-group has-feedback\"><input v-model=newUser.ic type=number class=form-control placeholder=\"Número BI\"> <span class=\"fa fa-id-card form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input type=password class=form-control name=password placeholder=Password v-model=newUser.password v-validate:password=\"['required']\"> <span class=\"fa fa-lock form-control-feedback\"></span><p style=color:red v-if=\"$validationew.password.required && $validationew.password.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida\">*</span></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input v-model=newUser.phone type=number class=form-control placeholder=\"Introduza o Numero\"> <span class=\"fa fa-phone form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><label class=radio-inline><input type=radio id=gender value=M name=gender v-model=newUser.gender> Masculino</label><label class=radio-inline><input type=radio id=gender name=gender value=F v-model=newUser.gender>Feminino</label></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=number class=form-control name=age placeholder=Idade min=20 max=50 v-model=newUser.age> <span class=\"fa fa-birthday-cake form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><select name=state class=\"selectpicker form-control show-tick\" v-model=newUser.state><optgroup label=Sotavento><option>Seleciona uma Ilha<option value=2>Maio<option value=1>Santiago<option value=3>Fogo<option value=4>Brava<optgroup label=Barlavento><option value=5>Santo Antão<option value=6>São Nicolau<option value=7>São Vicente<option value=8>Sal<option value=9>Boa Vista</select></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=council placeholder=Concelho v-model=newUser.council> <span class=\"fa fa-compass form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=parish placeholder=Fraguesia v-model=newUser.parish> <span class=\"fa fa-map-marker form-control-feedback\"></span></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=zone placeholder=Zona v-model=newUser.zone> <span class=\"fa fa-thumb-tack form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><select name=state class=\"selectpicker form-control show-tick\" v-model=newUser.type><option>Seleciona o tipo de utilizador<option value=member>Membro<option value=emp>Funcionario<option value=trad>Comerciante</select></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><select class=iform-control v-model=newUser.roles.name multiple><option value=\"\" selected>Escolhe Papeis para este Utilizador<option v-for=\"role in roles\" value={{role.id}}>{{role.display_name}}</select></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=\"Descrição do utilizador\" class=form-control rows=5 cols=40 id=description v-model=newUser.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createUser class=\"btn btn-secondary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar Dados Introduzidos</button></div></div></div></div><div id=modal-edit-user class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar Utilizador</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-8><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=\"Nome Completo\" v-model=newUser.name v-validate:name=\"['required']\"> <span class=\"fa fa-user form-control-feedback\"></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div><div class=col-md-4><div class=\"form-group has-feedback\"><input type=text class=form-control name=username placeholder=utilizador v-model=newUser.username v-validate:username=\"['required']\"> <span class=\"fa fa-user-circle form-control-feedback\"></span><p style=color:red v-if=\"$validationew.username.required && $validationew.username.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-8><div class=\"form-group has-feedback\"><input type=email class=form-control name=email placeholder=Email v-model=newUser.email v-validate:email=\"['required']\"> <span class=\"fa fa-envelope form-control-feedback\"></span> <span style=color:red v-show=!myValidation.email v-if=\"$validationew.email.required && $validationew.email.touched\"><span data-toggle=tooltip title=\"Este campo é obrigatório\">*</span></span>&nbsp;&nbsp;&nbsp; <span style=color:red v-if=\"!myValidation.email && $validationew.email.touched\"><span data-toggle=tooltip title=\"Recorda-se de introduzir email valido! ex exemplo@exemplo.cv\">*</span></span></div></div><div class=col-md-4><div class=\"form-group has-feedback\"><input v-model=newUser.ic type=number class=form-control placeholder=\"Número BI\"> <span class=\"fa fa-id-card form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input type=password class=form-control name=password placeholder=Password v-model=newUser.password v-validate:password=\"['required']\"> <span class=\"fa fa-lock form-control-feedback\"></span><p style=color:red v-if=\"$validationew.password.required && $validationew.password.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida\">*</span></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input v-model=newUser.phone type=number class=form-control placeholder=\"Introduza o Numero\"> <span class=\"fa fa-phone form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><label class=radio-inline><input type=radio id=gender value=M name=gender v-model=newUser.gender> Masculino</label><label class=radio-inline><input type=radio id=gender name=gender value=F v-model=newUser.gender>Feminino</label></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=number class=form-control name=age placeholder=\"Introduza a idade\" min=20 max=50 v-model=newUser.age> <span class=\"fa fa-calendarform-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><select name=state class=\"selectpicker form-control show-tick\" v-model=newUser.state><optgroup label=Sotavento><option>Seleciona uma Ilha<option value=2>Maio<option value=1>Santiago<option value=3>Fogo<option value=4>Brava<optgroup label=Barlavento><option value=5>Santo Antão<option value=6>São Nicolau<option value=7>São Vicente<option value=8>Sal<option value=9>Boa Vista</select></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=council placeholder=Concelho v-model=newUser.council> <span class=\"fa fa-compass form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=parish placeholder=Fraguesia v-model=newUser.parish> <span class=\"fa fa-map-marker form-control-feedback\"></span></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=zone placeholder=Zona v-model=newUser.zone> <span class=\"fa fa-thumb-tack form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><select name=state class=\"selectpicker form-control show-tick\" v-model=newUser.type><option>Seleciona o tipo de utilizador<option value=member>Membro<option value=emp>Funcionario<option value=trad>Comerciante</select></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><select class=form-control v-model=newUser.roles multiple><option value=\"\" selected>Escolhe Papeis para este Utilizador<option v-for=\"role in roles\" value={{role.id}}>{{role.display_name}}</select></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=\"Descrição do utilizador\" class=form-control rows=5 cols=40 id=description v-model=newUser.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedUser(newUser.id) type=button class=\"btn btn-secondary\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp; Salvar as Alterações</button></div></div></div></div></div></div>"
+
+},{"../../../Pagination/src/Component.vue":114,"babel-runtime/core-js/object/keys":10,"lodash":102,"vueify/lib/insert-css":108}],126:[function(require,module,exports){
 'use strict';
 
 var Vue = require('vue');
@@ -41683,6 +40418,6 @@ new Vue({
     }
 });
 
-},{"./components/Contracts/ShowContracts":111,"./components/Controls/ShowControls":112,"./components/Employees/ShowEmployees":113,"./components/Markets/ShowMarket":114,"./components/Materials/ShowMaterial":115,"./components/Permissions/showPermission":117,"./components/Places/ShowPlace":118,"./components/Products/ShowProduct":119,"./components/Promotions/ShowPromotion":120,"./components/Roles/showRoles":121,"./components/Taxations/ShowTaxations":122,"./components/Traders/ShowTraders":123,"./components/Typeofemployee/ShowTypeofemployee":124,"./components/Typeofplace/ShowTypeofplace":125,"./components/Users/CreateUser":126,"./components/Users/ShowUsers":127,"moment":103,"vue":109,"vue-resource":106,"vue-validator":108}]},{},[128]);
+},{"./components/Contracts/ShowContracts":109,"./components/Controls/ShowControls":110,"./components/Employees/ShowEmployees":111,"./components/Markets/ShowMarket":112,"./components/Materials/ShowMaterial":113,"./components/Permissions/showPermission":115,"./components/Places/ShowPlace":116,"./components/Products/ShowProduct":117,"./components/Promotions/ShowPromotion":118,"./components/Roles/showRoles":119,"./components/Taxations/ShowTaxations":120,"./components/Traders/ShowTraders":121,"./components/Typeofemployee/ShowTypeofemployee":122,"./components/Typeofplace/ShowTypeofplace":123,"./components/Users/CreateUser":124,"./components/Users/ShowUsers":125,"moment":103,"vue":107,"vue-resource":104,"vue-validator":106}]},{},[126]);
 
 //# sourceMappingURL=main.js.map

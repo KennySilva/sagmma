@@ -12,11 +12,10 @@ class Taxation extends Model
     //------------------------------------------------------------------------------
     public function employees()
     {
-        return $this->hasMany(Employee::class, 'employee_id', 'id');
+        return $this->hasMany(Employee::class, 'id', 'employee_id');
     }
     public function places()
     {
-        return $this->hasMany(Place::class, 'place_id', 'id');
+        return $this->hasMany(Place::class, 'id', 'place_id');
     }
-
 }

@@ -20,10 +20,14 @@
 <hr>
 
 <div class="row">
-	<div class="col-md-12">
+	<div v-if = "traders.length > 0 && products.length > 0" class="col-md-12">
 		<button @click="clearField" class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-promotion"><i class="fa fa-plus"></i> Novo</button>&nbsp;&nbsp;
-		<!-- <a class="btn btn-primary btn-flat btn-outline" href="/export/printablePromotionInformation"><i class="fa fa-print"></i> Imprimir</a> -->
 	</div>
+
+	<div v-else class="col-md-12">
+		<button data-toggle="tooltip" title="Não podes criar promoção referenciar comerciante e produtos" type="button" class="btn btn-danger btn-flat"><i class="fa fa-minus"></i> Novo</button>&nbsp;&nbsp;
+	</div>
+
 </div>
 
 <br>
@@ -216,12 +220,15 @@
 											<div class="form-group has-feedback">
 												<input type='date' name="begnning_date" class='form-control' placeholder='' v-model="newPromotion.begnning_date" v-validate:begnning_date = "['required']">
 												<!-- <span class="fa fa-calendar-check-o form-control-feedback"></span> -->
+												<p class="text-help">Data de início da promoção</p>
 											</div>
 										</div>
 										<div class="col-md-6">
 											<div class="form-group has-feedback">
 												<input type='date' name="ending_date" class='form-control' placeholder='' v-model="newPromotion.ending_date"  v-validate:ending_date = "['required']">
 												<!-- <span class="fa fa-calendar-times-o form-control-feedback"></span> -->
+												<p class="text-help">Término da promoção</p>
+
 											</div>
 										</div>
 									</div>
@@ -309,13 +316,13 @@
 										<div class="col-md-6">
 											<div class="form-group has-feedback">
 												<input type='date' class='form-control' placeholder='' v-model="newPromotion.begnning_date">
-												<!-- <span class="fa fa-calendar-check-o form-control-feedback"></span> -->
+												<p class="text-help">Data de início da promoção</p>
 											</div>
 										</div>
 										<div class="col-md-6">
 											<div class="form-group has-feedback">
 												<input type='date' class='form-control' placeholder='' v-model="newPromotion.ending_date">
-												<!-- <span class="fa fa-calendar-times-o form-control-feedback"></span> -->
+												<p class="text-help">Término da promoção</p>
 											</div>
 										</div>
 									</div>

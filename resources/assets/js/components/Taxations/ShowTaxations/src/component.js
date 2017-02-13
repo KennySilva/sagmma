@@ -8,13 +8,13 @@ export default{
 
     data(){
         return {
-
             newTaxation: {
                 id          : '',
                 employee_id : '',
-                place_id : '',
-                income : '',
-                type : '',
+                place_id    : '',
+                income      : '',
+                type        : '',
+                created_at  : '',
             },
 
             taxations : {},
@@ -96,6 +96,7 @@ export default{
                 this.newTaxation.place_id    = response.data.place_id;
                 this.newTaxation.income      = response.data.income;
                 this.newTaxation.type        = response.data.type;
+                this.newTaxation.created_at        = response.data.created_at;
             }, (response) => {
                 console.log('Error');
             });

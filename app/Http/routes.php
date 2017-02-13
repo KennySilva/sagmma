@@ -12,10 +12,6 @@ Route::resource('controlteste', 'ApiControllers\ApiControlsController');
 
 Route::resource('employees', 'ApiControllers\ApiEmployeesController');
 
-
-
-
-
 //----------------Authentication---------------------------------------------------------
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
@@ -45,22 +41,6 @@ Route::group(['middleware' => ['permission:adddmin']], function() {
     Route::resource('/testrole', 'AdminController');
 });
 
-// 'middleware' => ['role:owner', 'role:writer'] forma de atribuir multiplos apermições tem di tem um tudo dos função pe tem acesso
-// 'middleware' => ['role:admin|root'] orma de atribuir multiplos apermições tem di tem pelo menus um função pe tem acesso
-
-// Route::group(['prefix' => 'admin', 'middleware' => ['role:admin']], function() {
-//     Route::get('/home-test', function () {
-//         return view('_backend.home');
-//     });
-//     // Route::get('/manage', ['middleware' => ['permission:manage-admins'], 'uses' => 'AdminController@manageAdmins']);
-// });
-
-// Route::get('/home', ['middleware' => ['role:owener'], function () {
-//     return view('_backend.home');
-// }]);
-// ----------------------------------------------------------------------------------------------
-
-
 //Route de homo do backend
 Route::group(['middleware' => ['auth', 'permission:admin|test']], function () {
     Route::resource('/home', 'BackendHomeController');
@@ -77,14 +57,8 @@ Route::get('/criar', ['middleware' => 'auth', function () {
 Route::group(['namespace' => 'ApiControllers'], function()
 {
     Route::group(['prefix' => 'api/v1', 'middleware' => ['auth']], function () {
-        // ----------------------------------------Api-users------------------------------------
-        // Route::group(['middleware' => ['permission:admin']], function () {
-        //
-        // });
-        //Permissoes de acesso para utilizadores (Atores Admin, Super Admin e Dpel)
         Route::group(['middleware' => ['permission:admin']], function () {
             Route::resource('users', 'ApiUsersController');
-            // Route::resource('showThisUser/', 'ApiUsersController@showThisUser');
             Route::get('roleuser', 'ApiUsersController@getRoleForUser');
 
             Route::get('showThisUser/{id}', function ($id) {
