@@ -28,6 +28,8 @@ export default{
             },
             pagination: {},
             success: false,
+            report_date: '',
+            myDate: new Date(),
         }
     },
 

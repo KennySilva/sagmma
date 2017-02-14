@@ -40,6 +40,14 @@
     <script>
     webshims.setOptions('forms-ext', {types: 'date'});
     webshims.polyfill('forms forms-ext');
+
+    // $(document).ready(function () {
+    //        $('.datepicker').datepicker({
+    //            format: 'dd/mm/yyyy',
+    //            language: 'pt-BR'
+    //        });
+    //    });
+
     </script>
 
 @endpush

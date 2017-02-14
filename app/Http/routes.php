@@ -198,6 +198,24 @@ Route::group(['namespace' => 'PluginsControllers'], function()
             //-------------------------------Impressão-----------------------------------------------
             Route::get('/printableUserInformation', 'PrintController@indexUser');
             Route::get('/printUserPreview', 'PrintController@printUserPreview');
+            //----------Impressão de Relatório por data--------------------------------------------
+            // Route::get('dateRoportInformation/{id}', function ($id) {
+            //     return 'User '.$id;
+            // });
+
+
+
+
+
+
+            Route::get('/dateRoportInformation/{date}', 'PrintController@dateReport');
+            // Route::get('/printThisReport/{date}', 'PrintController@printThisReport');
+
+            Route::get('printThisReport/{date}',['as' => 'printThisReport', 'uses' => 'PrintController@printThisReport']);
+            
+
+
+
             // --------------------------------------------------------------------------------------
             Route::get('/printableEmployeeInformation', 'PrintController@indexEmployee');
             Route::get('/printEmployeePreview', 'PrintController@printEmployeePreview');

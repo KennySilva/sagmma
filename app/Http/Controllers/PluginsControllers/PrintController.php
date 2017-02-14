@@ -10,6 +10,7 @@ use PDF;
 // use Typeofplace;
 use User;
 use Employee;
+use Taxation;
 
 class PrintController extends Controller
 {
@@ -34,5 +35,24 @@ class PrintController extends Controller
     {
         $employees = Employee::all();
         return view('exportation.printEmployeePreview', compact('employees'));
+    }
+    // -------------------------------Taxations------------------------------------------------------
+    public function printThisReport($date)
+    {
+        $taxations = Taxation::whereDate('created_at', '=', $date)->get();
+        $total = $taxations->sum('income');
+
+        return view('exportation.printThisReport', compact('taxations', 'date', 'total'));
+
+    }
+    public function dateReport($date)
+    {
+        $taxations = Taxation::whereDate('created_at', '=', $date)->get();
+        if (count($taxations) > 0) {
+            return view('exportation.printDateReport', compact('date'));
+        }else {
+            return abort(408, 'Unauthorized action.');
+        }
+
     }
 }
