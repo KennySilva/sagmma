@@ -55,4 +55,17 @@ class PrintController extends Controller
         }
 
     }
+
+    public function receiptIndex($id)
+    {
+        $taxation = Taxation::find($id);
+        // return $taxation;
+        return view('exportation.printReceipt', compact('taxation', 'id'));
+    }
+    public function printReceipt($id)
+    {
+        $taxation = Taxation::find($id);
+        return view('exportation.printThisReceipt', compact('taxation'));
+
+    }
 }

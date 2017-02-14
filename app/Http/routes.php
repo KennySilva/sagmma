@@ -199,20 +199,19 @@ Route::group(['namespace' => 'PluginsControllers'], function()
             Route::get('/printableUserInformation', 'PrintController@indexUser');
             Route::get('/printUserPreview', 'PrintController@printUserPreview');
             //----------Impressão de Relatório por data--------------------------------------------
-            // Route::get('dateRoportInformation/{id}', function ($id) {
-            //     return 'User '.$id;
-            // });
-
-
-
-
-
-
             Route::get('/dateRoportInformation/{date}', 'PrintController@dateReport');
-            // Route::get('/printThisReport/{date}', 'PrintController@printThisReport');
-
             Route::get('printThisReport/{date}',['as' => 'printThisReport', 'uses' => 'PrintController@printThisReport']);
-            
+            // Route::get('/printThisReport/{date}', 'PrintController@printThisReport');
+            // --------------------------------------------------------------------------------------
+
+
+
+            Route::get('/receiptInformation/{id}', 'PrintController@receiptIndex');
+            Route::get('printReceipt/{date}',['as' => 'printReceipt', 'uses' => 'PrintController@printReceipt']);
+
+
+
+
 
 
 

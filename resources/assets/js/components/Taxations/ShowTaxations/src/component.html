@@ -113,7 +113,7 @@
 						<td align=center>  <a data-toggle="modal" data-target="#modal-edit-taxation" href="#"> <i class="fa fa-pencil text-primary" @click="getThisTaxation(taxation.id)" > </i></a></td>
 						<td align=center><a data-toggle="modal" data-target="#modal-delete-taxation" href="#"><i class="fa fa-trash text-danger" @click="getThisTaxation(taxation.id)"></i></a></td>
 
-						<td align=center><a href="#"><i class="fa fa-print text-info" @click="getThisTaxation(taxation.id)"></i></a></td>
+						<td align=center><a href="/export/receiptInformation/{{taxation.id}}"><i class="fa fa-print text-info"></i></a></td>
 					</tr>
 				</tbody>
 			</table>

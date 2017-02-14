@@ -3,7 +3,8 @@
     <div class="row">
         <div class="jumbotron">
             <h3 class="text-center">SAGMMA</h3>
-            <p class="text-center">Relatório Diário</p>
+            <p class="text-center">Relatório Diár
+                io</p>
         </div>
     </div>
     <div class="row">
