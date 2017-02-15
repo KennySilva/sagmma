@@ -8,7 +8,7 @@
         "php": ">=5.5.9",
         "laravel/framework": "5.1.*",
         "acacha/admin-lte-template-laravel": "1.*",
-        "nesbot/carbon": "^1.21",
+        "nesbot/carbon": "^1.22",
         "intervention/image": "^2.3",
         "guzzlehttp/guzzle": "~4.0",
         "laravel/socialite": "^2.0",

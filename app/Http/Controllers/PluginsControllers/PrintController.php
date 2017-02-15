@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Sagmma\Http\Requests;
 use Sagmma\Http\Controllers\Controller;
 use PDF;
+use Carbon\Carbon;
 // use Typeofplace;
 use User;
 use Employee;
@@ -14,6 +15,10 @@ use Taxation;
 
 class PrintController extends Controller
 {
+    public function __construct()
+    {
+        Carbon::setLocale('pt');
+    }
     // ----------------------------------Users-----------------------------------------------
     public function indexUser()
     {

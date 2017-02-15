@@ -22,11 +22,11 @@
                 <p class="text-left">
                     Eu {{$taxation->author}} Recebi do(a) senhor(a) (@foreach ($taxation->employees as $emp)
                         {{$emp->name}}
-                    @endforeach)</span>  a quantia de {{$taxation->income}}, no dia {{$taxation->created_at}}
+                    @endforeach)</span>  a quantia de {{$taxation->income}}, no dia {{$taxation->created_at->toDateString('d-m-y')}}
                 </p>
                 <br>
                 <hr>
-                <p>Assomada {{date('d-m-y')}}</p>
+                <p>Assomada {{date('y-m-d'))}}</p>
             </div>
             <hr>
             <br>
