@@ -18,17 +18,24 @@ export default{
             },
 
             taxations : {},
-            employees: [],
-            places: [],
+            employees : [],
+            places    : [],
 
             sortColumn : 'id',
             sortInverse: 1,
-            filter: {
-                term: ''
+            filter   : {
+                term : ''
             },
-            pagination: {},
-            success: false,
+            pagination : {},
+            success    : false,
             report_date: '',
+
+            report   : {
+                day  : '',
+                month: '',
+                year : '',
+            },
+
             myDate: new Date(),
         }
     },

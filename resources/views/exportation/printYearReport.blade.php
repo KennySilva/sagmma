@@ -18,7 +18,7 @@
                 <span class="info-box-icon bg-blue"><i class="fa fa-file-o"></i></span>
                 <div class="info-box-content">
                     <span class="info-box-text">Relarório</span>
-                    <span class="info-box-number">Registo de cobrança de {{$date}}</span>
+                    <span class="info-box-number">Registo de cobrança de {{$year}}</span>
                 </div>
             </div>
         </div>
@@ -30,7 +30,7 @@
                 <div class="box-header with-border">
                     <h3 class="box-title">Resisto de Cobrança de Impostos</h3>
                     <div class="box-tools pull-right">
-                        <span class="label label-primary">{{$date}}</span>
+                        <span class="label label-primary">{{$year}}</span>
                     </div>
                 </div>
                 <div class="box-body">
@@ -65,8 +65,13 @@
                     </div>
                 </div>
                 <div class="box-footer">
-                    <a class="btnPrint btn btn-primary btn-sm btn-flat" href="{{ route('printThisReport', $date) }}"><i class="fa fa-print"></i>  <b>Imprimir</b></a>
+                    <a class="btnPrint btn btn-primary btn-sm btn-flat" href="{{ route('printThisYearReport', $year) }}"><i class="fa fa-print"></i>  <b>Imprimir</b></a>
                     <a class="btn btn-default btn-sm btn-flat" href="{{URL::to('sagmma/taxations')}}"><i class="fa fa-reply"></i> <b>Voltar</b></a>
+
+                    <div class="box-tools pull-right">
+                        <span class="text-info">Total de Receita: <span class="label label-danger">{{$total}}$00</span></span>
+                    </div>
+
                 </div>
             </div>
         </div>

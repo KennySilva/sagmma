@@ -5,7 +5,6 @@
 @endsection
 
 @section('contentheader_title')
-    Imprimir Informações
 @endsection
 
 @section('$contentheader_description')

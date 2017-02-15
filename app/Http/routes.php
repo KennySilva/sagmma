@@ -203,8 +203,12 @@ Route::group(['namespace' => 'PluginsControllers'], function()
             Route::get('printThisReport/{date}',['as' => 'printThisReport', 'uses' => 'PrintController@printThisReport']);
             // Route::get('/printThisReport/{date}', 'PrintController@printThisReport');
             // --------------------------------------------------------------------------------------
-
-
+            //----------Impressão de Relatório por mês--------------------------------------------
+            Route::get('monthRoportInformation/{monh}/{year}', 'PrintController@monthReport');
+            Route::get('printMonthReport/{month}/{year}',['as' => 'printThisMonthReport', 'uses' => 'PrintController@printThisMonthReport']);
+            //----------Impressão de Relatório por mês--------------------------------------------
+            Route::get('yearRoportInformation/{year}', 'PrintController@yearReport');
+            Route::get('printYearReport/{year}',['as' => 'printThisYearReport', 'uses' => 'PrintController@printThisYearReport']);
 
             Route::get('/receiptInformation/{id}', 'PrintController@receiptIndex');
             Route::get('printReceipt/{date}',['as' => 'printReceipt', 'uses' => 'PrintController@printReceipt']);

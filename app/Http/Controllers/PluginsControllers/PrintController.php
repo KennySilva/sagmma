@@ -49,12 +49,60 @@ class PrintController extends Controller
     {
         $taxations = Taxation::whereDate('created_at', '=', $date)->get();
         if (count($taxations) > 0) {
-            return view('exportation.printDateReport', compact('date'));
+            return view('exportation.printDateReport', compact('taxations', 'date'));
         }else {
             return abort(408, 'Unauthorized action.');
         }
 
     }
+    // ---------------------------------------------------------------------------------------------
+    public function monthReport($month, $year)
+    {
+        $taxations = Taxation::whereMonth('created_at', '=', $month)->whereYear('created_at', '=', $year)->get();
+        $total = $taxations->sum('income');
+
+        if (count($taxations) > 0) {
+            return view('exportation.printMonthReport', compact('taxations', 'month', 'year','total'));
+        }else {
+            return abort(408, 'Unauthorized action.');
+        }
+
+    }
+
+    public function printThisMonthReport($month, $year)
+    {
+        $taxations = Taxation::whereMonth('created_at', '=', $month)->whereYear('created_at', '=', $year)->get();
+        $total = $taxations->sum('income');
+
+        return view('exportation.printThisMonthReport', compact('taxations', 'month', 'year','total'));
+
+    }
+    // ----------------------------------------------------------------------------------------------
+
+
+    // ---------------------------------------------------------------------------------------------
+    public function yearReport($year)
+    {
+        $taxations = Taxation::whereYear('created_at', '=', $year)->get();
+        $total = $taxations->sum('income');
+
+        if (count($taxations) > 0) {
+            return view('exportation.printYearReport', compact('taxations', 'year','total'));
+        }else {
+            return abort(408, 'Unauthorized action.');
+        }
+
+    }
+
+    public function printThisYearReport($year)
+    {
+        $taxations = Taxation::whereYear('created_at', '=', $year)->get();
+        $total = $taxations->sum('income');
+
+        return view('exportation.printThisYearReport', compact('taxations', 'year','total'));
+
+    }
+    // ----------------------------------------------------------------------------------------------
 
     public function receiptIndex($id)
     {
