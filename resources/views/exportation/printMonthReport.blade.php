@@ -49,9 +49,14 @@
                                 @foreach($taxations as $taxation)
                                     <tr>
                                         <td>{{$taxation->id}}</td>
-                                        @foreach ($taxation->employees as $emp)
-                                            <td>{{$emp->name}}</td>
-                                        @endforeach
+                                        @if ($taxation->type == 1)
+                                            <td>{{$taxation->author}}</td>
+                                        @else
+                                            @foreach ($taxation->employees as $emp)
+                                                <td>{{$emp->name}}</td>
+                                            @endforeach
+                                        @endif
+
 
                                         @foreach ($taxation->places as $place)
                                             <td>{{$place->name}}</td>

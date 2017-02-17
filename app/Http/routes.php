@@ -195,7 +195,8 @@ Route::group(['namespace' => 'PluginsControllers'], function()
     Route::group(['prefix' => 'export', 'middleware' => 'auth'], function () {
         Route::group(['middleware' => ['permission:admin']], function () {
             // -----------------------------PDF-Download---------------------------------------------
-            Route::resource('/getPDF', 'PluginsControllers\PDFController@getPDF');
+            Route::resource('/getPDF', 'PDFController@getPDF');
+            Route::resource('/taxationsPDF', 'PDFController@TaxationsPDF');
             //-------------------------------Impressão-----------------------------------------------
             Route::get('/printableUserInformation', 'PrintController@indexUser');
             Route::get('/printUserPreview', 'PrintController@printUserPreview');

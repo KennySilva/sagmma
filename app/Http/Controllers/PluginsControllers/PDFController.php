@@ -8,6 +8,7 @@ use Sagmma\Http\Requests;
 use Sagmma\Http\Controllers\Controller;
 use PDF;
 use Typeofplace;
+Use Taxation;
 
 class PDFController extends Controller
 {
@@ -15,7 +16,14 @@ class PDFController extends Controller
     {
         $datas = Typeofplace::all();
         $pdf = PDF::loadView('pdf.customer', ['datas' => $datas]);
-        return $pdf->download('customer.pdf');
-        // return $pdf->stream('customer.pdf');
+        return $pdf->download('fuck.pdf');
+        // return $pdf->stream('fuck.pdf');
+    }
+
+    public function TaxationsPDF()
+    {
+        $datas = Taxation::all();
+        $pdf = PDF::loadView('pdf.taxationReport', ['datas' => $datas]);
+        return $pdf->download('Relatorio_Cobrança.pdf');
     }
 }
