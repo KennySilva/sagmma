@@ -36,14 +36,25 @@ class ApiTaxationsController extends Controller
 
     public function store(TaxationsRequest $request)
     {
-        $taxation              = new Taxation($request->all());
-        $taxation->employee_id = $request->employee_id;
-        $taxation->place_id    = $request->place_id;
-        $taxation->income      = $request->income;
+        $taxation= new Taxation();
+        if ( $request->place_id == '') {
+            $place_id = 1;
+        }else {
+            $place_id = $request->place_id;
+        }
+        $place = Place::where('id', '=', $place_id)->first();
+        if ($request->type == 1) {
+            $taxation->employee_id = Auth::user()->id;
+            $taxation->income      = $place->price;
+            $taxation->place_id    = $request->place_id;
+        }else {
+            $taxation->employee_id = $request->employee_id;
+            $taxation->income      = $request->income;
+            $taxation->place_id    =  $request->place_id;
+        }
         $taxation->type        = $request->type;
         $taxation->author      = Auth::user()->name;
         $taxation->save();
-
     }
 
     public function show($id)
@@ -75,9 +86,18 @@ class ApiTaxationsController extends Controller
         $employee = Employee::all();
         return $employee;
     }
-    public function getPlaceForTaxation()
+
+    // --------------------------------------------------------------------------------------
+    public function getPlaceExtForTaxation()
     {
-        $place = Place::all();
+        $place = Place::where('typeofplace_id', '=', 7)->get();
+        return $place;
+    }
+
+
+    public function getPlaceIntForTaxation()
+    {
+        $place = Place::where('typeofplace_id', '!=', 7)->get();
         return $place;
     }
 

@@ -114,7 +114,8 @@ Route::group(['namespace' => 'ApiControllers'], function()
             // ------------------------------------Api-Taxation (place_trader)--------------------
             Route::resource('taxations', 'ApiTaxationsController');
             Route::get('taxationEmployee', 'ApiTaxationsController@getEmployeeForTaxation');
-            Route::get('taxationPlace', 'ApiTaxationsController@getPlaceForTaxation');
+            Route::get('taxationExtPlace', 'ApiTaxationsController@getPlaceExtForTaxation');
+            Route::get('taxationIntPlace', 'ApiTaxationsController@getPlaceIntForTaxation');
 
             // ----------------------------------------Api-place----------------------------------
             Route::resource('places', 'ApiPlacesController');

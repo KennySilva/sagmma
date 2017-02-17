@@ -14,10 +14,7 @@ class TaxationsRequest extends Request
     public function rules()
     {
         return [
-            'employee_id' => 'required',
-            'place_id'    => 'required',
-            'income'      => 'required',
-            'type'        => 'required',
+            
         ];
     }
 }

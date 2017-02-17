@@ -3,10 +3,6 @@
 	Contrato Criado com sucesso
 </div>
 
-<!-- <pre>
-{{$data.report | json}}
-</pre> -->
-
 <div class="row">
 	<div class="col-md-4 pull-right">
 		<div class="input-group">
@@ -172,7 +168,8 @@
 				</thead>
 				<tbody>
 					<tr v-for="taxation in taxations | filterBy filter.term | orderBy sortColumn sortInverse">
-						<td v-for="employee in taxation.employees">{{ employee.name }}</td>
+						<td v-if="taxation.type == 2" v-for="employee in taxation.employees">{{ employee.name }}</td>
+						<td v-if="taxation.type == 1">{{ taxation.author }}</td>
 						<td v-for="place in taxation.places">{{ place.name }}</td>
 
 						<td>{{ taxation.income }}</td>
@@ -183,9 +180,9 @@
 					</tr>
 				</tbody>
 			</table>
-			<!-- <div v-if="taxations" class="col-md-12 pull-left">
-			<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
-		</div> -->
+			<div v-if="taxations" class="col-md-12 pull-left">
+				<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
+			</div>
 	</div>
 
 	<!--------------------------------------------------------------------------------------------------------->
@@ -230,7 +227,7 @@
 								<div class="col-md-12">
 									<div class="col-md-12">
 										<div class="form-group has-Registarfeedback">
-											<select name="state" class="selectpicker form-control show-tick" v-model="newTaxation.type">
+											<select name="state" class="form-control" v-model="newTaxation.type">
 												<option value="" selected>Tipo de cobrança</option>
 												<option value="1">Cobrança interno</option>
 												<option value="2">Cobrança Externo</option>
@@ -246,7 +243,7 @@
 								<div class="col-md-12">
 									<div class="col-md-12">
 										<div class="form-group has-feedback">
-											<select class="form-control" v-model="newTaxation.employee_id">
+											<select :disabled = "newTaxation.type == 1 || newTaxation.type == ''" class="form-control" v-model="newTaxation.employee_id">
 												<option value="" selected>Cobrador</option>
 												<option v-for="employee in employees" value="{{employee.id}}">
 													{{employee.name}}
@@ -261,12 +258,23 @@
 								<div class="col-md-12">
 									<div class="col-md-12">
 										<div class="form-group has-feedback">
-											<select class="form-control" v-model="newTaxation.place_id">
+
+											<!-------------------------------------------------------------------------->
+											<select v-if="newTaxation.type == 2" :disabled = "newTaxation.type == ''" class="form-control" v-model="newTaxation.place_id">
 												<option value="" selected>Espaço</option>
-												<option v-for="place in places" value="{{place.id}}">
+												<option v-for="place in placesExt" value="{{place.id}}">
 													{{place.name}}
 												</option>
 											</select>
+											<!-------------------------------------------------------------------------->
+											<select v-else :disabled = "newTaxation.type == ''" class="form-control" v-model="newTaxation.place_id">
+												<option value="" selected>Espaço</option>
+												<option v-for="place in placesInt" value="{{place.id}}">
+													{{place.name}}
+												</option>
+											</select>
+											<!-------------------------------------------------------------------------->
+
 											<span class="help-block">Qual é o espaço?</span>
 										</div>
 									</div>
@@ -284,7 +292,7 @@
 									<div class="col-md-12">
 										<div class="form-group has-feedback">
 											<!-- <input class="form-control" type="number" name="income" value="" placeholder="Valor da cobrança"> -->
-											<input type="number" class="form-control" placeholder="Valor cobrado" v-model="newTaxation.income" name="email"/>
+											<input :disabled = "newTaxation.type == 1" type="number" class="form-control" placeholder="Valor cobrado" v-model="newTaxation.income" name="email"/>
 											<i class="fa fa-usd form-control-feedback"></i>
 										</div>
 
@@ -295,10 +303,16 @@
 						</form>
 					</validator>
 				</div>
-				<div class="modal-footer">
-					<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
+				<div v-if="newTaxation.type == 1" class="modal-footer">
+					<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
 
-					<button :disabled = "!$validationew.valid" @click="createTaxation" class="btn btn-secondary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar Registo</button>
+					<button :disabled = "newTaxation.place_id == ''" @click="createTaxation" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
+				</div>
+
+				<div v-else class="modal-footer">
+					<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
+
+					<button :disabled = "newTaxation.income == '' || newTaxation.employee_id == ''" @click="createTaxation" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
 				</div>
 			</div>
 		</div>

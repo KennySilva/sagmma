@@ -14,9 +14,7 @@ class PlacesRequest extends Request
     public function rules()
     {
         return [
-            'name'           => 'max         :20|required',
-            'dimension'      => 'required|max:10',
-            'price'          => 'required|max:10',
+            'name'           => 'max:20|required',
             'typeofplace_id' => 'required',
         ];
     }

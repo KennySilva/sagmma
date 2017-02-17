@@ -15,10 +15,6 @@ use Taxation;
 
 class PrintController extends Controller
 {
-    public function __construct()
-    {
-        Carbon::setLocale('pt');
-    }
     // ----------------------------------Users-----------------------------------------------
     public function indexUser()
     {
@@ -98,7 +94,7 @@ class PrintController extends Controller
         }
 
     }
-
+    
     public function printThisYearReport($year)
     {
         $taxations = Taxation::whereYear('created_at', '=', $year)->get();

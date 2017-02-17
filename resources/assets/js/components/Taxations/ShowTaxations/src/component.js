@@ -19,7 +19,8 @@ export default{
 
             taxations : {},
             employees : [],
-            places    : [],
+            placesInt    : [],
+            placesExt    : [],
 
             sortColumn : 'id',
             sortInverse: 1,
@@ -45,7 +46,8 @@ export default{
     ready () {
         this.fetchTaxation(1);
         this.taxationEmployee();
-        this.taxationPlace();
+        this.taxationIntPlace();
+        this.taxationExtPlace();
         // this.getPlaces();
     },
 
@@ -142,15 +144,26 @@ export default{
         },
 
         // -------------------------Metodo de suporte---------------------------------------------------
-        taxationPlace: function() {
-            this.$http.get('http://localhost:8000/api/v1/taxationPlace').then((response) => {
-                this.$set('places', response.data);
+        taxationIntPlace: function() {
+            this.$http.get('http://localhost:8000/api/v1/taxationIntPlace').then((response) => {
+                this.$set('placesInt', response.data);
                 // this.$set('options', response.data.name);
                 // this.options = response.data.items
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
             });
         },
+
+        taxationExtPlace: function() {
+            this.$http.get('http://localhost:8000/api/v1/taxationExtPlace').then((response) => {
+                this.$set('placesExt', response.data);
+                // this.$set('options', response.data.name);
+                // this.options = response.data.items
+            }, (response) => {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+        //-----------------------------------------------------------------------------------------------
 
         taxationEmployee: function() {
             this.$http.get('http://localhost:8000/api/v1/taxationEmployee').then((response) => {
@@ -186,6 +199,7 @@ export default{
     // ---------------------------------------------------------------------------------
 
     computed: {
+
     },
 
     // ---------------------------------------------------------------------------------

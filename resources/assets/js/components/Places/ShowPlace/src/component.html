@@ -200,25 +200,6 @@
 
 							<div class="row">
 								<div class="col-md-12">
-									<div class="col-md-6">
-										<div class="form-group has-feedback">
-											<input type="number" class="form-control" name="price" placeholder="Valor" v-model="newPlace.price"/>
-											<span class="fa fa-usd form-control-feedback"></span>
-										</div>
-									</div>
-									<div class="col-md-6">
-										<div class="form-group has-feedback">
-											<input type="number" class="form-control" name="dimension" placeholder="Dimensão" v-model="newPlace.dimension"/>
-											<span class="form-control-feedback">mm</span>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<hr>
-
-							<div class="row">
-								<div class="col-md-12">
 									<div class="col-md-12">
 										<div class="form-group has-feedback">
 											<select class="form-control" v-model="newPlace.typeofplace_id">
@@ -229,6 +210,27 @@
 									</div>
 								</div>
 							</div>
+
+
+							<div class="row">
+								<div class="col-md-12">
+									<div class="col-md-6">
+										<div class="form-group has-feedback">
+											<input :disabled = "newPlace.typeofplace_id == 7" type="number" class="form-control" name="price" placeholder="Valor" v-model="newPlace.price"/>
+											<span class="fa fa-usd form-control-feedback"></span>
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="form-group has-feedback">
+											<input :disabled = "newPlace.typeofplace_id == 7" type="number" class="form-control" name="dimension" placeholder="Dimensão" v-model="newPlace.dimension"/>
+											<span class="form-control-feedback">mm</span>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<hr>
+
 
 							<div class="row">
 								<div class="col-md-12">
