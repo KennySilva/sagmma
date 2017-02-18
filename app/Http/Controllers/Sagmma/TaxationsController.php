@@ -9,6 +9,8 @@ use Sagmma\Http\Controllers\Controller;
 use Taxation;
 use Charts;
 use Employee;
+use Typeofplace;
+use DB;
 
 
 
@@ -16,12 +18,22 @@ class TaxationsController extends Controller
 {
     public function index()
     {
-        $chart = Charts::database(Taxation::all(), 'bar', 'highcharts')->dateColumn('created_at')
+        // $data = Taxation::select('employee_place.employee_id', DB::raw('sum(employee_place.income) as aggregate'))->groupBy(DB::raw('employee_place.employee_id'))->get(); //must alias the aggregate column as aggregate
+        //
+        // $chart = Charts::database($data)->preaggregated(true)->lastByDay(7, false);
+
+
+
+
+
+
+
+        $chart = Charts::database(Taxation::all(), 'pie', 'fusioncharts')->dateColumn('created_at')
         ->elementLabel("Total")
         ->dimensions(1000, 500)
         ->responsive(false)
         ->groupBy('employee_id');
-
+        
         return view('_backend.taxations.show', ['chart' => $chart]);
     }
 
