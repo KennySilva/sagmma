@@ -16,7 +16,8 @@
         "laravelcollective/html": "5.1.*",
         "barryvdh/laravel-dompdf": "^0.7.0",
         "maatwebsite/excel": "~2.1.0",
-        "maddhatter/laravel-fullcalendar": "^1.2"
+        "maddhatter/laravel-fullcalendar": "^1.2",
+        "consoletvs/charts": "4.*"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

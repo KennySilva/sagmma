@@ -78,6 +78,8 @@ return [
         // Greggilbert\Recaptcha\RecaptchaServiceProvider::class,
         // Anhskohbo\NoCaptcha\NoCaptchaServiceProvider::class,
         // Spatie\Analytics\AnalyticsServiceProvider::class,
+        //Gráficos
+        ConsoleTVs\Charts\ChartsServiceProvider::class,
 
 
     ],
@@ -120,24 +122,25 @@ return [
 
         //Meus Alias
 
-        'Image'     => Intervention\Image\Facades\Image::class,
+        'Image'        => Intervention\Image\Facades\Image               ::class,
 
-        'Socialite' => Laravel\Socialite\Facades\Socialite::class,
+        'Socialite'    => Laravel\Socialite\Facades\Socialite            ::class,
 
-        'Entrust'   => Zizaco\Entrust\EntrustFacade::class,
+        'Entrust'      => Zizaco\Entrust\EntrustFacade                   ::class,
 
-        'Form' => Collective\Html\FormFacade::class,
-        'Html' => Collective\Html\HtmlFacade::class,
+        'Form'         => Collective\Html\FormFacade                     ::class,
+        'Html'         => Collective\Html\HtmlFacade                     ::class,
 
-        'PDF' => Barryvdh\DomPDF\Facade::class,
+        'PDF'          => Barryvdh\DomPDF\Facade                         ::class,
 
-        'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+        'Excel'        => Maatwebsite\Excel\Facades\Excel                ::class,
 
-        'Calendar' => MaddHatter\LaravelFullcalendar\Facades\Calendar::class,
+        'Calendar'     => MaddHatter\LaravelFullcalendar\Facades\Calendar::class,
 
-        // 'Recaptcha' => Greggilbert\Recaptcha\Facades\Recaptcha::class,
+        // 'Recaptcha' => Greggilbert\Recaptcha\Facades\Recaptcha        ::class,
 
-        // 'Analytics' => Spatie\Analytics\AnalyticsFacade::class,
+        // 'Analytics' => Spatie\Analytics\AnalyticsFacade               ::class,
+        'Charts'       => ConsoleTVs\Charts\Facades\Charts               ::class,
 
 
 
