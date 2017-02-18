@@ -3,6 +3,7 @@
 	Contrato Criado com sucesso
 </div>
 
+
 <div class="row">
 	<div class="col-md-4 pull-right">
 		<div class="input-group">
@@ -28,7 +29,7 @@
 				<li><a data-toggle="modal" data-target="#modal-report-year" href="#">Relatório Anual</a></li>
 			</ul>
 		</div>
-		
+
 
 	</div>
 
@@ -174,6 +175,7 @@
 
 						<td>{{ taxation.income }}</td>
 						<td align=center>  <a data-toggle="modal" data-target="#modal-edit-taxation" href="#"> <i class="fa fa-pencil text-primary" @click="getThisTaxation(taxation.id)" > </i></a></td>
+						<!-- <td v-for="roles in auth.roles" align=center>  <a v-if = "roles.name == 'admin'" data-toggle="modal" data-target="#modal-edit-taxation" href="#"> <i class="fa fa-pencil text-primary" @click="getThisTaxation(taxation.id)" > </i></a></td> -->
 						<td align=center><a data-toggle="modal" data-target="#modal-delete-taxation" href="#"><i class="fa fa-trash text-danger" @click="getThisTaxation(taxation.id)"></i></a></td>
 
 						<td align=center><a href="/export/receiptInformation/{{taxation.id}}"><i class="fa fa-print text-info"></i></a></td>
@@ -183,195 +185,260 @@
 			<div v-if="taxations" class="col-md-12 pull-left">
 				<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
 			</div>
-	</div>
+		</div>
 
-	<!--------------------------------------------------------------------------------------------------------->
+		<!--------------------------------------------------------------------------------------------------------->
 
-	<div class="modal fade" id="modal-delete-taxation" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button @click="clearField" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-					<h4 class="modal-title" id=""><i class=" text-danger fa fa-trash fa-2x"></i></h4>
+		<div class="modal fade" id="modal-delete-taxation" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button @click="clearField" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id=""><i class=" text-danger fa fa-trash fa-2x"></i></h4>
+					</div>
+
+					<div class="modal-body">
+						<h2 class="text-center text-info">Eliminar esta Cobrança</h2>
+					</div>
+
+					<div class="modal-footer">
+						<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
+						<button  @keyup.enter="deleteTaxation(newTaxation.id)" @click="deleteTaxation(newTaxation.id)" type="button" class="btn btn-danger"><i class="fa fa-trash-o"></i> Eliminar</button>
+					</div>
 				</div>
+			</div>
+		</div>
 
-				<div class="modal-body">
-					<h2 class="text-center text-info">Eliminar esta Cobrança</h2>
+
+		<!--------------------------------------------------------------------------------------------------------->
+		<!-- Modal -->
+		<div id="modal-create-taxation" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Registar</h4>
+					</div>
+					<div class="modal-body">
+						<validator name="validationew">
+							<form action="#" methods="POST">
+
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<div class="form-group has-Registarfeedback">
+												<select name="state" class="form-control" v-model="newTaxation.type">
+													<option value="" selected>Tipo de cobrança</option>
+													<option value="1">Cobrança interno</option>
+													<option value="2">Cobrança Externo</option>
+												</select>
+												<span class="help-block">Selecione o tipo de espaço</span>
+											</div>
+										</div>
+									</div>
+								</div>
+								<hr>
+
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<div class="form-group has-feedback">
+												<select :disabled = "newTaxation.type != 2" class="form-control" v-model="newTaxation.employee_id">
+													<option value="" selected>Cobrador</option>
+													<option v-for="employee in employees" value="{{employee.id}}">
+														{{employee.name}}
+													</option>
+												</select>
+												<span v-if="newTaxation.type == 2" class="text-help text-warning">Selecione o cobrador</span>
+												<span v-if="newTaxation.type == 1" class="text-help text-success">O cobrador será o responsável pelo gegisto</span>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<div class="form-group has-feedback">
+
+												<!-------------------------------------------------------------------------->
+												<select v-if="newTaxation.type == 2" :disabled = "newTaxation.type == ''" class="form-control" v-model="newTaxation.place_id">
+													<option value="" selected>Espaço</option>
+													<option v-for="place in placesExt" value="{{place.id}}">
+														{{place.name}}
+													</option>
+												</select>
+												<!-------------------------------------------------------------------------->
+												<select v-else :disabled = "newTaxation.type == ''" class="form-control" v-model="newTaxation.place_id">
+													<option value="" selected>Espaço</option>
+													<option v-for="place in placesInt" value="{{place.id}}">
+														{{place.name}}
+													</option>
+												</select>
+												<!-------------------------------------------------------------------------->
+
+												<span class="help-block">Qual é o espaço?</span>
+											</div>
+										</div>
+
+									</div>
+								</div>
+
+								<hr><!---------------------------------------------------------------------------------------------------------------->
+								<!-- <v-select :value.sync="selected" :options="options"></v-select> -->
+
+
+
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<div class="form-group has-feedback">
+												<!-- <input class="form-control" type="number" name="income" value="" placeholder="Valor da cobrança"> -->
+												<input :disabled = "newTaxation.type != 2" type="number" class="form-control" placeholder="Valor cobrado" v-model="newTaxation.income" name="email"/>
+												<i class="fa fa-usd form-control-feedback"></i>
+											</div>
+
+											<span class="text-help text-warning" v-if="newTaxation.type == 2">Introduza o valor cobrado</span>
+											<span class="text-help text-success" v-if="newTaxation.type == 1">O valor será preenchido automaticamente</span>
+										</div>
+									</div>
+								</div>
+							</form>
+						</validator>
+					</div>
+					<div v-if="newTaxation.type == 1" class="modal-footer">
+						<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
+
+						<button :disabled = "newTaxation.place_id == ''" @click="createTaxation" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
+					</div>
+
+					<div v-else class="modal-footer">
+						<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
+
+						<button :disabled = "newTaxation.income == '' || newTaxation.employee_id == ''" @click="createTaxation" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
+					</div>
 				</div>
+			</div>
+		</div>
 
-				<div class="modal-footer">
-					<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
-					<button  @keyup.enter="deleteTaxation(newTaxation.id)" @click="deleteTaxation(newTaxation.id)" type="button" class="btn btn-danger"><i class="fa fa-trash-o"></i> Eliminar</button>
+		<!--------------------------------------------------------------------------------------------------------->
+
+		<!-- Modal -->
+		<div id="modal-edit-taxation" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Editar Este contrato</h4>
+					</div>
+					<div class="modal-body">
+						<validator name="validationew">
+							<form action="#" methods="patch">
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<div class="form-group has-Registarfeedback">
+												<select name="state" class="form-control" v-model="newTaxation.type">
+													<option value="1">Cobrança interno</option>
+													<option value="2">Cobrança Externo</option>
+												</select>
+												<span class="help-block">Selecione o tipo de espaço</span>
+											</div>
+										</div>
+									</div>
+								</div>
+								<hr>
+
+								<!-- <td v-if="taxation.type == 2" v-for="employee in taxation.employees">{{ employee.name }}</td>
+								<td v-if="taxation.type == 1">{{ taxation.author }}</td> -->
+
+
+
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<div class="form-group has-feedback">
+												<!------------------------------------------------------------------------->
+												<select v-if="newTaxation.type == 2" :disabled = "newTaxation.type != 2" class="form-control" v-model="newTaxation.employee_id">
+													<option v-for="employee in employees" value="{{employee.id}}">
+														{{employee.name}}
+													</option>
+												</select>
+												<!------------------------------------------------------------------------->
+												<select v-if="newTaxation.type == 1" :disabled = "newTaxation.type != 2" class="form-control" v-model="newTaxation.employee_id">
+													<option value="{{newTaxation.employee_id}}">
+														{{newTaxation.author}}
+													</option>
+												</select>
+												<span v-if="newTaxation.type == 2" class="text-help text-warning">Selecione o cobrador</span>
+												<span v-if="newTaxation.type == 1" class="text-help text-success">O cobrador será o responsável pelo gegisto</span>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<div class="form-group has-feedback">
+
+												<!-------------------------------------------------------------------------->
+												<select v-if="newTaxation.type == 2" :disabled = "newTaxation.type == ''" class="form-control" v-model="newTaxation.place_id">
+													<option v-for="place in placesExt" value="{{place.id}}">
+														{{place.name}}
+													</option>
+												</select>
+												<!-------------------------------------------------------------------------->
+												<select v-else :disabled = "newTaxation.type == ''" class="form-control" v-model="newTaxation.place_id">
+													<option v-for="place in placesInt" value="{{place.id}}">
+														{{place.name}}
+													</option>
+												</select>
+												<!-------------------------------------------------------------------------->
+
+												<span class="help-block">Qual é o espaço?</span>
+											</div>
+										</div>
+
+									</div>
+								</div>
+
+								<hr><!---------------------------------------------------------------------------------------------------------------->
+								<!-- <v-select :value.sync="selected" :options="options"></v-select> -->
+
+
+
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<div class="form-group has-feedback">
+												<!-- <input class="form-control" type="number" name="income" value="" placeholder="Valor da cobrança"> -->
+												<input :disabled = "newTaxation.type != 2" type="number" class="form-control" placeholder="Valor cobrado" v-model="newTaxation.income" name="email"/>
+												<i class="fa fa-usd form-control-feedback"></i>
+											</div>
+
+											<span class="text-help text-warning" v-if="newTaxation.type == 2">Introduza o valor cobrado</span>
+											<span class="text-help text-success" v-if="newTaxation.type == 1">O valor será preenchido automaticamente</span>
+										</div>
+									</div>
+								</div>
+							</form>
+						</validator>
+					</div>
+					<div v-if="newTaxation.type == 1" class="modal-footer">
+						<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
+
+						<button :disabled = "newTaxation.place_id == ''" @click="saveEditedTaxation(newTaxation.id)" class="btn btn-primary pull-right" type="submit"><i class="fa fa-refresh fa-spin"></i>&nbsp; &nbsp;&nbsp;Actualizar</button>
+					</div>
+
+					<div v-else class="modal-footer">
+						<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
+
+						<button :disabled = "newTaxation.income == '' || newTaxation.employee_id == ''" @click="saveEditedTaxation(newTaxation.id)" class="btn btn-primary pull-right" type="submit"><i class="fa fa-refresh fa-spin"></i>&nbsp; &nbsp;&nbsp;Actualizar</button>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-
-
-	<!--------------------------------------------------------------------------------------------------------->
-	<!-- Modal -->
-	<div id="modal-create-taxation" class="modal fade" role="dialog">
-		<div class="modal-dialog">
-
-			<!-- Modal content-->
-			<div class="modal-content">
-				<div class="modal-header">
-					<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">Registar</h4>
-				</div>
-				<div class="modal-body">
-					<validator name="validationew">
-						<form action="#" methods="POST">
-
-							<div class="row">
-								<div class="col-md-12">
-									<div class="col-md-12">
-										<div class="form-group has-Registarfeedback">
-											<select name="state" class="form-control" v-model="newTaxation.type">
-												<option value="" selected>Tipo de cobrança</option>
-												<option value="1">Cobrança interno</option>
-												<option value="2">Cobrança Externo</option>
-											</select>
-											<span class="help-block">Selecione o tipo de espaço</span>
-										</div>
-									</div>
-								</div>
-							</div>
-							<hr>
-
-							<div class="row">
-								<div class="col-md-12">
-									<div class="col-md-12">
-										<div class="form-group has-feedback">
-											<select :disabled = "newTaxation.type == 1 || newTaxation.type == ''" class="form-control" v-model="newTaxation.employee_id">
-												<option value="" selected>Cobrador</option>
-												<option v-for="employee in employees" value="{{employee.id}}">
-													{{employee.name}}
-												</option>
-											</select>
-											<span class="help-block">Selecione o cobrador</span>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="row">
-								<div class="col-md-12">
-									<div class="col-md-12">
-										<div class="form-group has-feedback">
-
-											<!-------------------------------------------------------------------------->
-											<select v-if="newTaxation.type == 2" :disabled = "newTaxation.type == ''" class="form-control" v-model="newTaxation.place_id">
-												<option value="" selected>Espaço</option>
-												<option v-for="place in placesExt" value="{{place.id}}">
-													{{place.name}}
-												</option>
-											</select>
-											<!-------------------------------------------------------------------------->
-											<select v-else :disabled = "newTaxation.type == ''" class="form-control" v-model="newTaxation.place_id">
-												<option value="" selected>Espaço</option>
-												<option v-for="place in placesInt" value="{{place.id}}">
-													{{place.name}}
-												</option>
-											</select>
-											<!-------------------------------------------------------------------------->
-
-											<span class="help-block">Qual é o espaço?</span>
-										</div>
-									</div>
-
-								</div>
-							</div>
-
-							<hr><!---------------------------------------------------------------------------------------------------------------->
-							<!-- <v-select :value.sync="selected" :options="options"></v-select> -->
-
-
-
-							<div class="row">
-								<div class="col-md-12">
-									<div class="col-md-12">
-										<div class="form-group has-feedback">
-											<!-- <input class="form-control" type="number" name="income" value="" placeholder="Valor da cobrança"> -->
-											<input :disabled = "newTaxation.type == 1" type="number" class="form-control" placeholder="Valor cobrado" v-model="newTaxation.income" name="email"/>
-											<i class="fa fa-usd form-control-feedback"></i>
-										</div>
-
-										<span class="help-block">Introduza o valor cobrado</span>
-									</div>
-								</div>
-							</div>
-						</form>
-					</validator>
-				</div>
-				<div v-if="newTaxation.type == 1" class="modal-footer">
-					<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
-
-					<button :disabled = "newTaxation.place_id == ''" @click="createTaxation" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
-				</div>
-
-				<div v-else class="modal-footer">
-					<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
-
-					<button :disabled = "newTaxation.income == '' || newTaxation.employee_id == ''" @click="createTaxation" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<!--------------------------------------------------------------------------------------------------------->
-
-	<!-- Modal -->
-	<div id="modal-edit-taxation" class="modal fade" role="dialog">
-		<div class="modal-dialog">
-			<!-- Modal content-->
-			<div class="modal-content">
-				<div class="modal-header">
-					<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">Editar Este contrato</h4>
-				</div>
-				<div class="modal-body">
-					<validator name="validationew">
-						<form action="#" methods="patch">
-							<div class="row">
-								<div class="col-md-12">
-									<div class="col-md-12">
-										<div class="form-group has-feedback">
-											<select class="form-control" v-model="newTaxation.employee_id">
-												<option value="" selected>Selecione o Funcionário</option>
-												<option v-for="employee in employees" value="{{employee.id}}">
-													{{employee.id}}
-												</option>
-											</select>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<hr><!---------------------------------------------------------------------------------------------------------------->
-
-							<div class="row">
-								<div class="col-md-12">
-									<div class="col-md-12">
-										<div class="form-group has-feedback">
-											<select class="form-control" v-model="newTaxation.place_id">
-												<option value="" selected>Selecione o Espaços</option>
-												<option v-for="place in places" value="{{place.id}}">
-													{{place.name}}
-												</option>
-											</select>
-										</div>
-									</div>
-								</div>
-							</div>
-						</form>
-					</validator>
-				</div>
-				<div class="modal-footer">
-					<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Close</button>
-					<button v-on:show="" @click="saveEditedTaxation(newTaxation.id)" type="button" class="btn btn-secondary"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp; Salvar as Alterações sobre este contrato</button>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
 </div>
