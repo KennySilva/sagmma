@@ -24,6 +24,6 @@ class PDFController extends Controller
     {
         $datas = Taxation::all();
         $pdf = PDF::loadView('pdf.taxationReport', ['datas' => $datas]);
-        return $pdf->download('Relatorio_Cobrança.pdf');
+        return $pdf->download('relatoriocobarnca.pdf');
     }
 }

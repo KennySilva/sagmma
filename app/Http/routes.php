@@ -59,6 +59,7 @@ Route::group(['namespace' => 'ApiControllers'], function()
     Route::group(['prefix' => 'api/v1', 'middleware' => ['auth']], function () {
         Route::group(['middleware' => ['permission:admin']], function () {
             Route::resource('users', 'ApiUsersController');
+            Route::resource('authUser', 'ApiUsersController@authUser');
             Route::get('roleuser', 'ApiUsersController@getRoleForUser');
 
             Route::get('showThisUser/{id}', function ($id) {

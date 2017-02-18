@@ -24,10 +24,39 @@
                     </div>
                 </div>
                 <div class="box-body">
-                    {{ csrf_field() }}
-                    <!------------------------------------------------------------------------------------->
-                    <show-taxation></show-taxation>
-                    <!------------------------------------------------------------------------------------->
+                    <div id="exTab2" class="">
+                        <ul class="nav nav-tabs">
+                            <li class="active">
+                                <a  href="#1" data-toggle="tab">Cobranças de Imposto</a>
+                            </li>
+                            <li><a href="#2" data-toggle="tab">Funcionários</a>
+                            </li>
+                            <li><a href="#3" data-toggle="tab">Espaços</a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content ">
+                            <div class="tab-pane active" id="1">
+                                <br>
+                                {{ csrf_field() }}
+                                <!------------------------------------------------------------------------------------->
+                                <show-taxation></show-taxation>
+                                <!------------------------------------------------------------------------------------->
+                            </div>
+                            <div class="tab-pane" id="2">
+                                <br>
+                                <!------------------------------------------------------------------------------------->
+                                <show-employee></show-employee>
+                                <!------------------------------------------------------------------------------------->
+                            </div>
+                            <div class="tab-pane" id="3">
+                                <br>
+                                <!------------------------------------------------------------------------------------->
+                                <show-place></show-place>
+                                <!------------------------------------------------------------------------------------->
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -55,10 +84,10 @@
 
 
 {{-- @push('scripts') --}}
-    {{-- <script src="/bower_components/bootstrap-select/dist/js/bootstrap-select.js" charset="utf-8"></script> --}}
-    {{-- <script src="/bower_components/chosen/chosen.jquery.js" charset="utf-8"></script>
+{{-- <script src="/bower_components/bootstrap-select/dist/js/bootstrap-select.js" charset="utf-8"></script> --}}
+{{-- <script src="/bower_components/chosen/chosen.jquery.js" charset="utf-8"></script>
 
-    <script>
-    $('.contact-select').chosen({});
-    </script> --}}
+<script>
+$('.contact-select').chosen({});
+</script> --}}
 {{-- @endpush --}}

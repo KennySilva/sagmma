@@ -30,6 +30,7 @@ export default{
             pagination : {},
             success    : false,
             report_date: '',
+            auth: [],
 
             report   : {
                 day  : '',
@@ -48,7 +49,7 @@ export default{
         this.taxationEmployee();
         this.taxationIntPlace();
         this.taxationExtPlace();
-        // this.getPlaces();
+        this.authUser();
     },
 
     // ---------------------------------------------------------------------------------
@@ -153,6 +154,18 @@ export default{
                 console.log("Ocorreu um erro na operação");
             });
         },
+
+        authUser: function() {
+            this.$http.get('http://localhost:8000/api/v1/authUser').then((response) => {
+                this.$set('auth', response.data);
+                // this.$set('options', response.data.name);
+                // this.options = response.data.items
+            }, (response) => {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+
 
         taxationExtPlace: function() {
             this.$http.get('http://localhost:8000/api/v1/taxationExtPlace').then((response) => {

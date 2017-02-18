@@ -90,14 +90,15 @@ class ApiTaxationsController extends Controller
     // --------------------------------------------------------------------------------------
     public function getPlaceExtForTaxation()
     {
-        $place = Place::where('typeofplace_id', '=', 7)->get();
+        $place = Place::where('typeofplace_id', '>=', 4)->get();
+        // $place = Place::where('typeofplace_id', '>3', 7)->orWhere('typeofplace_id', '=', 6)->orWhere('typeofplace_id', '=', 5)->orWhere('typeofplace_id', '=', 4)->get();
         return $place;
     }
 
 
     public function getPlaceIntForTaxation()
     {
-        $place = Place::where('typeofplace_id', '!=', 7)->get();
+        $place = Place::where('typeofplace_id', '<', 4)->get();
         return $place;
     }
 

@@ -11,6 +11,7 @@ use User;
 use Role;
 use Response;
 use Input;
+use Auth;
 
 class ApiUsersController extends Controller
 {
@@ -25,7 +26,7 @@ class ApiUsersController extends Controller
         });
         return $user;
     }
-
+    
     public function create()
     {
         // // return User::create($request->all());
@@ -94,7 +95,7 @@ class ApiUsersController extends Controller
 
     public function showThisUser($id)
     {
-        return view('test');  
+        return view('test');
     }
 
     public function estado_utilizador(Request $request)
@@ -117,5 +118,11 @@ class ApiUsersController extends Controller
     {
         $roles = Role::all();
         return $roles;
+    }
+
+    public function authUser()
+    {
+        $user = Auth::user();
+        return $user;
     }
 }
