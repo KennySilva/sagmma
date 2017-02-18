@@ -7,14 +7,22 @@ use Illuminate\Http\Request;
 use Sagmma\Http\Requests;
 use Sagmma\Http\Controllers\Controller;
 use Taxation;
+use Charts;
+use Employee;
+
 
 
 class TaxationsController extends Controller
 {
     public function index()
     {
-        return view('_backend.taxations.show');
+        $chart = Charts::database(Taxation::all(), 'bar', 'highcharts')->dateColumn('created_at')
+        ->elementLabel("Total")
+        ->dimensions(1000, 500)
+        ->responsive(false)
+        ->groupBy('employee_id');
 
+        return view('_backend.taxations.show', ['chart' => $chart]);
     }
 
     public function create()

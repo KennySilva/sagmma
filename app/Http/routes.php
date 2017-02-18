@@ -247,6 +247,7 @@ Route::group(['namespace' => 'Web'], function()
 Route::get('/typetest', 'Test\TypeController@index');
 
 Route::get('/calendar', 'Test\CalendarController@index');
+Route::get('/chart', 'ServicesControllers\ChartsController@TestChart');
 
 
 //------------------------------------Services Routes---------------------------------------
