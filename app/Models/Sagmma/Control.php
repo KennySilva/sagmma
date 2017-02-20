@@ -23,11 +23,11 @@ class Control extends Model
 
     public function employees()
     {
-        return $this->hasMany(Employee::class, 'employee_id', 'id');
+        return $this->hasMany(Employee::class, 'id', 'employee_id');
     }
 
     public function materials()
     {
-        return $this->hasMany(Material::class, 'material_id', 'id');
+        return $this->hasMany(Material::class, 'id', 'material_id');
     }
 }

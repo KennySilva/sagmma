@@ -20,11 +20,11 @@ class Contract extends Model
     //------------------------------------------------------------------------------
     public function places()
     {
-        return $this->hasMany(Place::class, 'place_id', 'id');
+        return $this->hasMany(Place::class, 'id', 'place_id');
     }
     public function traders()
     {
-        return $this->hasMany(Trader::class, 'trader_id', 'id');
+        return $this->hasMany(Trader::class, 'id', 'trader_id');
     }
 
 }

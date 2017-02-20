@@ -14,9 +14,9 @@ class ContractsRequest extends Request
     public function rules()
     {
         return [
-            'place_id'  => 'required',
-            'trader_id' => 'required',
-            'rate'      => 'required',
+            'place_id'    => 'required',
+            'trader_id'   => 'required',
+            'ending_date' => 'required',
         ];
     }
 }

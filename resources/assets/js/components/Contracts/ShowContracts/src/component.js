@@ -13,10 +13,12 @@ export default{
 
             newContract: {
                 id          : '',
-                place_id : '',
-                trader_id : '',
-                status : '',
-                rate : '',
+                place_id    : '',
+                trader_id   : '',
+                status      : '',
+                rate        : '',
+                author      : '',
+                ending_date : '',
             },
 
             contracts : {},
@@ -53,11 +55,13 @@ export default{
 
         clearField: function(){
             this.newContract = {
-                id       : '',
-                place_id : '',
-                trader_id : '',
-                status   : '',
-                rate     : '',
+                id          : '',
+                place_id    : '',
+                trader_id   : '',
+                status      : '',
+                rate        : '',
+                author      : '',
+                ending_date : '',
             };
         },
 

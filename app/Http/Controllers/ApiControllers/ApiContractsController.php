@@ -44,12 +44,12 @@ class ApiContractsController extends Controller
         //     $contract->status    = true;
         // }
 
-        $contract->place_id  = $request->place_id;
-        $contract->trader_id = $request->trader_id;
-        $contract->status    = true;
-        $contract->rate      = $request->rate;
-        $contract->author    = Auth::user()->name;
-        $contract->ending_date      = $request->ending_date;
+        $contract->place_id    = $request->place_id;
+        $contract->trader_id   = $request->trader_id;
+        $contract->status      = true;
+        $contract->rate        = $request->rate;
+        $contract->author      = Auth::user()->name;
+        $contract->ending_date = $request->ending_date;
         $contract->save();
 
     }

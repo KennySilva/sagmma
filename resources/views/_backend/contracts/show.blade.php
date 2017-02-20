@@ -3,6 +3,7 @@
 
     {{-- <link rel="stylesheet" href="/bower_components/bootstrap-select/dist/css/bootstrap-select.css"> --}}
     {{-- <link rel="stylesheet" href="/bower_components/chosen/chosen.css"> --}}
+
 @endsection
 
 @section('htmlheader_title')

@@ -53,7 +53,7 @@
                         </a>
                         <ul class="treeview-menu">
                             {{-- @permission(['manage-contract']) --}}
-                            <li><a href="#"><i class="fa fa-file-text-o"></i><span>Contratos</span></a></li>
+                            <li><a href="{{ url('sagmma/contracts') }}"><i class="fa fa-file-text-o"></i><span>Contratos</span></a></li>
                             {{-- @endpermission --}}
                             {{-- @permission(['manage-resource']) --}}
                             <li><a href="#"><i class="fa fa-dot-circle-o"></i><span>Controlo dos Materiais</span></a></li>

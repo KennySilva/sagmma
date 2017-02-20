@@ -3,13 +3,11 @@
 	Contrato Criado com sucesso
 </div>
 
-
-
 <div class="row">
 	<div class="col-md-4 pull-right">
 		<div class="input-group">
 			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
-			<input v-model="filter.term" type="text" class="form-control" placeholder="Filtrar dados da tabela" aria-describedby="basic-addon1">
+			<input v-model="filter.term" type="text" class="form-control" placeholder="Filtrar..." aria-describedby="basic-addon1">
 		</div>
 	</div>
 </div>
@@ -17,11 +15,10 @@
 <hr>
 <div class="row">
 	<div class="col-md-12">
-		<button @click="clearField" class="btn btn-secondary pull-left" name="button" data-toggle="modal" data-target="#modal-create-contract"><i class="fa fa-plus"></i> Criar Novo</button>&nbsp;&nbsp;&nbsp;&nbsp;
-		<button class="btn btn-secondary" name="button"><i class="fa fa-print"></i> Imprimir</button>
+		<button @click="clearField" class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-contract"><i class="fa fa-plus"></i> Novo</button>&nbsp;&nbsp;
+		<a class="btn btn-primary btn-flat btn-outline" href="#"><i class="fa fa-print"></i> Imprimir</a>
 	</div>
 </div>
-
 
 <br>
 
@@ -42,36 +39,25 @@
 							<a href="#" @click = "doSort($event, 'trader_id')">Comerciante</a>
 						</th>
 
+
 						<th>
 							<i :class = "{'fa-sort-amount-asc': sortColumn == 'status' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'status' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
-							<a href="#" @click = "doSort($event, 'status')">Estado do Contrato</a>
+							<a href="#" @click = "doSort($event, 'status')">Estado</a>
 						</th>
 
-						<th>
-							<i :class = "{'fa-sort-amount-asc': sortColumn == 'rate' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'rate' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
-							<a href="#" @click = "doSort($event, 'rate')">Taxa</a>
-						</th>
-
-						<th>
-							<i :class = "{'fa-sort-amount-asc': sortColumn == 'created_at' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'created_at' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
-							<a href="#" @click = "doSort($event, 'created_at')">Data</a>
-						</th>
 
 						<th  class="text-center" colspan="3"><span><i class="fa fa-cogs"></i></span></th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr v-for="contract in contracts | filterBy filter.term | orderBy sortColumn sortInverse">
-						<td v-for="place in contract.places">{{ place.id }}</td>
+						<td v-for="place in contract.places">{{ place.name }}</td>
 						<td v-for="trader in contract.traders">{{ trader.name }}</td>
 						<!------------------------------------------------------------------------------------------>
-
 						<td>
 							<button type="submit" @click = "statusContractsChange(contract.id)" class='btn btn-xs' :class="{ 'btn-info': contract.status, 'btn-danger': !contract.status }">{{contract.status ? 'Ativado' : 'Desativado'}}</button>
 						</td>
 						<!------------------------------------------------------------------------------------------>
-						<td>{{ contract.rate }}</td>
-						<td>{{ contract.created_at | formatDate 'DD/MM/YYYY' }}</td>
 						<td align=center>  <a data-toggle="modal" data-target="#modal-edit-contract" href="#"> <i class="fa fa-pencil text-primary" @click="getThisContract(contract.id)" > </i></a></td>
 						<td align=center><a data-toggle="modal" data-target="#modal-delete-contract" href="#"><i class="fa fa-trash text-danger" @click="getThisContract(contract.id)"></i></a></td>
 
@@ -91,15 +77,17 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button @click="clearField" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-						<h4 class="modal-title" id="">Eliminar Registo</h4>
+						<h4 class="modal-title" id="">Eliminar contrato</h4>
 					</div>
 					<div class="modal-body">
-						<h1>Eliminar este registo</h1>
+						<h1>Eliminar este contrato</h1>
 					</div>
 					<div class="modal-footer">
-						<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-						<button  @keyup.enter="deleteContract(newContract.id)" @click="deleteContract(newContract.id)" type="button" class="btn btn-default">Eliminar  contract</button>
+						<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+						<button  @keyup.enter="deleteContract(newContract.id)" @click="deleteContract(newContract.id)" type="button" class="btn btn-danger">Eliminar</button>
 					</div>
+
+
 				</div>
 			</div>
 		</div>
@@ -114,7 +102,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
-						<h4 class="modal-title">Criar Registo</h4>
+						<h4 class="modal-title">Registar</h4>
 					</div>
 					<div class="modal-body">
 						<validator name="validationew">
@@ -123,55 +111,42 @@
 									<div class="col-md-12">
 										<div class="col-md-6">
 											<div class="form-group has-feedback">
-												<select class="form-control input-lg" v-model="newContract.place_id">
-													<option value="" selected>Selecione o espaço</option>
+												<select class="form-control selectpicker" v-model="newContract.place_id">
+													<option value="" selected>Selecione o Espaço</option>
 													<option v-for="place in places" value="{{place.id}}">
-														{{place.id}}
+														{{place.name}}
 													</option>
 												</select>
-												<span class="help-block">Selecione o espaço pretendido</span>
+												<!-- <span class="help-block">Selecione o espaço pretendido</span> -->
 											</div>
 										</div>
 										<div class="col-md-6">
 											<div class="form-group has-feedback">
-												<select class="form-control input-lg" v-model="newContract.trader_id">
-													<option value="" selected>O Comerciante</option>
+												<select class="selectpicker form-control" v-model="newContract.trader_id">
+													<option value="" selected>Selecione o Comerciante</option>
 													<option v-for="trader in traders" value="{{trader.id}}">
 														{{trader.name}}
 													</option>
 												</select>
-												<span class="help-block">Selecione o comerciante</span>
+												<!-- <span class="help-block">Selecione o comerciante</span> -->
 											</div>
 										</div>
 									</div>
 								</div>
 
-								<!-- <hr>
-
-								<div class="row">
-									<div class="col-md-12">
-										<div class="col-md-12">
-											<div class="form-group has-feedback">
-												<input type="number" class="form-control" name="age" placeholder="Taxa" min="20" max="50" v-model="newUser.age"/>
-											</div>
-										</div>
-									</div>
-								</div> -->
-
-								<hr><!---------------------------------------------------------------------------------------------------------------->
-
+								<hr><!---------------------------------------------------------------------------------------->
 
 								<div class="row">
 									<div class="col-md-12">
 										<div class="col-md-6">
 											<div class="form-group has-feedback">
-												<input  v-model="newContract.rate"  type='number' class='form-control input-lg' placeholder='Taxa do contrato'>
+												<input  v-model="newContract.rate"  type='number' class='form-control' placeholder='Taxa do contrato'>
 												<span class="help-block">Introduza o valor do contrato</span>
 											</div>
 										</div>
 										<div class="col-md-6">
 											<div class="form-group has-feedback">
-												<input type='date' class='form-control input-lg' placeholder='Fim do Contrato'>
+												<input v-model="newContract.ending_date" type='date' class='form-control' placeholder='Fim do Contrato'>
 												<span class="help-block">Introduza a data do término do contrato</span>
 											</div>
 										</div>
@@ -181,9 +156,9 @@
 						</validator>
 					</div>
 					<div class="modal-footer">
-						<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
+						<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
 
-						<button :disabled = "!$validationew.valid" @click="createContract" class="btn btn-secondary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar Registo</button>
+						<button :disabled = "!$validationew.valid" @click="createContract" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
 					</div>
 				</div>
 			</div>
@@ -205,7 +180,7 @@
 							<form action="#" methods="patch">
 								<div class="row">
 									<div class="col-md-12">
-										<div class="col-md-12">
+										<div class="col-md-6">
 											<div class="form-group has-feedback">
 												<select class="form-control" v-model="newContract.place_id">
 													<option value="" selected>Selecione o Espaço</option>
@@ -213,14 +188,10 @@
 														{{place.id}}
 													</option>
 												</select>
+												<!-- <span class="help-block">Selecione o espaço pretendido</span> -->
 											</div>
 										</div>
-									</div>
-								</div>
-
-								<div class="row">
-									<div class="col-md-12">
-										<div class="col-md-12">
+										<div class="col-md-6">
 											<div class="form-group has-feedback">
 												<select class="form-control" v-model="newContract.trader_id">
 													<option value="" selected>Selecione o Comerciante</option>
@@ -228,18 +199,26 @@
 														{{trader.name}}
 													</option>
 												</select>
+												<!-- <span class="help-block">Selecione o comerciante</span> -->
 											</div>
 										</div>
 									</div>
 								</div>
 
-								<hr><!---------------------------------------------------------------------------------------------------------------->
+								<hr><!---------------------------------------------------------------------------------------->
 
 								<div class="row">
 									<div class="col-md-12">
-										<div class="col-md-12">
+										<div class="col-md-6">
 											<div class="form-group has-feedback">
-												<input  v-model="newContract.rate"  type='number' class='form-control input-lg' placeholder='Taxa do contrato'>
+												<input  v-model="newContract.rate"  type='number' class='form-control' placeholder='Taxa do contrato'>
+												<span class="help-block">Introduza o valor do contrato</span>
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<input type='date' class='form-control' placeholder='Fim do Contrato'>
+												<span class="help-block">Introduza a data do término do contrato</span>
 											</div>
 										</div>
 									</div>
@@ -247,9 +226,11 @@
 							</form>
 						</validator>
 					</div>
-					<div class="modal-footer">
-						<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Close</button>
-						<button v-on:show="" @click="saveEditedContract(newContract.id)" type="button" class="btn btn-secondary"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp; Salvar as Alterações sobre este contrato</button>
+						<div class="modal-footer">
+							<div class="row">
+							<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Close</button>
+							<button v-on:show="" @click="saveEditedContract(newContract.id)" type="button" class="btn btn-primary"><i class="fa fa-refresh fa-spin"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>
+						</div>
 					</div>
 				</div>
 			</div>
