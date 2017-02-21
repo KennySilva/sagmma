@@ -82,12 +82,28 @@ class ApiContractsController extends Controller
     //Metodos de auxilio
     public function getPlaceForContract()
     {
+        // $place = Place::where('status', '=', 1)->where('typeofplace_id', '<', 7)->get();
         $place = Place::all();
         return $place;
     }
     public function getTraderForContract()
     {
         $trader = Trader::all();
+
+        // $trader->each(function($trader){
+        //     $trader->places;
+        // });
+        //
+        // foreach ($trader as $tra) {
+        //     $test = $tra->name;
+        // }
+        // return $test;
+
+
+
+        // foreach ($traderWithcontract->trader_id as $trader) {
+        //     $trader = Trader::where('id', '=', $trader)->get();
+        // }
         return $trader;
     }
 

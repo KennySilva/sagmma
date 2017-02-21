@@ -34,8 +34,6 @@ new Vue({
         'show-permission': require('./components/Permissions/showPermission'),
         //------------------------------Markets-----------------------------------
         'show-market': require('./components/Markets/ShowMarket'),
-        // //------------------------------Trader Type-----------------------------------
-        // 'show-typeoftrader': require('./components/Typeoftrader/ShowTypeoftrader'),
         //------------------------------Employee Type-----------------------------------
         'show-typeofemployee': require('./components/Typeofemployee/ShowTypeofemployee'),
         //------------------------------place Type-----------------------------------
@@ -55,11 +53,14 @@ new Vue({
         //------------------------------Taxation-----------------------------------
         'show-taxation': require('./components/Taxations/ShowTaxations'),
         //------------------------------Promotion-----------------------------------
-        // 'show-promotion': require('./components/Promotion/ShowTaxations')
-        // ------------------------------place-----------------------------------
         'show-promotion': require('./components/Promotions/ShowPromotion'),
         // ------------------------------place-----------------------------------
-        'show-place': require('./components/Places/ShowPlace')
+        'show-place': require('./components/Places/ShowPlace'),
+        // ##########################################################################
+        // #############################  Web  ######################################
+        // ##########################################################################
+        'show-category': require('./components/Categories/ShowCategories')
+
 
     }
 });

@@ -1,5 +1,9 @@
 <?php
 
+
+// #######################################################################################################################
+// ####################################################  Route Directs  ##################################################
+// #######################################################################################################################
 Route::get('/', function () {
     return view('_frontend.frontend');
 });
@@ -12,8 +16,9 @@ Route::resource('controlteste', 'ApiControllers\ApiControlsController');
 
 Route::resource('employees', 'ApiControllers\ApiEmployeesController');
 
-//----------------Authentication---------------------------------------------------------
-// Authentication routes...
+// #######################################################################################################################
+// ####################################################  Authentication  #################################################
+// #######################################################################################################################
 Route::get('auth/login', 'Auth\AuthController@getLogin');
 Route::post('auth/login', 'Auth\AuthController@postLogin');
 Route::get('auth/logout', 'Auth\AuthController@getLogout');
@@ -31,32 +36,25 @@ Route::get('password/reset/{token}', 'Auth\PasswordController@getReset');
 Route::post('password/reset', 'Auth\PasswordController@postReset');
 //-------------------------------------------------------------------------
 
-//------------------------------Authentication Social----------------------
+// ##############################################################################################################################
+// ####################################################  Authentication Social  #################################################
+// ##############################################################################################################################
 Route::get('social/{provider?}', 'SocialControllers\SocialController@getSocialAuth');
 Route::get('social/callback/{provider?}', 'SocialControllers\SocialController@getSocialAuthCallback');
-//----------------------------------------------------------------------------------------------------
-
-// -----------------------------------------------------------------------------------------------
-Route::group(['middleware' => ['permission:adddmin']], function() {
-    Route::resource('/testrole', 'AdminController');
-});
-
-//Route de homo do backend
-Route::group(['middleware' => ['auth', 'permission:admin|test']], function () {
-    Route::resource('/home', 'BackendHomeController');
-});
-
-Entrust::routeNeedsRole('/home*', 'admin');
-Route::get('/criar', ['middleware' => 'auth', function () {
-    return view('_backend.users.create');
-}]);
+// ##############################################################################################
 
 
-//Route de users e os seus API---------------------------------------------------------------
-//-----------------------------------------API-----------------------------------------------
+
+// ###########################################################################################################################
+// #####################################################  API Geral  #########################################################
+// ###########################################################################################################################
 Route::group(['namespace' => 'ApiControllers'], function()
 {
     Route::group(['prefix' => 'api/v1', 'middleware' => ['auth']], function () {
+
+        // ###############################################################################################################
+        // ################################################  API Sys  ####################################################
+        // ###############################################################################################################
         Route::group(['middleware' => ['permission:admin']], function () {
             Route::resource('users', 'ApiUsersController');
             Route::resource('authUser', 'ApiUsersController@authUser');
@@ -72,6 +70,9 @@ Route::group(['namespace' => 'ApiControllers'], function()
             Route::get('permissionrole', 'ApiRolesController@getPermissionForRole');
             Route::resource('permissions', 'ApiPermissionsController');
         });
+        // ##################################################################################################################
+        // ################################################  API Sagmma  ####################################################
+        // ##################################################################################################################
         Route::group(['middleware' => ['role:admin']], function () {
             // ----------------------------------------Api-Markets----------------------------------
             Route::resource('markets', 'ApiMarketsController');
@@ -128,13 +129,24 @@ Route::group(['namespace' => 'ApiControllers'], function()
             Route::get('promotionTrader', 'ApiPromotionsController@getTraderForPromotion');
             Route::get('promotionProduct', 'ApiPromotionsController@getProductForPromotion');
             Route::post('promotionStatus', 'ApiPromotionsController@statusPromotionsChange');
+
         });
+        // ###########################################################################################################
+        // ##################################################  API Web  ##############################################
+        // ###########################################################################################################
+        // -----------------------------------Categories--------------------------------------
+        Route::group(['middleware' => ['role:admin']], function () {
+            Route::resource('categories', 'ApiCategoriesController');
+            // Route::get('setPaginate\{entries}', 'ApiCategoriesController@index');
+        });
+
     });
 });
 
 
-//----------------------------------------Users----------------------------------------------
-
+// ###############################################################################################################
+// ###############################################  Sys  #########################################################
+// ###############################################################################################################
 Route::group(['namespace' => 'Admin'], function()
 {
     Route::group(['prefix' => 'user', 'middleware' => ['auth']], function () {
@@ -154,7 +166,9 @@ Route::group(['namespace' => 'Admin'], function()
     });
 });
 
-// -------------------------------------Sagmma-----------------------------------------------
+// ###########################################################################################################
+// ###############################################  Sagmma  ##################################################
+// ###########################################################################################################
 Route::group(['namespace' => 'Sagmma'], function()
 {
     Route::group(['prefix' => 'sagmma', 'middleware' => 'auth'], function () {
@@ -190,7 +204,23 @@ Route::group(['namespace' => 'Sagmma'], function()
     });
 });
 
-//--------------------------------------Download and PDF-----------------------------------------
+// #####################################################################################################################
+// ######################################################  Web  ########################################################
+// #####################################################################################################################
+Route::group(['namespace' => 'Web'], function()
+{
+    Route::group(['prefix' => 'web', 'middleware' => 'auth'], function () {
+        Route::group(['middleware' => ['permission:admin']], function () {//Adicionar os restantes papeis
+            // ----------------------------------------Markets----------------------------------
+            Route::resource('categories', 'CategoriesController');
+
+        });
+    });
+});
+
+// #########################################################################################################################
+// ######################################################  Plugins  ########################################################
+// #########################################################################################################################
 Route::group(['namespace' => 'PluginsControllers'], function()
 {
     Route::group(['prefix' => 'export', 'middleware' => 'auth'], function () {
@@ -215,10 +245,6 @@ Route::group(['namespace' => 'PluginsControllers'], function()
 
             Route::get('/receiptInformation/{id}', 'PrintController@receiptIndex');
             Route::get('printReceipt/{date}',['as' => 'printReceipt', 'uses' => 'PrintController@printReceipt']);
-
-
-
-
 
 
 
@@ -249,5 +275,24 @@ Route::get('/typetest', 'Test\TypeController@index');
 Route::get('/calendar', 'Test\CalendarController@index');
 Route::get('/chart', 'ServicesControllers\ChartsController@TestChart');
 
+
+
+// ###################################################################################################################
+// ###################################################  Testes  ######################################################
+// ###################################################################################################################
+Route::group(['middleware' => ['permission:adddmin']], function() {
+    Route::resource('/testrole', 'AdminController');
+});
+
+//Route de homo do backend
+Route::group(['middleware' => ['auth', 'permission:admin|test']], function () {
+    Route::resource('/home', 'BackendHomeController');
+});
+
+Entrust::routeNeedsRole('/home*', 'admin');
+Route::get('/criar', ['middleware' => 'auth', function () {
+    return view('_backend.users.create');
+}]);
+// ###################################################################################################################
 
 //------------------------------------Services Routes---------------------------------------
