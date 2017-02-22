@@ -9,8 +9,23 @@ class Article extends Model
     protected $table = 'articles';
     protected $guarded = ['id'];
 
-    //Relacionamentos;
+    public function getStatusAttribute($value)
+    {
+        if ($value) {
+            return true;
+        }
+        return false;
+    }
 
+    public function getFeaturedAttribute($value)
+    {
+        if ($value) {
+            return true;
+        }
+        return false;
+    }
+
+    //Relacionamentos;
     public function menus()
     {
         return $this->belongsTo(Menu::class);

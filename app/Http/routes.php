@@ -41,7 +41,7 @@ Route::post('password/reset', 'Auth\PasswordController@postReset');
 // ##############################################################################################################################
 Route::get('social/{provider?}', 'SocialControllers\SocialController@getSocialAuth');
 Route::get('social/callback/{provider?}', 'SocialControllers\SocialController@getSocialAuthCallback');
-// ##############################################################################################
+// ##############################################################################################################################
 
 
 
@@ -140,11 +140,16 @@ Route::group(['namespace' => 'ApiControllers'], function()
             // Route::get('setPaginate\{entries}', 'ApiCategoriesController@index');
             // --------------------------------------Tags-----------------------------------------
             Route::resource('tags', 'ApiTagsController');
+            // --------------------------------------Articles-----------------------------------------
+            Route::resource('articles', 'ApiArticlesController');
+            Route::post('articleStatus', 'ApiArticlesController@articleStatus');
+            Route::post('articleFeatures', 'ApiArticlesController@articleFeatures');
+            Route::get('articleTag', 'ApiArticlesController@getTagforArticle');
+            Route::get('articleCategory', 'ApiArticlesController@getCategoryForArticle');
+            Route::get('articleUser', 'ApiArticlesController@getUserforArticle');
         });
-
     });
 });
-
 
 // ###############################################################################################################
 // ###############################################  Sys  #########################################################
@@ -217,6 +222,8 @@ Route::group(['namespace' => 'Web'], function()
             Route::resource('categories', 'CategoriesController');
             // -------------------------------------------Tags-------------------------------------
             Route::resource('tags', 'TagsController');
+            // -------------------------------------------articles-------------------------------------
+            Route::resource('articles', 'ArticlesController');
 
         });
     });

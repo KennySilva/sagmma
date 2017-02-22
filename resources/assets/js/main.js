@@ -15,7 +15,6 @@ Vue.filter('formatDate', function(value, formatString) {
     return moment(value).format('DD/MMM/YYYY');
 });
 
-
 Vue.http.headers.common['X-CSRF-TOKEN'] = document.querySelector('#token').getAttribute('value');
 new Vue({
     el: '.sagmma_container',
@@ -62,7 +61,9 @@ new Vue({
         // ------------------------------Categories-----------------------------------
         'show-category': require('./components/Categories/ShowCategories'),
         // ---------------------------------Tags--------------------------------------
-        'show-tag': require('./components/Tags/ShowTags')
+        'show-tag': require('./components/Tags/ShowTags'),
+        // -------------------------------Articles--------------------------------------
+        'show-article': require('./components/Articles/ShowArticles')
 
 
     }
