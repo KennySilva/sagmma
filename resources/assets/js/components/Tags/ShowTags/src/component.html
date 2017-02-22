@@ -1,0 +1,172 @@
+
+<div class="alert alert-success" transition="success" v-if="success">
+	<i class="fa fa-thumbs-up"> Sucesso!!!</i>
+</div>
+
+<div class="row">
+	<div class="col-md-4 pull-right">
+		<div class="input-group">
+			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
+			<input v-model="filter.term" type="text" class="form-control" placeholder="Filtrar..." aria-describedby="basic-addon1">
+		</div>
+	</div>
+</div>
+
+<hr>
+<div class="col-md-12">
+	<button class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-tag"><i class="fa fa-plus"></i> Novo</button>
+</div>
+
+
+</div>
+<br><br>
+
+<div class="col-md-12">
+	<div class='table-responsive'>
+		<table class='table table-striped table-hover table-condensed'>
+			<thead>
+				<tr>
+					<th>
+						<i :class = "{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+						<a href="#" @click = "doSort($event, 'name')">Nome</a>
+					</th>
+					<th>
+						<i :class = "{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+						<a href="#" @click = "doSort($event, 'description')">Descrição</a>
+					</th>
+
+					<th  class="text-center" colspan="2"><span><i class="fa fa-cogs"></i></span></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-for="tag in tags | filterBy filter.term | orderBy sortColumn sortInverse">
+					<td>{{ tag.name }}</td>
+					<td>{{ tag.description }}</td>
+					<td align=left>  <a data-toggle="modal" data-target="#modal-edit-tag" href="#"> <i class="fa fa-pencil text-primary" @click="getThisTag(tag.id)" > </i></a></td>
+					<td align=right><a data-toggle="modal" data-target="#modal-delete-tag" href="#"><i class="fa fa-trash text-danger" @click="getThisTag(tag.id)"></i></a></td>
+				</tr>
+			</tbody>
+		</table>
+		<div class="col-md-12 pull-left">
+			<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
+		</div>
+	</div>
+
+	<!--------------------------------------------------------------------------------------------------------->
+
+	<div class="modal fade" id="modal-delete-tag" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button @click="clearField" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="">Eliminar</h4>
+				</div>
+				<div class="modal-body">
+					<h5>Eliminar - <span class="text-uppercase text-danger">{{newTag.name}}</span></h5>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+					<button  @keyup.enter="deleteTag(newTag.id)" @click="deleteTag(newTag.id)" type="button" class="btn btn-danger">Eliminar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<!--------------------------------------------------------------------------------------------------------->
+	<!-- Modal -->
+	<div id="modal-create-tag" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Registar</h4>
+				</div>
+				<div class="modal-body">
+					<validator name="validationew">
+						<form action="#" methods="POST">
+							<div class="row">
+								<div class="col-md-12">
+									<div class="col-md-12">
+										<div class="form-group has-feedback">
+											<input type="text" class="form-control" name="name" placeholder="Nome de Marcador" v-model="newTag.name" v-validate:name="['required']"/>
+											<span class="form-control-feedback"></span>
+											<p style="color:red;" v-if="$validationew.name.required && $validationew.name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<hr><!---------------------------------------------------------------------------------------------------------------->
+
+							<div class="row">
+								<div class="col-md-12">
+									<div class="col-md-12">
+										<div class="form-group has-feedback">
+											<textarea name="description" placeholder="Descrição..." class="form-control" rows="5" cols="40" id="description" v-model="newTag.description"></textarea>
+										</div>
+									</div>
+								</div>
+							</div>
+						</form>
+					</validator>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
+
+					<button :disabled = "!$validationew.valid" @click="createTag" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--------------------------------------------------------------------------------------------------------->
+
+	<!-- Modal -->
+	<div id="modal-edit-tag" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Editar</h4>
+				</div>
+				<div class="modal-body">
+					<validator name="validation1">
+						<form methods="patch">
+							<div class="row">
+								<div class="col-md-12">
+									<div class="col-md-12">
+										<div class="form-group has-feedback">
+											<input type="text" class="form-control" name="name" v-model="newTag.name" v-validate:name="['required']"/>
+											<span class="form-control-feedback"></span>
+											<p style="color:red;" v-if="$validation1.name.required && $validation1.name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<hr><!---------------------------------------------------------------------------------------------------------------->
+
+							<div class="row">
+								<div class="col-md-12">
+									<div class="col-md-12">
+										<div class="form-group has-feedback">
+											<textarea name="description" placeholder="Descrição..." class="form-control" rows="5" cols="40" id="description" v-model="newTag.description"></textarea>
+										</div>
+									</div>
+								</div>
+							</div>
+						</form>
+					</validator>
+				</div>
+				<div class="modal-footer">
+					<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Close</button>
+					<button v-on:show="" @click="saveEditedTag(newTag.id)" type="button" class="btn btn-primary"><i class="fa fa-refresh fa-spin"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

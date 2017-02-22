@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "6b4deac0903cb03d339ae30a590ae1bd",
-    "content-hash": "6b1a3b0a66d256f8393a20b79b72478e",
+    "hash": "9773446d99161ae173e10e3783dbda11",
+    "content-hash": "6ce92541b8b9297b6f82677a1a16d5df",
     "packages": [
         {
             "name": "acacha/admin-lte-template-laravel",
@@ -108,6 +108,56 @@
             "time": "2017-01-24 18:12:54"
         },
         {
+            "name": "caffeinated/flash",
+            "version": "v2.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/caffeinated/flash.git",
+                "reference": "92be353171a44297513f42418553fea7638cc5a9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/caffeinated/flash/zipball/92be353171a44297513f42418553fea7638cc5a9",
+                "reference": "92be353171a44297513f42418553fea7638cc5a9",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "5.1.*|5.2.*",
+                "php": ">=5.5.9"
+            },
+            "require-dev": {
+                "mockery/mockery": "~0.9"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Caffeinated\\Flash\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Shea Lewis",
+                    "email": "shea.lewis89@gmail.com"
+                }
+            ],
+            "description": "Laravel 5 Flash Messages",
+            "keywords": [
+                "caffeinated",
+                "flash",
+                "laravel"
+            ],
+            "time": "2016-02-25 23:37:16"
+        },
+        {
             "name": "classpreloader/classpreloader",
             "version": "3.1.0",
             "source": {
@@ -162,6 +212,70 @@
             "time": "2016-09-16 12:50:15"
         },
         {
+            "name": "cocur/slugify",
+            "version": "v2.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cocur/slugify.git",
+                "reference": "f11f22d4e60c408187c3efd8ac201c022a93cc3f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cocur/slugify/zipball/f11f22d4e60c408187c3efd8ac201c022a93cc3f",
+                "reference": "f11f22d4e60c408187c3efd8ac201c022a93cc3f",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5.9"
+            },
+            "require-dev": {
+                "laravel/framework": "~5.1",
+                "latte/latte": "~2.2",
+                "league/container": "^2.2.0",
+                "mikey179/vfsstream": "~1.6",
+                "mockery/mockery": "~0.9",
+                "nette/di": "~2.2",
+                "phpunit/phpunit": "~4.8|~5.2",
+                "pimple/pimple": "~1.1",
+                "plumphp/plum": "~0.1",
+                "silex/silex": "~1.3",
+                "symfony/config": "~2.4|~3.0",
+                "symfony/dependency-injection": "~2.4|~3.0",
+                "symfony/http-kernel": "~2.4|~3.0",
+                "twig/twig": "~1.12",
+                "zendframework/zend-modulemanager": "~2.2",
+                "zendframework/zend-servicemanager": "~2.2",
+                "zendframework/zend-view": "~2.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Cocur\\Slugify\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ivo Bathke",
+                    "email": "ivo.bathke@gmail.com"
+                },
+                {
+                    "name": "Florian Eckerstorfer",
+                    "email": "florian@eckerstorfer.co",
+                    "homepage": "https://florian.ec"
+                }
+            ],
+            "description": "Converts a string into a slug.",
+            "keywords": [
+                "slug",
+                "slugify"
+            ],
+            "time": "2017-02-09 19:27:52"
+        },
+        {
             "name": "consoletvs/charts",
             "version": "4.2.1",
             "source": {
@@ -198,6 +312,57 @@
             ],
             "description": "Create charts for laravel using diferent charts libraries",
             "time": "2017-02-21 10:16:03"
+        },
+        {
+            "name": "cviebrock/eloquent-sluggable",
+            "version": "4.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cviebrock/eloquent-sluggable.git",
+                "reference": "e9a020fd9d4676add911dd05d03e570735983f3d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cviebrock/eloquent-sluggable/zipball/e9a020fd9d4676add911dd05d03e570735983f3d",
+                "reference": "e9a020fd9d4676add911dd05d03e570735983f3d",
+                "shasum": ""
+            },
+            "require": {
+                "cocur/slugify": "^2.1",
+                "illuminate/config": "5.1.* || 5.2.* || 5.3.*",
+                "illuminate/database": "5.1.* || 5.2.* || 5.3.*",
+                "illuminate/support": "5.1.* || 5.2.* || 5.3.*",
+                "php": "^5.6 || ^7.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^0.9.4",
+                "orchestra/testbench": "^3.0",
+                "phpunit/phpunit": "^4.8 || ^5.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Cviebrock\\EloquentSluggable\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Colin Viebrock",
+                    "email": "colin@viebrock.ca"
+                }
+            ],
+            "description": "Easy creation of slugs for your Eloquent models in Laravel",
+            "homepage": "https://github.com/cviebrock/eloquent-sluggable",
+            "keywords": [
+                "eloquent",
+                "laravel",
+                "slug"
+            ],
+            "time": "2016-09-14 17:44:13"
         },
         {
             "name": "danielstjules/stringy",

@@ -134,10 +134,12 @@ Route::group(['namespace' => 'ApiControllers'], function()
         // ###########################################################################################################
         // ##################################################  API Web  ##############################################
         // ###########################################################################################################
-        // -----------------------------------Categories--------------------------------------
         Route::group(['middleware' => ['role:admin']], function () {
+            // -----------------------------------Categories--------------------------------------
             Route::resource('categories', 'ApiCategoriesController');
             // Route::get('setPaginate\{entries}', 'ApiCategoriesController@index');
+            // --------------------------------------Tags-----------------------------------------
+            Route::resource('tags', 'ApiTagsController');
         });
 
     });
@@ -211,8 +213,10 @@ Route::group(['namespace' => 'Web'], function()
 {
     Route::group(['prefix' => 'web', 'middleware' => 'auth'], function () {
         Route::group(['middleware' => ['permission:admin']], function () {//Adicionar os restantes papeis
-            // ----------------------------------------Markets----------------------------------
+            // ----------------------------------------Categories----------------------------------
             Route::resource('categories', 'CategoriesController');
+            // -------------------------------------------Tags-------------------------------------
+            Route::resource('tags', 'TagsController');
 
         });
     });

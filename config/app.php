@@ -81,6 +81,10 @@ return [
         //Gráficos
         ConsoleTVs\Charts\ChartsServiceProvider::class,
 
+        Caffeinated\Flash\FlashServiceProvider::class,
+
+        Cviebrock\EloquentSluggable\ServiceProvider::class,
+
 
     ],
 
@@ -141,6 +145,8 @@ return [
 
         // 'Analytics' => Spatie\Analytics\AnalyticsFacade               ::class,
         'Charts'       => ConsoleTVs\Charts\Facades\Charts               ::class,
+
+        'Flash' => Caffeinated\Flash\Facades\Flash::class,
 
 
 
