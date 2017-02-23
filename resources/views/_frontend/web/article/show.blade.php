@@ -1,6 +1,7 @@
 @extends('_backend.master.app')
 @section('sagmma-style')
     <link rel="stylesheet" href="{{ asset('bower_components/trumbowyg/dist/ui/trumbowyg.min.css') }}" media="screen" title="no title" charset="utf-8">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
 @endsection
 
 @section('htmlheader_title')
@@ -36,7 +37,12 @@
     @endsection
     @push('scripts')
         <script src="/bower_components/trumbowyg/dist/trumbowyg.js" charset="utf-8"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
         <script>
         $('.textarea-content').trumbowyg();
+        $(".selectTag").select2({
+            placeholder: "Select a state",
+            allowClear: true
+        });
         </script>
     @endpush

@@ -41,6 +41,7 @@ export default{
         this.articleTag();
         this.articleUser();
 
+
     },
 
 
@@ -89,9 +90,29 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         fetchArticle: function(page) {
-            this.$http.get('http://localhost:8000/api/v1/articles?page='+page).then((response) => {
-                this.$set('articles', response.data.data)
-                this.$set('pagination', response.data)
+            var self = this;
+            self.$http.get('http://localhost:8000/api/v1/articles?page='+page).then((response) => {
+                self.$set('articles', response.data.data)
+                self.$set('pagination', response.data)
+
+                jQuery(self.$els.category).select2({
+                    placeholder: "Selecionar a Catageria",
+                    allowClear: true,
+                    theme: "classic"
+
+                }).on('change', function () {
+                    self.$set('newArticle.category_id', jQuery(this).val());
+                });
+
+                jQuery(self.$els.select).select2({
+                    theme: "classic",
+                    placeholder: "Selecionar os Marcadores",
+                    allowClear: true
+                }).on('change', function () {
+                    self.$set('newArticle.tags', jQuery(this).val());
+
+                });
+
             }, (response) => {
                 console.log("Ocorreu um erro na operação")
             });
@@ -224,7 +245,7 @@ export default{
         openAllContents: function(ev)
         {
             ev.preventDefault();
-            
+
             var self = this;
             if (self.openContents.length > 0) {
                 self.$set('openContents', []);

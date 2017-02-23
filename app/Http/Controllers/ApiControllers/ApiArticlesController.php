@@ -20,13 +20,25 @@ class ApiArticlesController extends Controller
 {
     public function index()
     {
-        $article = Article::paginate(10);
+        $article = Article::paginate();
         $article->each(function($article){
             $article->tags;
             $article->categories;
         });
         return $article;
     }
+
+
+    public function articlesShow($showRow)
+    {
+        $article = Article::paginate($showRow);
+        $article->each(function($article){
+            $article->tags;
+            $article->categories;
+        });
+        return $article;
+    }
+    
 
     public function create()
     {}

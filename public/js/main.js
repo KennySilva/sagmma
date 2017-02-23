@@ -36822,11 +36822,27 @@ exports.default = {
         // --------------------------------------------------------------------------------------------
 
         fetchArticle: function fetchArticle(page) {
-            var _this2 = this;
+            var self = this;
+            self.$http.get('http://localhost:8000/api/v1/articles?page=' + page).then(function (response) {
+                self.$set('articles', response.data.data);
+                self.$set('pagination', response.data);
 
-            this.$http.get('http://localhost:8000/api/v1/articles?page=' + page).then(function (response) {
-                _this2.$set('articles', response.data.data);
-                _this2.$set('pagination', response.data);
+                jQuery(self.$els.category).select2({
+                    placeholder: "Selecionar a Catageria",
+                    allowClear: true,
+                    theme: "classic"
+
+                }).on('change', function () {
+                    self.$set('newArticle.category_id', jQuery(this).val());
+                });
+
+                jQuery(self.$els.select).select2({
+                    theme: "classic",
+                    placeholder: "Selecionar os Marcadores",
+                    allowClear: true
+                }).on('change', function () {
+                    self.$set('newArticle.tags', jQuery(this).val());
+                });
             }, function (response) {
                 console.log("Ocorreu um erro na operação");
             });
@@ -36835,17 +36851,17 @@ exports.default = {
         // --------------------------------------------------------------------------------------------
 
         getThisArticle: function getThisArticle(id) {
-            var _this3 = this;
+            var _this2 = this;
 
             this.$http.get('http://localhost:8000/api/v1/articles/' + id).then(function (response) {
-                _this3.newArticle.id = response.data.id;
-                _this3.newArticle.title = response.data.title;
-                _this3.newArticle.content = response.data.content;
-                _this3.newArticle.status = response.data.status;
-                _this3.newArticle.featured = response.data.featured;
-                _this3.newArticle.user_id = response.data.user_id;
-                _this3.newArticle.category_id = response.data.category_id;
-                _this3.newArticle.tags = response.data.tags;
+                _this2.newArticle.id = response.data.id;
+                _this2.newArticle.title = response.data.title;
+                _this2.newArticle.content = response.data.content;
+                _this2.newArticle.status = response.data.status;
+                _this2.newArticle.featured = response.data.featured;
+                _this2.newArticle.user_id = response.data.user_id;
+                _this2.newArticle.category_id = response.data.category_id;
+                _this2.newArticle.tags = response.data.tags;
             }, function (response) {
                 console.log('Error');
             });
@@ -36854,7 +36870,7 @@ exports.default = {
         // --------------------------------------------------------------------------------------------
 
         saveEditedArticle: function saveEditedArticle(id) {
-            var _this4 = this;
+            var _this3 = this;
 
             var article = this.newArticle;
 
@@ -36864,7 +36880,7 @@ exports.default = {
                 if (response.status == 200) {
                     $('#modal-edit-article').modal('hide');
                     // console.log(response.data);
-                    _this4.fetchArticle();
+                    _this3.fetchArticle();
                 }
             }, function (response) {
                 console.log("Ocorreu um erro na operação");
@@ -36874,13 +36890,13 @@ exports.default = {
         // --------------------------------------------------------------------------------------------
 
         deleteArticle: function deleteArticle(id) {
-            var _this5 = this;
+            var _this4 = this;
 
             this.$http.delete('http://localhost:8000/api/v1/articles/' + id).then(function (response) {
                 $('#modal-delete-article').modal('hide');
                 if (response.status == 200) {
                     // console.log(response.data);
-                    _this5.fetchArticle();
+                    _this4.fetchArticle();
                 }
             }, function (response) {
                 console.log("Ocorreu um erro na operação");
@@ -36888,30 +36904,30 @@ exports.default = {
         },
 
         articleTag: function articleTag() {
-            var _this6 = this;
+            var _this5 = this;
 
             this.$http.get('http://localhost:8000/api/v1/articleTag').then(function (response) {
-                _this6.$set('tags', response.data);
+                _this5.$set('tags', response.data);
             }, function (response) {
                 console.log("Ocorreu um erro na operação");
             });
         },
 
         articleCategory: function articleCategory() {
-            var _this7 = this;
+            var _this6 = this;
 
             this.$http.get('http://localhost:8000/api/v1/articleCategory').then(function (response) {
-                _this7.$set('categories', response.data);
+                _this6.$set('categories', response.data);
             }, function (response) {
                 console.log("Ocorreu um erro na operação");
             });
         },
 
         articleUser: function articleUser() {
-            var _this8 = this;
+            var _this7 = this;
 
             this.$http.get('http://localhost:8000/api/v1/articleUser').then(function (response) {
-                _this8.$set('users', response.data);
+                _this7.$set('users', response.data);
             }, function (response) {
                 console.log("Ocorreu um erro na operação");
             });
@@ -36931,22 +36947,22 @@ exports.default = {
         },
 
         articleStatus: function articleStatus(_articleStatus) {
-            var _this9 = this;
+            var _this8 = this;
 
             var postData = { id: _articleStatus };
             this.$http.post('http://localhost:8000/api/v1/articleStatus/', postData).then(function (response) {
                 if (response.status == 200) {
-                    _this9.fetchArticle(_this9.pagination.current_page);
+                    _this8.fetchArticle(_this8.pagination.current_page);
                 }
             }, function (response) {});
         },
         articleFeatures: function articleFeatures(_articleFeatures) {
-            var _this10 = this;
+            var _this9 = this;
 
             var postData = { id: _articleFeatures };
             this.$http.post('http://localhost:8000/api/v1/articleFeatures/', postData).then(function (response) {
                 if (response.status == 200) {
-                    _this10.fetchArticle(_this10.pagination.current_page);
+                    _this9.fetchArticle(_this9.pagination.current_page);
                 }
             }, function (response) {});
         },
@@ -36992,7 +37008,7 @@ exports.default = {
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success><i class=\"fa fa-thumbs-up\">Sucesso!!!</i></div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=col-md-12><button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-article><i class=\"fa fa-plus\"></i> Novo</button></div><br><br><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'title' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'title' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'title')\">Titulo</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'status' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'status' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'status')\">Publicação</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'featured' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'featured' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'featured')\">Destaque</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><th width=75 class=text-center><a @click=openAllContents href=#><span><i data-toggle=tooltip data-placement=left title=\"Ver Conteúdos de todos os Artigos\" class=fa :class=\"{'fa-plus': openContents.length == 0, 'fa-minus': openContents.length > 0}\"></i></span></a><tbody v-for=\"article in articles | filterBy filter.term | orderBy sortColumn sortInverse\"><tr><td>{{ article.title }}<td><button type=submit @click=articleStatus(article.id) class=\"btn btn-xs btn-flat\" :class=\"{ 'btn-info': article.status, 'btn-danger': !article.status }\">{{article.status ? 'Publicado' : 'Pendente'}}</button><td><button type=submit @click=articleFeatures(article.id) class=\"btn btn-xs btn-flat\" :class=\"{ 'btn-info': article.featured, 'btn-danger': !article.featured }\">{{article.featured ? 'Publicado' : 'Pendente'}}</button><td align=left><a data-toggle=modal data-target=#modal-edit-article href=#><i class=\"fa fa-pencil text-primary\" @click=getThisArticle(article.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-article href=#><i class=\"fa fa-trash text-danger\" @click=getThisArticle(article.id)></i></a><td width=75 class=text-center><a @click=\"doOpenContents($event, article.id)\" v-show=\"article.content != ''\" href=#><i data-toggle=tooltip data-placement=left title=\"Ver este conteúdo\" class=fa :class=\"{'fa-plus-square': openContents.indexOf(article.id) == -1, 'fa-minus-square': openContents.indexOf(article.id) > -1}\"></i></a> <i class=\"fa fa-plus-square\" v-show=\"article.content == ''\" style=\"opacity: 0.3\"></i><tr v-show=\"openContents.indexOf(article.id) > -1 && article.content != ''\"><td colspan=6>{{ article.content }}</table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div class=\"modal fade\" id=modal-delete-article tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar</h4></div><div class=modal-body><h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newArticle.name}}</span></h5></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteArticle(newArticle.id) @click=deleteArticle(newArticle.id) type=button class=\"btn btn-danger\">Eliminar</button></div></div></div></div><div id=modal-create-article class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=title placeholder=Titulo v-model=newArticle.title v-validate:title=\"['required']\"> <span class=form-control-feedback></span><p style=color:red v-if=\"$validationew.title.required && $validationew.title.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=content placeholder=Conteúdo... class=\"form-control textarea-content\" rows=5 cols=40 id=content v-model=newArticle.content></textarea></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=form-control v-model=newArticle.category_id><option value=\"\" selected>Categoria<option v-for=\"category in categories\" value={{category.id}}>{{category.name}}</select></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=form-control v-model=newArticle.tags multiple><option value=\"\" selected>Marcador<option v-for=\"tag in tags\" value={{tag.id}}>{{tag.name}}</select></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input class=form-control type=file name=\"\" v-model=newArticle.image></div></div></div></div></form></validator></div><div class=modal-footer><button type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createArticle class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button></div></div></div></div><div id=modal-edit-article class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name v-model=newArticle.name v-validate:name=\"['required']\"> <span class=form-control-feedback></span><p style=color:red v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newArticle.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedArticle(newArticle.id) type=button class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button></div></div></div></div></div>"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success><i class=\"fa fa-thumbs-up\">Sucesso!!!</i></div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=col-md-12><button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-article><i class=\"fa fa-plus\"></i> Novo</button></div><br><br><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'title' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'title' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'title')\">Titulo</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'status' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'status' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'status')\">Publicação</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'featured' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'featured' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'featured')\">Destaque</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><th width=75 class=text-center><a @click=openAllContents href=#><span><i data-toggle=tooltip data-placement=left title=\"Ver Conteúdos de todos os Artigos\" class=fa :class=\"{'fa-plus': openContents.length == 0, 'fa-minus': openContents.length > 0}\"></i></span></a><tbody v-for=\"article in articles | filterBy filter.term | orderBy sortColumn sortInverse\"><tr><td>{{ article.title }}<td><button type=submit @click=articleStatus(article.id) class=\"btn btn-xs btn-flat\" :class=\"{ 'btn-info': article.status, 'btn-danger': !article.status }\">{{article.status ? 'Publicado' : 'Pendente'}}</button><td><button type=submit @click=articleFeatures(article.id) class=\"btn btn-xs btn-flat\" :class=\"{ 'btn-info': article.featured, 'btn-danger': !article.featured }\">{{article.featured ? 'Publicado' : 'Pendente'}}</button><td align=left><a data-toggle=modal data-target=#modal-edit-article href=#><i class=\"fa fa-pencil text-primary\" @click=getThisArticle(article.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-article href=#><i class=\"fa fa-trash text-danger\" @click=getThisArticle(article.id)></i></a><td width=75 class=text-center><a @click=\"doOpenContents($event, article.id)\" v-show=\"article.content != ''\" href=#><i data-toggle=tooltip data-placement=left title=\"Ver este conteúdo\" class=fa :class=\"{'fa-plus-square': openContents.indexOf(article.id) == -1, 'fa-minus-square': openContents.indexOf(article.id) > -1}\"></i></a> <i class=\"fa fa-plus-square\" v-show=\"article.content == ''\" style=\"opacity: 0.3\"></i><tr v-show=\"openContents.indexOf(article.id) > -1 && article.content != ''\"><td colspan=6>{{ article.content }}</table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div class=\"modal fade\" id=modal-delete-article tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar</h4></div><div class=modal-body><h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newArticle.name}}</span></h5></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteArticle(newArticle.id) @click=deleteArticle(newArticle.id) type=button class=\"btn btn-danger\">Eliminar</button></div></div></div></div><div id=modal-create-article class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=title placeholder=Titulo v-model=newArticle.title v-validate:title=\"['required']\"> <span class=form-control-feedback></span><p style=color:red v-if=\"$validationew.title.required && $validationew.title.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=content placeholder=Conteúdo... class=\"form-control textarea-content\" rows=5 cols=40 id=content v-model=newArticle.content></textarea></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=form-control v-model=newArticle.category_id v-el:category style=\"width: 100%\"><option v-for=\"category in categories\" value={{category.id}}>{{category.name}}</select></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=\"form-control selectTag\" v-model=newArticle.tags v-el:select multiple style=\"width: 100%; color: #000000\"><option v-for=\"tag in tags\" value={{tag.id}}>{{tag.name}}</select></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input class=form-control type=file name=\"\" v-model=newArticle.image></div></div></div></div></form></validator></div><div class=modal-footer><button type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createArticle class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button></div></div></div></div><div id=modal-edit-article class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name v-model=newArticle.name v-validate:name=\"['required']\"> <span class=form-control-feedback></span><p style=color:red v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newArticle.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedArticle(newArticle.id) type=button class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button></div></div></div></div></div>"
 
 },{"../../../Pagination/src/Component.vue":116,"vueify/lib/insert-css":108}],110:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
