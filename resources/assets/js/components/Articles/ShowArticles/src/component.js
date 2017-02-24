@@ -14,8 +14,7 @@ export default{
                 featured   : '',
                 user_id    : '',
                 category_id: '',
-                image    : '',
-                tags        : [],
+                tags       : [],
 
             },
 
@@ -40,8 +39,6 @@ export default{
         this.articleCategory();
         this.articleTag();
         this.articleUser();
-
-
     },
 
 
@@ -58,23 +55,20 @@ export default{
                 featured   : '',
                 user_id    : '',
                 category_id: '',
-                image    : '',
+                tags       : [],
+
             };
         },
 
         createArticle: function() {
             var article = this.newArticle;
-
-            //Clear form input
+            // Clear form input
             this.clearField();
             this.$http.post('http://localhost:8000/api/v1/articles/', article).then((response) => {
                 if (response.status == 200) {
-                    console.log(response.data);
-                    // $('select').select2();
-                    // $('.textarea-content').trumbowyg();
-                    // $(".chosen-select").chosen({max_selected_options: 5});
 
                     $('#modal-create-article').modal('hide');
+                    this.uploadsImages();
                     this.fetchArticle();
                     var self = this;
                     this.success = true;
@@ -96,21 +90,21 @@ export default{
                 self.$set('pagination', response.data)
 
                 jQuery(self.$els.category).select2({
-                    placeholder: "Selecionar a Catageria",
+                    placeholder: "Catagerias",
                     allowClear: true,
-                    theme: "classic"
-
+                    theme: "classic",
+                    width: '100%'
                 }).on('change', function () {
                     self.$set('newArticle.category_id', jQuery(this).val());
                 });
 
-                jQuery(self.$els.select).select2({
+                jQuery(self.$els.tags).select2({
                     theme: "classic",
-                    placeholder: "Selecionar os Marcadores",
-                    allowClear: true
+                    placeholder: "Marcadores",
+                    allowClear: true,
+                    width: '100%'
                 }).on('change', function () {
                     self.$set('newArticle.tags', jQuery(this).val());
-
                 });
 
             }, (response) => {
@@ -252,7 +246,19 @@ export default{
             }else {
                 self.$set('openContents', map(self.articles, 'id'));
             }
-        }
+        },
+        // Metodos auxiliares
+        uploadsImages: function() {
+            // ev.preventDefault();
+            var files = this.$els.articleimage.files;
+            var data = new FormData();
+            data.append('articleimage', files[0]);
+
+            this.$http.post('http://localhost:8000/api/v1/articleImageUpload/', data).then((response) => {
+            }, (response) => {
+            });
+
+        },
     },
 
     // ---------------------------------------------------------------------------------

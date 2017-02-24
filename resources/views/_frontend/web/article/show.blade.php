@@ -40,9 +40,5 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
         <script>
         $('.textarea-content').trumbowyg();
-        $(".selectTag").select2({
-            placeholder: "Select a state",
-            allowClear: true
-        });
         </script>
     @endpush

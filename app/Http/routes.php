@@ -147,6 +147,7 @@ Route::group(['namespace' => 'ApiControllers'], function()
             Route::get('articleTag', 'ApiArticlesController@getTagforArticle');
             Route::get('articleCategory', 'ApiArticlesController@getCategoryForArticle');
             Route::get('articleUser', 'ApiArticlesController@getUserforArticle');
+            Route::post('articleImageUpload', 'ApiArticlesController@uploadImage');
         });
     });
 });
@@ -304,6 +305,12 @@ Entrust::routeNeedsRole('/home*', 'admin');
 Route::get('/criar', ['middleware' => 'auth', function () {
     return view('_backend.users.create');
 }]);
+
+
+
+
+Route::get('testevariavel', 'ApiControllers\ApiArticlesController@test2');
+
 // ###################################################################################################################
 
 //------------------------------------Services Routes---------------------------------------

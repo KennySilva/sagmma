@@ -3,9 +3,9 @@
 	<i class="fa fa-thumbs-up"> Sucesso!!!</i>
 </div>
 
-<!-- <pre>
+<pre>
 	{{$data.newArticle | json}}
-</pre> -->
+</pre>
 
 <div class="row">
 	<div class="col-md-4 pull-right">
@@ -149,7 +149,7 @@
 								<div class="col-md-12">
 									<div class="col-md-12">
 										<div class="form-group has-feedback">
-											<select class="form-control" v-model="newArticle.category_id" v-el:category style="width: 100%">
+											<select class="form-control" v-model="newArticle.category_id" v-el:category>
 												<option v-for="category in categories" value="{{category.id}}">{{category.name}}</option>
 											</select>
 										</div>
@@ -161,7 +161,7 @@
 								<div class="col-md-12">
 									<div class="col-md-12">
 										<div class="form-group has-feedback">
-											<select class="form-control selectTag" v-model="newArticle.tags" v-el:select multiple style="width: 100%; color: #000000">
+											<select class="form-control" v-model="newArticle.tags" v-el:tags multiple="multiple">
 												<option v-for="tag in tags" value="{{tag.id}}">
 													{{tag.name}}
 												</option>
@@ -175,7 +175,8 @@
 								<div class="col-md-12">
 									<div class="col-md-12">
 										<div class="form-group has-feedback">
-											<input  class="form-control" type="file" name="" value="" v-model="newArticle.image">
+											<input  class="form-control" type="file" name="articleimage"  id="articleimage" v-el:articleimage>
+											<!-- <input  class="form-control" type="file" name="articleimage" id="articleimage" @change = "uploadsImages" v-el:articleimage> -->
 										</div>
 									</div>
 								</div>

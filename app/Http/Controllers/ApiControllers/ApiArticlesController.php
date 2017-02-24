@@ -1,13 +1,13 @@
 <?php
 
 namespace Sagmma\Http\Controllers\ApiControllers;
+use Sagmma\Http\Requests\WebRequests\ArticlesRequest;
 
 use Illuminate\Http\Request;
 
 use Request as Req;
 use Sagmma\Http\Requests;
 use Sagmma\Http\Controllers\Controller;
-use Sagmma\Http\Requests\WebRequests\ArticlesRequest;
 use Article;
 use Category;
 use Tag;
@@ -15,11 +15,20 @@ use User;
 use Response;
 use Input;
 use Auth;
+use Image;
+use Session;
+use Config;
 
 class ApiArticlesController extends Controller
 {
+    public function _construct()
+    {
+        config('globalVariable.test1');
+    }
+
     public function index()
     {
+
         $article = Article::paginate();
         $article->each(function($article){
             $article->tags;
@@ -38,7 +47,7 @@ class ApiArticlesController extends Controller
         });
         return $article;
     }
-    
+
 
     public function create()
     {}
@@ -54,6 +63,16 @@ class ApiArticlesController extends Controller
             $article->category_id = $request->category_id;
             $article->save();
             $article->tags()->sync($request->tags);
+            // -------------------------------------------------
+            // -------------------------------------------------
+            $image = new Image();
+            $image->name = "nome3";
+            $image->description = "";
+            // $image->article_id = 4;
+            $image->article()->associate($article);
+            //----------------------
+            $image->save();
+
         }
 
 
@@ -125,4 +144,46 @@ class ApiArticlesController extends Controller
             $tag = Tag::all();
             return $tag;
         }
+
+        public function test1()
+        {
+            // global $jabberwocky;
+            // $jabberwocky="Jabberwocky";
+            // test2();
+            // $GLOBALS['myGlobalVariable'] = 42;
+            // session()->put('global', 'test1');
+            // $this->global = "Dentrop"
+            $value ='Terra sabi';
+
+            config('globalVariable.test1', $value);
+        }
+
+        public function test2()
+        {
+            // global $jabberwocky;
+            // dd($GLOBALS['myGlobalVariable']);
+            // Config::set('globalVariable.test1', 'sola');
+
+            dd(config('globalVariable.test1'));
+        }
+
+
+
+
+
+        //-----------------------------------------------------------
+        public function uploadImage(Request $request)
+        {
+            if ($request->file('articleimage')) {
+                $file = $request->file('articleimage');
+                $name = 'proj_teste_'.time().'.'.$file->getClientOriginalExtension();
+                $path = public_path().'/uploads/uploadsImages/articles/';
+                $file->move($path, $name);
+                global $nameNeeded;
+                $nameNeeded = $name;
+            }
+        }
+
+
+
     }
