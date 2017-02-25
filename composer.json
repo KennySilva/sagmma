@@ -19,7 +19,8 @@
         "maddhatter/laravel-fullcalendar": "^1.2",
         "consoletvs/charts": "4.*",
         "caffeinated/flash": "~2.0",
-        "cviebrock/eloquent-sluggable": "4.1"
+        "cviebrock/eloquent-sluggable": "4.1",
+        "edvinaskrucas/settings": "1.0.0"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

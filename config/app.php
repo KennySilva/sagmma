@@ -85,6 +85,8 @@ return [
 
         Cviebrock\EloquentSluggable\ServiceProvider::class,
 
+        Krucas\Settings\Providers\SettingsServiceProvider::class,
+
 
     ],
 
@@ -147,6 +149,8 @@ return [
         'Charts'       => ConsoleTVs\Charts\Facades\Charts               ::class,
 
         'Flash' => Caffeinated\Flash\Facades\Flash::class,
+
+        'Settings' => Krucas\Settings\Facades\Settings::class,
 
 
 

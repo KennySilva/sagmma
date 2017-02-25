@@ -68,7 +68,7 @@ export default{
                 if (response.status == 200) {
 
                     $('#modal-create-article').modal('hide');
-                    this.uploadsImages();
+                    // this.uploadsImages();
                     this.fetchArticle();
                     var self = this;
                     this.success = true;

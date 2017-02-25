@@ -3,10 +3,6 @@
 	<i class="fa fa-thumbs-up"> Sucesso!!!</i>
 </div>
 
-<pre>
-	{{$data.newArticle | json}}
-</pre>
-
 <div class="row">
 	<div class="col-md-4 pull-right">
 		<div class="input-group">
@@ -175,8 +171,8 @@
 								<div class="col-md-12">
 									<div class="col-md-12">
 										<div class="form-group has-feedback">
-											<input  class="form-control" type="file" name="articleimage"  id="articleimage" v-el:articleimage>
-											<!-- <input  class="form-control" type="file" name="articleimage" id="articleimage" @change = "uploadsImages" v-el:articleimage> -->
+											<!-- <input  class="form-control" type="file" name="articleimage"  id="articleimage" v-el:articleimage> -->
+											<input  class="form-control" type="file" name="articleimage" id="articleimage" @change = "uploadsImages" v-el:articleimage>
 										</div>
 									</div>
 								</div>
