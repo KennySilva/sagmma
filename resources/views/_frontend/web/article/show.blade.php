@@ -2,6 +2,8 @@
 @section('sagmma-style')
     <link rel="stylesheet" href="{{ asset('bower_components/trumbowyg/dist/ui/trumbowyg.min.css') }}" media="screen" title="no title" charset="utf-8">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ asset('bower_components/bootstrap-fileinput/css/fileinput.css') }}" media="screen" title="no title" charset="utf-8">
+
 @endsection
 
 @section('htmlheader_title')
@@ -38,7 +40,17 @@
     @push('scripts')
         <script src="/bower_components/trumbowyg/dist/trumbowyg.js" charset="utf-8"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+        <script src="{{ asset('bower_components/bootstrap-fileinput/js/fileinput.js') }}" charset="utf-8"> </script>
+        <script src="{{ asset('bower_components/bootstrap-fileinput/js/locales/pt.js') }}" charset="utf-8"> </script>
+        <script src="{{ asset('bower_components/bootstrap-fileinput/themes/fa/theme.js') }}" charset="utf-8"> </script>
+
         <script>
+        $("#articleimage").fileinput({
+            language: "pt",
+            showUpload: false,
+            allowedFileExtensions: ["jpg", "png", "gif"],
+            theme: "gly",
+        });
         $('.textarea-content').trumbowyg();
         </script>
     @endpush

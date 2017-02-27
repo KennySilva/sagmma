@@ -1,30 +1,12 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-module.exports = { "default": require("core-js/library/fn/json/stringify"), __esModule: true };
-},{"core-js/library/fn/json/stringify":16}],2:[function(require,module,exports){
-module.exports = { "default": require("core-js/library/fn/object/create"), __esModule: true };
-},{"core-js/library/fn/object/create":17}],3:[function(require,module,exports){
-module.exports = { "default": require("core-js/library/fn/object/define-properties"), __esModule: true };
-},{"core-js/library/fn/object/define-properties":18}],4:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/object/define-property"), __esModule: true };
-},{"core-js/library/fn/object/define-property":19}],5:[function(require,module,exports){
-module.exports = { "default": require("core-js/library/fn/object/get-own-property-descriptor"), __esModule: true };
-},{"core-js/library/fn/object/get-own-property-descriptor":20}],6:[function(require,module,exports){
-module.exports = { "default": require("core-js/library/fn/object/get-own-property-names"), __esModule: true };
-},{"core-js/library/fn/object/get-own-property-names":21}],7:[function(require,module,exports){
-module.exports = { "default": require("core-js/library/fn/object/get-own-property-symbols"), __esModule: true };
-},{"core-js/library/fn/object/get-own-property-symbols":22}],8:[function(require,module,exports){
-module.exports = { "default": require("core-js/library/fn/object/get-prototype-of"), __esModule: true };
-},{"core-js/library/fn/object/get-prototype-of":23}],9:[function(require,module,exports){
-module.exports = { "default": require("core-js/library/fn/object/is-extensible"), __esModule: true };
-},{"core-js/library/fn/object/is-extensible":24}],10:[function(require,module,exports){
+},{"core-js/library/fn/object/define-property":7}],2:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/object/keys"), __esModule: true };
-},{"core-js/library/fn/object/keys":25}],11:[function(require,module,exports){
-module.exports = { "default": require("core-js/library/fn/object/prevent-extensions"), __esModule: true };
-},{"core-js/library/fn/object/prevent-extensions":26}],12:[function(require,module,exports){
+},{"core-js/library/fn/object/keys":8}],3:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/symbol"), __esModule: true };
-},{"core-js/library/fn/symbol":27}],13:[function(require,module,exports){
+},{"core-js/library/fn/symbol":9}],4:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/symbol/iterator"), __esModule: true };
-},{"core-js/library/fn/symbol/iterator":28}],14:[function(require,module,exports){
+},{"core-js/library/fn/symbol/iterator":10}],5:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -49,7 +31,7 @@ exports.default = function (obj, key, value) {
 
   return obj;
 };
-},{"../core-js/object/define-property":4}],15:[function(require,module,exports){
+},{"../core-js/object/define-property":1}],6:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -71,81 +53,39 @@ exports.default = typeof _symbol2.default === "function" && _typeof(_iterator2.d
 } : function (obj) {
   return obj && typeof _symbol2.default === "function" && obj.constructor === _symbol2.default ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof(obj);
 };
-},{"../core-js/symbol":12,"../core-js/symbol/iterator":13}],16:[function(require,module,exports){
-var core  = require('../../modules/_core')
-  , $JSON = core.JSON || (core.JSON = {stringify: JSON.stringify});
-module.exports = function stringify(it){ // eslint-disable-line no-unused-vars
-  return $JSON.stringify.apply($JSON, arguments);
-};
-},{"../../modules/_core":34}],17:[function(require,module,exports){
-require('../../modules/es6.object.create');
-var $Object = require('../../modules/_core').Object;
-module.exports = function create(P, D){
-  return $Object.create(P, D);
-};
-},{"../../modules/_core":34,"../../modules/es6.object.create":87}],18:[function(require,module,exports){
-require('../../modules/es6.object.define-properties');
-var $Object = require('../../modules/_core').Object;
-module.exports = function defineProperties(T, D){
-  return $Object.defineProperties(T, D);
-};
-},{"../../modules/_core":34,"../../modules/es6.object.define-properties":88}],19:[function(require,module,exports){
+},{"../core-js/symbol":3,"../core-js/symbol/iterator":4}],7:[function(require,module,exports){
 require('../../modules/es6.object.define-property');
 var $Object = require('../../modules/_core').Object;
 module.exports = function defineProperty(it, key, desc){
   return $Object.defineProperty(it, key, desc);
 };
-},{"../../modules/_core":34,"../../modules/es6.object.define-property":89}],20:[function(require,module,exports){
-require('../../modules/es6.object.get-own-property-descriptor');
-var $Object = require('../../modules/_core').Object;
-module.exports = function getOwnPropertyDescriptor(it, key){
-  return $Object.getOwnPropertyDescriptor(it, key);
-};
-},{"../../modules/_core":34,"../../modules/es6.object.get-own-property-descriptor":90}],21:[function(require,module,exports){
-require('../../modules/es6.object.get-own-property-names');
-var $Object = require('../../modules/_core').Object;
-module.exports = function getOwnPropertyNames(it){
-  return $Object.getOwnPropertyNames(it);
-};
-},{"../../modules/_core":34,"../../modules/es6.object.get-own-property-names":91}],22:[function(require,module,exports){
-require('../../modules/es6.symbol');
-module.exports = require('../../modules/_core').Object.getOwnPropertySymbols;
-},{"../../modules/_core":34,"../../modules/es6.symbol":98}],23:[function(require,module,exports){
-require('../../modules/es6.object.get-prototype-of');
-module.exports = require('../../modules/_core').Object.getPrototypeOf;
-},{"../../modules/_core":34,"../../modules/es6.object.get-prototype-of":92}],24:[function(require,module,exports){
-require('../../modules/es6.object.is-extensible');
-module.exports = require('../../modules/_core').Object.isExtensible;
-},{"../../modules/_core":34,"../../modules/es6.object.is-extensible":93}],25:[function(require,module,exports){
+},{"../../modules/_core":16,"../../modules/es6.object.define-property":69}],8:[function(require,module,exports){
 require('../../modules/es6.object.keys');
 module.exports = require('../../modules/_core').Object.keys;
-},{"../../modules/_core":34,"../../modules/es6.object.keys":94}],26:[function(require,module,exports){
-require('../../modules/es6.object.prevent-extensions');
-module.exports = require('../../modules/_core').Object.preventExtensions;
-},{"../../modules/_core":34,"../../modules/es6.object.prevent-extensions":95}],27:[function(require,module,exports){
+},{"../../modules/_core":16,"../../modules/es6.object.keys":70}],9:[function(require,module,exports){
 require('../../modules/es6.symbol');
 require('../../modules/es6.object.to-string');
 require('../../modules/es7.symbol.async-iterator');
 require('../../modules/es7.symbol.observable');
 module.exports = require('../../modules/_core').Symbol;
-},{"../../modules/_core":34,"../../modules/es6.object.to-string":96,"../../modules/es6.symbol":98,"../../modules/es7.symbol.async-iterator":99,"../../modules/es7.symbol.observable":100}],28:[function(require,module,exports){
+},{"../../modules/_core":16,"../../modules/es6.object.to-string":71,"../../modules/es6.symbol":73,"../../modules/es7.symbol.async-iterator":74,"../../modules/es7.symbol.observable":75}],10:[function(require,module,exports){
 require('../../modules/es6.string.iterator');
 require('../../modules/web.dom.iterable');
 module.exports = require('../../modules/_wks-ext').f('iterator');
-},{"../../modules/_wks-ext":84,"../../modules/es6.string.iterator":97,"../../modules/web.dom.iterable":101}],29:[function(require,module,exports){
+},{"../../modules/_wks-ext":66,"../../modules/es6.string.iterator":72,"../../modules/web.dom.iterable":76}],11:[function(require,module,exports){
 module.exports = function(it){
   if(typeof it != 'function')throw TypeError(it + ' is not a function!');
   return it;
 };
-},{}],30:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 module.exports = function(){ /* empty */ };
-},{}],31:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 var isObject = require('./_is-object');
 module.exports = function(it){
   if(!isObject(it))throw TypeError(it + ' is not an object!');
   return it;
 };
-},{"./_is-object":50}],32:[function(require,module,exports){
+},{"./_is-object":32}],14:[function(require,module,exports){
 // false -> Array#indexOf
 // true  -> Array#includes
 var toIObject = require('./_to-iobject')
@@ -167,16 +107,16 @@ module.exports = function(IS_INCLUDES){
     } return !IS_INCLUDES && -1;
   };
 };
-},{"./_to-index":76,"./_to-iobject":78,"./_to-length":79}],33:[function(require,module,exports){
+},{"./_to-index":58,"./_to-iobject":60,"./_to-length":61}],15:[function(require,module,exports){
 var toString = {}.toString;
 
 module.exports = function(it){
   return toString.call(it).slice(8, -1);
 };
-},{}],34:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 var core = module.exports = {version: '2.4.0'};
 if(typeof __e == 'number')__e = core; // eslint-disable-line no-undef
-},{}],35:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 // optional / simple context binding
 var aFunction = require('./_a-function');
 module.exports = function(fn, that, length){
@@ -197,18 +137,18 @@ module.exports = function(fn, that, length){
     return fn.apply(that, arguments);
   };
 };
-},{"./_a-function":29}],36:[function(require,module,exports){
+},{"./_a-function":11}],18:[function(require,module,exports){
 // 7.2.1 RequireObjectCoercible(argument)
 module.exports = function(it){
   if(it == undefined)throw TypeError("Can't call method on  " + it);
   return it;
 };
-},{}],37:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 // Thank's IE8 for his funny defineProperty
 module.exports = !require('./_fails')(function(){
   return Object.defineProperty({}, 'a', {get: function(){ return 7; }}).a != 7;
 });
-},{"./_fails":42}],38:[function(require,module,exports){
+},{"./_fails":24}],20:[function(require,module,exports){
 var isObject = require('./_is-object')
   , document = require('./_global').document
   // in old IE typeof document.createElement is 'object'
@@ -216,12 +156,12 @@ var isObject = require('./_is-object')
 module.exports = function(it){
   return is ? document.createElement(it) : {};
 };
-},{"./_global":43,"./_is-object":50}],39:[function(require,module,exports){
+},{"./_global":25,"./_is-object":32}],21:[function(require,module,exports){
 // IE 8- don't enum bug keys
 module.exports = (
   'constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf'
 ).split(',');
-},{}],40:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 // all enumerable object keys, includes symbols
 var getKeys = require('./_object-keys')
   , gOPS    = require('./_object-gops')
@@ -237,7 +177,7 @@ module.exports = function(it){
     while(symbols.length > i)if(isEnum.call(it, key = symbols[i++]))result.push(key);
   } return result;
 };
-},{"./_object-gops":64,"./_object-keys":67,"./_object-pie":68}],41:[function(require,module,exports){
+},{"./_object-gops":46,"./_object-keys":49,"./_object-pie":50}],23:[function(require,module,exports){
 var global    = require('./_global')
   , core      = require('./_core')
   , ctx       = require('./_ctx')
@@ -299,7 +239,7 @@ $export.W = 32;  // wrap
 $export.U = 64;  // safe
 $export.R = 128; // real proto method for `library` 
 module.exports = $export;
-},{"./_core":34,"./_ctx":35,"./_global":43,"./_hide":45}],42:[function(require,module,exports){
+},{"./_core":16,"./_ctx":17,"./_global":25,"./_hide":27}],24:[function(require,module,exports){
 module.exports = function(exec){
   try {
     return !!exec();
@@ -307,17 +247,17 @@ module.exports = function(exec){
     return true;
   }
 };
-},{}],43:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 // https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
 var global = module.exports = typeof window != 'undefined' && window.Math == Math
   ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
 if(typeof __g == 'number')__g = global; // eslint-disable-line no-undef
-},{}],44:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 var hasOwnProperty = {}.hasOwnProperty;
 module.exports = function(it, key){
   return hasOwnProperty.call(it, key);
 };
-},{}],45:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 var dP         = require('./_object-dp')
   , createDesc = require('./_property-desc');
 module.exports = require('./_descriptors') ? function(object, key, value){
@@ -326,29 +266,29 @@ module.exports = require('./_descriptors') ? function(object, key, value){
   object[key] = value;
   return object;
 };
-},{"./_descriptors":37,"./_object-dp":59,"./_property-desc":70}],46:[function(require,module,exports){
+},{"./_descriptors":19,"./_object-dp":41,"./_property-desc":52}],28:[function(require,module,exports){
 module.exports = require('./_global').document && document.documentElement;
-},{"./_global":43}],47:[function(require,module,exports){
+},{"./_global":25}],29:[function(require,module,exports){
 module.exports = !require('./_descriptors') && !require('./_fails')(function(){
   return Object.defineProperty(require('./_dom-create')('div'), 'a', {get: function(){ return 7; }}).a != 7;
 });
-},{"./_descriptors":37,"./_dom-create":38,"./_fails":42}],48:[function(require,module,exports){
+},{"./_descriptors":19,"./_dom-create":20,"./_fails":24}],30:[function(require,module,exports){
 // fallback for non-array-like ES3 and non-enumerable old V8 strings
 var cof = require('./_cof');
 module.exports = Object('z').propertyIsEnumerable(0) ? Object : function(it){
   return cof(it) == 'String' ? it.split('') : Object(it);
 };
-},{"./_cof":33}],49:[function(require,module,exports){
+},{"./_cof":15}],31:[function(require,module,exports){
 // 7.2.2 IsArray(argument)
 var cof = require('./_cof');
 module.exports = Array.isArray || function isArray(arg){
   return cof(arg) == 'Array';
 };
-},{"./_cof":33}],50:[function(require,module,exports){
+},{"./_cof":15}],32:[function(require,module,exports){
 module.exports = function(it){
   return typeof it === 'object' ? it !== null : typeof it === 'function';
 };
-},{}],51:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 'use strict';
 var create         = require('./_object-create')
   , descriptor     = require('./_property-desc')
@@ -362,7 +302,7 @@ module.exports = function(Constructor, NAME, next){
   Constructor.prototype = create(IteratorPrototype, {next: descriptor(1, next)});
   setToStringTag(Constructor, NAME + ' Iterator');
 };
-},{"./_hide":45,"./_object-create":58,"./_property-desc":70,"./_set-to-string-tag":72,"./_wks":85}],52:[function(require,module,exports){
+},{"./_hide":27,"./_object-create":40,"./_property-desc":52,"./_set-to-string-tag":54,"./_wks":67}],34:[function(require,module,exports){
 'use strict';
 var LIBRARY        = require('./_library')
   , $export        = require('./_export')
@@ -433,13 +373,13 @@ module.exports = function(Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCED
   }
   return methods;
 };
-},{"./_export":41,"./_has":44,"./_hide":45,"./_iter-create":51,"./_iterators":54,"./_library":56,"./_object-gpo":65,"./_redefine":71,"./_set-to-string-tag":72,"./_wks":85}],53:[function(require,module,exports){
+},{"./_export":23,"./_has":26,"./_hide":27,"./_iter-create":33,"./_iterators":36,"./_library":38,"./_object-gpo":47,"./_redefine":53,"./_set-to-string-tag":54,"./_wks":67}],35:[function(require,module,exports){
 module.exports = function(done, value){
   return {value: value, done: !!done};
 };
-},{}],54:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 module.exports = {};
-},{}],55:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 var getKeys   = require('./_object-keys')
   , toIObject = require('./_to-iobject');
 module.exports = function(object, el){
@@ -450,9 +390,9 @@ module.exports = function(object, el){
     , key;
   while(length > index)if(O[key = keys[index++]] === el)return key;
 };
-},{"./_object-keys":67,"./_to-iobject":78}],56:[function(require,module,exports){
+},{"./_object-keys":49,"./_to-iobject":60}],38:[function(require,module,exports){
 module.exports = true;
-},{}],57:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 var META     = require('./_uid')('meta')
   , isObject = require('./_is-object')
   , has      = require('./_has')
@@ -506,7 +446,7 @@ var meta = module.exports = {
   getWeak:  getWeak,
   onFreeze: onFreeze
 };
-},{"./_fails":42,"./_has":44,"./_is-object":50,"./_object-dp":59,"./_uid":82}],58:[function(require,module,exports){
+},{"./_fails":24,"./_has":26,"./_is-object":32,"./_object-dp":41,"./_uid":64}],40:[function(require,module,exports){
 // 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
 var anObject    = require('./_an-object')
   , dPs         = require('./_object-dps')
@@ -549,7 +489,7 @@ module.exports = Object.create || function create(O, Properties){
   return Properties === undefined ? result : dPs(result, Properties);
 };
 
-},{"./_an-object":31,"./_dom-create":38,"./_enum-bug-keys":39,"./_html":46,"./_object-dps":60,"./_shared-key":73}],59:[function(require,module,exports){
+},{"./_an-object":13,"./_dom-create":20,"./_enum-bug-keys":21,"./_html":28,"./_object-dps":42,"./_shared-key":55}],41:[function(require,module,exports){
 var anObject       = require('./_an-object')
   , IE8_DOM_DEFINE = require('./_ie8-dom-define')
   , toPrimitive    = require('./_to-primitive')
@@ -566,7 +506,7 @@ exports.f = require('./_descriptors') ? Object.defineProperty : function defineP
   if('value' in Attributes)O[P] = Attributes.value;
   return O;
 };
-},{"./_an-object":31,"./_descriptors":37,"./_ie8-dom-define":47,"./_to-primitive":81}],60:[function(require,module,exports){
+},{"./_an-object":13,"./_descriptors":19,"./_ie8-dom-define":29,"./_to-primitive":63}],42:[function(require,module,exports){
 var dP       = require('./_object-dp')
   , anObject = require('./_an-object')
   , getKeys  = require('./_object-keys');
@@ -580,7 +520,7 @@ module.exports = require('./_descriptors') ? Object.defineProperties : function 
   while(length > i)dP.f(O, P = keys[i++], Properties[P]);
   return O;
 };
-},{"./_an-object":31,"./_descriptors":37,"./_object-dp":59,"./_object-keys":67}],61:[function(require,module,exports){
+},{"./_an-object":13,"./_descriptors":19,"./_object-dp":41,"./_object-keys":49}],43:[function(require,module,exports){
 var pIE            = require('./_object-pie')
   , createDesc     = require('./_property-desc')
   , toIObject      = require('./_to-iobject')
@@ -597,7 +537,7 @@ exports.f = require('./_descriptors') ? gOPD : function getOwnPropertyDescriptor
   } catch(e){ /* empty */ }
   if(has(O, P))return createDesc(!pIE.f.call(O, P), O[P]);
 };
-},{"./_descriptors":37,"./_has":44,"./_ie8-dom-define":47,"./_object-pie":68,"./_property-desc":70,"./_to-iobject":78,"./_to-primitive":81}],62:[function(require,module,exports){
+},{"./_descriptors":19,"./_has":26,"./_ie8-dom-define":29,"./_object-pie":50,"./_property-desc":52,"./_to-iobject":60,"./_to-primitive":63}],44:[function(require,module,exports){
 // fallback for IE11 buggy Object.getOwnPropertyNames with iframe and window
 var toIObject = require('./_to-iobject')
   , gOPN      = require('./_object-gopn').f
@@ -618,7 +558,7 @@ module.exports.f = function getOwnPropertyNames(it){
   return windowNames && toString.call(it) == '[object Window]' ? getWindowNames(it) : gOPN(toIObject(it));
 };
 
-},{"./_object-gopn":63,"./_to-iobject":78}],63:[function(require,module,exports){
+},{"./_object-gopn":45,"./_to-iobject":60}],45:[function(require,module,exports){
 // 19.1.2.7 / 15.2.3.4 Object.getOwnPropertyNames(O)
 var $keys      = require('./_object-keys-internal')
   , hiddenKeys = require('./_enum-bug-keys').concat('length', 'prototype');
@@ -626,9 +566,9 @@ var $keys      = require('./_object-keys-internal')
 exports.f = Object.getOwnPropertyNames || function getOwnPropertyNames(O){
   return $keys(O, hiddenKeys);
 };
-},{"./_enum-bug-keys":39,"./_object-keys-internal":66}],64:[function(require,module,exports){
+},{"./_enum-bug-keys":21,"./_object-keys-internal":48}],46:[function(require,module,exports){
 exports.f = Object.getOwnPropertySymbols;
-},{}],65:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 // 19.1.2.9 / 15.2.3.2 Object.getPrototypeOf(O)
 var has         = require('./_has')
   , toObject    = require('./_to-object')
@@ -642,7 +582,7 @@ module.exports = Object.getPrototypeOf || function(O){
     return O.constructor.prototype;
   } return O instanceof Object ? ObjectProto : null;
 };
-},{"./_has":44,"./_shared-key":73,"./_to-object":80}],66:[function(require,module,exports){
+},{"./_has":26,"./_shared-key":55,"./_to-object":62}],48:[function(require,module,exports){
 var has          = require('./_has')
   , toIObject    = require('./_to-iobject')
   , arrayIndexOf = require('./_array-includes')(false)
@@ -660,7 +600,7 @@ module.exports = function(object, names){
   }
   return result;
 };
-},{"./_array-includes":32,"./_has":44,"./_shared-key":73,"./_to-iobject":78}],67:[function(require,module,exports){
+},{"./_array-includes":14,"./_has":26,"./_shared-key":55,"./_to-iobject":60}],49:[function(require,module,exports){
 // 19.1.2.14 / 15.2.3.14 Object.keys(O)
 var $keys       = require('./_object-keys-internal')
   , enumBugKeys = require('./_enum-bug-keys');
@@ -668,9 +608,9 @@ var $keys       = require('./_object-keys-internal')
 module.exports = Object.keys || function keys(O){
   return $keys(O, enumBugKeys);
 };
-},{"./_enum-bug-keys":39,"./_object-keys-internal":66}],68:[function(require,module,exports){
+},{"./_enum-bug-keys":21,"./_object-keys-internal":48}],50:[function(require,module,exports){
 exports.f = {}.propertyIsEnumerable;
-},{}],69:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 // most Object methods by ES6 should accept primitives
 var $export = require('./_export')
   , core    = require('./_core')
@@ -681,7 +621,7 @@ module.exports = function(KEY, exec){
   exp[KEY] = exec(fn);
   $export($export.S + $export.F * fails(function(){ fn(1); }), 'Object', exp);
 };
-},{"./_core":34,"./_export":41,"./_fails":42}],70:[function(require,module,exports){
+},{"./_core":16,"./_export":23,"./_fails":24}],52:[function(require,module,exports){
 module.exports = function(bitmap, value){
   return {
     enumerable  : !(bitmap & 1),
@@ -690,9 +630,9 @@ module.exports = function(bitmap, value){
     value       : value
   };
 };
-},{}],71:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 module.exports = require('./_hide');
-},{"./_hide":45}],72:[function(require,module,exports){
+},{"./_hide":27}],54:[function(require,module,exports){
 var def = require('./_object-dp').f
   , has = require('./_has')
   , TAG = require('./_wks')('toStringTag');
@@ -700,20 +640,20 @@ var def = require('./_object-dp').f
 module.exports = function(it, tag, stat){
   if(it && !has(it = stat ? it : it.prototype, TAG))def(it, TAG, {configurable: true, value: tag});
 };
-},{"./_has":44,"./_object-dp":59,"./_wks":85}],73:[function(require,module,exports){
+},{"./_has":26,"./_object-dp":41,"./_wks":67}],55:[function(require,module,exports){
 var shared = require('./_shared')('keys')
   , uid    = require('./_uid');
 module.exports = function(key){
   return shared[key] || (shared[key] = uid(key));
 };
-},{"./_shared":74,"./_uid":82}],74:[function(require,module,exports){
+},{"./_shared":56,"./_uid":64}],56:[function(require,module,exports){
 var global = require('./_global')
   , SHARED = '__core-js_shared__'
   , store  = global[SHARED] || (global[SHARED] = {});
 module.exports = function(key){
   return store[key] || (store[key] = {});
 };
-},{"./_global":43}],75:[function(require,module,exports){
+},{"./_global":25}],57:[function(require,module,exports){
 var toInteger = require('./_to-integer')
   , defined   = require('./_defined');
 // true  -> String#at
@@ -731,7 +671,7 @@ module.exports = function(TO_STRING){
       : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
   };
 };
-},{"./_defined":36,"./_to-integer":77}],76:[function(require,module,exports){
+},{"./_defined":18,"./_to-integer":59}],58:[function(require,module,exports){
 var toInteger = require('./_to-integer')
   , max       = Math.max
   , min       = Math.min;
@@ -739,34 +679,34 @@ module.exports = function(index, length){
   index = toInteger(index);
   return index < 0 ? max(index + length, 0) : min(index, length);
 };
-},{"./_to-integer":77}],77:[function(require,module,exports){
+},{"./_to-integer":59}],59:[function(require,module,exports){
 // 7.1.4 ToInteger
 var ceil  = Math.ceil
   , floor = Math.floor;
 module.exports = function(it){
   return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
 };
-},{}],78:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 // to indexed object, toObject with fallback for non-array-like ES3 strings
 var IObject = require('./_iobject')
   , defined = require('./_defined');
 module.exports = function(it){
   return IObject(defined(it));
 };
-},{"./_defined":36,"./_iobject":48}],79:[function(require,module,exports){
+},{"./_defined":18,"./_iobject":30}],61:[function(require,module,exports){
 // 7.1.15 ToLength
 var toInteger = require('./_to-integer')
   , min       = Math.min;
 module.exports = function(it){
   return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0; // pow(2, 53) - 1 == 9007199254740991
 };
-},{"./_to-integer":77}],80:[function(require,module,exports){
+},{"./_to-integer":59}],62:[function(require,module,exports){
 // 7.1.13 ToObject(argument)
 var defined = require('./_defined');
 module.exports = function(it){
   return Object(defined(it));
 };
-},{"./_defined":36}],81:[function(require,module,exports){
+},{"./_defined":18}],63:[function(require,module,exports){
 // 7.1.1 ToPrimitive(input [, PreferredType])
 var isObject = require('./_is-object');
 // instead of the ES6 spec version, we didn't implement @@toPrimitive case
@@ -779,13 +719,13 @@ module.exports = function(it, S){
   if(!S && typeof (fn = it.toString) == 'function' && !isObject(val = fn.call(it)))return val;
   throw TypeError("Can't convert object to primitive value");
 };
-},{"./_is-object":50}],82:[function(require,module,exports){
+},{"./_is-object":32}],64:[function(require,module,exports){
 var id = 0
   , px = Math.random();
 module.exports = function(key){
   return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
 };
-},{}],83:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 var global         = require('./_global')
   , core           = require('./_core')
   , LIBRARY        = require('./_library')
@@ -795,9 +735,9 @@ module.exports = function(name){
   var $Symbol = core.Symbol || (core.Symbol = LIBRARY ? {} : global.Symbol || {});
   if(name.charAt(0) != '_' && !(name in $Symbol))defineProperty($Symbol, name, {value: wksExt.f(name)});
 };
-},{"./_core":34,"./_global":43,"./_library":56,"./_object-dp":59,"./_wks-ext":84}],84:[function(require,module,exports){
+},{"./_core":16,"./_global":25,"./_library":38,"./_object-dp":41,"./_wks-ext":66}],66:[function(require,module,exports){
 exports.f = require('./_wks');
-},{"./_wks":85}],85:[function(require,module,exports){
+},{"./_wks":67}],67:[function(require,module,exports){
 var store      = require('./_shared')('wks')
   , uid        = require('./_uid')
   , Symbol     = require('./_global').Symbol
@@ -809,7 +749,7 @@ var $exports = module.exports = function(name){
 };
 
 $exports.store = store;
-},{"./_global":43,"./_shared":74,"./_uid":82}],86:[function(require,module,exports){
+},{"./_global":25,"./_shared":56,"./_uid":64}],68:[function(require,module,exports){
 'use strict';
 var addToUnscopables = require('./_add-to-unscopables')
   , step             = require('./_iter-step')
@@ -844,53 +784,11 @@ Iterators.Arguments = Iterators.Array;
 addToUnscopables('keys');
 addToUnscopables('values');
 addToUnscopables('entries');
-},{"./_add-to-unscopables":30,"./_iter-define":52,"./_iter-step":53,"./_iterators":54,"./_to-iobject":78}],87:[function(require,module,exports){
-var $export = require('./_export')
-// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
-$export($export.S, 'Object', {create: require('./_object-create')});
-},{"./_export":41,"./_object-create":58}],88:[function(require,module,exports){
-var $export = require('./_export');
-// 19.1.2.3 / 15.2.3.7 Object.defineProperties(O, Properties)
-$export($export.S + $export.F * !require('./_descriptors'), 'Object', {defineProperties: require('./_object-dps')});
-},{"./_descriptors":37,"./_export":41,"./_object-dps":60}],89:[function(require,module,exports){
+},{"./_add-to-unscopables":12,"./_iter-define":34,"./_iter-step":35,"./_iterators":36,"./_to-iobject":60}],69:[function(require,module,exports){
 var $export = require('./_export');
 // 19.1.2.4 / 15.2.3.6 Object.defineProperty(O, P, Attributes)
 $export($export.S + $export.F * !require('./_descriptors'), 'Object', {defineProperty: require('./_object-dp').f});
-},{"./_descriptors":37,"./_export":41,"./_object-dp":59}],90:[function(require,module,exports){
-// 19.1.2.6 Object.getOwnPropertyDescriptor(O, P)
-var toIObject                 = require('./_to-iobject')
-  , $getOwnPropertyDescriptor = require('./_object-gopd').f;
-
-require('./_object-sap')('getOwnPropertyDescriptor', function(){
-  return function getOwnPropertyDescriptor(it, key){
-    return $getOwnPropertyDescriptor(toIObject(it), key);
-  };
-});
-},{"./_object-gopd":61,"./_object-sap":69,"./_to-iobject":78}],91:[function(require,module,exports){
-// 19.1.2.7 Object.getOwnPropertyNames(O)
-require('./_object-sap')('getOwnPropertyNames', function(){
-  return require('./_object-gopn-ext').f;
-});
-},{"./_object-gopn-ext":62,"./_object-sap":69}],92:[function(require,module,exports){
-// 19.1.2.9 Object.getPrototypeOf(O)
-var toObject        = require('./_to-object')
-  , $getPrototypeOf = require('./_object-gpo');
-
-require('./_object-sap')('getPrototypeOf', function(){
-  return function getPrototypeOf(it){
-    return $getPrototypeOf(toObject(it));
-  };
-});
-},{"./_object-gpo":65,"./_object-sap":69,"./_to-object":80}],93:[function(require,module,exports){
-// 19.1.2.11 Object.isExtensible(O)
-var isObject = require('./_is-object');
-
-require('./_object-sap')('isExtensible', function($isExtensible){
-  return function isExtensible(it){
-    return isObject(it) ? $isExtensible ? $isExtensible(it) : true : false;
-  };
-});
-},{"./_is-object":50,"./_object-sap":69}],94:[function(require,module,exports){
+},{"./_descriptors":19,"./_export":23,"./_object-dp":41}],70:[function(require,module,exports){
 // 19.1.2.14 Object.keys(O)
 var toObject = require('./_to-object')
   , $keys    = require('./_object-keys');
@@ -900,19 +798,9 @@ require('./_object-sap')('keys', function(){
     return $keys(toObject(it));
   };
 });
-},{"./_object-keys":67,"./_object-sap":69,"./_to-object":80}],95:[function(require,module,exports){
-// 19.1.2.15 Object.preventExtensions(O)
-var isObject = require('./_is-object')
-  , meta     = require('./_meta').onFreeze;
+},{"./_object-keys":49,"./_object-sap":51,"./_to-object":62}],71:[function(require,module,exports){
 
-require('./_object-sap')('preventExtensions', function($preventExtensions){
-  return function preventExtensions(it){
-    return $preventExtensions && isObject(it) ? $preventExtensions(meta(it)) : it;
-  };
-});
-},{"./_is-object":50,"./_meta":57,"./_object-sap":69}],96:[function(require,module,exports){
-
-},{}],97:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 'use strict';
 var $at  = require('./_string-at')(true);
 
@@ -930,7 +818,7 @@ require('./_iter-define')(String, 'String', function(iterated){
   this._i += point.length;
   return {value: point, done: false};
 });
-},{"./_iter-define":52,"./_string-at":75}],98:[function(require,module,exports){
+},{"./_iter-define":34,"./_string-at":57}],73:[function(require,module,exports){
 'use strict';
 // ECMAScript 6 symbols shim
 var global         = require('./_global')
@@ -1166,11 +1054,11 @@ setToStringTag($Symbol, 'Symbol');
 setToStringTag(Math, 'Math', true);
 // 24.3.3 JSON[@@toStringTag]
 setToStringTag(global.JSON, 'JSON', true);
-},{"./_an-object":31,"./_descriptors":37,"./_enum-keys":40,"./_export":41,"./_fails":42,"./_global":43,"./_has":44,"./_hide":45,"./_is-array":49,"./_keyof":55,"./_library":56,"./_meta":57,"./_object-create":58,"./_object-dp":59,"./_object-gopd":61,"./_object-gopn":63,"./_object-gopn-ext":62,"./_object-gops":64,"./_object-keys":67,"./_object-pie":68,"./_property-desc":70,"./_redefine":71,"./_set-to-string-tag":72,"./_shared":74,"./_to-iobject":78,"./_to-primitive":81,"./_uid":82,"./_wks":85,"./_wks-define":83,"./_wks-ext":84}],99:[function(require,module,exports){
+},{"./_an-object":13,"./_descriptors":19,"./_enum-keys":22,"./_export":23,"./_fails":24,"./_global":25,"./_has":26,"./_hide":27,"./_is-array":31,"./_keyof":37,"./_library":38,"./_meta":39,"./_object-create":40,"./_object-dp":41,"./_object-gopd":43,"./_object-gopn":45,"./_object-gopn-ext":44,"./_object-gops":46,"./_object-keys":49,"./_object-pie":50,"./_property-desc":52,"./_redefine":53,"./_set-to-string-tag":54,"./_shared":56,"./_to-iobject":60,"./_to-primitive":63,"./_uid":64,"./_wks":67,"./_wks-define":65,"./_wks-ext":66}],74:[function(require,module,exports){
 require('./_wks-define')('asyncIterator');
-},{"./_wks-define":83}],100:[function(require,module,exports){
+},{"./_wks-define":65}],75:[function(require,module,exports){
 require('./_wks-define')('observable');
-},{"./_wks-define":83}],101:[function(require,module,exports){
+},{"./_wks-define":65}],76:[function(require,module,exports){
 require('./es6.array.iterator');
 var global        = require('./_global')
   , hide          = require('./_hide')
@@ -1184,7 +1072,7 @@ for(var collections = ['NodeList', 'DOMTokenList', 'MediaList', 'StyleSheetList'
   if(proto && !proto[TO_STRING_TAG])hide(proto, TO_STRING_TAG, NAME);
   Iterators[NAME] = Iterators.Array;
 }
-},{"./_global":43,"./_hide":45,"./_iterators":54,"./_wks":85,"./es6.array.iterator":86}],102:[function(require,module,exports){
+},{"./_global":25,"./_hide":27,"./_iterators":36,"./_wks":67,"./es6.array.iterator":68}],77:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -18083,7 +17971,7 @@ for(var collections = ['NodeList', 'DOMTokenList', 'MediaList', 'StyleSheetList'
 }.call(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],103:[function(require,module,exports){
+},{}],78:[function(require,module,exports){
 //! moment.js
 //! version : 2.15.1
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
@@ -22318,7 +22206,7 @@ for(var collections = ['NodeList', 'DOMTokenList', 'MediaList', 'StyleSheetList'
     return _moment;
 
 }));
-},{}],104:[function(require,module,exports){
+},{}],79:[function(require,module,exports){
 /*!
  * vue-resource v0.9.3
  * https://github.com/vuejs/vue-resource
@@ -23631,948 +23519,7 @@ if (typeof window !== 'undefined' && window.Vue) {
 }
 
 module.exports = plugin;
-},{}],105:[function(require,module,exports){
-"use strict";
-
-var _stringify = require("babel-runtime/core-js/json/stringify");
-
-var _stringify2 = _interopRequireDefault(_stringify);
-
-var _getPrototypeOf = require("babel-runtime/core-js/object/get-prototype-of");
-
-var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
-
-var _getOwnPropertyDescriptor = require("babel-runtime/core-js/object/get-own-property-descriptor");
-
-var _getOwnPropertyDescriptor2 = _interopRequireDefault(_getOwnPropertyDescriptor);
-
-var _defineProperties = require("babel-runtime/core-js/object/define-properties");
-
-var _defineProperties2 = _interopRequireDefault(_defineProperties);
-
-var _preventExtensions = require("babel-runtime/core-js/object/prevent-extensions");
-
-var _preventExtensions2 = _interopRequireDefault(_preventExtensions);
-
-var _isExtensible = require("babel-runtime/core-js/object/is-extensible");
-
-var _isExtensible2 = _interopRequireDefault(_isExtensible);
-
-var _getOwnPropertySymbols = require("babel-runtime/core-js/object/get-own-property-symbols");
-
-var _getOwnPropertySymbols2 = _interopRequireDefault(_getOwnPropertySymbols);
-
-var _getOwnPropertyNames = require("babel-runtime/core-js/object/get-own-property-names");
-
-var _getOwnPropertyNames2 = _interopRequireDefault(_getOwnPropertyNames);
-
-var _create = require("babel-runtime/core-js/object/create");
-
-var _create2 = _interopRequireDefault(_create);
-
-var _keys = require("babel-runtime/core-js/object/keys");
-
-var _keys2 = _interopRequireDefault(_keys);
-
-var _defineProperty = require("babel-runtime/core-js/object/define-property");
-
-var _defineProperty2 = _interopRequireDefault(_defineProperty);
-
-var _typeof2 = require("babel-runtime/helpers/typeof");
-
-var _typeof3 = _interopRequireDefault(_typeof2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-!function (t, e) {
-  "object" == (typeof exports === "undefined" ? "undefined" : (0, _typeof3.default)(exports)) && "object" == (typeof module === "undefined" ? "undefined" : (0, _typeof3.default)(module)) ? module.exports = e() : "function" == typeof define && define.amd ? define([], e) : "object" == (typeof exports === "undefined" ? "undefined" : (0, _typeof3.default)(exports)) ? exports.VueSelect = e() : t.VueSelect = e();
-}(undefined, function () {
-  return function (t) {
-    function e(r) {
-      if (n[r]) return n[r].exports;var o = n[r] = { exports: {}, id: r, loaded: !1 };return t[r].call(o.exports, o, o.exports, e), o.loaded = !0, o.exports;
-    }var n = {};return e.m = t, e.c = n, e.p = "/", e(0);
-  }([function (t, e, n) {
-    "use strict";
-    function r(t) {
-      return t && t.__esModule ? t : { "default": t };
-    }Object.defineProperty(e, "__esModule", { value: !0 }), e.mixins = e.VueSelect = void 0;var o = n(85),
-        i = r(o),
-        s = n(41),
-        u = r(s);e["default"] = i["default"], e.VueSelect = i["default"], e.mixins = u["default"];
-  }, function (t, e) {
-    var n = t.exports = "undefined" != typeof window && window.Math == Math ? window : "undefined" != typeof self && self.Math == Math ? self : Function("return this")();"number" == typeof __g && (__g = n);
-  }, function (t, e, n) {
-    t.exports = !n(9)(function () {
-      return 7 != Object.defineProperty({}, "a", { get: function get() {
-          return 7;
-        } }).a;
-    });
-  }, function (t, e) {
-    var n = {}.hasOwnProperty;t.exports = function (t, e) {
-      return n.call(t, e);
-    };
-  }, function (t, e, n) {
-    var r = n(11),
-        o = n(33),
-        i = n(25),
-        s = _defineProperty2.default;e.f = n(2) ? _defineProperty2.default : function (t, e, n) {
-      if (r(t), e = i(e, !0), r(n), o) try {
-        return s(t, e, n);
-      } catch (u) {}if ("get" in n || "set" in n) throw TypeError("Accessors not supported!");return "value" in n && (t[e] = n.value), t;
-    };
-  }, function (t, e, n) {
-    var r = n(59),
-        o = n(16);t.exports = function (t) {
-      return r(o(t));
-    };
-  }, function (t, e) {
-    var n = t.exports = { version: "2.4.0" };"number" == typeof __e && (__e = n);
-  }, function (t, e, n) {
-    var r = n(4),
-        o = n(14);t.exports = n(2) ? function (t, e, n) {
-      return r.f(t, e, o(1, n));
-    } : function (t, e, n) {
-      return t[e] = n, t;
-    };
-  }, function (t, e, n) {
-    var r = n(23)("wks"),
-        o = n(15),
-        i = n(1).Symbol,
-        s = "function" == typeof i,
-        u = t.exports = function (t) {
-      return r[t] || (r[t] = s && i[t] || (s ? i : o)("Symbol." + t));
-    };u.store = r;
-  }, function (t, e) {
-    t.exports = function (t) {
-      try {
-        return !!t();
-      } catch (e) {
-        return !0;
-      }
-    };
-  }, function (t, e, n) {
-    var r = n(38),
-        o = n(17);t.exports = _keys2.default || function (t) {
-      return r(t, o);
-    };
-  }, function (t, e, n) {
-    var r = n(13);t.exports = function (t) {
-      if (!r(t)) throw TypeError(t + " is not an object!");return t;
-    };
-  }, function (t, e, n) {
-    var r = n(1),
-        o = n(6),
-        i = n(56),
-        s = n(7),
-        u = "prototype",
-        a = function a(t, e, n) {
-      var c,
-          l,
-          f,
-          p = t & a.F,
-          d = t & a.G,
-          h = t & a.S,
-          v = t & a.P,
-          y = t & a.B,
-          b = t & a.W,
-          g = d ? o : o[e] || (o[e] = {}),
-          m = g[u],
-          x = d ? r : h ? r[e] : (r[e] || {})[u];d && (n = e);for (c in n) {
-        l = !p && x && void 0 !== x[c], l && c in g || (f = l ? x[c] : n[c], g[c] = d && "function" != typeof x[c] ? n[c] : y && l ? i(f, r) : b && x[c] == f ? function (t) {
-          var e = function e(_e, n, r) {
-            if (this instanceof t) {
-              switch (arguments.length) {case 0:
-                  return new t();case 1:
-                  return new t(_e);case 2:
-                  return new t(_e, n);}return new t(_e, n, r);
-            }return t.apply(this, arguments);
-          };return e[u] = t[u], e;
-        }(f) : v && "function" == typeof f ? i(Function.call, f) : f, v && ((g.virtual || (g.virtual = {}))[c] = f, t & a.R && m && !m[c] && s(m, c, f)));
-      }
-    };a.F = 1, a.G = 2, a.S = 4, a.P = 8, a.B = 16, a.W = 32, a.U = 64, a.R = 128, t.exports = a;
-  }, function (t, e) {
-    t.exports = function (t) {
-      return "object" == (typeof t === "undefined" ? "undefined" : (0, _typeof3.default)(t)) ? null !== t : "function" == typeof t;
-    };
-  }, function (t, e) {
-    t.exports = function (t, e) {
-      return { enumerable: !(1 & t), configurable: !(2 & t), writable: !(4 & t), value: e };
-    };
-  }, function (t, e) {
-    var n = 0,
-        r = Math.random();t.exports = function (t) {
-      return "Symbol(".concat(void 0 === t ? "" : t, ")_", (++n + r).toString(36));
-    };
-  }, function (t, e) {
-    t.exports = function (t) {
-      if (void 0 == t) throw TypeError("Can't call method on  " + t);return t;
-    };
-  }, function (t, e) {
-    t.exports = "constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf".split(",");
-  }, function (t, e) {
-    t.exports = {};
-  }, function (t, e) {
-    t.exports = !0;
-  }, function (t, e) {
-    e.f = {}.propertyIsEnumerable;
-  }, function (t, e, n) {
-    var r = n(4).f,
-        o = n(3),
-        i = n(8)("toStringTag");t.exports = function (t, e, n) {
-      t && !o(t = n ? t : t.prototype, i) && r(t, i, { configurable: !0, value: e });
-    };
-  }, function (t, e, n) {
-    var r = n(23)("keys"),
-        o = n(15);t.exports = function (t) {
-      return r[t] || (r[t] = o(t));
-    };
-  }, function (t, e, n) {
-    var r = n(1),
-        o = "__core-js_shared__",
-        i = r[o] || (r[o] = {});t.exports = function (t) {
-      return i[t] || (i[t] = {});
-    };
-  }, function (t, e) {
-    var n = Math.ceil,
-        r = Math.floor;t.exports = function (t) {
-      return isNaN(t = +t) ? 0 : (t > 0 ? r : n)(t);
-    };
-  }, function (t, e, n) {
-    var r = n(13);t.exports = function (t, e) {
-      if (!r(t)) return t;var n, o;if (e && "function" == typeof (n = t.toString) && !r(o = n.call(t))) return o;if ("function" == typeof (n = t.valueOf) && !r(o = n.call(t))) return o;if (!e && "function" == typeof (n = t.toString) && !r(o = n.call(t))) return o;throw TypeError("Can't convert object to primitive value");
-    };
-  }, function (t, e, n) {
-    var r = n(1),
-        o = n(6),
-        i = n(19),
-        s = n(27),
-        u = n(4).f;t.exports = function (t) {
-      var e = o.Symbol || (o.Symbol = i ? {} : r.Symbol || {});"_" == t.charAt(0) || t in e || u(e, t, { value: s.f(t) });
-    };
-  }, function (t, e, n) {
-    e.f = n(8);
-  }, function (t, e) {
-    "use strict";
-    t.exports = { props: { loading: { type: Boolean, "default": !1 }, onSearch: { type: Function, "default": !1 }, debounce: { type: Number, "default": 0 } }, watch: { search: function search() {
-          this.search.length > 0 && this.onSearch && this.onSearch(this.search, this.toggleLoading);
-        } }, methods: { toggleLoading: function toggleLoading() {
-          var t = arguments.length <= 0 || void 0 === arguments[0] ? null : arguments[0];return null == t ? this.loading = !this.loading : this.loading = t;
-        } } };
-  }, function (t, e) {
-    "use strict";
-    t.exports = { watch: { typeAheadPointer: function typeAheadPointer() {
-          this.maybeAdjustScroll();
-        } }, methods: { maybeAdjustScroll: function maybeAdjustScroll() {
-          var t = this.pixelsToPointerTop(),
-              e = this.pixelsToPointerBottom();return t <= this.viewport().top ? this.scrollTo(t) : e >= this.viewport().bottom ? this.scrollTo(this.viewport().top + this.pointerHeight()) : void 0;
-        }, pixelsToPointerTop: function n() {
-          for (var n = 0, t = 0; t < this.typeAheadPointer; t++) {
-            n += this.$els.dropdownMenu.children[t].offsetHeight;
-          }return n;
-        }, pixelsToPointerBottom: function pixelsToPointerBottom() {
-          return this.pixelsToPointerTop() + this.pointerHeight();
-        }, pointerHeight: function pointerHeight() {
-          var t = this.$els.dropdownMenu.children[this.typeAheadPointer];return t ? t.offsetHeight : 0;
-        }, viewport: function viewport() {
-          return { top: this.$els.dropdownMenu.scrollTop, bottom: this.$els.dropdownMenu.offsetHeight + this.$els.dropdownMenu.scrollTop };
-        }, scrollTo: function scrollTo(t) {
-          return this.$els.dropdownMenu.scrollTop = t;
-        } } };
-  }, function (t, e) {
-    "use strict";
-    t.exports = { data: function data() {
-        return { typeAheadPointer: -1 };
-      }, watch: { filteredOptions: function filteredOptions() {
-          this.typeAheadPointer = 0;
-        } }, methods: { typeAheadUp: function typeAheadUp() {
-          this.typeAheadPointer > 0 && (this.typeAheadPointer--, this.maybeAdjustScroll && this.maybeAdjustScroll());
-        }, typeAheadDown: function typeAheadDown() {
-          this.typeAheadPointer < this.filteredOptions.length - 1 && (this.typeAheadPointer++, this.maybeAdjustScroll && this.maybeAdjustScroll());
-        }, typeAheadSelect: function typeAheadSelect() {
-          this.filteredOptions[this.typeAheadPointer] ? this.select(this.filteredOptions[this.typeAheadPointer]) : this.taggable && this.search.length && this.select(this.search), this.clearSearchOnSelect && (this.search = "");
-        } } };
-  }, function (t, e) {
-    var n = {}.toString;t.exports = function (t) {
-      return n.call(t).slice(8, -1);
-    };
-  }, function (t, e, n) {
-    var r = n(13),
-        o = n(1).document,
-        i = r(o) && r(o.createElement);t.exports = function (t) {
-      return i ? o.createElement(t) : {};
-    };
-  }, function (t, e, n) {
-    t.exports = !n(2) && !n(9)(function () {
-      return 7 != Object.defineProperty(n(32)("div"), "a", { get: function get() {
-          return 7;
-        } }).a;
-    });
-  }, function (t, e, n) {
-    "use strict";
-    var r = n(19),
-        o = n(12),
-        i = n(39),
-        s = n(7),
-        u = n(3),
-        a = n(18),
-        c = n(61),
-        l = n(21),
-        f = n(68),
-        p = n(8)("iterator"),
-        d = !([].keys && "next" in [].keys()),
-        h = "@@iterator",
-        v = "keys",
-        y = "values",
-        b = function b() {
-      return this;
-    };t.exports = function (t, e, n, g, m, x, w) {
-      c(n, e, g);var S,
-          O,
-          _,
-          j = function j(t) {
-        if (!d && t in E) return E[t];switch (t) {case v:
-            return function () {
-              return new n(this, t);
-            };case y:
-            return function () {
-              return new n(this, t);
-            };}return function () {
-          return new n(this, t);
-        };
-      },
-          A = e + " Iterator",
-          P = m == y,
-          k = !1,
-          E = t.prototype,
-          M = E[p] || E[h] || m && E[m],
-          T = M || j(m),
-          C = m ? P ? j("entries") : T : void 0,
-          $ = "Array" == e ? E.entries || M : M;if ($ && (_ = f($.call(new t())), _ !== Object.prototype && (l(_, A, !0), r || u(_, p) || s(_, p, b))), P && M && M.name !== y && (k = !0, T = function T() {
-        return M.call(this);
-      }), r && !w || !d && !k && E[p] || s(E, p, T), a[e] = T, a[A] = b, m) if (S = { values: P ? T : j(y), keys: x ? T : j(v), entries: C }, w) for (O in S) {
-        O in E || i(E, O, S[O]);
-      } else o(o.P + o.F * (d || k), e, S);return S;
-    };
-  }, function (t, e, n) {
-    var r = n(11),
-        o = n(65),
-        i = n(17),
-        s = n(22)("IE_PROTO"),
-        u = function u() {},
-        a = "prototype",
-        _c = function c() {
-      var t,
-          e = n(32)("iframe"),
-          r = i.length,
-          o = ">";for (e.style.display = "none", n(58).appendChild(e), e.src = "javascript:", t = e.contentWindow.document, t.open(), t.write("<script>document.F=Object</script" + o), t.close(), _c = t.F; r--;) {
-        delete _c[a][i[r]];
-      }return _c();
-    };t.exports = _create2.default || function (t, e) {
-      var n;return null !== t ? (u[a] = r(t), n = new u(), u[a] = null, n[s] = t) : n = _c(), void 0 === e ? n : o(n, e);
-    };
-  }, function (t, e, n) {
-    var r = n(38),
-        o = n(17).concat("length", "prototype");e.f = _getOwnPropertyNames2.default || function (t) {
-      return r(t, o);
-    };
-  }, function (t, e) {
-    e.f = _getOwnPropertySymbols2.default;
-  }, function (t, e, n) {
-    var r = n(3),
-        o = n(5),
-        i = n(55)(!1),
-        s = n(22)("IE_PROTO");t.exports = function (t, e) {
-      var n,
-          u = o(t),
-          a = 0,
-          c = [];for (n in u) {
-        n != s && r(u, n) && c.push(n);
-      }for (; e.length > a;) {
-        r(u, n = e[a++]) && (~i(c, n) || c.push(n));
-      }return c;
-    };
-  }, function (t, e, n) {
-    t.exports = n(7);
-  }, function (t, e, n) {
-    var r = n(16);t.exports = function (t) {
-      return Object(r(t));
-    };
-  }, function (t, e, n) {
-    "use strict";
-    function r(t) {
-      return t && t.__esModule ? t : { "default": t };
-    }Object.defineProperty(e, "__esModule", { value: !0 });var o = n(28),
-        i = r(o),
-        s = n(30),
-        u = r(s),
-        a = n(29),
-        c = r(a);e["default"] = { ajax: i["default"], pointer: u["default"], pointerScroll: c["default"] };
-  }, function (t, e, n) {
-    "use strict";
-    function r(t) {
-      return t && t.__esModule ? t : { "default": t };
-    }Object.defineProperty(e, "__esModule", { value: !0 });var o = n(44),
-        i = r(o),
-        s = n(47),
-        u = r(s),
-        a = n(48),
-        c = r(a),
-        l = n(29),
-        f = r(l),
-        p = n(30),
-        d = r(p),
-        h = n(28),
-        v = r(h);e["default"] = { mixins: [f["default"], d["default"], v["default"]], props: { value: { "default": null }, options: { type: Array, "default": function _default() {
-            return [];
-          } }, maxHeight: { type: String, "default": "400px" }, searchable: { type: Boolean, "default": !0 }, multiple: { type: Boolean, "default": !1 }, placeholder: { type: String, "default": "" }, transition: { type: String, "default": "expand" }, clearSearchOnSelect: { type: Boolean, "default": !0 }, label: { type: String, "default": "label" }, getOptionLabel: { type: Function, "default": function _default(t) {
-            return "object" === ("undefined" == typeof t ? "undefined" : (0, c["default"])(t)) && this.label && t[this.label] ? t[this.label] : t;
-          } }, onChange: Function, taggable: { type: Boolean, "default": !1 }, pushTags: { type: Boolean, "default": !1 }, createOption: { type: Function, "default": function _default(t) {
-            return "object" === (0, c["default"])(this.options[0]) ? (0, u["default"])({}, this.label, t) : t;
-          } }, resetOnOptionsChange: { type: Boolean, "default": !1 } }, data: function data() {
-        return { search: "", open: !1 };
-      }, watch: { value: function value(t, e) {
-          this.multiple ? this.onChange ? this.onChange(t) : null : this.onChange && t !== e ? this.onChange(t) : null;
-        }, options: function options() {
-          !this.taggable && this.resetOnOptionsChange && this.$set("value", this.multiple ? [] : null);
-        }, multiple: function multiple(t) {
-          this.$set("value", t ? [] : null);
-        } }, methods: { select: function select(t) {
-          this.isOptionSelected(t) ? this.deselect(t) : (this.taggable && !this.optionExists(t) && (t = this.createOption(t), this.pushTags && this.options.push(t)), this.multiple ? this.value ? this.value.push(t) : this.$set("value", [t]) : this.value = t), this.onAfterSelect(t);
-        }, deselect: function deselect(t) {
-          var e = this;if (this.multiple) {
-            var n = -1;this.value.forEach(function (r) {
-              (r === t || "object" === ("undefined" == typeof r ? "undefined" : (0, c["default"])(r)) && r[e.label] === t[e.label]) && (n = r);
-            }), this.value.$remove(n);
-          } else this.value = null;
-        }, onAfterSelect: function onAfterSelect(t) {
-          this.multiple || (this.open = !this.open, this.$els.search.blur()), this.clearSearchOnSelect && (this.search = "");
-        }, toggleDropdown: function toggleDropdown(t) {
-          t.target !== this.$els.openIndicator && t.target !== this.$els.search && t.target !== this.$els.toggle && t.target !== this.$el || (this.open ? this.$els.search.blur() : (this.open = !0, this.$els.search.focus()));
-        }, isOptionSelected: function isOptionSelected(t) {
-          var e = this;if (this.multiple && this.value) {
-            var n = !1;return this.value.forEach(function (r) {
-              "object" === ("undefined" == typeof r ? "undefined" : (0, c["default"])(r)) && r[e.label] === t[e.label] ? n = !0 : r === t && (n = !0);
-            }), n;
-          }return this.value === t;
-        }, onEscape: function onEscape() {
-          this.search.length ? this.search = "" : this.$els.search.blur();
-        }, maybeDeleteValue: function maybeDeleteValue() {
-          if (!this.$els.search.value.length && this.value) return this.multiple ? this.value.pop() : this.$set("value", null);
-        }, optionExists: function optionExists(t) {
-          var e = this,
-              n = !1;return this.options.forEach(function (r) {
-            "object" === ("undefined" == typeof r ? "undefined" : (0, c["default"])(r)) && r[e.label] === t ? n = !0 : r === t && (n = !0);
-          }), n;
-        } }, computed: { dropdownClasses: function dropdownClasses() {
-          return { open: this.open, searchable: this.searchable, loading: this.loading };
-        }, searchPlaceholder: function searchPlaceholder() {
-          if (this.isValueEmpty && this.placeholder) return this.placeholder;
-        }, filteredOptions: function filteredOptions() {
-          var t = this.$options.filters.filterBy(this.options, this.search);return this.taggable && this.search.length && !this.optionExists(this.search) && t.unshift(this.search), t;
-        }, isValueEmpty: function isValueEmpty() {
-          return !this.value || ("object" === (0, c["default"])(this.value) ? !(0, i["default"])(this.value).length : !this.value.length);
-        }, valueAsArray: function valueAsArray() {
-          return this.multiple ? this.value : this.value ? [this.value] : [];
-        } } };
-  }, function (t, e, n) {
-    t.exports = { "default": n(49), __esModule: !0 };
-  }, function (t, e, n) {
-    t.exports = { "default": n(50), __esModule: !0 };
-  }, function (t, e, n) {
-    t.exports = { "default": n(51), __esModule: !0 };
-  }, function (t, e, n) {
-    t.exports = { "default": n(52), __esModule: !0 };
-  }, function (t, e, n) {
-    "use strict";
-    function r(t) {
-      return t && t.__esModule ? t : { "default": t };
-    }e.__esModule = !0;var o = n(43),
-        i = r(o);e["default"] = function (t, e, n) {
-      return e in t ? (0, i["default"])(t, e, { value: n, enumerable: !0, configurable: !0, writable: !0 }) : t[e] = n, t;
-    };
-  }, function (t, e, n) {
-    "use strict";
-    function r(t) {
-      return t && t.__esModule ? t : { "default": t };
-    }e.__esModule = !0;var o = n(46),
-        i = r(o),
-        s = n(45),
-        u = r(s),
-        a = "function" == typeof u["default"] && "symbol" == (0, _typeof3.default)(i["default"]) ? function (t) {
-      return typeof t === "undefined" ? "undefined" : (0, _typeof3.default)(t);
-    } : function (t) {
-      return t && "function" == typeof u["default"] && t.constructor === u["default"] ? "symbol" : typeof t === "undefined" ? "undefined" : (0, _typeof3.default)(t);
-    };e["default"] = "function" == typeof u["default"] && "symbol" === a(i["default"]) ? function (t) {
-      return "undefined" == typeof t ? "undefined" : a(t);
-    } : function (t) {
-      return t && "function" == typeof u["default"] && t.constructor === u["default"] ? "symbol" : "undefined" == typeof t ? "undefined" : a(t);
-    };
-  }, function (t, e, n) {
-    n(74);var r = n(6).Object;t.exports = function (t, e, n) {
-      return r.defineProperty(t, e, n);
-    };
-  }, function (t, e, n) {
-    n(75), t.exports = n(6).Object.keys;
-  }, function (t, e, n) {
-    n(78), n(76), n(79), n(80), t.exports = n(6).Symbol;
-  }, function (t, e, n) {
-    n(77), n(81), t.exports = n(27).f("iterator");
-  }, function (t, e) {
-    t.exports = function (t) {
-      if ("function" != typeof t) throw TypeError(t + " is not a function!");return t;
-    };
-  }, function (t, e) {
-    t.exports = function () {};
-  }, function (t, e, n) {
-    var r = n(5),
-        o = n(72),
-        i = n(71);t.exports = function (t) {
-      return function (e, n, s) {
-        var u,
-            a = r(e),
-            c = o(a.length),
-            l = i(s, c);if (t && n != n) {
-          for (; c > l;) {
-            if (u = a[l++], u != u) return !0;
-          }
-        } else for (; c > l; l++) {
-          if ((t || l in a) && a[l] === n) return t || l || 0;
-        }return !t && -1;
-      };
-    };
-  }, function (t, e, n) {
-    var r = n(53);t.exports = function (t, e, n) {
-      if (r(t), void 0 === e) return t;switch (n) {case 1:
-          return function (n) {
-            return t.call(e, n);
-          };case 2:
-          return function (n, r) {
-            return t.call(e, n, r);
-          };case 3:
-          return function (n, r, o) {
-            return t.call(e, n, r, o);
-          };}return function () {
-        return t.apply(e, arguments);
-      };
-    };
-  }, function (t, e, n) {
-    var r = n(10),
-        o = n(37),
-        i = n(20);t.exports = function (t) {
-      var e = r(t),
-          n = o.f;if (n) for (var s, u = n(t), a = i.f, c = 0; u.length > c;) {
-        a.call(t, s = u[c++]) && e.push(s);
-      }return e;
-    };
-  }, function (t, e, n) {
-    t.exports = n(1).document && document.documentElement;
-  }, function (t, e, n) {
-    var r = n(31);t.exports = Object("z").propertyIsEnumerable(0) ? Object : function (t) {
-      return "String" == r(t) ? t.split("") : Object(t);
-    };
-  }, function (t, e, n) {
-    var r = n(31);t.exports = Array.isArray || function (t) {
-      return "Array" == r(t);
-    };
-  }, function (t, e, n) {
-    "use strict";
-    var r = n(35),
-        o = n(14),
-        i = n(21),
-        s = {};n(7)(s, n(8)("iterator"), function () {
-      return this;
-    }), t.exports = function (t, e, n) {
-      t.prototype = r(s, { next: o(1, n) }), i(t, e + " Iterator");
-    };
-  }, function (t, e) {
-    t.exports = function (t, e) {
-      return { value: e, done: !!t };
-    };
-  }, function (t, e, n) {
-    var r = n(10),
-        o = n(5);t.exports = function (t, e) {
-      for (var n, i = o(t), s = r(i), u = s.length, a = 0; u > a;) {
-        if (i[n = s[a++]] === e) return n;
-      }
-    };
-  }, function (t, e, n) {
-    var r = n(15)("meta"),
-        o = n(13),
-        i = n(3),
-        s = n(4).f,
-        u = 0,
-        a = _isExtensible2.default || function () {
-      return !0;
-    },
-        c = !n(9)(function () {
-      return a((0, _preventExtensions2.default)({}));
-    }),
-        l = function l(t) {
-      s(t, r, { value: { i: "O" + ++u, w: {} } });
-    },
-        f = function f(t, e) {
-      if (!o(t)) return "symbol" == (typeof t === "undefined" ? "undefined" : (0, _typeof3.default)(t)) ? t : ("string" == typeof t ? "S" : "P") + t;if (!i(t, r)) {
-        if (!a(t)) return "F";if (!e) return "E";l(t);
-      }return t[r].i;
-    },
-        p = function p(t, e) {
-      if (!i(t, r)) {
-        if (!a(t)) return !0;if (!e) return !1;l(t);
-      }return t[r].w;
-    },
-        d = function d(t) {
-      return c && h.NEED && a(t) && !i(t, r) && l(t), t;
-    },
-        h = t.exports = { KEY: r, NEED: !1, fastKey: f, getWeak: p, onFreeze: d };
-  }, function (t, e, n) {
-    var r = n(4),
-        o = n(11),
-        i = n(10);t.exports = n(2) ? _defineProperties2.default : function (t, e) {
-      o(t);for (var n, s = i(e), u = s.length, a = 0; u > a;) {
-        r.f(t, n = s[a++], e[n]);
-      }return t;
-    };
-  }, function (t, e, n) {
-    var r = n(20),
-        o = n(14),
-        i = n(5),
-        s = n(25),
-        u = n(3),
-        a = n(33),
-        c = _getOwnPropertyDescriptor2.default;e.f = n(2) ? c : function (t, e) {
-      if (t = i(t), e = s(e, !0), a) try {
-        return c(t, e);
-      } catch (n) {}if (u(t, e)) return o(!r.f.call(t, e), t[e]);
-    };
-  }, function (t, e, n) {
-    var r = n(5),
-        o = n(36).f,
-        i = {}.toString,
-        s = "object" == (typeof window === "undefined" ? "undefined" : (0, _typeof3.default)(window)) && window && _getOwnPropertyNames2.default ? (0, _getOwnPropertyNames2.default)(window) : [],
-        u = function u(t) {
-      try {
-        return o(t);
-      } catch (e) {
-        return s.slice();
-      }
-    };t.exports.f = function (t) {
-      return s && "[object Window]" == i.call(t) ? u(t) : o(r(t));
-    };
-  }, function (t, e, n) {
-    var r = n(3),
-        o = n(40),
-        i = n(22)("IE_PROTO"),
-        s = Object.prototype;t.exports = _getPrototypeOf2.default || function (t) {
-      return t = o(t), r(t, i) ? t[i] : "function" == typeof t.constructor && t instanceof t.constructor ? t.constructor.prototype : t instanceof Object ? s : null;
-    };
-  }, function (t, e, n) {
-    var r = n(12),
-        o = n(6),
-        i = n(9);t.exports = function (t, e) {
-      var n = (o.Object || {})[t] || Object[t],
-          s = {};s[t] = e(n), r(r.S + r.F * i(function () {
-        n(1);
-      }), "Object", s);
-    };
-  }, function (t, e, n) {
-    var r = n(24),
-        o = n(16);t.exports = function (t) {
-      return function (e, n) {
-        var i,
-            s,
-            u = String(o(e)),
-            a = r(n),
-            c = u.length;return a < 0 || a >= c ? t ? "" : void 0 : (i = u.charCodeAt(a), i < 55296 || i > 56319 || a + 1 === c || (s = u.charCodeAt(a + 1)) < 56320 || s > 57343 ? t ? u.charAt(a) : i : t ? u.slice(a, a + 2) : (i - 55296 << 10) + (s - 56320) + 65536);
-      };
-    };
-  }, function (t, e, n) {
-    var r = n(24),
-        o = Math.max,
-        i = Math.min;t.exports = function (t, e) {
-      return t = r(t), t < 0 ? o(t + e, 0) : i(t, e);
-    };
-  }, function (t, e, n) {
-    var r = n(24),
-        o = Math.min;t.exports = function (t) {
-      return t > 0 ? o(r(t), 9007199254740991) : 0;
-    };
-  }, function (t, e, n) {
-    "use strict";
-    var r = n(54),
-        o = n(62),
-        i = n(18),
-        s = n(5);t.exports = n(34)(Array, "Array", function (t, e) {
-      this._t = s(t), this._i = 0, this._k = e;
-    }, function () {
-      var t = this._t,
-          e = this._k,
-          n = this._i++;return !t || n >= t.length ? (this._t = void 0, o(1)) : "keys" == e ? o(0, n) : "values" == e ? o(0, t[n]) : o(0, [n, t[n]]);
-    }, "values"), i.Arguments = i.Array, r("keys"), r("values"), r("entries");
-  }, function (t, e, n) {
-    var r = n(12);r(r.S + r.F * !n(2), "Object", { defineProperty: n(4).f });
-  }, function (t, e, n) {
-    var r = n(40),
-        o = n(10);n(69)("keys", function () {
-      return function (t) {
-        return o(r(t));
-      };
-    });
-  }, function (t, e) {}, function (t, e, n) {
-    "use strict";
-    var r = n(70)(!0);n(34)(String, "String", function (t) {
-      this._t = String(t), this._i = 0;
-    }, function () {
-      var t,
-          e = this._t,
-          n = this._i;return n >= e.length ? { value: void 0, done: !0 } : (t = r(e, n), this._i += t.length, { value: t, done: !1 });
-    });
-  }, function (t, e, n) {
-    "use strict";
-    var r = n(1),
-        o = n(3),
-        i = n(2),
-        s = n(12),
-        u = n(39),
-        a = n(64).KEY,
-        c = n(9),
-        l = n(23),
-        f = n(21),
-        p = n(15),
-        d = n(8),
-        h = n(27),
-        v = n(26),
-        y = n(63),
-        b = n(57),
-        g = n(60),
-        m = n(11),
-        x = n(5),
-        w = n(25),
-        S = n(14),
-        O = n(35),
-        _ = n(67),
-        j = n(66),
-        A = n(4),
-        P = n(10),
-        k = j.f,
-        E = A.f,
-        M = _.f,
-        _T = r.Symbol,
-        C = r.JSON,
-        $ = C && C.stringify,
-        F = "prototype",
-        N = d("_hidden"),
-        B = d("toPrimitive"),
-        I = {}.propertyIsEnumerable,
-        L = l("symbol-registry"),
-        z = l("symbols"),
-        D = l("op-symbols"),
-        V = Object[F],
-        R = "function" == typeof _T,
-        H = r.QObject,
-        U = !H || !H[F] || !H[F].findChild,
-        W = i && c(function () {
-      return 7 != O(E({}, "a", { get: function get() {
-          return E(this, "a", { value: 7 }).a;
-        } })).a;
-    }) ? function (t, e, n) {
-      var r = k(V, e);r && delete V[e], E(t, e, n), r && t !== V && E(V, e, r);
-    } : E,
-        J = function J(t) {
-      var e = z[t] = O(_T[F]);return e._k = t, e;
-    },
-        G = R && "symbol" == (0, _typeof3.default)(_T.iterator) ? function (t) {
-      return "symbol" == (typeof t === "undefined" ? "undefined" : (0, _typeof3.default)(t));
-    } : function (t) {
-      return t instanceof _T;
-    },
-        K = function K(t, e, n) {
-      return t === V && K(D, e, n), m(t), e = w(e, !0), m(n), o(z, e) ? (n.enumerable ? (o(t, N) && t[N][e] && (t[N][e] = !1), n = O(n, { enumerable: S(0, !1) })) : (o(t, N) || E(t, N, S(1, {})), t[N][e] = !0), W(t, e, n)) : E(t, e, n);
-    },
-        Y = function Y(t, e) {
-      m(t);for (var n, r = b(e = x(e)), o = 0, i = r.length; i > o;) {
-        K(t, n = r[o++], e[n]);
-      }return t;
-    },
-        Z = function Z(t, e) {
-      return void 0 === e ? O(t) : Y(O(t), e);
-    },
-        Q = function Q(t) {
-      var e = I.call(this, t = w(t, !0));return !(this === V && o(z, t) && !o(D, t)) && (!(e || !o(this, t) || !o(z, t) || o(this, N) && this[N][t]) || e);
-    },
-        q = function q(t, e) {
-      if (t = x(t), e = w(e, !0), t !== V || !o(z, e) || o(D, e)) {
-        var n = k(t, e);return !n || !o(z, e) || o(t, N) && t[N][e] || (n.enumerable = !0), n;
-      }
-    },
-        X = function X(t) {
-      for (var e, n = M(x(t)), r = [], i = 0; n.length > i;) {
-        o(z, e = n[i++]) || e == N || e == a || r.push(e);
-      }return r;
-    },
-        tt = function tt(t) {
-      for (var e, n = t === V, r = M(n ? D : x(t)), i = [], s = 0; r.length > s;) {
-        !o(z, e = r[s++]) || n && !o(V, e) || i.push(z[e]);
-      }return i;
-    };R || (_T = function T() {
-      if (this instanceof _T) throw TypeError("Symbol is not a constructor!");var t = p(arguments.length > 0 ? arguments[0] : void 0),
-          e = function e(n) {
-        this === V && e.call(D, n), o(this, N) && o(this[N], t) && (this[N][t] = !1), W(this, t, S(1, n));
-      };return i && U && W(V, t, { configurable: !0, set: e }), J(t);
-    }, u(_T[F], "toString", function () {
-      return this._k;
-    }), j.f = q, A.f = K, n(36).f = _.f = X, n(20).f = Q, n(37).f = tt, i && !n(19) && u(V, "propertyIsEnumerable", Q, !0), h.f = function (t) {
-      return J(d(t));
-    }), s(s.G + s.W + s.F * !R, { Symbol: _T });for (var et = "hasInstance,isConcatSpreadable,iterator,match,replace,search,species,split,toPrimitive,toStringTag,unscopables".split(","), nt = 0; et.length > nt;) {
-      d(et[nt++]);
-    }for (var et = P(d.store), nt = 0; et.length > nt;) {
-      v(et[nt++]);
-    }s(s.S + s.F * !R, "Symbol", { "for": function _for(t) {
-        return o(L, t += "") ? L[t] : L[t] = _T(t);
-      }, keyFor: function keyFor(t) {
-        if (G(t)) return y(L, t);throw TypeError(t + " is not a symbol!");
-      }, useSetter: function useSetter() {
-        U = !0;
-      }, useSimple: function useSimple() {
-        U = !1;
-      } }), s(s.S + s.F * !R, "Object", { create: Z, defineProperty: K, defineProperties: Y, getOwnPropertyDescriptor: q, getOwnPropertyNames: X, getOwnPropertySymbols: tt }), C && s(s.S + s.F * (!R || c(function () {
-      var t = _T();return "[null]" != $([t]) || "{}" != $({ a: t }) || "{}" != $(Object(t));
-    })), "JSON", { stringify: function stringify(t) {
-        if (void 0 !== t && !G(t)) {
-          for (var e, n, r = [t], o = 1; arguments.length > o;) {
-            r.push(arguments[o++]);
-          }return e = r[1], "function" == typeof e && (n = e), !n && g(e) || (e = function e(t, _e2) {
-            if (n && (_e2 = n.call(this, t, _e2)), !G(_e2)) return _e2;
-          }), r[1] = e, $.apply(C, r);
-        }
-      } }), _T[F][B] || n(7)(_T[F], B, _T[F].valueOf), f(_T, "Symbol"), f(Math, "Math", !0), f(r.JSON, "JSON", !0);
-  }, function (t, e, n) {
-    n(26)("asyncIterator");
-  }, function (t, e, n) {
-    n(26)("observable");
-  }, function (t, e, n) {
-    n(73);for (var r = n(1), o = n(7), i = n(18), s = n(8)("toStringTag"), u = ["NodeList", "DOMTokenList", "MediaList", "StyleSheetList", "CSSRuleList"], a = 0; a < 5; a++) {
-      var c = u[a],
-          l = r[c],
-          f = l && l.prototype;f && !f[s] && o(f, s, c), i[c] = i.Array;
-    }
-  }, function (t, e, n) {
-    e = t.exports = n(83)(), e.push([t.id, ".v-select{position:relative}.v-select .open-indicator{position:absolute;bottom:6px;right:10px;display:inline-block;cursor:pointer;pointer-events:all;-webkit-transition:all .15s cubic-bezier(1,-.115,.975,.855);transition:all .15s cubic-bezier(1,-.115,.975,.855);-webkit-transition-timing-function:cubic-bezier(1,-.115,.975,.855);transition-timing-function:cubic-bezier(1,-.115,.975,.855);opacity:1;-webkit-transition:opacity .1s;transition:opacity .1s}.v-select.loading .open-indicator{opacity:0}.v-select .open-indicator:before{border-color:rgba(60,60,60,.5);border-style:solid;border-width:.25em .25em 0 0;content:'';display:inline-block;height:10px;width:10px;vertical-align:top;-webkit-transform:rotate(133deg);transform:rotate(133deg);-webkit-transition:all .15s cubic-bezier(1,-.115,.975,.855);transition:all .15s cubic-bezier(1,-.115,.975,.855);-webkit-transition-timing-function:cubic-bezier(1,-.115,.975,.855);transition-timing-function:cubic-bezier(1,-.115,.975,.855)}.v-select.open .open-indicator{bottom:1px}.v-select.open .open-indicator:before{-webkit-transform:rotate(315deg);transform:rotate(315deg)}.v-select .dropdown-toggle{display:block;padding:0;background:none;border:1px solid rgba(60,60,60,.26);border-radius:4px;white-space:normal}.v-select.searchable .dropdown-toggle{cursor:text}.v-select.open .dropdown-toggle{border-bottom:none;border-bottom-left-radius:0;border-bottom-right-radius:0}.v-select>.dropdown-menu{margin:0;width:100%;overflow-y:scroll;border-top:none;border-top-left-radius:0;border-top-right-radius:0}.v-select .selected-tag{color:#333;background-color:#f0f0f0;border:1px solid #ccc;border-radius:4px;height:26px;margin:4px 1px 0 3px;padding:0 .25em;float:left;line-height:1.7em}.v-select .selected-tag .close{float:none;margin-right:0;font-size:20px}.v-select input[type=search],.v-select input[type=search]:focus{display:inline-block;border:none;outline:none;margin:0;padding:0 .5em;width:10em;max-width:100%;background:none;position:relative;box-shadow:none;float:left;clear:none}.v-select input[type=search]:disabled,.v-select li a{cursor:pointer}.v-select .active a{background:rgba(50,50,50,.1);color:#333}.v-select .highlight a,.v-select li:hover>a{background:#f0f0f0;color:#333}.v-select .spinner{opacity:0;position:absolute;top:5px;right:10px;font-size:5px;text-indent:-9999em;overflow:hidden;border-top:.9em solid hsla(0,0%,39%,.1);border-right:.9em solid hsla(0,0%,39%,.1);border-bottom:.9em solid hsla(0,0%,39%,.1);border-left:.9em solid rgba(60,60,60,.45);-webkit-transform:translateZ(0);transform:translateZ(0);-webkit-animation:vSelectSpinner 1.1s infinite linear;animation:vSelectSpinner 1.1s infinite linear;-webkit-transition:opacity .1s;transition:opacity .1s}.v-select.loading .spinner{opacity:1}.v-select .spinner,.v-select .spinner:after{border-radius:50%;width:5em;height:5em}@-webkit-keyframes vSelectSpinner{0%{-webkit-transform:rotate(0deg);transform:rotate(0deg)}to{-webkit-transform:rotate(1turn);transform:rotate(1turn)}}@keyframes vSelectSpinner{0%{-webkit-transform:rotate(0deg);transform:rotate(0deg)}to{-webkit-transform:rotate(1turn);transform:rotate(1turn)}}", ""]);
-  }, function (t, e) {
-    t.exports = function () {
-      var t = [];return t.toString = function () {
-        for (var t = [], e = 0; e < this.length; e++) {
-          var n = this[e];n[2] ? t.push("@media " + n[2] + "{" + n[1] + "}") : t.push(n[1]);
-        }return t.join("");
-      }, t.i = function (e, n) {
-        "string" == typeof e && (e = [[null, e, ""]]);for (var r = {}, o = 0; o < this.length; o++) {
-          var i = this[o][0];"number" == typeof i && (r[i] = !0);
-        }for (o = 0; o < e.length; o++) {
-          var s = e[o];"number" == typeof s[0] && r[s[0]] || (n && !s[2] ? s[2] = n : n && (s[2] = "(" + s[2] + ") and (" + n + ")"), t.push(s));
-        }
-      }, t;
-    };
-  }, function (t, e) {
-    t.exports = ' <div class="dropdown v-select" :class=dropdownClasses> <div v-el:toggle @mousedown.prevent=toggleDropdown class="dropdown-toggle clearfix" type=button> <span class=form-control v-if="!searchable && isValueEmpty"> {{ placeholder }} </span> <span class=selected-tag v-for="option in valueAsArray" track-by=$index> {{ getOptionLabel(option) }} <button v-if=multiple @click=select(option) type=button class=close> <span aria-hidden=true>&times;</span> </button> </span> <input v-el:search :debounce=debounce v-model=search v-show=searchable @keydown.delete=maybeDeleteValue @keyup.esc=onEscape @keydown.up.prevent=typeAheadUp @keydown.down.prevent=typeAheadDown @keyup.enter.prevent=typeAheadSelect @blur="open = false" @focus="open = true" type=search class=form-control :placeholder=searchPlaceholder :style="{ width: isValueEmpty ? \'100%\' : \'auto\' }"> <i v-el:open-indicator role=presentation class=open-indicator></i> <slot name=spinner> <div class=spinner v-show="onSearch && loading">Loading...</div> </slot> </div> <ul v-el:dropdown-menu v-show=open :transition=transition class=dropdown-menu :style="{ \'max-height\': maxHeight }"> <li v-for="option in filteredOptions" track-by=$index :class="{ active: isOptionSelected(option), highlight: $index === typeAheadPointer }" @mouseover="typeAheadPointer = $index"> <a @mousedown.prevent=select(option)> {{ getOptionLabel(option) }} </a> </li> <li transition=fade v-if=!filteredOptions.length class=divider></li> <li transition=fade v-if=!filteredOptions.length class=text-center> <slot name=no-options>Sorry, no matching options.</slot> </li> </ul> </div> ';
-  }, function (t, e, n) {
-    var r, o;n(87), r = n(42), o = n(84), t.exports = r || {}, t.exports.__esModule && (t.exports = t.exports["default"]), o && (("function" == typeof t.exports ? t.exports.options || (t.exports.options = {}) : t.exports).template = o);
-  }, function (t, e, n) {
-    function r(t, e) {
-      for (var n = 0; n < t.length; n++) {
-        var r = t[n],
-            o = f[r.id];if (o) {
-          o.refs++;for (var i = 0; i < o.parts.length; i++) {
-            o.parts[i](r.parts[i]);
-          }for (; i < r.parts.length; i++) {
-            o.parts.push(a(r.parts[i], e));
-          }
-        } else {
-          for (var s = [], i = 0; i < r.parts.length; i++) {
-            s.push(a(r.parts[i], e));
-          }f[r.id] = { id: r.id, refs: 1, parts: s };
-        }
-      }
-    }function o(t) {
-      for (var e = [], n = {}, r = 0; r < t.length; r++) {
-        var o = t[r],
-            i = o[0],
-            s = o[1],
-            u = o[2],
-            a = o[3],
-            c = { css: s, media: u, sourceMap: a };n[i] ? n[i].parts.push(c) : e.push(n[i] = { id: i, parts: [c] });
-      }return e;
-    }function i(t, e) {
-      var n = h(),
-          r = b[b.length - 1];if ("top" === t.insertAt) r ? r.nextSibling ? n.insertBefore(e, r.nextSibling) : n.appendChild(e) : n.insertBefore(e, n.firstChild), b.push(e);else {
-        if ("bottom" !== t.insertAt) throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");n.appendChild(e);
-      }
-    }function s(t) {
-      t.parentNode.removeChild(t);var e = b.indexOf(t);e >= 0 && b.splice(e, 1);
-    }function u(t) {
-      var e = document.createElement("style");return e.type = "text/css", i(t, e), e;
-    }function a(t, e) {
-      var n, r, o;if (e.singleton) {
-        var i = y++;n = v || (v = u(e)), r = c.bind(null, n, i, !1), o = c.bind(null, n, i, !0);
-      } else n = u(e), r = l.bind(null, n), o = function o() {
-        s(n);
-      };return r(t), function (e) {
-        if (e) {
-          if (e.css === t.css && e.media === t.media && e.sourceMap === t.sourceMap) return;r(t = e);
-        } else o();
-      };
-    }function c(t, e, n, r) {
-      var o = n ? "" : r.css;if (t.styleSheet) t.styleSheet.cssText = g(e, o);else {
-        var i = document.createTextNode(o),
-            s = t.childNodes;s[e] && t.removeChild(s[e]), s.length ? t.insertBefore(i, s[e]) : t.appendChild(i);
-      }
-    }function l(t, e) {
-      var n = e.css,
-          r = e.media,
-          o = e.sourceMap;if (r && t.setAttribute("media", r), o && (n += "\n/*# sourceURL=" + o.sources[0] + " */", n += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent((0, _stringify2.default)(o)))) + " */"), t.styleSheet) t.styleSheet.cssText = n;else {
-        for (; t.firstChild;) {
-          t.removeChild(t.firstChild);
-        }t.appendChild(document.createTextNode(n));
-      }
-    }var f = {},
-        p = function p(t) {
-      var e;return function () {
-        return "undefined" == typeof e && (e = t.apply(this, arguments)), e;
-      };
-    },
-        d = p(function () {
-      return (/msie [6-9]\b/.test(window.navigator.userAgent.toLowerCase())
-      );
-    }),
-        h = p(function () {
-      return document.head || document.getElementsByTagName("head")[0];
-    }),
-        v = null,
-        y = 0,
-        b = [];t.exports = function (t, e) {
-      e = e || {}, "undefined" == typeof e.singleton && (e.singleton = d()), "undefined" == typeof e.insertAt && (e.insertAt = "bottom");var n = o(t);return r(n, e), function (t) {
-        for (var i = [], s = 0; s < n.length; s++) {
-          var u = n[s],
-              a = f[u.id];a.refs--, i.push(a);
-        }if (t) {
-          var c = o(t);r(c, e);
-        }for (var s = 0; s < i.length; s++) {
-          var a = i[s];if (0 === a.refs) {
-            for (var l = 0; l < a.parts.length; l++) {
-              a.parts[l]();
-            }delete f[a.id];
-          }
-        }
-      };
-    };var g = function () {
-      var t = [];return function (e, n) {
-        return t[e] = n, t.filter(Boolean).join("\n");
-      };
-    }();
-  }, function (t, e, n) {
-    var r = n(82);"string" == typeof r && (r = [[t.id, r, ""]]);n(86)(r, {});r.locals && (t.exports = r.locals);
-  }]);
-});
-
-},{"babel-runtime/core-js/json/stringify":1,"babel-runtime/core-js/object/create":2,"babel-runtime/core-js/object/define-properties":3,"babel-runtime/core-js/object/define-property":4,"babel-runtime/core-js/object/get-own-property-descriptor":5,"babel-runtime/core-js/object/get-own-property-names":6,"babel-runtime/core-js/object/get-own-property-symbols":7,"babel-runtime/core-js/object/get-prototype-of":8,"babel-runtime/core-js/object/is-extensible":9,"babel-runtime/core-js/object/keys":10,"babel-runtime/core-js/object/prevent-extensions":11,"babel-runtime/helpers/typeof":15}],106:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
 /*!
  * vue-validator v3.0.0-alpha.2 
  * (c) 2016 kazuya kawaguchi
@@ -26622,7 +25569,7 @@ var index = {
 
 module.exports = index;
 
-},{}],107:[function(require,module,exports){
+},{}],81:[function(require,module,exports){
 (function (global){
 /*!
  * Vue.js v1.0.26
@@ -36699,7 +35646,7 @@ setTimeout(function () {
 
 module.exports = Vue;
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],108:[function(require,module,exports){
+},{}],82:[function(require,module,exports){
 var inserted = exports.cache = {}
 
 exports.insert = function (css) {
@@ -36719,7 +35666,7 @@ exports.insert = function (css) {
   return elem
 }
 
-},{}],109:[function(require,module,exports){
+},{}],83:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
@@ -37014,9 +35961,9 @@ exports.default = {
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success><i class=\"fa fa-thumbs-up\">Sucesso!!!</i></div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=col-md-12><button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-article><i class=\"fa fa-plus\"></i> Novo</button></div><br><br><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'title' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'title' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'title')\">Titulo</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'status' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'status' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'status')\">Publicação</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'featured' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'featured' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'featured')\">Destaque</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><th width=75 class=text-center><a @click=openAllContents href=#><span><i data-toggle=tooltip data-placement=left title=\"Ver Conteúdos de todos os Artigos\" class=fa :class=\"{'fa-plus': openContents.length == 0, 'fa-minus': openContents.length > 0}\"></i></span></a><tbody v-for=\"article in articles | filterBy filter.term | orderBy sortColumn sortInverse\"><tr><td>{{ article.title }}<td><button type=submit @click=articleStatus(article.id) class=\"btn btn-xs btn-flat\" :class=\"{ 'btn-info': article.status, 'btn-danger': !article.status }\">{{article.status ? 'Publicado' : 'Pendente'}}</button><td><button type=submit @click=articleFeatures(article.id) class=\"btn btn-xs btn-flat\" :class=\"{ 'btn-info': article.featured, 'btn-danger': !article.featured }\">{{article.featured ? 'Publicado' : 'Pendente'}}</button><td align=left><a data-toggle=modal data-target=#modal-edit-article href=#><i class=\"fa fa-pencil text-primary\" @click=getThisArticle(article.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-article href=#><i class=\"fa fa-trash text-danger\" @click=getThisArticle(article.id)></i></a><td width=75 class=text-center><a @click=\"doOpenContents($event, article.id)\" v-show=\"article.content != ''\" href=#><i data-toggle=tooltip data-placement=left title=\"Ver este conteúdo\" class=fa :class=\"{'fa-plus-square': openContents.indexOf(article.id) == -1, 'fa-minus-square': openContents.indexOf(article.id) > -1}\"></i></a> <i class=\"fa fa-plus-square\" v-show=\"article.content == ''\" style=\"opacity: 0.3\"></i><tr v-show=\"openContents.indexOf(article.id) > -1 && article.content != ''\"><td colspan=6>{{ article.content }}</table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div class=\"modal fade\" id=modal-delete-article tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar</h4></div><div class=modal-body><h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newArticle.name}}</span></h5></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteArticle(newArticle.id) @click=deleteArticle(newArticle.id) type=button class=\"btn btn-danger\">Eliminar</button></div></div></div></div><div id=modal-create-article class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=title placeholder=Titulo v-model=newArticle.title v-validate:title=\"['required']\"> <span class=form-control-feedback></span><p style=color:red v-if=\"$validationew.title.required && $validationew.title.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=content placeholder=Conteúdo... class=\"form-control textarea-content\" rows=5 cols=40 id=content v-model=newArticle.content></textarea></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=form-control v-model=newArticle.category_id v-el:category><option v-for=\"category in categories\" value={{category.id}}>{{category.name}}</select></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=form-control v-model=newArticle.tags v-el:tags multiple><option v-for=\"tag in tags\" value={{tag.id}}>{{tag.name}}</select></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input class=form-control type=file name=articleimage id=articleimage @change=uploadsImages v-el:articleimage></div></div></div></div></form></validator></div><div class=modal-footer><button type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createArticle class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button></div></div></div></div><div id=modal-edit-article class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name v-model=newArticle.name v-validate:name=\"['required']\"> <span class=form-control-feedback></span><p style=color:red v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newArticle.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedArticle(newArticle.id) type=button class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button></div></div></div></div></div>"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success><i class=\"fa fa-thumbs-up\">Sucesso!!!</i></div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=col-md-12><button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-article><i class=\"fa fa-plus\"></i> Novo</button></div><br><br><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'title' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'title' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'title')\">Titulo</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'status' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'status' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'status')\">Publicação</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'featured' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'featured' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'featured')\">Destaque</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><th width=75 class=text-center><a @click=openAllContents href=#><span><i data-toggle=tooltip data-placement=left title=\"Ver Conteúdos de todos os Artigos\" class=fa :class=\"{'fa-plus': openContents.length == 0, 'fa-minus': openContents.length > 0}\"></i></span></a><tbody v-for=\"article in articles | filterBy filter.term | orderBy sortColumn sortInverse\"><tr><td>{{ article.title }}<td><button type=submit @click=articleStatus(article.id) class=\"btn btn-xs btn-flat\" :class=\"{ 'btn-info': article.status, 'btn-danger': !article.status }\">{{article.status ? 'Publicado' : 'Pendente'}}</button><td><button type=submit @click=articleFeatures(article.id) class=\"btn btn-xs btn-flat\" :class=\"{ 'btn-info': article.featured, 'btn-danger': !article.featured }\">{{article.featured ? 'Publicado' : 'Pendente'}}</button><td align=left><a data-toggle=modal data-target=#modal-edit-article href=#><i class=\"fa fa-pencil text-primary\" @click=getThisArticle(article.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-article href=#><i class=\"fa fa-trash text-danger\" @click=getThisArticle(article.id)></i></a><td width=75 class=text-center><a @click=\"doOpenContents($event, article.id)\" v-show=\"article.content != ''\" href=#><i data-toggle=tooltip data-placement=left title=\"Ver este conteúdo\" class=fa :class=\"{'fa-plus-square': openContents.indexOf(article.id) == -1, 'fa-minus-square': openContents.indexOf(article.id) > -1}\"></i></a> <i class=\"fa fa-plus-square\" v-show=\"article.content == ''\" style=\"opacity: 0.3\"></i><tr v-show=\"openContents.indexOf(article.id) > -1 && article.content != ''\"><td colspan=6>{{ article.content }}</table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div class=\"modal fade\" id=modal-delete-article tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar</h4></div><div class=modal-body><h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newArticle.name}}</span></h5></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteArticle(newArticle.id) @click=deleteArticle(newArticle.id) type=button class=\"btn btn-danger\">Eliminar</button></div></div></div></div><div id=modal-create-article class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=title placeholder=Titulo v-model=newArticle.title v-validate:title=\"['required']\"> <span class=form-control-feedback></span><p style=color:red v-if=\"$validationew.title.required && $validationew.title.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=form-control v-model=newArticle.category_id v-el:category><option v-for=\"category in categories\" value={{category.id}}>{{category.name}}</select></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=form-control v-model=newArticle.tags v-el:tags multiple><option v-for=\"tag in tags\" value={{tag.id}}>{{tag.name}}</select></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=content placeholder=Conteúdo... class=\"form-control textarea-content\" rows=5 cols=40 id=content v-model=newArticle.content></textarea></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input class=form-control type=file name=articleimage id=articleimage @change=uploadsImages v-el:articleimage></div></div></div></div></form></validator></div><div class=modal-footer><button type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createArticle class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button></div></div></div></div><div id=modal-edit-article class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name v-model=newArticle.name v-validate:name=\"['required']\"> <span class=form-control-feedback></span><p style=color:red v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newArticle.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedArticle(newArticle.id) type=button class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button></div></div></div></div></div>"
 
-},{"../../../Pagination/src/Component.vue":116,"vueify/lib/insert-css":108}],110:[function(require,module,exports){
+},{"../../../Pagination/src/Component.vue":89,"vueify/lib/insert-css":82}],84:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
@@ -37200,245 +36147,7 @@ exports.default = {
 if (module.exports.__esModule) module.exports = module.exports.default
 ;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success><i class=\"fa fa-thumbs-up\">Sucesso!!!</i></div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=col-md-12><button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-category><i class=\"fa fa-plus\"></i> Novo</button></div><br><br><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'description')\">Descrição</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"category in categories | filterBy filter.term | orderBy sortColumn sortInverse\"><td>{{ category.name }}<td>{{ category.description }}<td align=left><a data-toggle=modal data-target=#modal-edit-category href=#><i class=\"fa fa-pencil text-primary\" @click=getThisCategory(category.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-category href=#><i class=\"fa fa-trash text-danger\" @click=getThisCategory(category.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div class=\"modal fade\" id=modal-delete-category tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar</h4></div><div class=modal-body><h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newCategory.name}}</span></h5></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteCategory(newCategory.id) @click=deleteCategory(newCategory.id) type=button class=\"btn btn-danger\">Eliminar</button></div></div></div></div><div id=modal-create-category class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=\"Nome de Categoria\" v-model=newCategory.name v-validate:name=\"['required']\"> <span class=form-control-feedback></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newCategory.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createCategory class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button></div></div></div></div><div id=modal-edit-category class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name v-model=newCategory.name v-validate:name=\"['required']\"> <span class=form-control-feedback></span><p style=color:red v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newCategory.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedCategory(newCategory.id) type=button class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button></div></div></div></div></div>"
 
-},{"../../../Pagination/src/Component.vue":116,"vueify/lib/insert-css":108}],111:[function(require,module,exports){
-var __vueify_insert__ = require("vueify/lib/insert-css")
-var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _vueSelect = require('vue-select');
-
-var _vueSelect2 = _interopRequireDefault(_vueSelect);
-
-var _Component = require('../../../Pagination/src/Component.vue');
-
-var _Component2 = _interopRequireDefault(_Component);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.default = {
-
-    name: 'show-contract',
-
-    data: function data() {
-        return {
-            selected: null,
-            // options: [],
-
-            newContract: {
-                id: '',
-                place_id: '',
-                trader_id: '',
-                status: '',
-                rate: '',
-                author: '',
-                ending_date: ''
-            },
-
-            contracts: {},
-            places: [],
-            traders: [],
-
-            sortColumn: 'id',
-            sortInverse: 1,
-            filter: {
-                term: ''
-            },
-            pagination: {},
-            success: false
-        };
-    },
-
-
-    // ---------------------------------------------------------------------------------
-
-    ready: function ready() {
-        this.fetchContract(1);
-        this.contractPlace();
-        this.contractTrader();
-        // this.getTraders();
-    },
-
-
-    // ---------------------------------------------------------------------------------
-
-    methods: {
-        // getTraders: function() {
-        //     var self = this;
-        //     // this.options = this.traders.name;
-        //     this.options.push(this.traders.name);
-        // },
-
-        clearField: function clearField() {
-            this.newContract = {
-                id: '',
-                place_id: '',
-                trader_id: '',
-                status: '',
-                rate: '',
-                author: '',
-                ending_date: ''
-            };
-        },
-
-        createContract: function createContract() {
-            var _this = this;
-
-            var contract = this.newContract;
-
-            //Clear form input
-            this.clearField();
-            this.$http.post('http://localhost:8000/api/v1/contracts/', contract).then(function (response) {
-                if (response.status == 200) {
-                    $('#modal-create-contract').modal('hide');
-                    _this.fetchContract();
-                    console.log('correu bem');
-                    var self = _this;
-                    _this.success = true;
-                    setTimeout(function () {
-                        self.success = false;
-                    }, 5000);
-                }
-            }, function (response) {});
-        },
-
-        // --------------------------------------------------------------------------------------------
-
-        fetchContract: function fetchContract(page) {
-            var _this2 = this;
-
-            this.$http.get('http://localhost:8000/api/v1/contracts?page=' + page).then(function (response) {
-                _this2.$set('contracts', response.data.data);
-                _this2.$set('pagination', response.data);
-            }, function (response) {
-                console.log("Ocorreu um erro na operação");
-            });
-        },
-
-        // --------------------------------------------------------------------------------------------
-
-        getThisContract: function getThisContract(id) {
-            var _this3 = this;
-
-            this.$http.get('http://localhost:8000/api/v1/contracts/' + id).then(function (response) {
-                _this3.newContract.id = response.data.id;
-                _this3.newContract.place_id = response.data.place_id;
-                _this3.newContract.trader_id = response.data.trader_id;
-                _this3.newContract.status = response.data.status;
-                _this3.newContract.rate = response.data.rate;
-            }, function (response) {
-                console.log('Error');
-            });
-        },
-
-        // --------------------------------------------------------------------------------------------
-
-        saveEditedContract: function saveEditedContract(id) {
-            var _this4 = this;
-
-            var contract = this.newContract;
-            this.clearField();
-            this.$http.patch('http://localhost:8000/api/v1/contracts/' + id, contract).then(function (response) {
-                if (response.status == 200) {
-                    $('#modal-edit-contract').modal('hide');
-                    // console.log(response.data);
-                    _this4.fetchContract();
-                }
-            }, function (response) {
-                console.log("Ocorreu um erro na operação");
-            });
-        },
-
-        // --------------------------------------------------------------------------------------------
-
-        deleteContract: function deleteContract(id) {
-            var _this5 = this;
-
-            this.$http.delete('http://localhost:8000/api/v1/contracts/' + id).then(function (response) {
-                $('#modal-delete-contract').modal('hide');
-                if (response.status == 200) {
-                    // console.log(response.data);
-                    _this5.fetchContract();
-                }
-            }, function (response) {
-                console.log("Ocorreu um erro na operação");
-            });
-        },
-
-        // -------------------------Metodo de suporte---------------------------------------------------
-        contractTrader: function contractTrader() {
-            var _this6 = this;
-
-            this.$http.get('http://localhost:8000/api/v1/contractTrader').then(function (response) {
-                _this6.$set('traders', response.data);
-                // this.$set('options', response.data.name);
-                // this.options = response.data.items
-            }, function (response) {
-                console.log("Ocorreu um erro na operação");
-            });
-        },
-
-        contractPlace: function contractPlace() {
-            var _this7 = this;
-
-            this.$http.get('http://localhost:8000/api/v1/contractPlace').then(function (response) {
-                _this7.$set('places', response.data);
-            }, function (response) {
-                console.log("Ocorreu um erro na operação");
-            });
-        },
-        // --------------------------------------------------------------------------------------------
-
-        doSort: function doSort(ev, column) {
-            var self = this;
-            ev.preventDefault();
-            self.sortColumn = column;
-            if (self.sortInverse == 1) {
-                self.sortInverse = -1;
-            } else {
-                self.sortInverse = 1;
-            }
-        },
-
-        statusContractsChange: function statusContractsChange(contractStatus) {
-            var _this8 = this;
-
-            var postData = { id: contractStatus };
-            this.$http.post('http://localhost:8000/api/v1/contractStatus/', postData).then(function (response) {
-                if (response.status == 200) {
-                    _this8.fetchContract();
-                }
-            }, function (response) {
-                console.log("Ocorreu um erro na operação");
-            });
-        },
-
-        // --------------------------------------------------------------------------------------------
-
-        // Outros funções
-        navigate: function navigate(page) {
-            this.fetchContract(page);
-        }
-    },
-
-    // ---------------------------------------------------------------------------------
-
-    computed: {},
-
-    // ---------------------------------------------------------------------------------
-
-    components: {
-        'Pagination': _Component2.default,
-        'vSelect': _vueSelect2.default
-    }
-};
-if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success>Contrato Criado com sucesso</div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=row><div class=col-md-12><button @click=clearField class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-contract><i class=\"fa fa-plus\"></i> Novo</button>&nbsp;&nbsp; <a class=\"btn btn-primary btn-flat btn-outline\" href=#><i class=\"fa fa-print\"></i> Imprimir</a></div></div><br><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'place_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'place_id' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'place_id')\">Espaço</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'trader_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'trader_id' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'trader_id')\">Comerciante</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'status' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'status' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'status')\">Estado</a><th class=text-center colspan=3><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"contract in contracts | filterBy filter.term | orderBy sortColumn sortInverse\"><td v-for=\"place in contract.places\">{{ place.name }}<td v-for=\"trader in contract.traders\">{{ trader.name }}<td><button type=submit @click=statusContractsChange(contract.id) class=\"btn btn-xs\" :class=\"{ 'btn-info': contract.status, 'btn-danger': !contract.status }\">{{contract.status ? 'Ativado' : 'Desativado'}}</button><td align=center><a data-toggle=modal data-target=#modal-edit-contract href=#><i class=\"fa fa-pencil text-primary\" @click=getThisContract(contract.id)></i></a><td align=center><a data-toggle=modal data-target=#modal-delete-contract href=#><i class=\"fa fa-trash text-danger\" @click=getThisContract(contract.id)></i></a><td align=center><a href=#><i class=\"fa fa-print text-info\" @click=getThisContract(contract.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div class=\"modal fade\" id=modal-delete-contract tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar contrato</h4></div><div class=modal-body><h1>Eliminar este contrato</h1></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteContract(newContract.id) @click=deleteContract(newContract.id) type=button class=\"btn btn-danger\">Eliminar</button></div></div></div></div><div id=modal-create-contract class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><select class=\"form-control selectpicker\" v-model=newContract.place_id><option value=\"\" selected>Selecione o Espaço<option v-for=\"place in places\" value={{place.id}}>{{place.name}}</select></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><select class=\"selectpicker form-control\" v-model=newContract.trader_id><option value=\"\" selected>Selecione o Comerciante<option v-for=\"trader in traders\" value={{trader.id}}>{{trader.name}}</select></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input v-model=newContract.rate type=number class=form-control placeholder=\"Taxa do contrato\"> <span class=help-block>Introduza o valor do contrato</span></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input v-model=newContract.ending_date type=date class=form-control placeholder=\"Fim do Contrato\"> <span class=help-block>Introduza a data do término do contrato</span></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createContract class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button></div></div></div></div><div id=modal-edit-contract class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar Este contrato</h4></div><div class=modal-body><validator name=validationew><form action=# methods=patch><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><select class=form-control v-model=newContract.place_id><option value=\"\" selected>Selecione o Espaço<option v-for=\"place in places\" value={{place.id}}>{{place.id}}</select></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><select class=form-control v-model=newContract.trader_id><option value=\"\" selected>Selecione o Comerciante<option v-for=\"trader in traders\" value={{trader.id}}>{{trader.name}}</select></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input v-model=newContract.rate type=number class=form-control placeholder=\"Taxa do contrato\"> <span class=help-block>Introduza o valor do contrato</span></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=date class=form-control placeholder=\"Fim do Contrato\"> <span class=help-block>Introduza a data do término do contrato</span></div></div></div></div></form></validator></div><div class=modal-footer><div class=row><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedContract(newContract.id) type=button class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button></div></div></div></div></div></div></div>"
-
-},{"../../../Pagination/src/Component.vue":116,"vue-select":105,"vueify/lib/insert-css":108}],112:[function(require,module,exports){
+},{"../../../Pagination/src/Component.vue":89,"vueify/lib/insert-css":82}],85:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
@@ -37652,7 +36361,7 @@ exports.default = {
 if (module.exports.__esModule) module.exports = module.exports.default
 ;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success>Control adicionado com sucesso</div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=\"Filtrar dados da tabela\" aria-describedby=basic-addon1></div></div></div><hr><div class=col-md-12><button @click=clearField class=\"btn btn-secondary pull-right\" name=button data-toggle=modal data-target=#modal-create-control>Criar Novo</button></div><br><br><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'employee_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'employee_id' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'employee_id')\">Funcionário(a)</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'material_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'material_id' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'material_id')\">Material</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'status' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'status' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'status')\">Estado</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'created_at' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'created_at' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'created_at')\">Data</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"control in controls | filterBy filter.term | orderBy sortColumn sortInverse\"><td v-for=\"emp in control.employees\">{{ emp.name }}<td v-for=\"mat in control.materials\">{{ mat.name }}<td><button :disabled=control.status type=submit @click=statusControlsChange(control.id) class=\"btn btn-xs\" :class=\"{ 'btn-info': control.status, 'btn-danger': !control.status }\">{{control.status ? 'Confirmado' : 'Pendente'}}</button><td>{{ control.created_at }}<td align=left><a data-toggle=modal data-target=#modal-edit-control href=#><i class=\"fa fa-pencil text-primary\" @click=getThisControl(control.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-control href=#><i class=\"fa fa-trash text-danger\" @click=getThisControl(control.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div class=\"modal fade\" id=modal-delete-control tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar Registo</h4></div><div class=modal-body><h1>Eliminar este registo</h1></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteControl(newControl.id) @click=deleteControl(newControl.id) type=button class=\"btn btn-default\">Eliminar control</button></div></div></div></div><div id=modal-create-control class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Criar Registo</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=form-control v-model=newControl.employee_id><option value=\"\" selected>Selecione o funcionario(a)<option v-for=\"employee in employees\" value={{employee.id}}>{{employee.name}}</select></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=form-control v-model=newControl.material_id><option value=\"\" selected>Selecione o material<option v-for=\"material in materials\" value={{material.id}}>{{material.name}}</select></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createControl class=\"btn btn-secondary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar Dados Sobre este control</button></div></div></div></div><div id=modal-edit-control class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar Este control</h4></div><div class=modal-body><validator name=validationew><form action=# methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=form-control v-model=newControl.employee_id><option value=\"\" selected>Selecione o funcionario(a)<option v-for=\"employee in employees\" value={{employee.id}}>{{employee.name}}</select></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=form-control v-model=newControl.material_id><option value=\"\" selected>Selecione o material<option v-for=\"material in materials\" value={{material.id}}>{{material.name}}</select></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedControl(newControl.id) type=button class=\"btn btn-secondary\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp; Salvar as Alterações sobre este control</button></div></div></div></div></div>"
 
-},{"../../../Pagination/src/Component.vue":116,"vueify/lib/insert-css":108}],113:[function(require,module,exports){
+},{"../../../Pagination/src/Component.vue":89,"vueify/lib/insert-css":82}],86:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
@@ -37936,7 +36645,7 @@ exports.default = {
 if (module.exports.__esModule) module.exports = module.exports.default
 ;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success><i class=\"fa fa-thumbs-up\">Sucesso!!</i></div><div class=row><div class=\"pull right col-md-8\"><label class=checkbox-inline><input type=checkbox v-model=showColumn.ic>BI</label><label class=checkbox-inline><input type=checkbox v-model=showColumn.service_beginning>Inicio Serviço</label></div><div class=\"col-md-4 pull-left\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=row><div class=col-md-12><button @click=clearField class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-employee><i class=\"fa fa-plus\"></i> Novo</button>&nbsp;&nbsp; <a class=\"btn btn-primary btn-flat btn-outline\" href=/export/printableEmployeeInformation><i class=\"fa fa-print\"></i> Imprimir</a></div></div><br><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome</a><th class=info v-if=showColumn.ic><i :class=\"{'fa-sort-amount-asc': sortColumn == 'ic' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'ic' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'ic')\">BI</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'phone' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'phone' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'phone')\">Telefone</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'typeofemployee_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'typeofemployee_id' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'typeofemployee_id')\">Tipo</a><th class=info v-if=showColumn.service_beginning><i :class=\"{'fa-sort-amount-asc': sortColumn == 'service_beginning' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'service_beginning' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'service_beginning')\">Inicio de Serviço</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"employee in employees | filterBy filter.term | orderBy sortColumn sortInverse\"><td><a href=# data-toggle=modal data-target=#show-employee @click=getThisEmployee(employee.id)>{{ employee.name }}</a><td class=info v-if=showColumn.ic>{{ employee.ic }}<td>{{ employee.phone }}<td>{{ employee.typeofemployees.name }}<td class=info v-if=showColumn.service_beginning>{{ employee.service_beginning }}<td align=left><a data-toggle=modal data-target=#modal-edit-employee href=#><i class=\"fa fa-pencil text-primary\" @click=getThisEmployee(employee.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-employee href=#><i class=\"fa fa-trash text-danger\" @click=getThisEmployee(employee.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div id=show-employee class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Detalhes do(a) {{ newEmployee.name }}</h4></div><div class=modal-body><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover\"><thead><tr><th class=text-center colspan=2>INFORMAÇOES DO FUNCIONÁRIO<tbody><tr><td><b>ID</b><td><i>{{ newEmployee.id }}</i><tr><td><b>Nome</b><td><i>{{ newEmployee.name }}</i><tr><td><b>BI</b><td><span class=\"label label-info\"><i>{{ newEmployee.ic }}</i></span><tr><td><b>Idade</b><td><i>{{ newEmployee.age }}</i><tr><td><b>Sexo</b><td><i>{{ alterGenderValue(newEmployee.gender) }}</i><tr><td><b>Email</b><td><span class=\"label label-info\"><i>{{ newEmployee.email }}</i></span><tr><td><b>Ilha</b><td><i>{{ alterStateValue(newEmployee.state) }}</i><tr><td><b>Concelho</b><td><i>{{ newEmployee.council }}</i><tr><td><b>Freguesia</b><td><i>{{ newEmployee.parish }}</i><tr><td><b>Zona</b><td><i>{{ newEmployee.zone }}</i><tr><td><b>Telefone</b><td><span class=label :class=\"{ 'label-info': newEmployee.phone, 'none': !newEmployee.phone }\"><i>{{ newEmployee.phone }}</i></span><tr><td><b>Escalão</b><td><i>{{ newEmployee.echelon }}</i><tr><td><b>Descrição</b><td><i>{{ newEmployee.description }}</i><tr><td><b>Data da criação</b><td><i>{{ employee.created_at | formatDate 'DD/MM/YYYY' }}</i><tr><td><b>Data de atualização</b><td><i>{{ employee.updated_at | formatDate 'DD/MM/YYYY' }}</i></table></div></div></div></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-success\" data-dismiss=modal><i class=\"fa fa-check\"></i></button></div></div></div></div><div class=\"modal fade\" id=modal-delete-employee tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar</h4></div><div class=modal-body><h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newEmployee.name}}</span></h5></div><div class=modal-footer><button type=button class=\"btn btn-secondary\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteEmployee(newEmployee.id) @click=deleteEmployee(newEmployee.id) type=button class=\"btn btn-danger\">Eliminar</button></div></div></div></div><div id=modal-create-employee class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-8><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=Nome v-model=newEmployee.name v-validate:name=\"['required']\"> <span class=\"fa fa-user form-control-feedback\"></span></div></div><div class=col-md-4><div class=\"form-group has-feedback\"><input type=number class=form-control name=ic placeholder=\"Número BI\" v-model=newEmployee.ic> <span class=\"fa fa-id-card form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-8><div class=\"form-group has-feedback\"><input type=email class=form-control name=email placeholder=Email v-model=newEmployee.email> <span class=\"fa fa-envelope form-control-feedback\"></span></div></div><div class=col-md-4><div class=\"form-group has-feedback\"><input type=number class=form-control name=phone placeholder=Telefone v-model=newEmployee.phone> <span class=\"fa fa-phone form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-2><div class=\"form-group has-feedback\"><label class=radio-inline><input type=radio id=gender value=M name=gender v-model=newEmployee.gender> <i class=\"fa fa-male\"></i></label><label class=radio-inline><input type=radio id=gender name=gender value=F v-model=newEmployee.gender><i class=\"fa fa-female\"></i></label></div></div><div class=\"col-md-10 pull-right\"><div class=\"form-group has-feedback\"><input type=number class=form-control name=age placeholder=Idade v-model=newEmployee.age> <span class=\"fa fa-birthday-cake form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><select name=state class=\"selectpicker form-control show-tick\" v-model=newEmployee.state><optgroup label=Sotavento><option>Selecione Ilha<option value=2>Maio<option value=1>Santiago<option value=3>Fogo<option value=4>Brava<optgroup label=Barlavento><option value=5>Santo Antão<option value=6>São Nicolau<option value=7>São Vicente<option value=8>Sal<option value=9>Boa Vista</select></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=council placeholder=Concelho v-model=newEmployee.council> <span class=\"fa fa-compass form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=parish placeholder=Freguezia v-model=newEmployee.parish> <span class=\"fa fa-map-marker form-control-feedback\"></span></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=zone placeholder=Zona v-model=newEmployee.zone> <span class=\"fa fa-thumb-tack form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input type=date class=form-control name=service_beginning placeholder=\"Inicio de serviço\" v-model=newEmployee.service_beginning> <span class=\"fa fa-calendar form-control-feedback\"></span><p class=text-help>Data de inicio de serviço</div></div><div class=col-md-6><div class=\"form-group has-feedback\"><select name=type class=\"selectpicker form-control\" title=Escalão v-model=newEmployee.echelon><option value=a>A<option value=b>B<option value=c>C<option value=d>D<option value=e>E</select></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><select class=form-control v-model=newEmployee.typeofemployee_id><option value=\"\" selected>Tipo de funcionário<option v-for=\"type in types\" value={{type.id}}>{{type.name}}</select></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><select class=form-control v-model=newEmployee.markets multiple><option value=\"\" selected>Mercado<option v-for=\"market in markets\" value={{market.id}}>{{market.name}}</select></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newEmployee.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createEmployee class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button><label v-if=!newTrader.get_password class=\"checkbox-inline pull-left\"><input data-toggle=modal data-target=#getAcountForEmployee type=checkbox v-model=newTrader.get_email>Obter uma conta</label><p v-if=newTrader.get_password class=\"text-help text-success pull-left\">Funcionário Terá uma conta no SAGMMA</div></div></div></div><div class=\"modal fade\" id=getAcountForEmployee tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button @click=clearField class=close data-dismiss=modal aria-hidden=true>&times;</button><h5 class=modal-title>Introduza a palavra passe para a conta pretendida</h5></div><div class=modal-body><div class=\"form-group has-feedback\"><input type=password name=get_password class=\"form-control input-lg\" placeholder=\"Introduza a palavra passe\" v-model=newEmployee.get_password> <span class=\"fa fa-lock form-control-feedback\"></span></div></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-close\"></i></button> <button :disabled=!newEmployee.get_password type=button class=\"btn btn-primary\" data-dismiss=modal><i class=\"fa fa-check\"></i></button></div></div></div></div><div id=modal-edit-employee class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-8><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=Nome v-model=newEmployee.name v-validate:name=\"['required']\"> <span class=\"fa fa-user form-control-feedback\"></span></div></div><div class=col-md-4><div class=\"form-group has-feedback\"><input type=number class=form-control name=ic placeholder=\"Número BI\" v-model=newEmployee.ic> <span class=\"fa fa-id-card form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-8><div class=\"form-group has-feedback\"><input type=email class=form-control name=email placeholder=Email v-model=newEmployee.email> <span class=\"fa fa-envelope form-control-feedback\"></span></div></div><div class=col-md-4><div class=\"form-group has-feedback\"><input type=number class=form-control name=phone placeholder=Telefone v-model=newEmployee.phone> <span class=\"fa fa-phone form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-2><div class=\"form-group has-feedback\"><label class=radio-inline><input type=radio id=gender value=M name=gender v-model=newEmployee.gender> <i class=\"fa fa-male\"></i></label><label class=radio-inline><input type=radio id=gender name=gender value=F v-model=newEmployee.gender><i class=\"fa fa-female\"></i></label></div></div><div class=\"col-md-10 pull-right\"><div class=\"form-group has-feedback\"><input type=number class=form-control name=age placeholder=Idade v-model=newEmployee.age> <span class=\"fa fa-birthday-cake form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><select name=state class=\"selectpicker form-control show-tick\" v-model=newEmployee.state><optgroup label=Sotavento><option>Selecione Ilha<option value=2>Maio<option value=1>Santiago<option value=3>Fogo<option value=4>Brava<optgroup label=Barlavento><option value=5>Santo Antão<option value=6>São Nicolau<option value=7>São Vicente<option value=8>Sal<option value=9>Boa Vista</select></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=council placeholder=Concelho v-model=newEmployee.council> <span class=\"fa fa-compass form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=parish placeholder=Freguezia v-model=newEmployee.parish> <span class=\"fa fa-map-marker form-control-feedback\"></span></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=zone placeholder=Zona v-model=newEmployee.zone> <span class=\"fa fa-thumb-tack form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input type=date class=form-control name=service_beginning placeholder=\"Inicio de serviço\" v-model=newEmployee.service_beginning> <span class=\"fa fa-calendar form-control-feedback\"></span><p class=text-help>Data de inicio de serviço</div></div><div class=col-md-6><div class=\"form-group has-feedback\"><select name=type class=\"selectpicker form-control\" title=Escalão v-model=newEmployee.echelon><option value=a>A<option value=b>B<option value=c>C<option value=d>D<option value=e>E</select></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=form-control v-model=newEmployee.typeofemployee_id><option value=\"\" selected>Tipo de funcionário<option v-for=\"type in types\" value={{type.id}}>{{type.name}}</select></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=\"Descrição do utilizador\" class=form-control rows=5 cols=40 id=description v-model=newEmployee.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedEmployee(newEmployee.id) type=button class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button></div></div></div></div></div></div>"
 
-},{"../../../Pagination/src/Component.vue":116,"vueify/lib/insert-css":108}],114:[function(require,module,exports){
+},{"../../../Pagination/src/Component.vue":89,"vueify/lib/insert-css":82}],87:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
@@ -38125,7 +36834,7 @@ exports.default = {
 if (module.exports.__esModule) module.exports = module.exports.default
 ;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success>Mercado Criado Com Sucesso</div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=col-md-12><button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-market><i class=\"fa fa-plus\"></i> Novo</button></div><br><br><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-success\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'location' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'location' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'location')\">Localização</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"market in markets | filterBy filter.term | orderBy sortColumn sortInverse\"><td><a href=# data-toggle=modal data-target=#show-market @click=getThisMarket(market.id)>{{ market.name }}</a><td>{{ market.location }}<td align=left><a data-toggle=modal data-target=#modal-edit-market href=#><i class=\"fa fa-pencil text-primary\" @click=getThisMarket(market.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-market href=#><i class=\"fa fa-trash text-danger\" @click=getThisMarket(market.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div id=show-market class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Detalhes do {{ newMarket.name }}</h4></div><div class=modal-body><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover\"><thead><tr><th class=text-center colspan=2>INFORMAÇOES DO MERCADO<tbody><tr><td><b>ID</b><td><i>{{ newMarket.id }}</i><tr><td><b>Nome</b><td><i>{{ newMarket.name }}</i><tr><td><b>Localização</b><td><span class=\"label label-info\"><i>{{ newMarket.location }}</i></span><tr><td><b>Descrição</b><td><i>{{ newMarket.description }}</i><tr><td><b>Data da criação</b><td><i>{{ market.created_at | formatDate 'DD/MM/YYYY' }}</i><tr><td><b>Data de atualização</b><td><i>{{ market.updated_at | formatDate 'DD/MM/YYYY' }}</i></table></div></div></div></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-primary\" data-dismiss=modal><i class=\"fa fa-check\"></i></button></div></div></div></div><div class=\"modal fade\" id=modal-delete-market tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar</h4></div><div class=modal-body><h5>Eliminar - <span class=text-uppercase>{{newMarket.name}}</span></h5></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteMarket(newMarket.id) @click=deleteMarket(newMarket.id) type=button class=\"btn btn-danger\">Eliminar Mercado</button></div></div></div></div><div id=modal-create-market class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar Mercado</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=\"Nome do Mercado\" v-model=newMarket.name v-validate:name=\"['required']\"> <span class=\"fa fa-university form-control-feedback\"></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=location placeholder=Localização v-model=newMarket.location v-validate:location=\"['required']\"> <span class=\"fa fa-thumb-tack form-control-feedback\"></span><p style=color:red v-if=\"$validationew.location.required && $validationew.location.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=\"Descrição do Mercado\" class=form-control rows=5 cols=40 id=description v-model=newMarket.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><div class=col-md-12><div class=col-md-12><button type=button class=\"btn btn-outline-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createMarket class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button></div></div></div></div></div></div><div id=modal-edit-market class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar Mercado</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name v-model=newMarket.name v-validate:name=\"['required']\"> <span class=\"fa fa-university form-control-feedback\"></span><p style=color:red v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=location v-model=newMarket.location v-validate:location=\"['required']\"> <span class=\"fa fa-thumb-tack form-control-feedback\"></span><p style=color:red v-if=\"$validation1.location.required && $validation1.location.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=\"Descrição do Mescado\" class=form-control rows=5 cols=40 id=description v-model=newMarket.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button v-on:show=\"\" @click=saveEditedMarket(newMarket.id) type=button class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button></div></div></div></div></div>"
 
-},{"../../../Pagination/src/Component.vue":116,"vueify/lib/insert-css":108}],115:[function(require,module,exports){
+},{"../../../Pagination/src/Component.vue":89,"vueify/lib/insert-css":82}],88:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
@@ -38313,7 +37022,7 @@ exports.default = {
 if (module.exports.__esModule) module.exports = module.exports.default
 ;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success>Material adicionado com sucesso</div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=row><div class=col-md-12><button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-material><i class=\"fa fa-plus\"></i> Novo</button></div></div><br><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-success\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'description')\">Descrição</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"material in materials | filterBy filter.term | orderBy sortColumn sortInverse\"><td>{{ material.name }}<td>{{ material.description }}<td align=left><a data-toggle=modal data-target=#modal-edit-material href=#><i class=\"fa fa-pencil text-primary\" @click=getThisMaterial(material.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-material href=#><i class=\"fa fa-trash text-danger\" @click=getThisMaterial(material.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div class=\"modal fade\" id=modal-delete-material tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar</h4></div><div class=modal-body><h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newMaterial.name}}</span></h5></div><div class=modal-footer><button type=button class=\"btn btn-secondary\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteMaterial(newMaterial.id) @click=deleteMaterial(newMaterial.id) type=button class=\"btn btn-danger\">Eliminar</button></div></div></div></div><div id=modal-create-material class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=\"Nome do  material\" v-model=newMaterial.name v-validate:name=\"['required']\"> <span class=\"fa fa-circle form-control-feedback\"></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=\"Descrição deste Mescado\" class=form-control rows=5 cols=40 id=description v-model=newMaterial.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createMaterial class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp; Guardar</button></div></div></div></div><div id=modal-edit-material class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name v-model=newMaterial.name v-validate:name=\"['required']\"> <span class=\"fa fa-circle form-control-feedback\"></span><p style=color:red v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=\"Descrição deste Mescado\" class=form-control rows=5 cols=40 id=description v-model=newMaterial.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedMaterial(newMaterial.id) type=button class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button></div></div></div></div></div></div>"
 
-},{"../../../Pagination/src/Component.vue":116,"vueify/lib/insert-css":108}],116:[function(require,module,exports){
+},{"../../../Pagination/src/Component.vue":89,"vueify/lib/insert-css":82}],89:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
@@ -38452,7 +37161,7 @@ exports.default = {
 if (module.exports.__esModule) module.exports = module.exports.default
 ;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<nav aria-label=\"Page navigation\"><ul class=pagination><li :class=\"{ disabled: source.current_page == 1}\" v-if=\"!(source.current_page == 1)\"><a href=# aria-label=Previous @click=\"nextPrev($event, source.current_page-1)\"><span aria-hidden=true>&laquo;</span></a><li v-for=\"page in pages\" track-by=$index :class=\"{ active: source.current_page == page }\"><span id=sear v-if=\"page == '...'\">{{ page }}</span> <a v-if=\"page != '...'\" href=# @click=\"navigate($event, page)\">{{ page }}</a><li :class=\"{ disabled: source.current_page == this.source.last_page}\" v-if=\"!(source.current_page == this.source.last_page)\"><a href=# aria-label=Next @click=\"nextPrev($event, source.current_page+1)\"><span aria-hidden=true>&raquo;</span></a></ul></nav>"
 
-},{"vueify/lib/insert-css":108}],117:[function(require,module,exports){
+},{"vueify/lib/insert-css":82}],90:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
@@ -38643,7 +37352,7 @@ exports.default = {
 if (module.exports.__esModule) module.exports = module.exports.default
 ;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success>Permissão Adicionado com sucesso</div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=\"Filtrar dados da tabela\" aria-describedby=basic-addon1></div></div></div><hr><div class=row><div class=col-md-12><button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-permission><i class=\"fa fa-plus\"></i> Novo</button></div></div><br><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome da Permissão</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'display_name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'display_name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'display_name')\">Label</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'description')\">Descriçãos</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"permission in permissions | filterBy filter.term | orderBy sortColumn sortInverse\"><td>{{ permission.name }}<td>{{ permission.display_name }}<td>{{ permission.description }}<td align=left><a data-toggle=modal data-target=#modal-edit-permission href=#><i class=\"fa fa-pencil text-primary\" @click=getThisPermission(permission.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-permission href=#><i class=\"fa fa-trash text-danger\" @click=getThisPermission(permission.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div class=\"modal fade\" id=modal-delete-permission tabindex=-1 permission=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar Permissão</h4></div><div class=modal-body><h1>Eliminar Permissão {{newPermission.name}}</h1></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deletePermission(newPermission.id) @click=deletePermission(newPermission.id) type=button class=\"btn btn-default\">Eliminar Permissão</button></div></div></div></div><div id=modal-create-permission class=\"modal fade\" permission=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar permission</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=\"Nome da permissão no sistema\" v-model=newPermission.name v-validate:name=\"['required']\"> <span class=\"fa fa-hand-stop-o form-control-feedback\"></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=display_name placeholder=\"Nome da permissão a ser vizualizado\" v-model=newPermission.display_name v-validate:display_name=\"['required']\"> <span class=\"fa fa-eye form-control-feedback\"></span><p style=color:red v-if=\"$validationew.display_name.required && $validationew.display_name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=\"Descrião da permissão...\" class=form-control rows=5 cols=40 id=description v-model=newPermission.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createPermission class=\"btn btn-secondary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar Registo</button></div></div></div></div><div id=modal-edit-permission class=\"modal fade\" permission=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar Esta função</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name v-model=newPermission.name v-validate:name=\"['required']\"> <span class=\"glyphicon glyphicon-user form-control-feedback\"></span><p style=color:red v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=display_name v-model=newPermission.display_name v-validate:display_name=\"['required']\"> <span class=\"glyphicon glyphicon-user form-control-feedback\"></span><p style=color:red v-if=\"$validation1.display_name.required && $validation1.display_name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=\"Descrição desta função\" class=form-control rows=5 cols=40 id=description v-model=newPermission.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedPermission(newPermission.id) type=button class=\"btn btn-secondary\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp; Salvar as Alterações sobre esta função</button></div></div></div></div></div></div>"
 
-},{"../../../Pagination/src/Component.vue":116,"vueify/lib/insert-css":108}],118:[function(require,module,exports){
+},{"../../../Pagination/src/Component.vue":89,"vueify/lib/insert-css":82}],91:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
@@ -38857,7 +37566,7 @@ exports.default = {
 if (module.exports.__esModule) module.exports = module.exports.default
 ;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success><i class=\"fa fa-thumbs-up\">Sucesso!!</i></div><div class=row><div class=\"pull right col-md-8\"><label class=checkbox-inline><input type=checkbox v-model=showColumn.price>Valor</label><label class=checkbox-inline><input type=checkbox v-model=showColumn.typeofplace_id>Tipo</label></div><div class=\"col-md-4 pull-left\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=row><div class=col-md-12><button @click=clearField class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-place><i class=\"fa fa-plus\"></i> Novo</button>&nbsp;&nbsp; <a class=\"btn btn-primary btn-flat btn-outline\" href=/export/printablePlaceInformation><i class=\"fa fa-print\"></i> Imprimir</a></div></div><br><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome</a><th class=info v-if=showColumn.price><i :class=\"{'fa-sort-amount-asc': sortColumn == 'price' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'price' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'price')\">Valor</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'status' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'status' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'status')\">Estado</a><th class=info v-if=showColumn.typeofplace_id><i :class=\"{'fa-sort-amount-asc': sortColumn == 'typeofplace_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'typeofplace_id' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'typeofplace_id')\">Tipo</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"place in places | filterBy filter.term | orderBy sortColumn sortInverse\"><td><a href=# data-toggle=modal data-target=#show-place @click=getThisPlace(place.id)>{{ place.name }}</a><td class=info v-if=showColumn.price>{{ place.price }} ECV<td><button type=submit @click=placeStatus(place.id) class=\"btn btn-xs btn-flat\" :class=\"{ 'btn-info': place.status, 'btn-danger': !place.status }\">{{place.status ? 'Ativado' : 'Disativado'}}</button><td class=info v-if=showColumn.typeofplace_id>{{ place.typeofplace.name }}<td align=left><a data-toggle=modal data-target=#modal-edit-place href=#><i class=\"fa fa-pencil text-primary\" @click=getThisPlace(place.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-place href=#><i class=\"fa fa-trash text-danger\" @click=getThisPlace(place.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div id=show-place class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Detalhes do {{ newPlace.name }}</h4></div><div class=modal-body><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover\"><thead><tr><th class=text-center colspan=2>INFORMAÇOES DO FUNCIONÁRIO<tbody><tr><td><b>ID</b><td><i>{{ newPlace.id }}</i><tr><td><b>Nome</b><td><i>{{ newPlace.name }}</i><tr><td><b>Demensão</b><td><i>{{ newPlace.dimension }} mm</i><tr><td><b>Valor</b><td><span class=\"label label-info\"><i>{{ newPlace.price }} ECV</i></span><tr><td><b>Estado</b><td><span class=label :class=\"{ 'label-info': newPlace.status, 'label-danger': !newPlace.status }\"><i>{{newPlace.status ? 'Ativado' : 'Disativado'}}</i></span><tr><td><b>Descrição</b><td><i>{{ newPlace.description }}</i><tr><td><b>Data da criação</b><td><i>{{ place.created_at | formatDate 'DD/MM/YYYY' }}</i><tr><td><b>Data de atualização</b><td><i>{{ place.updated_at | formatDate 'DD/MM/YYYY' }}</i></table></div></div></div></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-success\" data-dismiss=modal><i class=\"fa fa-check\"></i></button></div></div></div></div><div class=\"modal fade\" id=modal-delete-place tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar</h4></div><div class=modal-body><h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newPlace.name}}</span></h5></div><div class=modal-footer><button type=button class=\"btn btn-secondary\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deletePlace(newPlace.id) @click=deletePlace(newPlace.id) type=button class=\"btn btn-danger\">Eliminar</button></div></div></div></div><div id=modal-create-place class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=Nome v-model=newPlace.name v-validate:name=\"['required']\"> <span class=\"fa fa-map-pin form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=form-control v-model=newPlace.typeofplace_id><option value=\"\" selected>Tipo de Espaço<option v-for=\"type in types\" value={{type.id}}>{{type.name}}</select></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input :disabled=\"newPlace.typeofplace_id == 7\" type=number class=form-control name=price placeholder=Valor v-model=newPlace.price> <span class=\"fa fa-usd form-control-feedback\"></span></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input :disabled=\"newPlace.typeofplace_id == 7\" type=number class=form-control name=dimension placeholder=Dimensão v-model=newPlace.dimension> <span class=form-control-feedback>mm</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newPlace.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createPlace class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button></div></div></div></div><div id=modal-edit-place class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=Nome v-model=newPlace.name v-validate:name=\"['required']\"> <span class=\"fa fa-user form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input type=number class=form-control name=price placeholder=Valor v-model=newPlace.price> <span class=\"fa fa-envelope form-control-feedback\"></span></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=number class=form-control name=dimension placeholder=Dimensão v-model=newPlace.dimension> <span class=\"fa fa-phone form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=form-control v-model=newPlace.typeofplace_id><option value=\"\" selected>Tipo de Espaço<option v-for=\"type in types\" value={{type.id}}>{{type.name}}</select></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newPlace.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedPlace(newPlace.id) type=button class=\"btn btn-secondary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button></div></div></div></div></div></div>"
 
-},{"../../../Pagination/src/Component.vue":116,"vueify/lib/insert-css":108}],119:[function(require,module,exports){
+},{"../../../Pagination/src/Component.vue":89,"vueify/lib/insert-css":82}],92:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
@@ -39055,7 +37764,7 @@ exports.default = {
 if (module.exports.__esModule) module.exports = module.exports.default
 ;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success><i class=\"fa fa-thumbs-up\">Sucesso!!</i></div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=row><div class=col-md-12><button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-product><i class=\"fa fa-plus\"></i> Novo</button></div></div><br><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-success\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'price' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'price' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'price')\">Preço</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'description')\">Descrição</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"product in products | filterBy filter.term | orderBy sortColumn sortInverse\"><td><a href=# data-toggle=modal data-target=#show-product @click=getThisProduct(product.id)>{{ product.name }}</a><td>{{ product.price }}<td>{{ product.description }}<td align=left><a data-toggle=modal data-target=#modal-edit-product href=#><i class=\"fa fa-pencil text-primary\" @click=getThisProduct(product.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-product href=#><i class=\"fa fa-trash text-danger\" @click=getThisProduct(product.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div id=show-product class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Detalhes do {{ newProduct.name }}</h4></div><div class=modal-body><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover\"><thead><tr><th class=text-center colspan=2>INFORMAÇOES DO PRODUTO<tbody><tr><td><b>ID</b><td><i>{{ newProduct.id }}</i><tr><td><b>Nome</b><td><i>{{ newProduct.name }}</i><tr><td><b>Preço</b><td><span class=\"label label-info\"><i>{{ newProduct.price }}</i></span><tr><td><b>Responsável</b><td><i>{{ newProduct.author }}</i><tr><td><b>Descrição</b><td><i>{{ newProduct.description }}</i><tr><td><b>Data da criação</b><td><i>{{ product.created_at | formatDate 'DD/MM/YYYY' }}</i><tr><td><b>Data de atualização</b><td><i>{{ product.updated_at | formatDate 'DD/MM/YYYY' }}</i></table></div></div></div></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-primary\" data-dismiss=modal><i class=\"fa fa-check\"></i></button></div></div></div></div><div class=\"modal fade\" id=modal-delete-product tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar</h4></div><div class=modal-body><h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newProduct.name}}</span></h5></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteProduct(newProduct.id) @click=deleteProduct(newProduct.id) type=button class=\"btn btn-danger\">Eliminar</button></div></div></div></div><div id=modal-create-product class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=Nome v-model=newProduct.name v-validate:name=\"['required']\"> <span class=\"fa fa-shopping-basket form-control-feedback\"></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=number class=form-control name=price placeholder=Preço v-model=newProduct.price v-validate:price=\"['required']\"> <span class=\"fa fa-usd form-control-feedback\">00</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newProduct.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createProduct class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button></div></div></div></div><div id=modal-edit-product class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=Nome v-model=newProduct.name v-validate:name=\"['required']\"> <span class=\"fa fa-shopping-basket form-control-feedback\"></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=number class=form-control name=price placeholder=Preço v-model=newProduct.price v-validate:name=\"['required']\"> <span class=\"fa fa-usd form-control-feedback\">00</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newProduct.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedProduct(newProduct.id) type=button class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button></div></div></div></div></div></div>"
 
-},{"../../../Pagination/src/Component.vue":116,"babel-runtime/helpers/defineProperty":14,"vueify/lib/insert-css":108}],120:[function(require,module,exports){
+},{"../../../Pagination/src/Component.vue":89,"babel-runtime/helpers/defineProperty":5,"vueify/lib/insert-css":82}],93:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
@@ -39284,7 +37993,7 @@ exports.default = {
 if (module.exports.__esModule) module.exports = module.exports.default
 ;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success><i class=\"fa fa-thumbs-up\">Sucesso!!</i></div><div class=row><div class=\"pull right col-md-8\"><label class=checkbox-inline><input type=checkbox v-model=showColumn.begnning_date>Início</label><label class=checkbox-inline><input type=checkbox v-model=showColumn.ending_date>Término</label><label class=checkbox-inline><input type=checkbox v-model=showColumn.trader_id>Comerciante</label></div><div class=\"col-md-4 pull-left\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=row><div v-if=\"traders.length > 0 && products.length > 0\" class=col-md-12><button @click=clearField class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-promotion><i class=\"fa fa-plus\"></i> Novo</button>&nbsp;&nbsp;</div><div v-else class=col-md-12><button data-toggle=tooltip title=\"Não podes criar promoção referenciar comerciante e produtos\" type=button class=\"btn btn-danger btn-flat\"><i class=\"fa fa-minus\"></i> Novo</button>&nbsp;&nbsp;</div></div><br><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome</a><th class=info v-if=showColumn.begnning_date><i :class=\"{'fa-sort-amount-asc': sortColumn == 'begnning_date' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'begnning_date' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'begnning_date')\">Início</a><th class=info v-if=showColumn.ending_date><i :class=\"{'fa-sort-amount-asc': sortColumn == 'ending_date' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'ending_date' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'ending_date')\">Término</a><th class=text-center><i :class=\"{'fa-sort-amount-asc': sortColumn == 'state' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'state' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'state')\">Publicação</a><th class=info v-if=showColumn.trader_id><i :class=\"{'fa-sort-amount-asc': sortColumn == 'trader_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'trader_id' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'trader_id')\">Comerciante</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"promotion in promotions | filterBy filter.term | orderBy sortColumn sortInverse\"><td><a href=# data-toggle=modal data-target=#show-promotion @click=getThisPromotion(promotion.id)>{{ promotion.name }}</a><td class=info v-if=showColumn.begnning_date>{{ promotion.begnning_date }}<td class=info v-if=showColumn.ending_date>{{ promotion.ending_date }}<td class=text-center v-if=promotion.status><button data-toggle=tooltip title=\"Despublicar esta promoção\" type=submit @click=promotionStatus(promotion.id) class=\"btn btn-xs btn-flat\" :class=\"{ 'btn-success': promotion.status, 'btn-warning': !promotion.status }\"><i class=\"fa fa-check\"></i></button><td class=text-center v-if=!promotion.status><button data-toggle=tooltip title=\"Publicar esta promoção\" type=submit @click=promotionStatus(promotion.id) class=\"btn btn-xs btn-flat\" :class=\"{ 'btn-success': promotion.status, 'btn-warning': !promotion.status }\"><i class=\"fa fa-times\"></i></button><td class=info v-if=showColumn.service_beginning>{{ promotion.trader.name }}<td align=left><a data-toggle=modal data-target=#modal-edit-promotion href=#><i class=\"fa fa-pencil text-primary\" @click=getThisPromotion(promotion.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-promotion href=#><i class=\"fa fa-trash text-danger\" @click=getThisPromotion(promotion.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div id=show-promotion class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Detalhes do(a) {{ newPromotion.name }}</h4></div><div class=modal-body><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover\"><thead><tr><th class=text-center colspan=2>INFORMAÇOES DE PROMOÇÃO<tbody><tr><td><b>ID</b><td><i>{{ newPromotion.id }}</i><tr><td><b>Nome</b><td><i>{{ newPromotion.name }}</i><tr><td><b>Início</b><td><span class=\"label label-info\"><i>{{ newPromotion.begnning_date }}</i></span><tr><td><b>Término</b><td><i>{{ newPromotion.ending_date }}</i><tr><td><b>Publicação</b><td><span class=label :class=\"{ 'label-success': newPromotion.status, 'label-warning': !newPromotion.status }\"><i>{{newPromotion.status ? 'Publicado' : 'Aguardando'}}</i></span><tr><td><b>Descrição</b><td><i>{{ newPromotion.description }}</i><tr><td><b>Data da criação</b><td><i>{{ promotion.created_at | formatDate 'DD/MM/YYYY' }}</i><tr><td><b>Data de atualização</b><td><i>{{ promotion.updated_at | formatDate 'DD/MM/YYYY' }}</i></table></div></div></div></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-success\" data-dismiss=modal><i class=\"fa fa-check\"></i></button></div></div></div></div><div class=\"modal fade\" id=modal-delete-promotion tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar</h4></div><div class=modal-body><h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newPromotion.name}}</span></h5></div><div class=modal-footer><button type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i> Cancelar</button> <button @keyup.enter=deletePromotion(newPromotion.id) @click=deletePromotion(newPromotion.id) type=button class=\"btn btn-danger\"><i class=\"fa fa-trash-o\"></i> Eliminar</button></div></div></div></div><div id=modal-create-promotion class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=Nome v-model=newPromotion.name v-validate:name=\"['required']\"> <span class=\"fa fa-user form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input type=date name=begnning_date class=form-control placeholder=\"\" v-model=newPromotion.begnning_date v-validate:begnning_date=\"['required']\"><p class=text-help>Data de início da promoção</div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=date name=ending_date class=form-control placeholder=\"\" v-model=newPromotion.ending_date v-validate:ending_date=\"['required']\"><p class=text-help>Término da promoção</div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><select name=trader_id class=form-control v-model=newPromotion.trader_id v-validate:trader_id=\"['required']\"><option value=\"\" selected>Comerciantes<option v-for=\"trader in traders\" value={{trader.id}}>{{trader.name}}</select></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><select name=product_id class=form-control v-model=newPromotion.product_id v-validate:product_id=\"['required']\"><option value=\"\" selected>Produtos<option v-for=\"product in products\" value={{product.id}}>{{product.name}}</select></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newPromotion.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createPromotion class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button></div></div></div></div><div id=modal-edit-promotion class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=Nome v-model=newPromotion.name v-validate:name=\"['required']\"> <span class=\"fa fa-user form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input type=date class=form-control placeholder=\"\" v-model=newPromotion.begnning_date><p class=text-help>Data de início da promoção</div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=date class=form-control placeholder=\"\" v-model=newPromotion.ending_date><p class=text-help>Término da promoção</div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><select class=form-control v-model=newPromotion.trader_id><option value=\"\" selected>Comerciantes<option v-for=\"trader in traders\" value={{trader.id}}>{{trader.name}}</select></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><select class=form-control v-model=newPromotion.product_id><option value=\"\" selected>Produtos<option v-for=\"product in products\" value={{product.id}}>{{product.name}}</select></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newPromotion.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedPromotion(newPromotion.id) type=button class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button></div></div></div></div></div></div>"
 
-},{"../../../Pagination/src/Component.vue":116,"vueify/lib/insert-css":108}],121:[function(require,module,exports){
+},{"../../../Pagination/src/Component.vue":89,"vueify/lib/insert-css":82}],94:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
@@ -39529,7 +38238,7 @@ exports.default = {
 if (module.exports.__esModule) module.exports = module.exports.default
 ;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success>Função Adicionado com sucesso</div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=\"Filtrar dados da tabela\" aria-describedby=basic-addon1></div></div></div><hr><div class=row><div class=col-md-12><button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-role><i class=\"fa fa-plus\"></i> Novo</button></div></div><br><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome do papel</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'display_name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'display_name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'display_name')\">Papel</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'description')\">Descriçãos</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><th width=75 class=text-center><a @click=openAllDetails href=#><span><i data-toggle=tooltip data-placement=left title=\"Ver Todas Permissões\" class=fa :class=\"{'fa-sign-in': openDetails.length == 0, 'fa-sign-out': openDetails.length > 0}\"></i></span></a><tbody v-for=\"role in roles | filterBy filter.term | orderBy sortColumn sortInverse\"><tr><td>{{ role.name }}<td>{{ role.display_name }}<td>{{ role.description }}<td align=left><a data-toggle=modal data-target=#modal-edit-role href=#><i class=\"fa fa-pencil text-primary\" @click=getThisRole(role.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-role href=#><i class=\"fa fa-trash text-danger\" @click=getThisRole(role.id)></i></a><td width=75 class=text-center><a @click=\"doOpenDetails($event, role.id)\" v-show=\"role.perms != ''\" href=#><i data-toggle=tooltip data-placement=left title=\"Ver Permissões\" class=fa :class=\"{'fa-plus-square': openDetails.indexOf(role.id) == -1, 'fa-minus-square': openDetails.indexOf(role.id) > -1}\"></i></a> <i class=\"fa fa-plus-square\" v-show=\"role.perms == ''\" style=\"opacity: 0.3\"></i><tr v-show=\"openDetails.indexOf(role.id) > -1 && role.perms != ''\"><td colspan=6><ul class=\"list-unstyled list-group-flush\" v-for=\"perms in role.perms\"><li><span class=\"label label-primary\"><b><i class=\"fa fa-unlock\"></i> &nbsp;{{ perms.display_name }}</b></span>&nbsp;</ul></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div class=\"modal fade\" id=modal-delete-role tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar Função</h4></div><div class=modal-body><h1>Eliminar Função {{newRole.name}}</h1></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteRole(newRole.id) @click=deleteRole(newRole.id) type=button class=\"btn btn-default\">Eliminar Função</button></div></div></div></div><div id=modal-create-role class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Criar novo Papel</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=\"Nome do  papel para o sistema\" v-model=newRole.name v-validate:name=\"['required']\"> <span class=\"fa fa-lock form-control-feedback\"></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=display_name placeholder=\"Nome do papel para ser visualizado\" v-model=newRole.display_name v-validate:display_name=\"['required']\"> <span class=\"fa fa-eye form-control-feedback\"></span><p style=color:red v-if=\"$validationew.display_name.required && $validationew.display_name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=descrição class=form-control rows=5 cols=40 id=description v-model=newRole.description></textarea></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=iform-control v-model=newRole.permissions multiple><option value=\"\" selected>Escolha Permissões<option v-for=\"permission in permissions\" value={{permission.id}}>{{permission.display_name}}</select></div></div></div></div></form></validator></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createRole class=\"btn btn-secondary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar Registo</button></div></div></div></div><div id=modal-edit-role class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name v-model=newRole.name v-validate:name=\"['required']\"> <span class=\"fa fa-lock form-control-feedback\"></span><p style=color:red v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=display_name v-model=newRole.display_name v-validate:display_name=\"['required']\"> <span class=\"fa fa-eye form-control-feedback\"></span><p style=color:red v-if=\"$validation1.display_name.required && $validation1.display_name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição class=form-control rows=5 cols=40 id=description v-model=newRole.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><div class=col-md-12><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedRole(newRole.id) type=button class=\"btn btn-secondary\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar Edição</button></div></div></div></div></div></div></div>"
 
-},{"../../../Pagination/src/Component.vue":116,"lodash":102,"vueify/lib/insert-css":108}],122:[function(require,module,exports){
+},{"../../../Pagination/src/Component.vue":89,"lodash":77,"vueify/lib/insert-css":82}],95:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
@@ -39713,258 +38422,7 @@ exports.default = {
 if (module.exports.__esModule) module.exports = module.exports.default
 ;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success><i class=\"fa fa-thumbs-up\">Sucesso!!!</i></div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=col-md-12><button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-tag><i class=\"fa fa-plus\"></i> Novo</button></div><br><br><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'description')\">Descrição</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"tag in tags | filterBy filter.term | orderBy sortColumn sortInverse\"><td>{{ tag.name }}<td>{{ tag.description }}<td align=left><a data-toggle=modal data-target=#modal-edit-tag href=#><i class=\"fa fa-pencil text-primary\" @click=getThisTag(tag.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-tag href=#><i class=\"fa fa-trash text-danger\" @click=getThisTag(tag.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div class=\"modal fade\" id=modal-delete-tag tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar</h4></div><div class=modal-body><h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newTag.name}}</span></h5></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteTag(newTag.id) @click=deleteTag(newTag.id) type=button class=\"btn btn-danger\">Eliminar</button></div></div></div></div><div id=modal-create-tag class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=\"Nome de Marcador\" v-model=newTag.name v-validate:name=\"['required']\"> <span class=form-control-feedback></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newTag.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createTag class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button></div></div></div></div><div id=modal-edit-tag class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name v-model=newTag.name v-validate:name=\"['required']\"> <span class=form-control-feedback></span><p style=color:red v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newTag.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedTag(newTag.id) type=button class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button></div></div></div></div></div>"
 
-},{"../../../Pagination/src/Component.vue":116,"vueify/lib/insert-css":108}],123:[function(require,module,exports){
-var __vueify_insert__ = require("vueify/lib/insert-css")
-var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _vueSelect = require('vue-select');
-
-var _vueSelect2 = _interopRequireDefault(_vueSelect);
-
-var _Component = require('../../../Pagination/src/Component.vue');
-
-var _Component2 = _interopRequireDefault(_Component);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.default = {
-
-    name: 'show-taxation',
-
-    data: function data() {
-        return {
-            newTaxation: {
-                id: '',
-                employee_id: '',
-                place_id: '',
-                income: '',
-                type: '',
-                created_at: ''
-            },
-
-            taxations: {},
-            employees: [],
-            placesInt: [],
-            placesExt: [],
-
-            sortColumn: 'id',
-            sortInverse: 1,
-            filter: {
-                term: ''
-            },
-            pagination: {},
-            success: false,
-            report_date: '',
-            auth: [],
-
-            report: {
-                day: '',
-                month: '',
-                year: ''
-            },
-
-            myDate: new Date()
-        };
-    },
-
-
-    // ---------------------------------------------------------------------------------
-
-    ready: function ready() {
-        this.fetchTaxation(1);
-        this.taxationEmployee();
-        this.taxationIntPlace();
-        this.taxationExtPlace();
-        this.authUser();
-    },
-
-
-    // ---------------------------------------------------------------------------------
-
-    methods: {
-
-        clearField: function clearField() {
-            this.newTaxation = {
-                id: '',
-                employee_id: '',
-                place_id: '',
-                income: '',
-                type: ''
-            };
-        },
-
-        createTaxation: function createTaxation() {
-            var _this = this;
-
-            var taxation = this.newTaxation;
-
-            //Clear form input
-            this.clearField();
-            this.$http.post('http://localhost:8000/api/v1/taxations/', taxation).then(function (response) {
-                if (response.status == 200) {
-                    $('#modal-create-taxation').modal('hide');
-                    _this.fetchTaxation();
-                    console.log('correu bem');
-                    var self = _this;
-                    _this.success = true;
-                    setTimeout(function () {
-                        self.success = false;
-                    }, 5000);
-                }
-            }, function (response) {});
-        },
-
-        // --------------------------------------------------------------------------------------------
-
-        fetchTaxation: function fetchTaxation(page) {
-            var _this2 = this;
-
-            this.$http.get('http://localhost:8000/api/v1/taxations?page=' + page).then(function (response) {
-                _this2.$set('taxations', response.data.data);
-                _this2.$set('pagination', response.data);
-            }, function (response) {
-                console.log("Ocorreu um erro na operação");
-            });
-        },
-
-        // --------------------------------------------------------------------------------------------
-
-        getThisTaxation: function getThisTaxation(id) {
-            var _this3 = this;
-
-            this.$http.get('http://localhost:8000/api/v1/taxations/' + id).then(function (response) {
-                _this3.newTaxation.id = response.data.id;
-                _this3.newTaxation.employee_id = response.data.employee_id;
-                _this3.newTaxation.place_id = response.data.place_id;
-                _this3.newTaxation.income = response.data.income;
-                _this3.newTaxation.type = response.data.type;
-                _this3.newTaxation.created_at = response.data.created_at;
-            }, function (response) {
-                console.log('Error');
-            });
-        },
-
-        // --------------------------------------------------------------------------------------------
-
-        saveEditedTaxation: function saveEditedTaxation(id) {
-            var _this4 = this;
-
-            var taxation = this.newTaxation;
-            this.clearField();
-            this.$http.patch('http://localhost:8000/api/v1/taxations/' + id, taxation).then(function (response) {
-                if (response.status == 200) {
-                    $('#modal-edit-taxation').modal('hide');
-                    // console.log(response.data);
-                    _this4.fetchTaxation();
-                }
-            }, function (response) {
-                console.log("Ocorreu um erro na operação");
-            });
-        },
-
-        // --------------------------------------------------------------------------------------------
-
-        deleteTaxation: function deleteTaxation(id) {
-            var _this5 = this;
-
-            this.$http.delete('http://localhost:8000/api/v1/taxations/' + id).then(function (response) {
-                $('#modal-delete-taxation').modal('hide');
-                if (response.status == 200) {
-                    // console.log(response.data);
-                    _this5.fetchTaxation();
-                }
-            }, function (response) {
-                console.log("Ocorreu um erro na operação");
-            });
-        },
-
-        // -------------------------Metodo de suporte---------------------------------------------------
-        taxationIntPlace: function taxationIntPlace() {
-            var _this6 = this;
-
-            this.$http.get('http://localhost:8000/api/v1/taxationIntPlace').then(function (response) {
-                _this6.$set('placesInt', response.data);
-                // this.$set('options', response.data.name);
-                // this.options = response.data.items
-            }, function (response) {
-                console.log("Ocorreu um erro na operação");
-            });
-        },
-
-        authUser: function authUser() {
-            var _this7 = this;
-
-            this.$http.get('http://localhost:8000/api/v1/authUser').then(function (response) {
-                _this7.$set('auth', response.data);
-                // this.$set('options', response.data.name);
-                // this.options = response.data.items
-            }, function (response) {
-                console.log("Ocorreu um erro na operação");
-            });
-        },
-
-        taxationExtPlace: function taxationExtPlace() {
-            var _this8 = this;
-
-            this.$http.get('http://localhost:8000/api/v1/taxationExtPlace').then(function (response) {
-                _this8.$set('placesExt', response.data);
-                // this.$set('options', response.data.name);
-                // this.options = response.data.items
-            }, function (response) {
-                console.log("Ocorreu um erro na operação");
-            });
-        },
-        //-----------------------------------------------------------------------------------------------
-
-        taxationEmployee: function taxationEmployee() {
-            var _this9 = this;
-
-            this.$http.get('http://localhost:8000/api/v1/taxationEmployee').then(function (response) {
-                _this9.$set('employees', response.data);
-            }, function (response) {
-                console.log("Ocorreu um erro na operação");
-            });
-        },
-        // --------------------------------------------------------------------------------------------
-
-        doSort: function doSort(ev, column) {
-            var self = this;
-            ev.preventDefault();
-            self.sortColumn = column;
-            if (self.sortInverse == 1) {
-                self.sortInverse = -1;
-            } else {
-                self.sortInverse = 1;
-            }
-        },
-
-        // --------------------------------------------------------------------------------------------
-
-        // Outros funções
-        navigate: function navigate(page) {
-            this.fetchTaxation(page);
-        }
-    },
-
-    // ---------------------------------------------------------------------------------
-
-    computed: {},
-
-    // ---------------------------------------------------------------------------------
-
-    components: {
-        'Pagination': _Component2.default
-    }
-};
-if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success>Contrato Criado com sucesso</div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control employeeholder=\"Filtrar dados da tabela\" aria-describedby=basic-addon1></div></div></div><hr><div class=row><div class=col-md-12><button @click=clearField class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-taxation><i class=\"fa fa-plus\"></i> Novo</button>&nbsp;&nbsp; <a class=\"btn btn-primary btn-flat btn-outline\" href=/export/taxationsPDF><i class=\"fa fa-download\"></i> PDF</a>&nbsp;&nbsp;<div class=btn-group><button type=button class=\"btn btn-primary btn-flat btn-outline dropdown-toggle\" data-toggle=dropdown aria-haspopup=true aria-expanded=false><i class=\"fa fa-eye\"></i> Ver Relatórios <span class=caret></span></button><ul class=dropdown-menu><li><a data-toggle=modal data-target=#modal-report-date href=#>Relatório Diário</a><li><a data-toggle=modal data-target=#modal-report-month href=#>Relatório Mensal</a><li><a data-toggle=modal data-target=#modal-report-year href=#>Relatório Anual</a></ul></div></div><div class=\"modal fade\" id=modal-report-date tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title><i class=\"fa fa-calendar fa-2x\"></i></h4></div><div class=modal-body><div class=form-group><label for=\"\"></label><input type=date class=form-control placeholder=\"\" v-model=report.day><p class=help-block>Introduza data do relatório</div></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal>Close</button> <a v-if=report.day class=\"btn btn-primary\" href=/export/dateRoportInformation/{{report.day}}>Enviar</a></div></div></div></div><div class=\"modal fade\" id=modal-report-month tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title><i class=\"fa fa-calendar fa-2x\"></i></h4></div><div class=modal-body><div class=row><div class=col-md-6><div class=form-group><select class=form-control v-model=report.month><option value=\"\" selected>Mês<option value=01>Janeiro<option value=02>Fevereiro<option value=03>Março<option value=04>Abril<option value=05>Maio<option value=06>Junho<option value=07>Julho<option value=08>Agosto<option value=09>Setembro<option value=10>Outubro<option value=11>Novembro<option value=12>Desembro</select></div></div><div v-if=report.month class=col-md-6><div class=form-group><select class=form-control v-model=report.year><option value=\"\" selected>Ano<option value=2013>2013<option value=2014>2014<option value=2015>2015<option value=2016>2016<option value=2017>2017</select></div></div></div></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal>Close</button> <a v-if=report.year class=\"btn btn-primary\" href=/export/monthRoportInformation/{{report.month}}/{{report.year}}>Enviar</a></div></div></div></div><div class=\"modal fade\" id=modal-report-year tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title><i class=\"fa fa-calendar fa-2x\"></i></h4></div><div class=modal-body><div class=row><div class=col-md-12><div class=form-group><select class=form-control v-model=report.year><option value=\"\" selected>Ano<option value=2013>2013<option value=2014>2014<option value=2015>2015<option value=2016>2016<option value=2017>2017</select></div></div></div></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal>Close</button> <a v-if=report.year class=\"btn btn-primary\" href=/export/yearRoportInformation/{{report.year}}>Enviar</a></div></div></div></div></div><br><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'employee_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'employee_id' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'employee_id')\">Funcionário</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'place_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'place_id' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'place_id')\">Espaços</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'income' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'income' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'income')\">Valor ($)</a><th class=text-center colspan=3><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"taxation in taxations | filterBy filter.term | orderBy sortColumn sortInverse\"><td v-if=\"taxation.type == 2\" v-for=\"employee in taxation.employees\">{{ employee.name }}<td v-if=\"taxation.type == 1\">{{ taxation.author }}<td v-for=\"place in taxation.places\">{{ place.name }}<td>{{ taxation.income }}<td align=center><a data-toggle=modal data-target=#modal-edit-taxation href=#><i class=\"fa fa-pencil text-primary\" @click=getThisTaxation(taxation.id)></i></a><td align=center><a data-toggle=modal data-target=#modal-delete-taxation href=#><i class=\"fa fa-trash text-danger\" @click=getThisTaxation(taxation.id)></i></a><td align=center><a href=/export/receiptInformation/{{taxation.id}}><i class=\"fa fa-print text-info\"></i></a></table><div v-if=taxations class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div class=\"modal fade\" id=modal-delete-taxation tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title><i class=\"text-danger fa fa-trash fa-2x\"></i></h4></div><div class=modal-body><h2 class=\"text-center text-info\">Eliminar esta Cobrança</h2></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i> Cancelar</button> <button @keyup.enter=deleteTaxation(newTaxation.id) @click=deleteTaxation(newTaxation.id) type=button class=\"btn btn-danger\"><i class=\"fa fa-trash-o\"></i> Eliminar</button></div></div></div></div><div id=modal-create-taxation class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-Registarfeedback\"><select name=state class=form-control v-model=newTaxation.type><option value=\"\" selected>Tipo de cobrança<option value=1>Cobrança interno<option value=2>Cobrança Externo</select><span class=help-block>Selecione o tipo de espaço</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select :disabled=\"newTaxation.type != 2\" class=form-control v-model=newTaxation.employee_id><option value=\"\" selected>Cobrador<option v-for=\"employee in employees\" value={{employee.id}}>{{employee.name}}</select><span v-if=\"newTaxation.type == 2\" class=\"text-help text-warning\">Selecione o cobrador</span> <span v-if=\"newTaxation.type == 1\" class=\"text-help text-success\">O cobrador será o responsável pelo gegisto</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select v-if=\"newTaxation.type == 2\" :disabled=\"newTaxation.type == ''\" class=form-control v-model=newTaxation.place_id><option value=\"\" selected>Espaço<option v-for=\"place in placesExt\" value={{place.id}}>{{place.name}}</select><select v-else :disabled=\"newTaxation.type == ''\" class=form-control v-model=newTaxation.place_id><option value=\"\" selected>Espaço<option v-for=\"place in placesInt\" value={{place.id}}>{{place.name}}</select><span class=help-block>Qual é o espaço?</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input :disabled=\"newTaxation.type != 2\" type=number class=form-control placeholder=\"Valor cobrado\" v-model=newTaxation.income name=email> <i class=\"fa fa-usd form-control-feedback\"></i></div><span class=\"text-help text-warning\" v-if=\"newTaxation.type == 2\">Introduza o valor cobrado</span> <span class=\"text-help text-success\" v-if=\"newTaxation.type == 1\">O valor será preenchido automaticamente</span></div></div></div></form></validator></div><div v-if=\"newTaxation.type == 1\" class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=\"newTaxation.place_id == ''\" @click=createTaxation class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button></div><div v-else class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=\"newTaxation.income == '' || newTaxation.employee_id == ''\" @click=createTaxation class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button></div></div></div></div><div id=modal-edit-taxation class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar Este contrato</h4></div><div class=modal-body><validator name=validationew><form action=# methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-Registarfeedback\"><select name=state class=form-control v-model=newTaxation.type><option value=1>Cobrança interno<option value=2>Cobrança Externo</select><span class=help-block>Selecione o tipo de espaço</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select v-if=\"newTaxation.type == 2\" :disabled=\"newTaxation.type != 2\" class=form-control v-model=newTaxation.employee_id><option v-for=\"employee in employees\" value={{employee.id}}>{{employee.name}}</select><select v-if=\"newTaxation.type == 1\" :disabled=\"newTaxation.type != 2\" class=form-control v-model=newTaxation.employee_id><option value={{newTaxation.employee_id}}>{{newTaxation.author}}</select><span v-if=\"newTaxation.type == 2\" class=\"text-help text-warning\">Selecione o cobrador</span> <span v-if=\"newTaxation.type == 1\" class=\"text-help text-success\">O cobrador será o responsável pelo gegisto</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select v-if=\"newTaxation.type == 2\" :disabled=\"newTaxation.type == ''\" class=form-control v-model=newTaxation.place_id><option v-for=\"place in placesExt\" value={{place.id}}>{{place.name}}</select><select v-else :disabled=\"newTaxation.type == ''\" class=form-control v-model=newTaxation.place_id><option v-for=\"place in placesInt\" value={{place.id}}>{{place.name}}</select><span class=help-block>Qual é o espaço?</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input :disabled=\"newTaxation.type != 2\" type=number class=form-control placeholder=\"Valor cobrado\" v-model=newTaxation.income name=email> <i class=\"fa fa-usd form-control-feedback\"></i></div><span class=\"text-help text-warning\" v-if=\"newTaxation.type == 2\">Introduza o valor cobrado</span> <span class=\"text-help text-success\" v-if=\"newTaxation.type == 1\">O valor será preenchido automaticamente</span></div></div></div></form></validator></div><div v-if=\"newTaxation.type == 1\" class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=\"newTaxation.place_id == ''\" @click=saveEditedTaxation(newTaxation.id) class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp;Actualizar</button></div><div v-else class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=\"newTaxation.income == '' || newTaxation.employee_id == ''\" @click=saveEditedTaxation(newTaxation.id) class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp;Actualizar</button></div></div></div></div></div></div>"
-
-},{"../../../Pagination/src/Component.vue":116,"vue-select":105,"vueify/lib/insert-css":108}],124:[function(require,module,exports){
+},{"../../../Pagination/src/Component.vue":89,"vueify/lib/insert-css":82}],96:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
@@ -40208,7 +38666,7 @@ exports.default = {
 if (module.exports.__esModule) module.exports = module.exports.default
 ;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success><i class=\"fa fa-thumbs-up\">Sucesso!!</i></div><div class=row><div class=\"pull right col-md-8\"><label class=checkbox-inline><input type=checkbox v-model=showColumn.ic>BI</label></div><div class=\"col-md-4 pull-left\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=row><div class=col-md-12><button @click=clearField class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-trader><i class=\"fa fa-plus\"></i> Novo</button>&nbsp;&nbsp; <a class=\"btn btn-primary btn-flat btn-outline\" href=/export/printableTraderInformation><i class=\"fa fa-print\"></i> Imprimir</a></div></div><br><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-reflow\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome</a><th class=info v-if=showColumn.ic><i :class=\"{'fa-sort-amount-asc': sortColumn == 'ic' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'ic' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'ic')\">BI</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'phone' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'phone' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'phone')\">Telefone</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"trader in traders | filterBy filter.term | orderBy sortColumn sortInverse\"><td><a href=# data-toggle=modal data-target=#show-trader @click=getThisTrader(trader.id)>{{ trader.name }}</a><td class=info v-if=showColumn.ic>{{ trader.ic }}<td>{{ trader.phone }}<td align=left><a data-toggle=modal data-target=#modal-edit-trader href=#><i class=\"fa fa-pencil text-primary\" @click=getThisTrader(trader.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-trader href=#><i class=\"fa fa-trash text-danger\" @click=getThisTrader(trader.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div id=show-trader class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Detalhes do(a) {{ newTrader.name }}</h4></div><div class=modal-body><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover\"><thead><tr><th class=text-center colspan=2>INFORMAÇOES DO COMERCIANTE<tbody><tr><td><b>ID</b><td><i>{{ newTrader.id }}</i><tr><td><b>Nome</b><td><i>{{ newTrader.name }}</i><tr><td><b>BI</b><td><span class=\"label label-info\"><i>{{ newTrader.ic }}</i></span><tr><td><b>Idade</b><td><i>{{ newTrader.age }}</i><tr><td><b>Sexo</b><td><i>{{ alterGenderValue(newTrader.gender) }}</i><tr><td><b>Email</b><td><span class=\"label label-info\"><i>{{ newTrader.email }}</i></span><tr><td><b>Ilha</b><td><i>{{ alterStateValue(newTrader.state) }}</i><tr><td><b>Concelho</b><td><i>{{ newTrader.council }}</i><tr><td><b>Freguesia</b><td><i>{{ newTrader.parish }}</i><tr><td><b>Zona</b><td><i>{{ newTrader.zone }}</i><tr><td><b>Telefone</b><td><span class=label :class=\"{ 'label-info': newTrader.phone, 'none': !newTrader.phone }\"><i>{{ newTrader.phone }}</i></span><tr><td><b>Descrição</b><td><i>{{ newTrader.description }}</i><tr><td><b>Data da criação</b><td><i>{{ trader.created_at | formatDate 'DD/MM/YYYY' }}</i><tr><td><b>Data de atualização</b><td><i>{{ trader.updated_at | formatDate 'DD/MM/YYYY' }}</i></table></div></div></div></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal>Close</button></div></div></div></div><div class=\"modal fade\" id=modal-delete-trader tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar</h4></div><div class=modal-body><h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newTrader.name}}</span></h5></div><div class=modal-footer><button type=button class=\"btn btn-secondary\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteTrader(newTrader.id) @click=deleteTrader(newTrader.id) type=button class=\"btn btn-danger\">Eliminar</button></div></div></div></div><div id=modal-create-trader class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-8><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=Nome v-model=newTrader.name v-validate:name=\"['required']\"> <span class=\"fa fa-user form-control-feedback\"></span></div></div><div class=col-md-4><div class=\"form-group has-feedback\"><input type=number class=form-control name=ic placeholder=\"Número BI\" v-model=newTrader.ic> <span class=\"fa fa-id-card form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-8><div class=\"form-group has-feedback\"><input type=email class=form-control name=email placeholder=Email v-model=newTrader.email> <span class=\"fa fa-envelope form-control-feedback\"></span></div></div><div class=col-md-4><div class=\"form-group has-feedback\"><input type=number class=form-control name=phone placeholder=Telefone v-model=newTrader.phone> <span class=\"fa fa-phone form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-2><div class=\"form-group has-feedback\"><label class=radio-inline><input type=radio id=gender value=M name=gender v-model=newTrader.gender> <i class=\"fa fa-male\"></i></label><label class=radio-inline><input type=radio id=gender name=gender value=F v-model=newTrader.gender><i class=\"fa fa-female\"></i></label></div></div><div class=\"col-md-10 pull-right\"><div class=\"form-group has-feedback\"><input type=number class=form-control name=age placeholder=Idade v-model=newTrader.age> <span class=\"fa fa-birthday-cake form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><select name=state class=\"selectpicker form-control show-tick\" v-model=newTrader.state><optgroup label=Sotavento><option>Selecione Ilha<option value=2>Maio<option value=1>Santiago<option value=3>Fogo<option value=4>Brava<optgroup label=Barlavento><option value=5>Santo Antão<option value=6>São Nicolau<option value=7>São Vicente<option value=8>Sal<option value=9>Boa Vista</select></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=council placeholder=Concelho v-model=newTrader.council> <span class=\"fa fa-compass form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=parish placeholder=Freguezia v-model=newTrader.parish> <span class=\"fa fa-map-marker form-control-feedback\"></span></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=zone placeholder=Zona v-model=newTrader.zone> <span class=\"fa fa-thumb-tack form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newTrader.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createTrader class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button><label v-if=!newTrader.get_password class=\"checkbox-inline pull-left\"><input data-toggle=modal data-target=#getAcountForTrader type=checkbox v-model=newTrader.get_email>Obter uma conta</label><p v-if=newTrader.get_password class=\"text-help text-success pull-left\">Comerciante Estará no SAGMMA</div></div></div></div><div class=\"modal fade\" id=getAcountForTrader tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button @click=clearField class=close data-dismiss=modal aria-hidden=true>&times;</button><h5 class=modal-title>Introduza a palavra passe para a conta pretendida</h5></div><div class=modal-body><div class=\"form-group has-feedback\"><input type=password name=get_password class=\"form-control input-lg\" placeholder=\"Introduza a palavra passe\" v-model=newTrader.get_password> <span class=\"fa fa-lock form-control-feedback\"></span></div></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-close\"></i></button> <button :disabled=!newTrader.get_password type=button class=\"btn btn-primary\" data-dismiss=modal><i class=\"fa fa-check\"></i></button></div></div></div></div><div id=modal-edit-trader class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-8><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=Nome v-model=newTrader.name v-validate:name=\"['required']\"> <span class=\"fa fa-user form-control-feedback\"></span></div></div><div class=col-md-4><div class=\"form-group has-feedback\"><input type=number class=form-control name=ic placeholder=\"Número BI\" v-model=newTrader.ic> <span class=\"fa fa-id-card form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-8><div class=\"form-group has-feedback\"><input type=email class=form-control name=email placeholder=Email v-model=newTrader.email> <span class=\"fa fa-envelope form-control-feedback\"></span></div></div><div class=col-md-4><div class=\"form-group has-feedback\"><input type=number class=form-control name=phone placeholder=Telefone v-model=newTrader.phone> <span class=\"fa fa-phone form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-2><div class=\"form-group has-feedback\"><label class=radio-inline><input type=radio id=gender value=M name=gender v-model=newTrader.gender> <i class=\"fa fa-male\"></i></label><label class=radio-inline><input type=radio id=gender name=gender value=F v-model=newTrader.gender><i class=\"fa fa-female\"></i></label></div></div><div class=\"col-md-10 pull-right\"><div class=\"form-group has-feedback\"><input type=number class=form-control name=age placeholder=Idade v-model=newTrader.age> <span class=\"fa fa-birthday-cake form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><select name=state class=\"selectpicker form-control show-tick\" v-model=newTrader.state><optgroup label=Sotavento><option>Selecione Ilha<option value=2>Maio<option value=1>Santiago<option value=3>Fogo<option value=4>Brava<optgroup label=Barlavento><option value=5>Santo Antão<option value=6>São Nicolau<option value=7>São Vicente<option value=8>Sal<option value=9>Boa Vista</select></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=council placeholder=Concelho v-model=newTrader.council> <span class=\"fa fa-compass form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=parish placeholder=Freguezia v-model=newTrader.parish> <span class=\"fa fa-map-marker form-control-feedback\"></span></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=zone placeholder=Zona v-model=newTrader.zone> <span class=\"fa fa-thumb-tack form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=\"Descrição do utilizador\" class=form-control rows=5 cols=40 id=description v-model=newTrader.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedTrader(newTrader.id) type=button class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button></div></div></div></div></div></div>"
 
-},{"../../../Pagination/src/Component.vue":116,"vueify/lib/insert-css":108}],125:[function(require,module,exports){
+},{"../../../Pagination/src/Component.vue":89,"vueify/lib/insert-css":82}],97:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
@@ -40399,7 +38857,7 @@ exports.default = {
 if (module.exports.__esModule) module.exports = module.exports.default
 ;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success>Tipo de funcionário adicionado com sucesso</div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=row><div class=col-md-12><button @click=clearField class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-typeofemployee><i class=\"fa fa-plus\"></i> Novo</button></div></div><br><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'description')\">Descrição</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"typeofemployee in typeofemployees | filterBy filter.term | orderBy sortColumn sortInverse\"><td>{{ typeofemployee.name }}<td>{{ typeofemployee.description }}<td align=left><a data-toggle=modal data-target=#modal-edit-typeofemployee href=#><i class=\"fa fa-pencil text-primary\" @click=getThisTypeofemployee(typeofemployee.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-typeofemployee href=#><i class=\"fa fa-trash text-danger\" @click=getThisTypeofemployee(typeofemployee.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div class=\"modal fade\" id=modal-delete-typeofemployee tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar</h4></div><div class=modal-body><h5>Eliminar - <span class=text-uppercase>{{newTypeofemployee.name}}</span></h5></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteTypeofemployee(newTypeofemployee.id) @click=deleteTypeofemployee(newTypeofemployee.id) type=button class=\"btn btn-danger\">Eliminar</button></div></div></div></div><div id=modal-create-typeofemployee class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=\"Nome do tipo de funcionário\" v-model=newTypeofemployee.name v-validate:name=\"['required']\"> <span class=\"fa fa-users form-control-feedback\"></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newTypeofemployee.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createTypeofemployee class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button></div></div></div></div><div id=modal-edit-typeofemployee class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name v-model=newTypeofemployee.name v-validate:name=\"['required']\"> <span class=\"fa fa-users form-control-feedback\"></span><p style=color:red v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=\"Descrição deste Mescado\" class=form-control rows=5 cols=40 id=description v-model=newTypeofemployee.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button v-on:show=\"\" @click=saveEditedTypeofemployee(newTypeofemployee.id) type=button class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button></div></div></div></div></div></div>"
 
-},{"../../../Pagination/src/Component.vue":116,"babel-runtime/helpers/defineProperty":14,"vueify/lib/insert-css":108}],126:[function(require,module,exports){
+},{"../../../Pagination/src/Component.vue":89,"babel-runtime/helpers/defineProperty":5,"vueify/lib/insert-css":82}],98:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
@@ -40576,7 +39034,7 @@ exports.default = {
 if (module.exports.__esModule) module.exports = module.exports.default
 ;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success><i class=\"fa fa-thumbs-up\">Sucesso!!!</i></div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=col-md-12><button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-typeofplace><i class=\"fa fa-plus\"></i> Novo</button></div><br><br><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'description')\">Descrição</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"typeofplace in typeofplaces | filterBy filter.term | orderBy sortColumn sortInverse\"><td>{{ typeofplace.name }}<td>{{ typeofplace.description }}<td align=left><a data-toggle=modal data-target=#modal-edit-typeofplace href=#><i class=\"fa fa-pencil text-primary\" @click=getThisTypeofplace(typeofplace.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-typeofplace href=#><i class=\"fa fa-trash text-danger\" @click=getThisTypeofplace(typeofplace.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div class=\"modal fade\" id=modal-delete-typeofplace tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar</h4></div><div class=modal-body><h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newTypeofplace.name}}</span></h5></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteTypeofplace(newTypeofplace.id) @click=deleteTypeofplace(newTypeofplace.id) type=button class=\"btn btn-danger\">Eliminar</button></div></div></div></div><div id=modal-create-typeofplace class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=\"Nome do tipo de espaço\" v-model=newTypeofplace.name v-validate:name=\"['required']\"> <span class=form-control-feedback></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newTypeofplace.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createTypeofplace class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button></div></div></div></div><div id=modal-edit-typeofplace class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name v-model=newTypeofplace.name v-validate:name=\"['required']\"> <span class=form-control-feedback></span><p style=color:red v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição... class=form-control rows=5 cols=40 id=description v-model=newTypeofplace.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedTypeofplace(newTypeofplace.id) type=button class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button></div></div></div></div></div>"
 
-},{"../../../Pagination/src/Component.vue":116,"vueify/lib/insert-css":108}],127:[function(require,module,exports){
+},{"../../../Pagination/src/Component.vue":89,"vueify/lib/insert-css":82}],99:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
@@ -40691,7 +39149,7 @@ exports.default = {
 if (module.exports.__esModule) module.exports = module.exports.default
 ;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success>Usuário adicionado com sucesso</div><validator name=validation1><form action=# methods=POST @submit.prevent=createUser><div class=row><div class=col-md-12><div class=\"alert alert-danger\" v-if=\"errors.length > 0\"><p><strong>Whoops!</strong>Algo naõ bate!</p><br><ul><li v-for=\"error in errors\">{{ error }}</ul></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control placeholder=\"Nome Completo\" name=name v-model=newUser.name v-validate:name=\"['required']\"> <span class=\"glyphicon glyphicon-user form-control-feedback\"></span><p style=color:red v-if=$validation1.name.required><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control placeholder=Usuário name=username v-model=newUser.username v-validate:username=\"['required']\"> <span class=\"glyphicon glyphicon-user form-control-feedback\"></span><p style=color:red v-if=$validation1.username.required><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=email class=form-control placeholder=Email name=email v-model=newUser.email> <span class=\"glyphicon glyphicon-envelope form-control-feedback\"></span><p style=color:red v-if=!myValidation.email><span data-toggle=tooltip title=\"Recorda-se de introduzir email valido! ex exemplo@exemplo.cv\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input type=password class=form-control placeholder=Password name=password v-model=newUser.password v-validate:password=\"['required']\"> <span class=\"glyphicon glyphicon-lock form-control-feedback\"></span><p style=color:red v-if=$validation1.password.required><span data-toggle=tooltip title=\"Este campo tem de ser preenchida\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><select name=gender class=\"selectpicker form-control\" title=\"Selecione o sexo\" v-model=newUser.gender><option value=M>Masculino<option value=F>Femenino<option value=other>Outro</select></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=number class=form-control placeholder=\"Introduza a idade\" name=age min=20 max=50 v-model=newUser.age></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-3><div class=\"form-group has-feedback\"><input type=text class=form-control placeholder=Ilha name=sland v-model=newUser.sland> <span class=\"fa fa-globe form-control-feedback\"></span><p class=help-block>Introduza a ilha a qual o usario pertence</div></div><div class=col-md-3><div class=\"form-group has-feedback\"><input type=text class=form-control placeholder=Concelho name=council v-model=newUser.council> <span class=\"fa fa-compass form-control-feedback\"></span></div></div><div class=col-md-3><div class=\"form-group has-feedback\"><input type=text class=form-control placeholder=Freguezia name=parish v-model=newUser.parish> <span class=\"fa fa-map-marker form-control-feedback\"></span></div></div><div class=col-md-3><div class=\"form-group has-feedback\"><input type=text class=form-control placeholder=Zona name=zone v-model=newUser.zone> <span class=\"fa fa-thumb-tack form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select name=type class=\"selectpicker form-control\" title=\"Selecione o grupo para este usuario\" v-model=newUser.type><option value=admin>Admin<option value=gest>Gest<option value=ta>TA<option value=pa>PA<option value=member>Menbro</select></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=bio class=form-control rows=5 cols=40 id=bio v-model=newUser.bio placeholder=\"Adciona um piquema discrição do curiculo do susuario...\"></textarea></div></div></div></div><hr><div class=form-group><button :disabled=!$validation1.valid class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar Dados Introduzidos</button></div></form></validator>"
 
-},{"babel-runtime/core-js/object/keys":10,"babel-runtime/helpers/typeof":15,"vueify/lib/insert-css":108}],128:[function(require,module,exports){
+},{"babel-runtime/core-js/object/keys":2,"babel-runtime/helpers/typeof":6,"vueify/lib/insert-css":82}],100:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1{color:#00a8ed}")
 'use strict';
@@ -41056,7 +39514,7 @@ exports.default = {
 if (module.exports.__esModule) module.exports = module.exports.default
 ;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success>utilizador adicionado com sucesso</div><div class=row><div class=col-md-8></div><div class=\"col-md-4 pull-left\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=Filtrar... aria-describedby=basic-addon1></div></div></div><hr><div class=row><div class=col-md-12><button @click=clearField class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-user><i class=\"fa fa-plus\"></i> Novo</button>&nbsp;&nbsp; <a class=\"btn btn-primary btn-flat btn-outline\" href=/export/printableUserInformation><i class=\"fa fa-print\"></i> Imprimir</a></div></div><br><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-success\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'phone' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'phone' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'phone')\">Tel</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'status' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'status' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'status')\">Estado</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><th width=75 class=text-center><a @click=openAllDetails href=#><span><i data-toggle=tooltip data-placement=left title=\"Ver Todos os papeis\" class=fa :class=\"{'fa-lock': openDetails.length == 0, 'fa-unlock': openDetails.length > 0}\"></i></span></a><tbody v-for=\"user in users | filterBy filter.term | orderBy sortColumn sortInverse\"><tr><td><a href=# data-toggle=modal data-target=#show-user @click=getThisUser(user.id)>{{ user.name }}</a><td>{{ user.phone }}<td v-if=\"user.name != 'Admin'\"><button type=submit @click=estado_utilizador(user.id) class=\"btn btn-xs btn-flat\" :class=\"{ 'btn-info': user.status, 'btn-danger': !user.status }\">{{user.status ? 'Ativado' : 'Disativado'}}</button><td v-if=\"user.name == 'Admin'\"><button class=\"btn btn-success btn-xs btn-flat\" disabled>Admin</button><td v-if=\"user.name != 'Admin'\" class=text-center><a data-toggle=modal data-target=#modal-edit-user href=#><i class=\"fa fa-pencil text-primary\" @click=getThisUser(user.id)></i></a><td v-if=\"user.name == 'Admin'\" class=text-center><i class=\"fa fa-ban text-warning\"></i><td v-if=\"user.name != 'Admin'\" class=text-center><a data-toggle=modal data-target=#modal-delete-user href=#><i class=\"fa fa-trash text-danger\" @click=getThisUser(user.id)></i></a><td v-if=\"user.name == 'Admin'\" class=text-center><i class=\"fa fa-ban text-warning\"></i><td v-if=\"user.name != 'Admin'\" width=75 class=text-center><a @click=\"doOpenDetails($event, user.id)\" v-show=\"user.roles != ''\" href=#><i data-toggle=tooltip data-placement=left title=\"Ver Papeis de utilizador\" class=fa :class=\"{'fa-plus-square': openDetails.indexOf(user.id) == -1, 'fa-minus-square': openDetails.indexOf(user.id) > -1}\"></i></a> <i class=\"fa fa-plus-square\" v-show=\"user.roles == ''\" style=\"opacity: 0.3\"></i><td v-if=\"user.name == 'Admin'\" width=75 class=text-center><i class=\"fa fa-minus-square\"></i><tr v-show=\"openDetails.indexOf(user.id) > -1 && user.roles != ''\"><td colspan=12><span class=\"label label-primary\" v-for=\"roles in user.roles\"><b><i class=\"fa fa-unlock\"></i> {{ roles.display_name }}&nbsp;</b></span></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div id=show-user class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Info do {{ newUser.name }}</h4></div><div class=modal-body><div class=row><div class=col-md-12><div class=\"col-md-6 col-md-offset-5\"><img src=\"/uploads/avatars/{{ newUser.avatar }}\" alt=\"Imagem do Usuário\" style=\"width: 100px; height: 100px; float: left; border-radius: 50%; margin-right: 25px\"></div></div></div><hr><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover\"><thead><tr><th class=text-center colspan=2>INFORMAÇOES DO UTILIZADOR<tbody><tr><td><b>ID</b><td><i>{{ newUser.id }}</i><tr><td><b>Nome</b><td><i>{{ newUser.name }}</i><tr><td><b>Utilizador</b><td><span class=\"label label-info\"><i>{{ newUser.username }}</i></span><tr><td><b>Sexo</b><td><i>{{ alterGenderValue(newUser.gender) }}</i><tr><td><b>BI</b><td><span class=\"label label-info\"><i>{{ newUser.ic }}</i></span><tr><td><b>Idade</b><td><i>{{ newUser.age }}</i><tr><td><b>Email</b><td><span class=\"label label-info\"><i>{{ newUser.email }}</i></span><tr><td><b>Telefone</b><td><span class=label :class=\"{ 'label-info': newUser.phone, 'none': !newUser.phone }\"><i>{{ newUser.phone }}</i></span><tr><td><b>Ilha</b><td><i>{{ alterStateValue(newUser.state) }}</i><tr><td><b>Concelho</b><td><i>{{ newUser.council }}</i><tr><td><b>Freguesia</b><td><i>{{ newUser.parish }}</i><tr><td><b>Zona</b><td><i>{{ newUser.zone }}</i><tr><td><b>Tipo</b><td><span class=\"label label-primary\"><i>{{ alterTypeValue(newUser.type) }}</i></span><tr><td><b>Estado</b><td><span class=label :class=\"{ 'label-info': newUser.status, 'label-danger': !newUser.status }\"><i>{{newUser.status ? 'Ativado' : 'Disativado'}}</i></span><tr><td><b>Descrição</b><td><i>{{ newUser.description }}</i><tr><td><b>Data da criação</b><td><i>{{ user.created_at | formatDate 'DD/MM/YYYY' }}</i><tr><td><b>Data de atualização</b><td><i>{{ user.updated_at | formatDate 'DD/MM/YYYY' }}</i></table></div></div></div></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal>Close</button></div></div></div></div><div class=\"modal fade\" id=modal-delete-user tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar Utilizador</h4></div><div class=modal-body><h1>Eliminar Utilizador {{newUser.name}}</h1></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteUser(newUser.id) @click=deleteUser(newUser.id) type=button class=\"btn btn-default\">Eliminar Utilizador</button></div></div></div></div><div id=modal-create-user class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Criar Utilizador</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-8><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=\"Nome Completo\" v-model=newUser.name v-validate:name=\"['required']\"> <span class=\"fa fa-user form-control-feedback\"></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div><div class=col-md-4><div class=\"form-group has-feedback\"><input type=text class=form-control name=username placeholder=utilizador v-model=newUser.username v-validate:username=\"['required']\"> <span class=\"fa fa-user-circle form-control-feedback\"></span><p style=color:red v-if=\"$validationew.username.required && $validationew.username.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-8><div class=\"form-group has-feedback\"><input type=email class=form-control name=email placeholder=Email v-model=newUser.email v-validate:email=\"['required']\"> <span class=\"fa fa-envelope form-control-feedback\"></span> <span style=color:red v-show=!myValidation.email v-if=\"$validationew.email.required && $validationew.email.touched\"><span data-toggle=tooltip title=\"Este campo é obrigatório\">*</span></span>&nbsp;&nbsp;&nbsp; <span style=color:red v-if=\"!myValidation.email && $validationew.email.touched\"><span data-toggle=tooltip title=\"Recorda-se de introduzir email valido! ex exemplo@exemplo.cv\">*</span></span></div></div><div class=col-md-4><div class=\"form-group has-feedback\"><input v-model=newUser.ic type=number class=form-control placeholder=\"Número BI\"> <span class=\"fa fa-id-card form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input type=password class=form-control name=password placeholder=Password v-model=newUser.password v-validate:password=\"['required']\"> <span class=\"fa fa-lock form-control-feedback\"></span><p style=color:red v-if=\"$validationew.password.required && $validationew.password.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida\">*</span></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input v-model=newUser.phone type=number class=form-control placeholder=\"Introduza o Numero\"> <span class=\"fa fa-phone form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><label class=radio-inline><input type=radio id=gender value=M name=gender v-model=newUser.gender> Masculino</label><label class=radio-inline><input type=radio id=gender name=gender value=F v-model=newUser.gender>Feminino</label></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=number class=form-control name=age placeholder=Idade min=20 max=50 v-model=newUser.age> <span class=\"fa fa-birthday-cake form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><select name=state class=\"selectpicker form-control show-tick\" v-model=newUser.state><optgroup label=Sotavento><option>Seleciona uma Ilha<option value=2>Maio<option value=1>Santiago<option value=3>Fogo<option value=4>Brava<optgroup label=Barlavento><option value=5>Santo Antão<option value=6>São Nicolau<option value=7>São Vicente<option value=8>Sal<option value=9>Boa Vista</select></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=council placeholder=Concelho v-model=newUser.council> <span class=\"fa fa-compass form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=parish placeholder=Fraguesia v-model=newUser.parish> <span class=\"fa fa-map-marker form-control-feedback\"></span></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=zone placeholder=Zona v-model=newUser.zone> <span class=\"fa fa-thumb-tack form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><select name=state class=\"selectpicker form-control show-tick\" v-model=newUser.type><option>Seleciona o tipo de utilizador<option value=member>Membro<option value=emp>Funcionario<option value=trad>Comerciante</select></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><select class=iform-control v-model=newUser.roles.name multiple><option value=\"\" selected>Escolhe Papeis para este Utilizador<option v-for=\"role in roles\" value={{role.id}}>{{role.display_name}}</select></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=\"Descrição do utilizador\" class=form-control rows=5 cols=40 id=description v-model=newUser.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createUser class=\"btn btn-secondary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar Dados Introduzidos</button></div></div></div></div><div id=modal-edit-user class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar Utilizador</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-8><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=\"Nome Completo\" v-model=newUser.name v-validate:name=\"['required']\"> <span class=\"fa fa-user form-control-feedback\"></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div><div class=col-md-4><div class=\"form-group has-feedback\"><input type=text class=form-control name=username placeholder=utilizador v-model=newUser.username v-validate:username=\"['required']\"> <span class=\"fa fa-user-circle form-control-feedback\"></span><p style=color:red v-if=\"$validationew.username.required && $validationew.username.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-8><div class=\"form-group has-feedback\"><input type=email class=form-control name=email placeholder=Email v-model=newUser.email v-validate:email=\"['required']\"> <span class=\"fa fa-envelope form-control-feedback\"></span> <span style=color:red v-show=!myValidation.email v-if=\"$validationew.email.required && $validationew.email.touched\"><span data-toggle=tooltip title=\"Este campo é obrigatório\">*</span></span>&nbsp;&nbsp;&nbsp; <span style=color:red v-if=\"!myValidation.email && $validationew.email.touched\"><span data-toggle=tooltip title=\"Recorda-se de introduzir email valido! ex exemplo@exemplo.cv\">*</span></span></div></div><div class=col-md-4><div class=\"form-group has-feedback\"><input v-model=newUser.ic type=number class=form-control placeholder=\"Número BI\"> <span class=\"fa fa-id-card form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input type=password class=form-control name=password placeholder=Password v-model=newUser.password v-validate:password=\"['required']\"> <span class=\"fa fa-lock form-control-feedback\"></span><p style=color:red v-if=\"$validationew.password.required && $validationew.password.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida\">*</span></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input v-model=newUser.phone type=number class=form-control placeholder=\"Introduza o Numero\"> <span class=\"fa fa-phone form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><label class=radio-inline><input type=radio id=gender value=M name=gender v-model=newUser.gender> Masculino</label><label class=radio-inline><input type=radio id=gender name=gender value=F v-model=newUser.gender>Feminino</label></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=number class=form-control name=age placeholder=\"Introduza a idade\" min=20 max=50 v-model=newUser.age> <span class=\"fa fa-calendarform-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><select name=state class=\"selectpicker form-control show-tick\" v-model=newUser.state><optgroup label=Sotavento><option>Seleciona uma Ilha<option value=2>Maio<option value=1>Santiago<option value=3>Fogo<option value=4>Brava<optgroup label=Barlavento><option value=5>Santo Antão<option value=6>São Nicolau<option value=7>São Vicente<option value=8>Sal<option value=9>Boa Vista</select></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=council placeholder=Concelho v-model=newUser.council> <span class=\"fa fa-compass form-control-feedback\"></span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=parish placeholder=Fraguesia v-model=newUser.parish> <span class=\"fa fa-map-marker form-control-feedback\"></span></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><input type=text class=form-control name=zone placeholder=Zona v-model=newUser.zone> <span class=\"fa fa-thumb-tack form-control-feedback\"></span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-6><div class=\"form-group has-feedback\"><select name=state class=\"selectpicker form-control show-tick\" v-model=newUser.type><option>Seleciona o tipo de utilizador<option value=member>Membro<option value=emp>Funcionario<option value=trad>Comerciante</select></div></div><div class=col-md-6><div class=\"form-group has-feedback\"><select class=form-control v-model=newUser.roles multiple><option value=\"\" selected>Escolhe Papeis para este Utilizador<option v-for=\"role in roles\" value={{role.id}}>{{role.display_name}}</select></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=\"Descrição do utilizador\" class=form-control rows=5 cols=40 id=description v-model=newUser.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedUser(newUser.id) type=button class=\"btn btn-secondary\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp; Salvar as Alterações</button></div></div></div></div></div></div>"
 
-},{"../../../Pagination/src/Component.vue":116,"babel-runtime/core-js/object/keys":10,"lodash":102,"vueify/lib/insert-css":108}],129:[function(require,module,exports){
+},{"../../../Pagination/src/Component.vue":89,"babel-runtime/core-js/object/keys":2,"lodash":77,"vueify/lib/insert-css":82}],101:[function(require,module,exports){
 'use strict';
 
 var Vue = require('vue');
@@ -41109,9 +39567,9 @@ new Vue({
         //------------------------------Control-----------------------------------
         'show-control': require('./components/Controls/ShowControls'),
         //------------------------------Contract-----------------------------------
-        'show-contract': require('./components/Contracts/ShowContracts'),
+        // 'show-contract': require('./components/Contracts/ShowContracts'),
         //------------------------------Taxation-----------------------------------
-        'show-taxation': require('./components/Taxations/ShowTaxations'),
+        // 'show-taxation': require('./components/Taxations/ShowTaxations'),
         //------------------------------Promotion-----------------------------------
         'show-promotion': require('./components/Promotions/ShowPromotion'),
         // ------------------------------place-----------------------------------
@@ -41129,6 +39587,6 @@ new Vue({
     }
 });
 
-},{"./components/Articles/ShowArticles":109,"./components/Categories/ShowCategories":110,"./components/Contracts/ShowContracts":111,"./components/Controls/ShowControls":112,"./components/Employees/ShowEmployees":113,"./components/Markets/ShowMarket":114,"./components/Materials/ShowMaterial":115,"./components/Permissions/showPermission":117,"./components/Places/ShowPlace":118,"./components/Products/ShowProduct":119,"./components/Promotions/ShowPromotion":120,"./components/Roles/showRoles":121,"./components/Tags/ShowTags":122,"./components/Taxations/ShowTaxations":123,"./components/Traders/ShowTraders":124,"./components/Typeofemployee/ShowTypeofemployee":125,"./components/Typeofplace/ShowTypeofplace":126,"./components/Users/CreateUser":127,"./components/Users/ShowUsers":128,"moment":103,"vue":107,"vue-resource":104,"vue-validator":106}]},{},[129]);
+},{"./components/Articles/ShowArticles":83,"./components/Categories/ShowCategories":84,"./components/Controls/ShowControls":85,"./components/Employees/ShowEmployees":86,"./components/Markets/ShowMarket":87,"./components/Materials/ShowMaterial":88,"./components/Permissions/showPermission":90,"./components/Places/ShowPlace":91,"./components/Products/ShowProduct":92,"./components/Promotions/ShowPromotion":93,"./components/Roles/showRoles":94,"./components/Tags/ShowTags":95,"./components/Traders/ShowTraders":96,"./components/Typeofemployee/ShowTypeofemployee":97,"./components/Typeofplace/ShowTypeofplace":98,"./components/Users/CreateUser":99,"./components/Users/ShowUsers":100,"moment":78,"vue":81,"vue-resource":79,"vue-validator":80}]},{},[101]);
 
 //# sourceMappingURL=main.js.map
