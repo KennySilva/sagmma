@@ -77,12 +77,12 @@
                             @role(['superadmin', 'admin', 'dpel', 'ga'])
                             <a href="#"><i class='fa fa-desktop'></i> <span>APLICAÇÃO E CONTEÚDO</span> <i class="fa fa-angle-left pull-right"></i></a>
                             <ul class="treeview-menu">
-                                <li><a href="{{ url('sagmma/categories') }}"><i class='fa fa-folder-open'></i> <span>Categorias</span></a></li>
-                                <li><a href="{{ url('sagmma/tags') }}"><i class='fa fa-tag'></i> <span>Etiquetas</span></a></li>
-                                <li><a href="{{ url('sagmma/tasks') }}"><i class='fa fa-tasks'></i> <span>Tarefas</span></a></li>
-                                <li><a href="{{ url('sagmma/articles') }}"><i class='fa fa-file'></i> <span>Artigos</span></a></li>
-                                <li><a href="{{ url('sagmma/images') }}"><i class='fa fa-file-image-o'></i> <span>Imagems</span></a></li>
-                                <li><a href="{{ url('sagmma/menus') }}"><i class='fa fa-bars'></i> <span>Menus</span></a></li>
+                                <li><a href="{{ url('web/categories') }}"><i class='fa fa-folder-open'></i> <span>Categorias</span></a></li>
+                                <li><a href="{{ url('web/tags') }}"><i class='fa fa-tag'></i> <span>Etiquetas</span></a></li>
+                                <li><a href="{{ url('web/tasks') }}"><i class='fa fa-tasks'></i> <span>Tarefas</span></a></li>
+                                <li><a href="{{ url('web/articles') }}"><i class='fa fa-file'></i> <span>Artigos</span></a></li>
+                                <li><a href="{{ url('web/images') }}"><i class='fa fa-file-image-o'></i> <span>Imagems</span></a></li>
+                                <li><a href="{{ url('web/menus') }}"><i class='fa fa-bars'></i> <span>Menus</span></a></li>
                             </ul>
                             @endrole
                         </li>

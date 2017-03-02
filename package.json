@@ -5,6 +5,7 @@
   },
   "devDependencies": {
     "babel-preset-stage-2": "^6.18.0",
+    "css-loader": "^0.26.2",
     "gulp": "^3.9.1",
     "gulp-sass": "^2.3.2",
     "laravel-elixir": "^6.0.0-9",
@@ -12,6 +13,7 @@
     "laravel-elixir-vue": "^0.1.4",
     "laravel-elixir-webpack-official": "^1.0.2",
     "lodash": "^4.14.0",
+    "style-loader": "^0.13.2",
     "vue": "^1.0.26",
     "vue-resource": "^0.9.3"
   },
@@ -22,6 +24,7 @@
     "laravel-elixir-vueify": "^2.0.0",
     "moment": "^2.14.1",
     "vue-cli": "^2.2.0",
+    "vue-quill-editor": "^1.1.1",
     "vue-router": "^0.7.13"
   }
 }

@@ -11,6 +11,7 @@ use Charts;
 use Employee;
 use Typeofplace;
 use DB;
+use User;
 
 
 
@@ -27,13 +28,12 @@ class TaxationsController extends Controller
 
 
 
-
         $chart = Charts::database(Taxation::all(), 'pie', 'fusioncharts')->dateColumn('created_at')
         ->elementLabel("Total")
         ->dimensions(1000, 500)
         ->responsive(false)
         ->groupBy('employee_id');
-        
+
         return view('_backend.taxations.show', ['chart' => $chart]);
     }
 

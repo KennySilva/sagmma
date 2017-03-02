@@ -13,7 +13,7 @@ class CategoriesController extends Controller
 {
     public function index()
     {
-        return view('_frontend.web.category.show');
+        return view('_backend.category.show');
 
     }
 

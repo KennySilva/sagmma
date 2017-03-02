@@ -148,6 +148,7 @@ Route::group(['namespace' => 'ApiControllers'], function()
             Route::get('articleCategory', 'ApiArticlesController@getCategoryForArticle');
             Route::get('articleUser', 'ApiArticlesController@getUserforArticle');
             Route::post('articleImageUpload', 'ApiArticlesController@uploadImage');
+
         });
     });
 });
@@ -225,6 +226,8 @@ Route::group(['namespace' => 'Web'], function()
             Route::resource('tags', 'TagsController');
             // -------------------------------------------articles-------------------------------------
             Route::resource('articles', 'ArticlesController');
+            // --------------------------------------Images-----------------------------------------
+            Route::resource('images', 'ImagesController');
 
         });
     });
@@ -305,6 +308,15 @@ Entrust::routeNeedsRole('/home*', 'admin');
 Route::get('/criar', ['middleware' => 'auth', function () {
     return view('_backend.users.create');
 }]);
+
+Route::get('/art', ['middleware' => 'auth', function () {
+    return view('_frontend.web.index');
+}]);
+
+Route::get('/news', function () {
+    return view('newscaroucel');
+});
+
 
 
 

@@ -13,7 +13,7 @@ class TagsController extends Controller
 {
     public function index()
     {
-        return view('_frontend.web.tag.show');
+        return view('_backend.tag.show');
 
     }
 

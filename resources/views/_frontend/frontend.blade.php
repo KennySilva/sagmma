@@ -1,6 +1,9 @@
 @extends('_frontend.master.app')
 
 @section('content')
+    <!--------------------------------------------------------------------------------------->
+    @include('_frontend.master.partials.carousel')
+    <!--------------------------------------------------------------------------------------->
 
     <!-- Container (About Section) -->
     @include('_frontend.master.partials.pages.market_info')
@@ -13,9 +16,15 @@
 
     <!-- Container (Pricing Section) -->
     @include('_frontend.master.partials.pages.market_team')
-
+    
     <!-- Container (Contact Section) -->
     @include('_frontend.master.partials.pages.contact')
+
+    <!--------------------------------------------------------------------------------------->
+    @include('_frontend.master.partials.mapscript')
+    <!--------------------------------------------------------------------------------------->
+
+
 @endsection
 @push('scripts')
     <script>

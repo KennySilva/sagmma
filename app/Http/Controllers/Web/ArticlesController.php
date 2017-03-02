@@ -13,7 +13,7 @@ class ArticlesController extends Controller
 {
     public function index()
     {
-        return view('_frontend.web.article.show');
+        return view('_backend.article.show');
 
     }
 

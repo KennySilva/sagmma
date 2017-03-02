@@ -1,243 +1,260 @@
 <div class="alert alert-success" transition="success" v-if="success">
-	   <i class="fa fa-thumbs-up"> Sucesso!!!</i>
-   </div>
+	<i class="fa fa-thumbs-up"> Sucesso!!!</i>
+</div>
 
-   <div class="row">
-	   <div class="col-md-4 pull-right">
-		   <div class="input-group">
-			   <span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
-			   <input v-model="filter.term" type="text" class="form-control" placeholder="Filtrar..." aria-describedby="basic-addon1">
-		   </div>
-	   </div>
-   </div>
+<div class="row">
+	<div class="col-md-4 pull-right">
+		<div class="input-group">
+			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
+			<input v-model="filter.term" type="text" class="form-control" placeholder="Filtrar..." aria-describedby="basic-addon1">
+		</div>
+	</div>
+</div>
 
-   <hr>
-   <div class="col-md-12">
-	   <button class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-article"><i class="fa fa-plus"></i> Novo</button>
-   </div>
-
-
-   </div>
-   <br><br>
-
-   <div class="col-md-12">
-	   <div class='table-responsive'>
-		   <table class='table table-striped table-hover table-condensed'>
-			   <thead>
-				   <tr>
-					   <th>
-						   <i :class = "{'fa-sort-amount-asc': sortColumn == 'title' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'title' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
-						   <a href="#" @click = "doSort($event, 'title')">Titulo</a>
-					   </th>
-					   <th>
-						   <i :class = "{'fa-sort-amount-asc': sortColumn == 'status' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'status' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
-						   <a href="#" @click = "doSort($event, 'status')">Publicação</a>
-					   </th>
-					   <th>
-						   <i :class = "{'fa-sort-amount-asc': sortColumn == 'featured' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'featured' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
-						   <a href="#" @click = "doSort($event, 'featured')">Destaque</a>
-					   </th>
-
-					   <th  class="text-center" colspan="2">
-						   <span><i class="fa fa-cogs"></i></span>
-					   </th>
-
-					   <th width=75  class="text-center">
-						   <a @click = "openAllContents" href="#">
-							   <span><i data-toggle="tooltip" data-placement="left" title="Ver Conteúdos de todos os Artigos" class="fa" :class="{'fa-plus': openContents.length == 0, 'fa-minus': openContents.length > 0}"></i></span>
-						   </a>
-					   </th>
-				   </tr>
-			   </thead>
-			   <tbody v-for="article in articles | filterBy filter.term | orderBy sortColumn sortInverse">
-				   <tr>
-					   <td>{{ article.title }}</td>
-
-					   <td>
-						   <button type="submit" @click = "articleStatus(article.id)" class='btn btn-xs btn-flat' :class="{ 'btn-info': article.status, 'btn-danger': !article.status }">{{article.status ? 'Publicado' : 'Pendente'}}</button>
-					   </td>
-
-					   <td>
-						   <button type="submit" @click = "articleFeatures(article.id)" class='btn btn-xs btn-flat' :class="{ 'btn-info': article.featured, 'btn-danger': !article.featured }">{{article.featured ? 'Publicado' : 'Pendente'}}</button>
-					   </td>
-
-					   <td align=left>  <a data-toggle="modal" data-target="#modal-edit-article" href="#"> <i class="fa fa-pencil text-primary" @click="getThisArticle(article.id)" > </i></a></td>
-					   <td align=right><a data-toggle="modal" data-target="#modal-delete-article" href="#"><i class="fa fa-trash text-danger" @click="getThisArticle(article.id)"></i></a></td>
-
-					   <td width=75 class="text-center">
-						   <a @click = "doOpenContents($event, article.id)" v-show="article.content != ''" href="#"><i data-toggle="tooltip" data-placement="left" title="Ver este conteúdo" class="fa" :class="{'fa-plus-square': openContents.indexOf(article.id) == -1, 'fa-minus-square': openContents.indexOf(article.id) > -1}"></i></a>
-						   <i class="fa fa-plus-square" v-show="article.content == ''" style="opacity: 0.3"></i>
-					   </td>
-				   </tr>
-				   <tr class="" v-show="openContents.indexOf(article.id) > -1 && article.content != ''">
-					   <td colspan="6">
-						   {{ article.content }}
-					   </td>
-				   </tr>
-			   </tbody>
-		   </table>
-		   <div class="col-md-12 pull-left">
-			   <Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
-		   </div>
-	   </div>
-
-	   <!--------------------------------------------------------------------------------------------------------->
-
-	   <div class="modal fade" id="modal-delete-article" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
-		   <div class="modal-dialog">
-			   <div class="modal-content">
-				   <div class="modal-header">
-					   <button @click="clearField" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-					   <h4 class="modal-title" id="">Eliminar</h4>
-				   </div>
-				   <div class="modal-body">
-					   <h5>Eliminar - <span class="text-uppercase text-danger">{{newArticle.name}}</span></h5>
-				   </div>
-				   <div class="modal-footer">
-					   <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-					   <button  @keyup.enter="deleteArticle(newArticle.id)" @click="deleteArticle(newArticle.id)" type="button" class="btn btn-danger">Eliminar</button>
-				   </div>
-			   </div>
-		   </div>
-	   </div>
+<hr>
+<div class="col-md-12">
+	<button class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-article"><i class="fa fa-plus"></i> Novo</button>
+</div>
 
 
-	   <!--------------------------------------------------------------------------------------------------------->
-	   <!-- Modal -->
-	   <div id="modal-create-article" class="modal fade" role="dialog">
-		   <div class="modal-dialog">
+</div>
+<br><br>
 
-			   <!-- Modal content-->
-			   <div class="modal-content">
-				   <div class="modal-header">
-					   <button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
-					   <h4 class="modal-title">Registar</h4>
-				   </div>
-				   <div class="modal-body">
-					   <validator name="validationew">
-						   <form action="#" methods="POST">
-							   <div class="row">
-								   <div class="col-md-12">
-									   <div class="col-md-12">
-										   <div class="form-group has-feedback">
-											   <input type="text" class="form-control" name="title" placeholder="Titulo" v-model="newArticle.title" v-validate:title="['required']"/>
-											   <span class="form-control-feedback"></span>
-											   <p style="color:red;" v-if="$validationew.title.required && $validationew.title.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
-										   </div>
-									   </div>
-								   </div>
-							   </div>
+<div class="col-md-12">
+	<div class='table-responsive'>
+		<table class='table table-striped table-hover table-condensed'>
+			<thead>
+				<tr>
+					<th>
+						<i :class = "{'fa-sort-amount-asc': sortColumn == 'title' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'title' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+						<a href="#" @click = "doSort($event, 'title')">Titulo</a>
+					</th>
+					<th>
+						<i :class = "{'fa-sort-amount-asc': sortColumn == 'status' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'status' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+						<a href="#" @click = "doSort($event, 'status')">Publicação</a>
+					</th>
+					<th>
+						<i :class = "{'fa-sort-amount-asc': sortColumn == 'featured' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'featured' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+						<a href="#" @click = "doSort($event, 'featured')">Destaque</a>
+					</th>
 
-							   <div class="row">
-								   <div class="col-md-12">
-									   <div class="col-md-12">
-										   <div class="form-group has-feedback">
-											   <select class="form-control" v-model="newArticle.category_id" v-el:category>
-												   <option v-for="category in categories" value="{{category.id}}">{{category.name}}</option>
-											   </select>
-										   </div>
-									   </div>
-								   </div>
-							   </div>
+					<th  class="text-center" colspan="2">
+						<span><i class="fa fa-cogs"></i></span>
+					</th>
 
-							   <div class="row">
-								   <div class="col-md-12">
-									   <div class="col-md-12">
-										   <div class="form-group has-feedback">
-											   <select class="form-control" v-model="newArticle.tags" v-el:tags multiple="multiple">
-												   <option v-for="tag in tags" value="{{tag.id}}">
-													   {{tag.name}}
-												   </option>
-											   </select>
-										   </div>
-									   </div>
-								   </div>
-							   </div>
+					<th width=75  class="text-center">
+						<a @click = "openAllContents" href="#">
+							<span><i data-toggle="tooltip" data-placement="left" title="Ver Conteúdos de todos os Artigos" class="fa" :class="{'fa-plus': openContents.length == 0, 'fa-minus': openContents.length > 0}"></i></span>
+						</a>
+					</th>
+				</tr>
+			</thead>
+			<tbody v-for="article in articles | filterBy filter.term | orderBy sortColumn sortInverse">
+				<tr>
+					<td>{{ article.title }}</td>
 
+					<td>
+						<button type="submit" @click = "articleStatus(article.id)" class='btn btn-xs btn-flat' :class="{ 'btn-info': article.status, 'btn-danger': !article.status }">{{article.status ? 'Publicado' : 'Pendente'}}</button>
+					</td>
 
-							   <hr><!---------------------------------------------------------------------------------------------------------------->
+					<td>
+						<button type="submit" @click = "articleFeatures(article.id)" class='btn btn-xs btn-flat' :class="{ 'btn-info': article.featured, 'btn-danger': !article.featured }">{{article.featured ? 'Publicado' : 'Pendente'}}</button>
+					</td>
 
-							   <div class="row">
-								   <div class="col-md-12">
-									   <div class="col-md-12">
-										   <div class="form-group has-feedback">
-											   <textarea name="content" placeholder="Conteúdo..." class="form-control textarea-content" rows="5" cols="40" id="content" v-model="newArticle.content"></textarea>
-										   </div>
-									   </div>
-								   </div>
-							   </div>
+					<td align=left>  <a data-toggle="modal" data-target="#modal-edit-article" href="#"> <i class="fa fa-pencil text-primary" @click="getThisArticle(article.id)" > </i></a></td>
+					<td align=right><a data-toggle="modal" data-target="#modal-delete-article" href="#"><i class="fa fa-trash text-danger" @click="getThisArticle(article.id)"></i></a></td>
 
+					<td width=75 class="text-center">
+						<a @click = "doOpenContents($event, article.id)" v-show="article.content != ''" href="#"><i data-toggle="tooltip" data-placement="left" title="Ver este conteúdo" class="fa" :class="{'fa-plus-square': openContents.indexOf(article.id) == -1, 'fa-minus-square': openContents.indexOf(article.id) > -1}"></i></a>
+						<i class="fa fa-plus-square" v-show="article.content == ''" style="opacity: 0.3"></i>
+					</td>
+				</tr>
+				<tr class="" v-show="openContents.indexOf(article.id) > -1 && article.content != ''">
+					<td colspan="6">
+						{{ article.content }}
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<div class="col-md-12 pull-left">
+			<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
+		</div>
+	</div>
 
-							   <div class="row">
-								   <div class="col-md-12">
-									   <div class="col-md-12">
-										   <div class="form-group has-feedback">
-											   <!-- <input  class="form-control" type="file" name="articleimage" id="articleimage" v-el:articleimage> -->
-											   <input  class="form-control" type="file" name="articleimage" id="articleimage" @change = "uploadsImages" v-el:articleimage>
-										   </div>
-									   </div>
-								   </div>
-							   </div>
+	<!--------------------------------------------------------------------------------------------------------->
 
-						   </form>
-					   </validator>
-				   </div>
-				   <div class="modal-footer">
-					   <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
-
-					   <button :disabled = "!$validationew.valid" @click="createArticle" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
-				   </div>
-			   </div>
-		   </div>
-	   </div>
+	<div class="modal fade" id="modal-delete-article" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button @click="clearField" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="">Eliminar</h4>
+				</div>
+				<div class="modal-body">
+					<h5>Eliminar - <span class="text-uppercase text-danger">{{newArticle.name}}</span></h5>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+					<button  @keyup.enter="deleteArticle(newArticle.id)" @click="deleteArticle(newArticle.id)" type="button" class="btn btn-danger">Eliminar</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
 
+	<!--------------------------------------------------------------------------------------------------------->
+	<!-- Modal -->
+	<div id="modal-create-article" class="modal fade" role="dialog">
+		<div class="modal-dialog">
 
-	   <!--------------------------------------------------------------------------------------------------------->
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Registar</h4>
+				</div>
+				<div class="modal-body">
+					<validator name="validationew">
+						<form action="#" methods="POST">
+							<div class="row">
+								<div class="col-md-12">
+									<div class="col-md-12">
+										<div class="form-group has-feedback">
+											<input type="text" class="form-control" name="title" placeholder="Titulo" v-model="newArticle.title" v-validate:title="['required']"/>
+											<span class="form-control-feedback"></span>
+											<p style="color:red;" v-if="$validationew.title.required && $validationew.title.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
+										</div>
+									</div>
+								</div>
+							</div>
 
-	   <!-- Modal -->
-	   <div id="modal-edit-article" class="modal fade" role="dialog">
-		   <div class="modal-dialog">
-			   <!-- Modal content-->
-			   <div class="modal-content">
-				   <div class="modal-header">
-					   <button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
-					   <h4 class="modal-title">Editar</h4>
-				   </div>
-				   <div class="modal-body">
-					   <validator name="validation1">
-						   <form methods="patch">
-							   <div class="row">
-								   <div class="col-md-12">
-									   <div class="col-md-12">
-										   <div class="form-group has-feedback">
-											   <input type="text" class="form-control" name="name" v-model="newArticle.name" v-validate:name="['required']"/>
-											   <span class="form-control-feedback"></span>
-											   <p style="color:red;" v-if="$validation1.name.required && $validation1.name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
-										   </div>
-									   </div>
-								   </div>
-							   </div>
+							<div class="row">
+								<div class="col-md-12">
+									<div class="col-md-12">
+										<div class="form-group has-feedback">
+											<select class="form-control" v-model="newArticle.category_id" v-el:category>
+												<option v-for="category in categories" value="{{category.id}}">{{category.name}}</option>
+											</select>
+										</div>
+									</div>
+								</div>
+							</div>
 
-							   <hr><!---------------------------------------------------------------------------------------------------------------->
+							<div class="row">
+								<div class="col-md-12">
+									<div class="col-md-12">
+										<div class="form-group has-feedback">
+											<select class="form-control" v-model="newArticle.tags" v-el:tags multiple="multiple">
+												<option v-for="tag in tags" value="{{tag.id}}">
+													{{tag.name}}
+												</option>
+											</select>
+										</div>
+									</div>
+								</div>
+							</div>
 
-							   <div class="row">
-								   <div class="col-md-12">
-									   <div class="col-md-12">
-										   <div class="form-group has-feedback">
-											   <textarea name="description" placeholder="Descrição..." class="form-control" rows="5" cols="40" id="description" v-model="newArticle.description"></textarea>
-										   </div>
-									   </div>
-								   </div>
-							   </div>
-						   </form>
-					   </validator>
-				   </div>
-				   <div class="modal-footer">
-					   <button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Close</button>
-					   <button v-on:show="" @click="saveEditedArticle(newArticle.id)" type="button" class="btn btn-primary"><i class="fa fa-refresh fa-spin"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>
-				   </div>
-			   </div>
-		   </div>
-	   </div>
-   </div>
+
+							<hr><!---------------------------------------------------------------------------------------------------------------->
+
+							<div class="row">
+								<div class="col-md-12">
+									<div class="col-md-12">
+										<div class="form-group has-feedback">
+											<textarea name="content" placeholder="Conteúdo..." class="form-control textarea-content" rows="5" cols="40" id="content" v-model="newArticle.content"></textarea>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-md-12">
+									<div class="col-md-12">
+										<div class="form-group has-feedback">
+											<quill-editor ref="myTextEditor"
+											v-model="content"
+											:config="editorOption"
+											@blur="onEditorBlur($event)"
+											@focus="onEditorFocus($event)"
+											@ready="onEditorReady($event)">
+										</quill-editor>
+
+									</div>
+								</div>
+							</div>
+						</div>
+
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-12">
+									<div class="form-group has-feedback">
+										<!-- <input  class="form-control" type="file" name="articleimage" id="articleimage" v-el:articleimage> -->
+										<input  class="form-control" type="file" name="articleimage" id="articleimage" @change = "uploadsImages" v-el:articleimage>
+									</div>
+								</div>
+							</div>
+						</div>
+
+					</form>
+				</validator>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
+
+				<button :disabled = "!$validationew.valid" @click="createArticle" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<!--------------------------------------------------------------------------------------------------------->
+
+<!-- Modal -->
+<div id="modal-edit-article" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+		<!-- Modal content-->
+		<div class="modal-content">
+			<div class="modal-header">
+				<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Editar</h4>
+			</div>
+			<div class="modal-body">
+				<validator name="validation1">
+					<form methods="patch">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-12">
+									<div class="form-group has-feedback">
+										<input type="text" class="form-control" name="name" v-model="newArticle.name" v-validate:name="['required']"/>
+										<span class="form-control-feedback"></span>
+										<p style="color:red;" v-if="$validation1.name.required && $validation1.name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<hr><!---------------------------------------------------------------------------------------------------------------->
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-12">
+									<div class="form-group has-feedback">
+										<textarea name="description" placeholder="Descrição..." class="form-control" rows="5" cols="40" id="description" v-model="newArticle.description"></textarea>
+									</div>
+								</div>
+							</div>
+						</div>
+					</form>
+				</validator>
+			</div>
+			<div class="modal-footer">
+				<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Close</button>
+				<button v-on:show="" @click="saveEditedArticle(newArticle.id)" type="button" class="btn btn-primary"><i class="fa fa-refresh fa-spin"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>
+			</div>
+		</div>
+	</div>
+</div>
+</div>

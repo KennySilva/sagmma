@@ -1,4 +1,6 @@
 var Vue = require('vue');
+var VueQuillEditor = require('vue-quill-editor');
+Vue.use(VueQuillEditor);
 Vue.use(require('vue-resource'));
 Vue.use(require('vue-validator'));
 // Vue.use(require('vue-form'));
