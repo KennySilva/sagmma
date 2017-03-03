@@ -94,7 +94,7 @@
                 </h2>
                 <div class="">
                     <p>
-                        <span class="post-fecha"><i class="fa fa-folder-open-o"></i> <a href="">{{ $article->category->name }}</a> &nbsp; &nbsp;
+                        <span class="post-fecha"><i class="fa fa-folder-open-o"></i> <a href="{{ route('front.search.category', $article->category->name) }}">{{ $article->category->name }}</a> &nbsp; &nbsp;
                             <i class="fa fa-clock-o"></i> {{ $article->created_at->diffForHumans() }}</span><a href="#"></a>
                         </p>
                     </div>

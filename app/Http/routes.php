@@ -10,6 +10,15 @@ Route::group(['middleware' => []], function () { //Papel de Admin, Superadimin, 
     //-------------------------------------Página Principal------------------------------------------------------
     Route::resource('/', 'FrontController');
     Route::resource('/article', 'Web\NewsController');
+    Route::get('/categories/{name}', [
+        'uses' => 'Web\NewsController@searchCategory',
+        'as'   => 'front.search.category'
+    ]);
+
+    Route::get('/tags/{name}', [
+        'uses' => 'Web\NewsController@searchTag',
+        'as'   => 'front.search.tag'
+    ]);
 
 });
 

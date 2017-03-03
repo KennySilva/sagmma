@@ -22,4 +22,9 @@ class Category extends Model
         return $this->hasMany(Task::class);
     }
 
+    public function scopeSearchCategory($query, $name)
+    {
+        return $query->where('name', '=', $name);
+    }
+
 }

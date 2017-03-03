@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Sagmma\Http\Requests;
 use Sagmma\Http\Controllers\Controller;
 use Article;
+use Tag;
+use Category;
 use Carbon\Carbon;
 
 
@@ -31,36 +33,31 @@ class NewsController extends Controller
         return view('_frontend.web.articlesPresentation.index')->with('articles', $articles);
     }
 
-    public function create()
+
+
+    public function searchCategory($name)
     {
-        //
+        $category = Category::SearchCategory($name)->first();
+        $articles = $category->articles()->paginate(5);
+        $articles->each(function ($articles)
+        {
+            $articles->category;
+            $articles->images;
+            // $articles->user;
+        });
+        return view('_frontend.web.articlesPresentation.index')->with('articles', $articles);
     }
 
-
-    public function store(Request $request)
+    public function searchTag($name)
     {
-        //
-    }
-
-
-    public function show($id)
-    {
-        //
-    }
-
-
-    public function edit($id)
-    {
-        //
-    }
-
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    public function destroy($id)
-    {
-        //
+        $tag = Tag::SearchTag($name)->first();
+        $articles = $tag->articles()->paginate(5);
+        $articles->each(function ($articles)
+        {
+            $articles->category;
+            $articles->images;
+            // $articles->user;
+        });
+        return view('_frontend.web.articlesPresentation.index')->with('articles', $articles);
     }
 }
