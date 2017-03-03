@@ -6,10 +6,9 @@ elixir(function(mix) {
     mix.less('bootstrap/bootstrap.less');
     mix.less('admin-lte/skins/_all-skins.less');
 
-
     //--------------------------------------------------------------
     mix.browserify('main.js');
-
+    mix.browserify('mainfront.js');
     //--------------------------------------------------------------
     mix.scripts(['front.js'],'public/js/front/front.js');
 

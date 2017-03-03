@@ -2,19 +2,17 @@
 
 
 // #######################################################################################################################
-// ####################################################  Route Directs  ##################################################
+// ####################################################  Route Presentation  ##################################################
 // #######################################################################################################################
-Route::get('/', function () {
-    return view('_frontend.frontend');
+
+
+Route::group(['middleware' => []], function () { //Papel de Admin, Superadimin, Dpel
+    //-------------------------------------Página Principal------------------------------------------------------
+    Route::resource('/', 'FrontController');
+    Route::resource('/article', 'Web\NewsController');
+
 });
 
-Route::get('/tester', function () {
-    return view('test');
-});
-
-Route::resource('controlteste', 'ApiControllers\ApiControlsController');
-
-Route::resource('employees', 'ApiControllers\ApiEmployeesController');
 
 // #######################################################################################################################
 // ####################################################  Authentication  #################################################
@@ -316,6 +314,18 @@ Route::get('/art', ['middleware' => 'auth', function () {
 Route::get('/news', function () {
     return view('newscaroucel');
 });
+
+
+
+
+Route::get('/tester', function () {
+    return view('test');
+});
+
+Route::resource('controlteste', 'ApiControllers\ApiControlsController');
+
+Route::resource('employees', 'ApiControllers\ApiEmployeesController');
+
 
 
 

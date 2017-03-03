@@ -66,6 +66,8 @@ export default{
         },
 
         createArticle: function() {
+            this.uploadsImages();
+
             var article = this.newArticle;
             // Clear form input
             this.clearField();

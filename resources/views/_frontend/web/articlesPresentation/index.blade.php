@@ -44,55 +44,26 @@
 
 @section('content')
     <div class="row">
-
-        
-        <div class="jumbotron">
-            <h1>Hello, world!</h1>
-            <p>...</p>
-            <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a></p>
-        </div>
-
-
         {{-- <div class="page-header">
-            <div class="container">
-                <h1 class="text-center">Portal de Notícia do Concelho de Santa Catarina</h1>
-                <h5 class="text-center">Corração da Ilha de Santiago</h5>
+        <div class="container">
+        <h1 class="text-center">Portal de Notícia do Concelho de Santa Catarina</h1>
+        <h5 class="text-center">Corração da Ilha de Santiago</h5>
 
-            </div>
-        </div> --}}
-        @include('_frontend.master.partials.caroucelNews')
     </div>
-    <br>
-    <br>
-    <div class="row">
-        <div class="col-md-12">
+</div> --}}
 
-            {{-- <aside class="col-md-3 hidden-xs hidden-sm">
-            <div class="panel panel-danger">
-            <div class="panel-heading">Categorias</div>
-            <div class="panel-body">
-            <div class="list-group">
-            <a class="list-group-item" href="#">Categoria 1</a>
-            <a class="list-group-item" href="#">Categoria 2</a>
-            <a class="list-group-item" href="#">Categoria 3</a>
 
-        </div>
-    </div>
+<div class="jumbotron">
+    <h1 class="text-center">Santa Catarina</h1>
+    <h5 class="text-center">Corração de Santiago</h5>
 </div>
 
-<div class="panel panel-danger">
-<div class="panel-heading">Marcadores</div>
-<div class="panel-body">
-Panel content
+@include('_frontend.master.partials.caroucelNews')
 </div>
-</div>
-</aside> --}}
-
-
-
-
-
-
+<br>
+<br>
+<div class="row">
+    <div class="col-md-12">
 
 <section  class="main container">
     <div class="row">
@@ -124,7 +95,7 @@ Panel content
                 <div class="">
                     <p>
                         <span class="post-fecha"><i class="fa fa-folder-open-o"></i> <a href="">{{ $article->category->name }}</a> &nbsp; &nbsp;
-                            <i class="fa fa-clock-o"></i> {{ $article->created_at->diffForHumans() }} </span> &nbsp; &nbsp; <span class="post-autor"> <i class="fa fa-user" aria-hidden="true"></i></span><a href="#"></a>
+                            <i class="fa fa-clock-o"></i> {{ $article->created_at->diffForHumans() }}</span><a href="#"></a>
                         </p>
                     </div>
                     <p class="post-contenido text-justify">

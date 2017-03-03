@@ -30,9 +30,19 @@
                         @foreach ($images as $image)
                             <div class="col-sm-6 col-md-4">
                                 <div class="thumbnail">
-                                    <img src="..." alt="...">
+
+                                    <img src="/uploads/uploadsImages/articles/{{$image->name}}" alt="...">
+
+
+                                    {{-- <a href="/uploads/uploadsImages/articles/{!!$image->name!!}" data-lightbox="photo-1" data-title="Um Mercado com capacidade"><img src="/uploads/uploadsImages/articles/{!!$image->name!!}" alt=""></a> --}}
+                                    {{-- <a href="http://lorempixel.com/200/200" data-lightbox="photo-1" data-title="Um Mercado com capacidade"><img src="http://lorempixel.com/200/200" alt=""></a> --}}
+
+
+
                                     <div class="caption">
-                                        <h3>Thumbnail label</h3>
+                                        <h3>{{$image->article->title}}</h3>
+                                        <hr>
+                                        {{-- <p><a href="/uploads/uploadsImages/articles/{{$image->name}}" data-lightbox="photo-2" data-title="{{$image->article->title}}"><i class="fa fa-eye"></i></a></p> --}}
                                     </div>
                                 </div>
                             </div>
@@ -55,6 +65,12 @@
         <script src="{{ asset('bower_components/bootstrap-fileinput/themes/fa/theme.js') }}" charset="utf-8"> </script>
 
         <script>
+        lightbox.option({
+            'resizeDuration': 200,
+            'wrapAround': true,
+            'albumLabel':	"Imagem %1 of %3"
+        });
+
         $("#articleimage").fileinput({
             language: "pt",
             showUpload: false,

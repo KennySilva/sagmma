@@ -6,7 +6,7 @@
                 <div class="row">
                     <div class="col-md-3"><img src="http://lorempixel.com/350/250" alt="Placeholder" class="img-responsive"></div>
                     <div class="col-md-9">
-                        <h2>Slide 1</h2> 
+                        <h2>Slide 1</h2>
                         <p>Lorem ipsum dolor sit <a>ambvvvvvvvvvvvvvet</a>, consectetur adipisicing elit. Animi, labore, magni illum nemo ipsum quod voluptates ab natus nulla possimus incidunt aut neque quaerat mollitia perspiciatis assumenda asperiores consequatur soluta.</p><p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi, labore, magni illum nemo ipsum quod voluptates ab natus nulla possimus incidunt aut neque quaerat mollitia perspiciatis assumenda asperiores consequatur soluta.</p>
                     </div>
                 </div>

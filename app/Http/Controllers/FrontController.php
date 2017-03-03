@@ -1,26 +1,22 @@
 <?php
 
-namespace Sagmma\Http\Controllers\Web;
+namespace Sagmma\Http\Controllers;
 
 use Illuminate\Http\Request;
 
 use Sagmma\Http\Requests;
 use Sagmma\Http\Controllers\Controller;
-use Image;
 
-class ImagesController extends Controller
+
+class FrontController extends Controller
 {
+
 
     public function index()
     {
-        $images = Image::paginate(10);
-        $images->each(function($images)
-        {
-            $images->article;
-        });
-        return view('_backend.image.index')->with('images', $images);
-    }
+        return view('_frontend.frontend');
 
+    }
 
     public function create()
     {
@@ -45,12 +41,10 @@ class ImagesController extends Controller
         //
     }
 
-
     public function update(Request $request, $id)
     {
         //
     }
-
 
     public function destroy($id)
     {

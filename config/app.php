@@ -50,10 +50,14 @@ return [
         /*
         * Application Service Providers...
         */
+
         Sagmma\Providers\AppServiceProvider::class,
         Sagmma\Providers\AuthServiceProvider::class,
         Sagmma\Providers\EventServiceProvider::class,
         Sagmma\Providers\RouteServiceProvider::class,
+
+        Sagmma\Providers\ComposerServiceProvider::class,
+
 
         /*
         * Providers instalado e personalizados para SAGMMA...

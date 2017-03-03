@@ -6,21 +6,30 @@ use Illuminate\Http\Request;
 
 use Sagmma\Http\Requests;
 use Sagmma\Http\Controllers\Controller;
-use Image;
+use Article;
+use Carbon\Carbon;
 
-class ImagesController extends Controller
+
+class NewsController extends Controller
 {
+    public function __construct()
+    {
+        Carbon::setlocale('pt');
+    }
+
 
     public function index()
     {
-        $images = Image::paginate(10);
-        $images->each(function($images)
+        // $articles = Article::take(5)->get();
+        $articles = Article::paginate(5);
+        $articles->each(function ($articles)
         {
-            $images->article;
+            $articles->category;
+            $articles->images;
+            // $articles->user;
         });
-        return view('_backend.image.index')->with('images', $images);
+        return view('_frontend.web.articlesPresentation.index')->with('articles', $articles);
     }
-
 
     public function create()
     {
@@ -45,12 +54,10 @@ class ImagesController extends Controller
         //
     }
 
-
     public function update(Request $request, $id)
     {
         //
     }
-
 
     public function destroy($id)
     {

@@ -36,12 +36,12 @@ class Article extends Model
         return $this->hasMany(Image::class);
     }
 
-    public function categories()
+    public function category()
     {
         return $this->belongsTo(Category::class);
     }
 
-    public function users()
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
