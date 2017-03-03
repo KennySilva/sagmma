@@ -20,6 +20,11 @@ Route::group(['middleware' => []], function () { //Papel de Admin, Superadimin, 
         'as'   => 'front.search.tag'
     ]);
 
+    Route::get('viewArticle/{slug}', [
+        'uses' => 'Web\NewsController@viewArticle',
+        'as'   => 'front.view.article'
+    ]);
+
 });
 
 

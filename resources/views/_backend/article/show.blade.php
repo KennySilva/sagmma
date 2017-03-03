@@ -4,6 +4,14 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="{{ asset('bower_components/bootstrap-fileinput/css/fileinput.css') }}" media="screen" title="no title" charset="utf-8">
 
+    <style media="screen">
+    #exTab2 h3 {
+        color : white;
+        background-color: #428bca;
+        padding : 5px 15px;
+    }
+    </style>
+
 @endsection
 
 @section('htmlheader_title')
@@ -25,10 +33,40 @@
                     </div>
                 </div>
                 <div class="box-body">
-                    {{ csrf_field() }}
-                    <!------------------------------------------------------------------------------------->
-                    <show-article></show-article>
-                    <!------------------------------------------------------------------------------------->
+                    <div id="exTab2" class="">
+                        <ul class="nav nav-tabs">
+                            <li class="active">
+                                <a  href="#1" data-toggle="tab">ARTIGOS</a>
+                            </li>
+                            <li><a href="#2" data-toggle="tab">CATEGORIAS</a>
+                            </li>
+                            <li><a href="#3" data-toggle="tab">MARCADORES</a>
+                            </li>
+
+                        </ul>
+
+                        <div class="tab-content ">
+                            <div class="tab-pane active" id="1">
+                                <br>
+                                {{ csrf_field() }}
+                                <!------------------------------------------------------------------------------------->
+                                <show-article></show-article>
+                                <!------------------------------------------------------------------------------------->
+                            </div>
+                            <div class="tab-pane" id="2">
+                                <br>
+                                <!------------------------------------------------------------------------------------->
+                                <show-category></show-category>
+                                <!------------------------------------------------------------------------------------->
+                            </div>
+                            <div class="tab-pane" id="3">
+                                <br>
+                                <!------------------------------------------------------------------------------------->
+                                <show-tag></show-tag>
+                                <!------------------------------------------------------------------------------------->
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
             </div>

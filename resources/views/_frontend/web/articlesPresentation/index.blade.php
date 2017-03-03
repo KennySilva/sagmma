@@ -65,64 +65,62 @@
 <div class="row">
     <div class="col-md-12">
 
-<section  class="main container">
-    <div class="row">
-        <section  class="posts col-md-9">
-            <div class="miga-de-pan">
-                <ol  class="breadcrumb">
-                    <li class=""><a href="#">Home</a></li>
-                    <li class=""><a href="#">Categprias</a></li>
-                    <li class="">Disenho Web</li>
-                </ol>
-            </div>
-
-
-            @foreach ($articles as $article)
-                <article class="post clearfix">
-                    {{-- <a href="{{ route('front.view.article', $article->slug) }}" class="thumb pull-left"> --}}
-
-                    @foreach ($article->images as $image)
-                        <a href="#" class="thumb pull-left">
-
-                            <img class="img-thumbnail img-responsive" src="{{ asset('/uploads/uploadsImages/articles/'.$image->name) }}" alt="" />
-                        </a>
-                    @endforeach
-
-                </a>
-                <h2 class="post-title">
-                    <a href="">{{ $article->title }}</a>
-                </h2>
-                <div class="">
-                    <p>
-                        <span class="post-fecha"><i class="fa fa-folder-open-o"></i> <a href="{{ route('front.search.category', $article->category->name) }}">{{ $article->category->name }}</a> &nbsp; &nbsp;
-                            <i class="fa fa-clock-o"></i> {{ $article->created_at->diffForHumans() }}</span><a href="#"></a>
-                        </p>
+        <section  class="main container">
+            <div class="row">
+                <section  class="posts col-md-9">
+                    <div class="miga-de-pan">
+                        <ol  class="breadcrumb">
+                            <li class=""><a href="#">Home</a></li>
+                            <li class=""><a href="#">Categprias</a></li>
+                            <li class="">Disenho Web</li>
+                        </ol>
                     </div>
-                    <p class="post-contenido text-justify">
-                        <div class="comment more">
-                            {{-- {!! $article->content !!} --}}
-                        </div>
-                    </p>
-                </article>
-            @endforeach
-            <nav class="center-block">
-                {!! $articles->render() !!}
-            </nav>
-
-        </section>
-        <aside class="col-md-3 hidden-xs hidden-sm">
-            @include('_frontend.master.partials.asideNews')
 
 
+                    @foreach ($articles as $article)
+                        <article class="post clearfix">
+
+                            <a href="{{ route('front.view.article', $article->slug) }}" class="thumb pull-left">
+                                @foreach ($article->images as $image)
+
+                                    <img class="img-thumbnail img-responsive" src="{{ asset('/uploads/uploadsImages/articles/'.$image->name) }}" alt="" />
+                                @endforeach
+                            </a>
+
+                            <h2 class="post-title">
+                                <a href="{{ route('front.view.article', $article->slug) }}">{{ $article->title }}</a>
+                            </h2>
+                            <div class="">
+                                <p>
+                                    <span class="post-fecha"><i class="fa fa-folder-open-o"></i> <a href="{{ route('front.search.category', $article->category->name) }}">{{ $article->category->name }}</a> &nbsp; &nbsp;
+                                        <i class="fa fa-clock-o"></i> {{ $article->created_at->diffForHumans() }}</span><a href="#"></a>
+                                    </p>
+                                </div>
+                                <p class="post-contenido text-justify">
+                                    <div class="comment more">
+                                        {{-- {!! $article->content !!} --}}
+                                    </div>
+                                </p>
+                            </article>
+                        @endforeach
+                        <nav class="center-block">
+                            {!! $articles->render() !!}
+                        </nav>
+
+                    </section>
+                    <aside class="col-md-3 hidden-xs hidden-sm">
+                        @include('_frontend.master.partials.asideNews')
 
 
 
 
-        </aside>
+
+
+                    </aside>
+                </div>
+            </section>
+        </div>
     </div>
-</section>
-</div>
-</div>
 
 
 @endsection

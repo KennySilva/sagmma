@@ -18,8 +18,6 @@ class NewsController extends Controller
     {
         Carbon::setlocale('pt');
     }
-
-
     public function index()
     {
         // $articles = Article::take(5)->get();
@@ -32,9 +30,30 @@ class NewsController extends Controller
         });
         return view('_frontend.web.articlesPresentation.index')->with('articles', $articles);
     }
-
-
-
+    public function create()
+    {
+        //
+    }
+    public function store(Request $request)
+    {
+        //
+    }
+    public function show($id)
+    {
+        //
+    }
+    public function edit($id)
+    {
+        //
+    }
+    public function update(Request $request, $id)
+    {
+        //
+    }
+    public function destroy($id)
+    {
+        //
+    }
     public function searchCategory($name)
     {
         $category = Category::SearchCategory($name)->first();
@@ -59,5 +78,17 @@ class NewsController extends Controller
             // $articles->user;
         });
         return view('_frontend.web.articlesPresentation.index')->with('articles', $articles);
+    }
+
+    public function viewArticle($slug)
+    {
+        $article = Article::findBySlugOrFail($slug);
+        // $article = \Article::whereSlug($slug)->get();
+        $article->category;
+        // $article->user;
+        $article->tags;
+        $article->images;
+
+        return view('_frontend.web.articlesPresentation.articleView')->with('article', $article);
     }
 }

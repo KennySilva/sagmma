@@ -10,7 +10,7 @@ class ComposerServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        View::composer(['_frontend.web.articlesPresentation.index'],'Sagmma\Http\ViewComposers\AsideComposer');
+        View::composer(['_frontend.web.articlesPresentation.index', '_frontend.web.articlesPresentation.articleView'],'Sagmma\Http\ViewComposers\AsideComposer');
     }
 
     public function register()
