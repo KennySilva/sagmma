@@ -350,3 +350,14 @@ Route::get('testevariavel', 'ApiControllers\ApiArticlesController@test2');
 // ###################################################################################################################
 
 //------------------------------------Services Routes---------------------------------------
+
+
+Route::get('/fullcalendar', function () {
+    return view('_backend.fullcalendar');
+});
+
+
+Route::get('cargaEventos{id?}','CalendarController@index');
+Route::post('guardaEventos', array('as' => 'guardaEventos','uses' => 'CalendarController@create'));
+Route::post('actualizaEventos','CalendarController@update');
+Route::post('eliminaEvento','CalendarController@delete');

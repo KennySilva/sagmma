@@ -186,6 +186,7 @@ return [
         'Promotion'      => Sagmma\Models\Sagmma\Promotion     ::class,
         'Occupation'     => Sagmma\Models\Sys\Occupation       ::class,
         'Charge'         => Sagmma\Models\Sys\Charge           ::class,
+        'Calendarevent'  => Sagmma\Models\Plugins\Calendarevent::class,
 
     ],
 
