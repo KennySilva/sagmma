@@ -18,7 +18,7 @@ class CalendareventsController extends Controller
         $title = Calendarevent::all()->lists('title');
         $start = Calendarevent::all()->lists('start');
         $end = Calendarevent::all()->lists('end');
-        $all_Day = Calendarevent::all()->lists('alll_day');
+        $allDay = Calendarevent::all()->lists('all_day');
         $background = Calendarevent::all()->lists('color');
         $count = count($id);
 
@@ -27,9 +27,13 @@ class CalendareventsController extends Controller
                 "title"=>$title[$i],
                 "start"=>$start[$i],
                 "end"=>$end[$i],
-                "all_Day"=>$all_Day[$i],
+                "allDay"=>$allDay[$i],
                 "backgroundColor"=>$background[$i],
                 "id"=>$id[$i]
+                //"url"=>"cargaEventos".$id[$i]
+                //en el campo "url" concatenamos el el URL con el id del evento para luego
+                //en el evento onclick de JS hacer referencia a este y usar el método show
+                //para mostrar los datos completos de un evento
             );
         }
         json_encode($data);
@@ -58,7 +62,7 @@ class CalendareventsController extends Controller
         $title = $_POST['title'];
         $start = $_POST['start'];
         $end = $_POST['end'];
-        $all_Day = $_POST['all_day'];
+        $allDay = $_POST['allday'];
         $back = $_POST['background'];
 
         $event=Calendarevent::find($id);
@@ -68,7 +72,7 @@ class CalendareventsController extends Controller
             $event->end=$end;
         }
         $event->start=$start;
-        $event->all_day=$all_Day;
+        $event->all_day=$allDay;
         $event->color=$back;
         $event->title=$title;
         //$event->fechaFin=$end;

@@ -29,7 +29,7 @@
                         <div class="col-md-3">
                             <div class="box box-solid">
                                 <div class="box-header with-border">
-                                    <h4 class="box-title">Eventos</h4>
+                                    <h4 class="box-title">Tarefas Basicas</h4>
                                 </div>
                                 <div class="box-body">
                                     <!-- the events -->
@@ -40,8 +40,8 @@
                                         <div class="external-event bg-light-blue">Evento 4</div>
                                         <div class="checkbox">
                                             <label for="drop-remove">
-                                                <input type="checkbox" id="drop-remove">
-                                                Eliminar al asignar
+                                                <input type="checkbox" id="drop-remove"> <span class="text-danger">Eliminar ao Guardar</span>
+
                                             </label>
                                         </div>
                                     </div>
@@ -51,7 +51,7 @@
                             <!-- /. box -->
                             <div class="box box-solid">
                                 <div class="box-header with-border">
-                                    <h3 class="box-title">Crear evento</h3>
+                                    <h3 class="box-title">Criar nova terefa</h3>
                                 </div>
                                 <div class="box-body">
                                     <div class="btn-group" style="width: 100%; margin-bottom: 10px;">
@@ -74,10 +74,10 @@
                                     </div>
                                     <!-- /btn-group -->
                                     <div class="input-group">
-                                        <input id="new-event" type="text" class="form-control" placeholder="Titulo de evento">
+                                        <input id="new-event" type="text" class="form-control" placeholder="Título de tarefa">
 
                                         <div class="input-group-btn">
-                                            <button id="add-new-event" type="button" class="btn btn-primary btn-flat">Adicionar</button>
+                                            <button id="add-new-event" type="button" class="btn btn-primary btn-flat"><i class="fa fa-plus"></i></button>
                                         </div>
                                         <!-- /btn-group -->
                                     </div><br/><br/>
@@ -112,7 +112,7 @@
 
 
 @push('scripts')
-    <script src="\plugins\jQueryUI\jquery-ui.js" charset="utf-8"></script>
+    <script src="/plugins/jQueryUI/jquery-ui.js" charset="utf-8"></script>
     <script src="/bower_components/moment/moment.js" charset="utf-8"></script>
     <script src="/bower_components/fullcalendar/dist/fullcalendar.js" charset="utf-8"></script>
     <script src="/bower_components/fullcalendar/dist/locale/pt.js" charset="utf-8"></script>
@@ -156,7 +156,7 @@
             locale: 'pt',
             height: 450,
             // contentHeight: 250,
-             aspectRatio: 0,
+            aspectRatio: 0,
             header: {
                 left: 'prev,next today',
                 center: 'title',
@@ -168,20 +168,20 @@
                 week: 'Semana',
                 day: 'Dia'
             },
-            //events: { url:"cargaEventos"},
+            events: { url:"cargaEventos"},
 
             editable: true,
             droppable: true, // this allows things to be dropped onto the calendar !!!
 
-            drop: function (date, all_Day) { // this function is called when something is dropped
+            drop: function (date, allDay) { // this function is called when something is dropped
                 // retrieve the dropped element's stored Event Object
                 var originalEventObject = $(this).data('eventObject');
                 // we need to copy it, so that multiple events don't have a reference to the same object
                 var copiedEventObject = $.extend({}, originalEventObject);
-                all_Day=true;
+                allDay=true;
                 // assign it the date that was reported
                 copiedEventObject.start = date;
-                copiedEventObject.all_Day = all_Day;
+                copiedEventObject.allDay = allDay;
                 copiedEventObject.backgroundColor = $(this).css("background-color");
                 copiedEventObject.borderColor = $(this).css("border-color");
 
@@ -201,7 +201,7 @@
                 crsfToken = document.getElementsByName("_token")[0].value;
                 $.ajax({
                     url: 'guardaEventos',
-                    data: 'title='+ title+'&start='+ start+'&all_day='+all_Day+'&background='+back,
+                    data: 'title='+ title+'&start='+ start+'&allday='+allDay+'&background='+back,
                     type: "POST",
                     headers: {
                         "X-CSRF-TOKEN": crsfToken
@@ -214,40 +214,148 @@
                         console.log("Error al crear evento");
                     }
                 });
+            },
+
+            eventResize: function(event) {
+                var start = event.start.format("YYYY-MM-DD HH:mm");
+                var back=event.backgroundColor;
+                var allDay=event.allDay;
+                if(event.end){
+                    var end = event.end.format("YYYY-MM-DD HH:mm");
+                }else{var end="NULL";
             }
-        });
+            crsfToken = document.getElementsByName("_token")[0].value;
+            $.ajax({
+                url: 'actualizaEventos',
+                data: 'title='+ event.title+'&start='+ start +'&end='+ end +'&id='+ event.id+'&background='+back+'&allday='+allDay,
+                type: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": crsfToken
+                },
+                success: function(json) {
+                    console.log("Updated Successfully");
+                },
+                error: function(json){
+                    console.log("Error al actualizar evento");
+                }
+            });
+        },
 
-        /* AGREGANDO EVENTOS AL PANEL */
-        var currColor = "#3c8dbc"; //Red by default
-        //Color chooser button
-        var colorChooser = $("#color-chooser-btn");
-        $("#color-chooser > li > a").click(function (e) {
-            e.preventDefault();
-            //Save color
-            currColor = $(this).css("color");
-            //Add color effect to button
-            $('#add-new-event').css({"background-color": currColor, "border-color": currColor});
-        });
-        $("#add-new-event").click(function (e) {
-            e.preventDefault();
-            //Get value and make sure it is not null
-            var val = $("#new-event").val();
-            if (val.length == 0) {
-                return;
-            }
-
-            //Create events
-            var event = $("<div />");
-            event.css({"background-color": currColor, "border-color": currColor, "color": "#fff"}).addClass("external-event");
-            event.html(val);
-            $('#external-events').prepend(event);
-
-            //Add draggable funtionality
-            ini_events(event);
-
-            //Remove event from text input
-            $("#new-event").val("");
-        });
+        eventMouseover: function( event, jsEvent, view ) {
+            var start = (event.start.format("HH:mm"));
+            var back=event.backgroundColor;
+            if(event.end){
+                var end = event.end.format("HH:mm");
+            }else{var end="Indeterminado";
+        }
+        if(event.allDay){
+            var allDay = "Sim";
+        }else{var allDay="Não";
+    }
+    var tooltip = '<div class="tooltipevent" style="width:200px;height:100px;color:white;background:'+back+';position:absolute;z-index:10001;">'+'<center>'+ event.title +'</center>'+'Durante o dia: '+allDay+'<br>'+ 'Início: '+start+'<br>'+ 'Fim: '+ end +'</div>';
+    $("body").append(tooltip);
+    $(this).mouseover(function(e) {
+        $(this).css('z-index', 10000);
+        $('.tooltipevent').fadeIn('500');
+        $('.tooltipevent').fadeTo('10', 1.9);
+    }).mousemove(function(e) {
+        $('.tooltipevent').css('top', e.pageY + 10);
+        $('.tooltipevent').css('left', e.pageX + 20);
     });
-    </script>
+},
+
+eventMouseout: function(calEvent, jsEvent) {
+    $(this).css('z-index', 8);
+    $('.tooltipevent').remove();
+},
+
+eventDrop: function(event, delta) {
+    var start = event.start.format("YYYY-MM-DD HH:mm");
+    if(event.end){
+        var end = event.end.format("YYYY-MM-DD HH:mm");
+    }else{var end="NULL";
+}
+var back=event.backgroundColor;
+var allDay=event.allDay;
+crsfToken = document.getElementsByName("_token")[0].value;
+
+$.ajax({
+    url: 'actualizaEventos',
+    data: 'title='+ event.title+'&start='+ start +'&end='+ end+'&id='+ event.id+'&background='+back+'&allday='+allDay ,
+    type: "POST",
+    headers: {
+        "X-CSRF-TOKEN": crsfToken
+    },
+    success: function(json) {
+        console.log("Updated Successfully eventdrop");
+    },
+    error: function(json){
+        console.log("Error al actualizar eventdrop");
+    }
+});
+},
+
+dayClick: function(date, jsEvent, view) {
+    if (view.name === "month") {
+        $('#calendar').fullCalendar('gotoDate', date);
+        $('#calendar').fullCalendar('changeView', 'agendaDay');
+    }
+},
+
+eventClick: function (event, jsEvent, view) {
+    crsfToken = document.getElementsByName("_token")[0].value;
+    var con=confirm("Realmente queres eliminar esta Tarefa?");
+    if(con){
+        $.ajax({
+            url: 'eliminaEvento',
+            data: 'id=' + event.id,
+            headers: {
+                "X-CSRF-TOKEN": crsfToken
+            },
+            type: "POST",
+            success: function () {
+                $('#calendar').fullCalendar('removeEvents', event._id);
+                console.log("Evento eliminado");
+            }
+        });
+    }else{
+        console.log("Cancelado");
+    }
+},
+
+});
+
+/* AGREGANDO EVENTOS AL PANEL */
+var currColor = "#3c8dbc"; //Red by default
+//Color chooser button
+var colorChooser = $("#color-chooser-btn");
+$("#color-chooser > li > a").click(function (e) {
+    e.preventDefault();
+    //Save color
+    currColor = $(this).css("color");
+    //Add color effect to button
+    $('#add-new-event').css({"background-color": currColor, "border-color": currColor});
+});
+$("#add-new-event").click(function (e) {
+    e.preventDefault();
+    //Get value and make sure it is not null
+    var val = $("#new-event").val();
+    if (val.length == 0) {
+        return;
+    }
+
+    //Create events
+    var event = $("<div />");
+    event.css({"background-color": currColor, "border-color": currColor, "color": "#fff"}).addClass("external-event");
+    event.html(val);
+    $('#external-events').prepend(event);
+
+    //Add draggable funtionality
+    ini_events(event);
+
+    //Remove event from text input
+    $("#new-event").val("");
+});
+});
+</script>
 @endpush

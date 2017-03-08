@@ -305,7 +305,7 @@ Route::get('/chart', 'ServicesControllers\ChartsController@TestChart');
 
 
 // ###################################################################################################################
-// ###################################################  Testes  ######################################################
+// ###################################################  Testes ######################################################
 // ###################################################################################################################
 Route::group(['middleware' => ['permission:adddmin']], function() {
     Route::resource('/testrole', 'AdminController');
@@ -357,7 +357,7 @@ Route::get('/fullcalendar', function () {
 });
 
 
-Route::get('cargaEventos{id?}','CalendarController@index');
-Route::post('guardaEventos', array('as' => 'guardaEventos','uses' => 'CalendarController@create'));
-Route::post('actualizaEventos','CalendarController@update');
-Route::post('eliminaEvento','CalendarController@delete');
+Route::get('cargaEventos{id?}','PluginsControllers\CalendareventsController@index');
+Route::post('guardaEventos', array('as' => 'guardaEventos','uses' => 'PluginsControllers\CalendareventsController@create'));
+Route::post('actualizaEventos','PluginsControllers\CalendareventsController@update');
+Route::post('eliminaEvento','PluginsControllers\CalendareventsController@delete');
