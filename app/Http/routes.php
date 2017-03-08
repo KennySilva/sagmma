@@ -357,7 +357,7 @@ Route::get('/fullcalendar', function () {
 });
 
 
-Route::get('cargaEventos{id?}','PluginsControllers\CalendareventsController@index');
-Route::post('guardaEventos', array('as' => 'guardaEventos','uses' => 'PluginsControllers\CalendareventsController@create'));
-Route::post('actualizaEventos','PluginsControllers\CalendareventsController@update');
-Route::post('eliminaEvento','PluginsControllers\CalendareventsController@delete');
+Route::get('showEvents{id?}','PluginsControllers\CalendareventsController@index');
+Route::post('saveEvents', array('as' => 'guardaEventos','uses' => 'PluginsControllers\CalendareventsController@create'));
+Route::post('updateEvents','PluginsControllers\CalendareventsController@update');
+Route::post('deleteEvents','PluginsControllers\CalendareventsController@delete');

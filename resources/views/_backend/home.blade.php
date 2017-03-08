@@ -1,6 +1,8 @@
 @extends('_backend.master.app')
 @section('sagmma-style')
     <link rel="stylesheet" href="bower_components/bootstrap-select/dist/css/bootstrap-select.css">
+    <link rel="stylesheet" href="/bower_components/fullcalendar/dist/fullcalendar.css">
+    <link rel="stylesheet" href="/bower_components/fullcalendar/dist/fullcalendar.print.css" media="print">
 @endsection
 
 
@@ -11,6 +13,9 @@
 @section('contentheader_title')
     {{-- Sagmma Home --}}
 @endsection
+
+
+
 
 
 @section('main-content')
@@ -37,7 +42,6 @@
                     </div><!-- /.info-box-content -->
                 </div><!-- /.info-box -->
             </div>
-
             <div class="col-md-4">
                 <div class="info-box">
                     <!-- Apply any bg-* class to to the icon to color it -->
@@ -49,12 +53,14 @@
                 </div><!-- /.info-box -->
             </div>
         </div>
-
-
-
+        <div class="row">
+            <div class="col-md-12">
+                @include('_backend.master.partials.painelCalendar')
+            </div>
+        </div>
         <div class="row ">
             <div class="col-md-12">
-                <div class="box box-default">
+                <div class="box box-primary">
                     <div class="box-header with-border">
                         <h3 class="box-title">Acção Rápida</h3>
                         <div class="box-tools pull-right">
@@ -109,6 +115,11 @@
 
 @push('scripts')
     <script src="bower_components/bootstrap-select/dist/js/bootstrap-select.js" charset="utf-8"></script>
+    <script src="/plugins/jQueryUI/jquery-ui.js" charset="utf-8"></script>
+    <script src="/bower_components/moment/moment.js" charset="utf-8"></script>
+    <script src="/bower_components/fullcalendar/dist/fullcalendar.js" charset="utf-8"></script>
+    <script src="/bower_components/fullcalendar/dist/locale/pt.js" charset="utf-8"></script>
+    <script src="/js/back/calendarEvents.js" charset="utf-8"></script>
 
     <script type="text/javascript">
     $(document).ready(function(){

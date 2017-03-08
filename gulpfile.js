@@ -11,6 +11,7 @@ elixir(function(mix) {
     mix.browserify('mainfront.js');
     //--------------------------------------------------------------
     mix.scripts(['front.js'],'public/js/front/front.js');
+    mix.scripts(['calendarEvents.js'],'public/js/back/calendarEvents.js');
 
     //--------------------------------------------------------------
     mix.styles(['app.css'],'public/css/sagmma/app.css');

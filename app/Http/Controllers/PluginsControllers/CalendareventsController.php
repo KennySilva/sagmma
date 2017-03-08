@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 
 use Sagmma\Http\Requests;
 use Sagmma\Http\Controllers\Controller;
-use Carbon\Carbon;
 use Calendarevent;
 
 class CalendareventsController extends Controller
@@ -30,10 +29,6 @@ class CalendareventsController extends Controller
                 "allDay"=>$allDay[$i],
                 "backgroundColor"=>$background[$i],
                 "id"=>$id[$i]
-                //"url"=>"cargaEventos".$id[$i]
-                //en el campo "url" concatenamos el el URL con el id del evento para luego
-                //en el evento onclick de JS hacer referencia a este y usar el método show
-                //para mostrar los datos completos de un evento
             );
         }
         json_encode($data);
@@ -41,15 +36,12 @@ class CalendareventsController extends Controller
     }
 
     public function create(){
-        //Valores recibidos via ajax
         $title = $_POST['title'];
         $start = $_POST['start'];
         $back = $_POST['background'];
 
         $event=new Calendarevent();
         $event->start = $start;
-
-        //$event->fechaFin=$end;
         $event->all_day = true;
         $event->color = $back;
         $event->title = $title;
@@ -57,7 +49,6 @@ class CalendareventsController extends Controller
     }
 
     public function update(){
-        //Valores recibidos via ajax
         $id = $_POST['id'];
         $title = $_POST['title'];
         $start = $_POST['start'];
@@ -75,15 +66,11 @@ class CalendareventsController extends Controller
         $event->all_day=$allDay;
         $event->color=$back;
         $event->title=$title;
-        //$event->fechaFin=$end;
-
         $event->save();
     }
 
     public function delete(){
-        //Valor id recibidos via ajax
         $id = $_POST['id'];
-
         Calendarevent::destroy($id);
     }
 
