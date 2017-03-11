@@ -155,7 +155,7 @@ return [
         'Flash' => Caffeinated\Flash\Facades\Flash::class,
 
         'Settings' => Krucas\Settings\Facades\Settings::class,
-
+        
 
 
         /*
@@ -187,6 +187,7 @@ return [
         'Occupation'     => Sagmma\Models\Sys\Occupation       ::class,
         'Charge'         => Sagmma\Models\Sys\Charge           ::class,
         'Calendarevent'  => Sagmma\Models\Plugins\Calendarevent::class,
+        'Social'         => Sagmma\Models\Plugins\Social::class,
 
     ],
 

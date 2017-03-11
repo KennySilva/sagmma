@@ -51,8 +51,11 @@ Route::post('password/reset', 'Auth\PasswordController@postReset');
 // ##############################################################################################################################
 // ####################################################  Authentication Social  #################################################
 // ##############################################################################################################################
-Route::get('social/{provider?}', 'SocialControllers\SocialController@getSocialAuth');
-Route::get('social/callback/{provider?}', 'SocialControllers\SocialController@getSocialAuthCallback');
+Route::group(['namespace' => 'SocialControllers'], function()
+{
+    Route::get('social/{provider?}', 'SocialController@getSocialAuth');
+    Route::get('social/callback/{provider?}', 'SocialController@getSocialAuthCallback');
+});
 // ##############################################################################################################################
 
 
@@ -350,6 +353,16 @@ Route::get('testevariavel', 'ApiControllers\ApiArticlesController@test2');
 // ###################################################################################################################
 
 //------------------------------------Services Routes---------------------------------------
+Route::group(['namespace' => 'ServicesControllers'], function()
+{
+    Route::Post('/mailSagmma',  array('as' => 'mailToSagmma', 'uses' => 'MailController@mailToSagmma'));
+    Route::post('/mailDirector', array('as' => 'mailToDirector', 'uses' => 'MailController@mailToDirector'));
+    Route::post('/maiManager', array('as' => 'mailToManager', 'uses' => 'MailController@mailToManager'));
+    Route::post('/mailAux', array('as' => 'mailToAux', 'uses' => 'MailController@mailToAux'));
+});
+
+
+
 
 
 Route::get('/fullcalendar', function () {

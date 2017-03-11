@@ -1,6 +1,8 @@
 @extends('_frontend.master.app')
 
 @section('content')
+    <!----------------------------Alerts----------------------------------------------------------->
+    @include('_frontend.master.partials.alerts')
     <!--------------------------------------------------------------------------------------->
     @include('_frontend.master.partials.carousel')
     <!--------------------------------------------------------------------------------------->
@@ -16,7 +18,7 @@
 
     <!-- Container (Pricing Section) -->
     @include('_frontend.master.partials.pages.market_team')
-    
+
     <!-- Container (Contact Section) -->
     @include('_frontend.master.partials.pages.contact')
 

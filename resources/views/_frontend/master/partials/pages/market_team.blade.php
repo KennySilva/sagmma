@@ -12,7 +12,7 @@
                     <div class="thumbnail">
                         <a href="img/frontend_img/team/diretor_test.png" data-lightbox="photo1" data-title="Um Mercado com capacidade"><img src="img/frontend_img/team/diretor_test.png" alt="..."></a>
 
-                        <h3>Diretor <a href="#" class="btn btn-default btn-sm" data-toggle="modal" data-target="#perfil_diretor"><i class="fa fa-eye"></i></a> <a href="#" class="btn btn-default btn-sm" role="button" data-toggle="modal" data-target="#myModal"><i class="fa fa-envelope"></i></a> </h3>
+                        <h4 class="text-center"><a href="#" class="" data-toggle="modal" data-target="#perfil_diretor">Diretor</a> | <a href="#" role="button" data-toggle="modal" data-target="#myModal"><i class="fa fa-envelope-o"></i></a> </h4>
                         {{-- <hr>
 
                         <p><i class="fa fa-envelope" aria-hidden="true"></i>&nbsp;&nbsp; diretor@sagmma.com</p> --}}
@@ -46,66 +46,61 @@
                                         <button type="button" class="close" data-dismiss="modal">&times;</button>
                                         <h4 class="modal-title">Contactar Diretor</h4>
                                     </div>
+                                    {!!Form::open(['route'=>'mailToDirector', 'method'=>'POST'])!!}
                                     <div class="modal-body">
-                                        <form class="" action="index.html" method="post">
-                                            <div class="row">
+                                        <div class="row">
 
-                                                <div class="col-md-12">
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <input type="text" class="form-control" id="" placeholder="Introduza o seu nome">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <input type="text" class="form-control" id="" placeholder="Introduza o seu email">
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                        @if(Auth::check())
+                                            <div class="col-sm-4 form-group">
+                                                {!!Form::text('name', Auth::user()->name, ['class'=>'form-control disabled', 'readonly'=>'readonly'])!!}
                                             </div>
 
-                                            <hr>
-
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <div class="col-md-12">
-                                                        <div class="form-group">
-                                                            <textarea style="width:100%;" name="name" rows="8" cols="40" placeholder="Escvreva a sua mensagem aqui"></textarea>
-                                                            <p class="help-block">Escreva mensagem claro e direto</p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-
-                                                    </div>
-                                                </div>
+                                            <div class="col-sm-4 form-group">
+                                                {!!Form::text('email', Auth::user()->email, ['class'=>'form-control disabled', 'readonly'=>'readonly'])!!}
+                                            </div>
+                                        @else
+                                            <div class="col-sm-4 form-group">
+                                                {!!Form::text('name', null, ['class'=>'form-control', 'placeholder'=>'Indique o seu nome'])!!}
                                             </div>
 
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <div class="col-md-12">
-
-                                                    </div>
-                                                </div>
+                                            <div class="col-sm-4 form-group">
+                                                {!!Form::text('email', null, ['class'=>'form-control', 'placeholder'=>'Indique o seu email'])!!}
                                             </div>
+                                        @endif
+
+                                        <div class="col-sm-4 form-group">
+                                            {!!Form::text('subject', null, ['class'=>'form-control', 'placeholder'=>'Assunto'])!!}
+                                        </div>
+
+                                        <div class="col-md-12 form-group">
+                                            {!!Form::textarea('mensagem', null, ['class'=>'form-control', 'placeholder'=>'Escreva  aqui a sua mensagem', 'size' => '30x4'])!!}
 
                                         </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-primary">Enviar</button>
-                                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                                    </div>
+
+                                    </div>
+                                    <div class="modal-footer">
+                                        <div class="row">
+
+                                        <div class="col-sm-12 form-group">
+                                            {!!Form::submit('Enviar', ['class'=>'btn btn-primary'])!!}
+                                            {!!Form::submit('Cancelar', ['class'=>'btn btn-secondary', 'data-dismiss'=>'modal'])!!}
                                         </div>
-                                    </form>
+                                    </div>
+                                    </div>
+                                    {!!Form::close()!!}
                                 </div>
-
                             </div>
                         </div>
                     </div>
                 </div>
 
+
                 <div class="col-sm-4 col-md-3">
                     <div class="thumbnail">
                         <a href="img/frontend_img/team/gestor_test.png" data-lightbox="photo1" data-title="Um Mercado com capacidade"><img src="img/frontend_img/team/gestor_test.png" alt="..."></a>
 
-                        <h3>Gestor <a href="#" class="btn btn-default btn-sm" data-toggle="modal" data-target="#perfil_gestor"><i class="fa fa-eye"></i></a> <a href="#" class="btn btn-default btn-sm" role="button" data-toggle="modal" data-target="#myModal"><i class="fa fa-envelope"></i></a> </h3>
+                        <h4 class="text-center"><a href="#" data-toggle="modal" data-target="#perfil_gestor">Gestor</a> | <a href="#" role="button" data-toggle="modal" data-target="#myModal"><i class="fa fa-envelope-o"></i></a> </h4>
                         {{-- <hr>
                         <p><i class="fa fa-envelope" aria-hidden="true"></i>&nbsp;&nbsp; diretor@sagmma.com</p> --}}
                         {{-- ------------------------------------------------------------------ --}}
@@ -140,7 +135,40 @@
                                         <h4 class="modal-title">Modal Header</h4>
                                     </div>
                                     <div class="modal-body">
-                                        <p>Some text in the modal.</p>
+                                        <form class="" action="index.html" method="post">
+                                            <div class="modal-body">
+
+                                                <div class="form-group">
+                                                    @if(Auth::check())
+                                                        <input type="text" name="" value="{{Auth::user()->name}}" placeholder="Introduza o seu nove" class="form-control" disabled>
+                                                    @else
+                                                        <input type="text" name="" value="" placeholder="Introduza o seu nove" class="form-control">
+                                                    @endif
+                                                </div>
+
+                                                <div class="form-group">
+                                                    @if(Auth::check())
+                                                        <input type="email" name="" value="{{Auth::user()->email}}" class="form-control" disabled>
+                                                    @else
+                                                        <input type="email" name="" value="" placeholder="Introduza o seu Email" class="form-control">
+                                                    @endif
+                                                </div>
+                                                <div class="form-group">
+                                                    <input type="text" name="" value="" placeholder="Assunto" class="form-control">
+                                                </div>
+
+                                                <hr>
+                                                <div class="form-group">
+                                                    <textarea name="name" rows="4" cols="80" class="form-control"></textarea>
+                                                </div>
+
+
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-primary">Enviar</button>
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                                            </div>
+                                        </form>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -158,7 +186,7 @@
                     <div class="thumbnail">
                         <a href="img/frontend_img/team/gestor_test.png" data-lightbox="photo1" data-title="Um Mercado com capacidade"><img src="img/frontend_img/team/auxiliar_test.png" alt="..."></a>
 
-                        <h3>Auxiliar <a href="#" class="btn btn-default btn-sm" data-toggle="modal" data-target="#perfil_gestor"><i class="fa fa-eye"></i></a> <a href="#" class="btn btn-default btn-sm" role="button" data-toggle="modal" data-target="#myModal"><i class="fa fa-envelope"></i></a> </h3>
+                        <h4 class="text-center"><a href="#" data-toggle="modal" data-target="#perfil_gestor">Auxiliar</a> | <a href="#" role="button" data-toggle="modal" data-target="#myModal"><i class="fa fa-envelope-o"></i></a> </h4>
                         {{-- <hr>
                         <p><i class="fa fa-envelope" aria-hidden="true"></i>&nbsp;&nbsp; diretor@sagmma.com</p> --}}
                         {{-- ------------------------------------------------------------------ --}}
@@ -193,7 +221,40 @@
                                         <h4 class="modal-title">Modal Header</h4>
                                     </div>
                                     <div class="modal-body">
-                                        <p>Some text in the modal.</p>
+                                        <form class="" action="index.html" method="post">
+                                            <div class="modal-body">
+
+                                                <div class="form-group">
+                                                    @if(Auth::check())
+                                                        <input type="text" name="" value="{{Auth::user()->name}}" placeholder="Introduza o seu nove" class="form-control" disabled>
+                                                    @else
+                                                        <input type="text" name="" value="" placeholder="Introduza o seu nove" class="form-control">
+                                                    @endif
+                                                </div>
+
+                                                <div class="form-group">
+                                                    @if(Auth::check())
+                                                        <input type="email" name="" value="{{Auth::user()->email}}" class="form-control" disabled>
+                                                    @else
+                                                        <input type="email" name="" value="" placeholder="Introduza o seu Email" class="form-control">
+                                                    @endif
+                                                </div>
+                                                <div class="form-group">
+                                                    <input type="text" name="" value="" placeholder="Assunto" class="form-control">
+                                                </div>
+
+                                                <hr>
+                                                <div class="form-group">
+                                                    <textarea name="name" rows="4" cols="80" class="form-control"></textarea>
+                                                </div>
+
+
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-primary">Enviar</button>
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                                            </div>
+                                        </form>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

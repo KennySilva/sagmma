@@ -11,22 +11,58 @@
         </div>
         <div class="col-sm-7 slideanim">
             <div class="row">
+
+                {!!Form::open(['route'=>'mailToSagmma', 'method'=>'POST'])!!}
+
+                @if(Auth::check())
+                    <div class="col-sm-4 form-group">
+                        <div class="input-group">
+                          <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                          {!!Form::text('name', Auth::user()->name, ['class'=>'form-control disabled', 'readonly'=>'readonly'])!!}
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4 form-group">
+                        <div class="input-group">
+                          <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
+                          {!!Form::text('email', Auth::user()->email, ['class'=>'form-control disabled', 'readonly'=>'readonly'])!!}
+                        </div>
+                    </div>
+                @else
+                    <div class="col-sm-4 form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                            {!!Form::text('name', null, ['class'=>'form-control', 'placeholder'=>'Indique o seu nome', 'required'])!!}
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4 form-group">
+                        <div class="input-group">
+                          <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
+                          {!!Form::email('email', null, ['class'=>'form-control', 'placeholder'=>'Indique o seu email', 'required'])!!}
+                        </div>
+                    </div>
+                @endif
+
                 <div class="col-sm-4 form-group">
-                    <input class="form-control" id="name" name="name" placeholder="Nome" type="text" required>
+                    <div class="input-group">
+                      <span class="input-group-addon"><i class="fa fa-pencil"></i></span>
+                      {!!Form::text('subject', null, ['class'=>'form-control', 'placeholder'=>'Assunto', 'required'])!!}
+                    </div>
                 </div>
-                <div class="col-sm-4 form-group">
-                    <input class="form-control" id="email" name="email" placeholder="Email" type="email" required>
-                </div>
-                <div class="col-sm-4 form-group">
-                    <input class="form-control" id="subject" name="subject" placeholder="Assunto" type="text" required>
-                </div>
+
+
             </div>
-            <textarea class="form-control" id="comments" name="comments" placeholder="Mensagem..." rows="5"></textarea><br>
+            {!!Form::textarea('mensagem', null, ['class'=>'form-control', 'placeholder'=>'Escreva  aqui a sua mensagem', 'required', 'size' => '40x6'])!!}
+            <br>
             <div class="row">
                 <div class="col-sm-12 form-group">
-                    <button class="btn btn-default pull-right" type="submit">Enviar</button>
+                    {!!Form::submit('Enviar', ['class'=>'btn btn-secondary','style'=>'border-radius: 0px; padding: 5px 20px 5px 20px'])!!}
                 </div>
             </div>
+            {!!Form::close()!!}
+
         </div>
     </div>
 </div>
+<br><br>

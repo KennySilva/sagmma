@@ -24,7 +24,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     protected $hidden = ['password', 'remember_token'];
 
 
-    
+
 
 
 
@@ -33,6 +33,14 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     public function getStatusAttribute($value)  /*pa nu txoma nome di culuna nu ta usa es expressao li geNomediculunaAtribute*/
     {
         if ($value) {  /*li nu sa fala ma si status ê 1 pe ritorna verdadiro e si nau pe ritorna falso*/
+            return true;
+        }
+        return false;
+    }
+
+    public function getSocialAttribute($value)
+    {
+        if ($value) {
             return true;
         }
         return false;

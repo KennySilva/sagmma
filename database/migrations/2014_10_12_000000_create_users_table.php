@@ -26,11 +26,12 @@ class CreateUsersTable extends Migration
             $table->enum('type', ['member', 'emp', 'trad'])->default('member');
             $table->text('description', 255)->nullable();
             $table->string('avatar', 50)->default('default.png')->nullable();
+            $table->boolean('social')->default(false);
             $table->rememberToken();
             $table->timestamps();
         });
     }
-    
+
     public function down()
     {
         Schema::drop('users');

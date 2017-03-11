@@ -2,10 +2,10 @@
 
 namespace Sagmma\Http\Controllers\SocialControllers;
 use Sagmma\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use Socialite;
 use User;
 use Auth;
-use Socialite;
+use Social;
 
 class SocialController extends Controller
 {
@@ -23,29 +23,27 @@ class SocialController extends Controller
     public function getSocialAuthCallback($provider = null)
     {
         if ($user = Socialite::driver($provider)->user()) {
-            dd($user);
+            // dd($user);
+            if ($this_user = User::select()->where('email', '=', $user->email)->where('status', '=', true)->first()) {
+                Auth::login($this_user);
+            }else {
+                $new_user              = new User();
+                $new_user->name        = $user->name;
+                $new_user->email       = $user->email;
+                $new_user->status      = false;
+                $new_user->avatar      =  $user->avatar;;
+                $new_user->social      = true;
+                $new_user->save();
+                $social = new Social();
+                $social->user_id      = $new_user->id;
+                $social->provider     = $provider;
+                $social->uid_provider = $user->id;
+                $social->save();
+
+            }
+            return redirect('/');
         }else {
-            return '!!!!Algo não certo!!!!!';
+            return '!!ERRO!!';
         }
     }
-
-
-    // public function redirectToProvider()
-    // {
-    //     dd('EStou aqui');
-    // 
-    //     return Socialite::driver('facebook')->redirect();
-    //     // return Socialite::with('facebook')->redirect();
-    // }
-    //
-    //
-    // public function handleProviderCallback()
-    // {
-    //
-    //     $user = Socialite::driver('facebook')->user();
-    //     // $user = Socialite::with('facebook')->user();
-    //
-    //     // $user->token;
-    // }
-
 }

@@ -15,7 +15,7 @@ class AuthController extends Controller
 {
     use AuthenticatesAndRegistersUsers, ThrottlesLogins;
 
-    
+
 
 
     // protected $redirectPath = '/dashboard';
@@ -49,11 +49,12 @@ class AuthController extends Controller
     protected function create(array $data)
     {
         return User::create([
-            'name' => $data['name'],
+            'name'     => $data['name'],
             'username' => $data['username'],
-            'ic' => $data['ic'],
-            'email' => $data['email'],
+            'ic'       => $data['ic'],
+            'email'    => $data['email'],
             'password' => bcrypt($data['password']),
+            'social' => false,
         ]);
     }
 

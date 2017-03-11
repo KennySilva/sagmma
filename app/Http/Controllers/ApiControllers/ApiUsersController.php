@@ -26,7 +26,7 @@ class ApiUsersController extends Controller
         });
         return $user;
     }
-    
+
     public function create()
     {
         // // return User::create($request->all());
@@ -54,6 +54,7 @@ class ApiUsersController extends Controller
         $user->type        = $request->type;
         $user->description = $request->description;
         $user->avatar      = 'default.png';
+        $user->social      = false;
         $user->save();
         $user->roles()->sync($request->roles);
 
