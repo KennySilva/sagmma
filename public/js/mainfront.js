@@ -10251,11 +10251,12 @@ new Vue({
 
     methods: {
         showMenu: function showMenu() {
-            if (this.show == true) {
-                this.show = false;
-            } else {
-                this.show = true;
-            }
+            // return this.show=true;
+            this.$set('show', true);
+        },
+
+        hideMenu: function hideMenu() {
+            this.show = false;
         }
     },
 

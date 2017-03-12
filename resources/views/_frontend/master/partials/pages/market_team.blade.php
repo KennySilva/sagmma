@@ -50,43 +50,43 @@
                                     <div class="modal-body">
                                         <div class="row">
 
-                                        @if(Auth::check())
-                                            <div class="col-sm-4 form-group">
-                                                {!!Form::text('name', Auth::user()->name, ['class'=>'form-control disabled', 'readonly'=>'readonly'])!!}
-                                            </div>
+                                            @if(Auth::check())
+                                                <div class="col-sm-4 form-group">
+                                                    {!!Form::text('name', Auth::user()->name, ['class'=>'form-control disabled', 'readonly'=>'readonly'])!!}
+                                                </div>
+
+                                                <div class="col-sm-4 form-group">
+                                                    {!!Form::text('email', Auth::user()->email, ['class'=>'form-control disabled', 'readonly'=>'readonly'])!!}
+                                                </div>
+                                            @else
+                                                <div class="col-sm-4 form-group">
+                                                    {!!Form::text('name', null, ['class'=>'form-control', 'placeholder'=>'Indique o seu nome', 'required'])!!}
+                                                </div>
+
+                                                <div class="col-sm-4 form-group">
+                                                    {!!Form::text('email', null, ['class'=>'form-control', 'placeholder'=>'Indique o seu email', 'required'])!!}
+                                                </div>
+                                            @endif
 
                                             <div class="col-sm-4 form-group">
-                                                {!!Form::text('email', Auth::user()->email, ['class'=>'form-control disabled', 'readonly'=>'readonly'])!!}
-                                            </div>
-                                        @else
-                                            <div class="col-sm-4 form-group">
-                                                {!!Form::text('name', null, ['class'=>'form-control', 'placeholder'=>'Indique o seu nome'])!!}
+                                                {!!Form::text('subject', null, ['class'=>'form-control', 'placeholder'=>'Assunto', 'required'])!!}
                                             </div>
 
-                                            <div class="col-sm-4 form-group">
-                                                {!!Form::text('email', null, ['class'=>'form-control', 'placeholder'=>'Indique o seu email'])!!}
-                                            </div>
-                                        @endif
+                                            <div class="col-md-12 form-group">
+                                                {!!Form::textarea('mensagem', null, ['class'=>'form-control', 'placeholder'=>'Escreva  aqui a sua mensagem', 'size' => '30x4', 'required'])!!}
 
-                                        <div class="col-sm-4 form-group">
-                                            {!!Form::text('subject', null, ['class'=>'form-control', 'placeholder'=>'Assunto'])!!}
+                                            </div>
                                         </div>
-
-                                        <div class="col-md-12 form-group">
-                                            {!!Form::textarea('mensagem', null, ['class'=>'form-control', 'placeholder'=>'Escreva  aqui a sua mensagem', 'size' => '30x4'])!!}
-
-                                        </div>
-                                    </div>
 
                                     </div>
                                     <div class="modal-footer">
                                         <div class="row">
 
-                                        <div class="col-sm-12 form-group">
-                                            {!!Form::submit('Enviar', ['class'=>'btn btn-primary'])!!}
-                                            {!!Form::submit('Cancelar', ['class'=>'btn btn-secondary', 'data-dismiss'=>'modal'])!!}
+                                            <div class="col-sm-12 form-group">
+                                                {!!Form::submit('Enviar', ['class'=>'btn btn-primary'])!!}
+                                                {!!Form::submit('Cancelar', ['class'=>'btn btn-secondary', 'data-dismiss'=>'modal'])!!}
+                                            </div>
                                         </div>
-                                    </div>
                                     </div>
                                     {!!Form::close()!!}
                                 </div>
@@ -134,45 +134,50 @@
                                         <button type="button" class="close" data-dismiss="modal">&times;</button>
                                         <h4 class="modal-title">Modal Header</h4>
                                     </div>
+                                    {!!Form::open(['route'=>'mailToManager', 'method'=>'POST'])!!}
                                     <div class="modal-body">
-                                        <form class="" action="index.html" method="post">
-                                            <div class="modal-body">
+                                        <div class="row">
 
-                                                <div class="form-group">
-                                                    @if(Auth::check())
-                                                        <input type="text" name="" value="{{Auth::user()->name}}" placeholder="Introduza o seu nove" class="form-control" disabled>
-                                                    @else
-                                                        <input type="text" name="" value="" placeholder="Introduza o seu nove" class="form-control">
-                                                    @endif
+                                            @if(Auth::check())
+                                                <div class="col-sm-4 form-group">
+                                                    {!!Form::text('name', Auth::user()->name, ['class'=>'form-control disabled', 'readonly'=>'readonly'])!!}
                                                 </div>
 
-                                                <div class="form-group">
-                                                    @if(Auth::check())
-                                                        <input type="email" name="" value="{{Auth::user()->email}}" class="form-control" disabled>
-                                                    @else
-                                                        <input type="email" name="" value="" placeholder="Introduza o seu Email" class="form-control">
-                                                    @endif
+                                                <div class="col-sm-4 form-group">
+                                                    {!!Form::text('email', Auth::user()->email, ['class'=>'form-control disabled', 'readonly'=>'readonly'])!!}
                                                 </div>
-                                                <div class="form-group">
-                                                    <input type="text" name="" value="" placeholder="Assunto" class="form-control">
+                                            @else
+                                                <div class="col-sm-4 form-group">
+                                                    {!!Form::text('name', null, ['class'=>'form-control', 'placeholder'=>'Indique o seu nome', 'required'])!!}
                                                 </div>
 
-                                                <hr>
-                                                <div class="form-group">
-                                                    <textarea name="name" rows="4" cols="80" class="form-control"></textarea>
+                                                <div class="col-sm-4 form-group">
+                                                    {!!Form::text('email', null, ['class'=>'form-control', 'placeholder'=>'Indique o seu email', 'required'])!!}
                                                 </div>
+                                            @endif
 
+                                            <div class="col-sm-4 form-group">
+                                                {!!Form::text('subject', null, ['class'=>'form-control', 'placeholder'=>'Assunto', 'required'])!!}
+                                            </div>
+
+                                            <div class="col-md-12 form-group">
+                                                {!!Form::textarea('mensagem', null, ['class'=>'form-control', 'placeholder'=>'Escreva  aqui a sua mensagem', 'size' => '30x4', 'required'])!!}
 
                                             </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-primary">Enviar</button>
-                                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                                            </div>
-                                        </form>
+                                        </div>
+
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                        <div class="row">
+
+                                            <div class="col-sm-12 form-group">
+                                                {!!Form::submit('Enviar', ['class'=>'btn btn-primary'])!!}
+                                                {!!Form::submit('Cancelar', ['class'=>'btn btn-secondary', 'data-dismiss'=>'modal'])!!}
+                                            </div>
+                                        </div>
                                     </div>
+                                    {!!Form::close()!!}
+
                                 </div>
 
                             </div>
@@ -221,85 +226,88 @@
                                         <h4 class="modal-title">Modal Header</h4>
                                     </div>
                                     <div class="modal-body">
-                                        <form class="" action="index.html" method="post">
-                                            <div class="modal-body">
+                                        {!!Form::open(['route'=>'mailToAux', 'method'=>'POST'])!!}
+                                        <div class="modal-body">
+                                            <div class="row">
 
-                                                <div class="form-group">
-                                                    @if(Auth::check())
-                                                        <input type="text" name="" value="{{Auth::user()->name}}" placeholder="Introduza o seu nove" class="form-control" disabled>
-                                                    @else
-                                                        <input type="text" name="" value="" placeholder="Introduza o seu nove" class="form-control">
-                                                    @endif
+                                                @if(Auth::check())
+                                                    <div class="col-sm-4 form-group">
+                                                        {!!Form::text('name', Auth::user()->name, ['class'=>'form-control disabled', 'readonly'=>'readonly'])!!}
+                                                    </div>
+
+                                                    <div class="col-sm-4 form-group">
+                                                        {!!Form::text('email', Auth::user()->email, ['class'=>'form-control disabled', 'readonly'=>'readonly'])!!}
+                                                    </div>
+                                                @else
+                                                    <div class="col-sm-4 form-group">
+                                                        {!!Form::text('name', null, ['class'=>'form-control', 'placeholder'=>'Indique o seu nome', 'required'])!!}
+                                                    </div>
+
+                                                    <div class="col-sm-4 form-group">
+                                                        {!!Form::text('email', null, ['class'=>'form-control', 'placeholder'=>'Indique o seu email', 'required'])!!}
+                                                    </div>
+                                                @endif
+
+                                                <div class="col-sm-4 form-group">
+                                                    {!!Form::text('subject', null, ['class'=>'form-control', 'placeholder'=>'Assunto', 'required'])!!}
                                                 </div>
 
-                                                <div class="form-group">
-                                                    @if(Auth::check())
-                                                        <input type="email" name="" value="{{Auth::user()->email}}" class="form-control" disabled>
-                                                    @else
-                                                        <input type="email" name="" value="" placeholder="Introduza o seu Email" class="form-control">
-                                                    @endif
-                                                </div>
-                                                <div class="form-group">
-                                                    <input type="text" name="" value="" placeholder="Assunto" class="form-control">
-                                                </div>
+                                                <div class="col-md-12 form-group">
+                                                    {!!Form::textarea('mensagem', null, ['class'=>'form-control', 'placeholder'=>'Escreva  aqui a sua mensagem', 'size' => '30x4', 'required'])!!}
 
-                                                <hr>
-                                                <div class="form-group">
-                                                    <textarea name="name" rows="4" cols="80" class="form-control"></textarea>
                                                 </div>
-
-
                                             </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-primary">Enviar</button>
-                                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+
+                                        </div>
+                                        <div class="modal-footer">
+                                            <div class="row">
+
+                                                <div class="col-sm-12 form-group">
+                                                    {!!Form::submit('Enviar', ['class'=>'btn btn-primary'])!!}
+                                                    {!!Form::submit('Cancelar', ['class'=>'btn btn-secondary', 'data-dismiss'=>'modal'])!!}
+                                                </div>
                                             </div>
-                                        </form>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                        </div>
+                                        {!!Form::close()!!}
                                     </div>
                                 </div>
+                                <!------------------------------------------------------------------------------------------------------------------>
 
                             </div>
                         </div>
-                        <!------------------------------------------------------------------------------------------------------------------>
-
                     </div>
+
+                    {{-- <div class="col-sm-6 col-md-3">
+                    <div class="thumbnail">
+                    <img src="http://lorempixel.com/300/300" alt="...">
+                    <div class="caption">
+                    <h3>Tecnico Auxiliar</h3>
+                    <hr>
+
+                    <p><i class="fa fa-envelope" aria-hidden="true"></i>&nbsp;&nbsp; diretor@sagmma.com</p>
+                    <p><i class="fa fa-facebook" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;&nbsp; facebook.sagmma.diretor</p>
+                    <p><i class="fa fa-phone" aria-hidden="true"></i></i>&nbsp;&nbsp;&nbsp; diretor@sagmma.com</p>
+                    <hr>
+
+                    <!--------------------------------------------------------------------------------------------------------------->
+                    <p><a href="#" class="btn btn-default btn-sm" role="button" data-toggle="modal" data-target="#myModal">Enviar Email</a></p>
+
+                    <div id="myModal" class="modal fade" role="dialog" tabindex="-1" data-width="760">
+                    <div class="modal-dialog">
+
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                    <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Modal Header</h4>
                 </div>
+                <div class="modal-body">
+                <p>Some text in the modal.</p>
             </div>
-
-            {{-- <div class="col-sm-6 col-md-3">
-            <div class="thumbnail">
-            <img src="http://lorempixel.com/300/300" alt="...">
-            <div class="caption">
-            <h3>Tecnico Auxiliar</h3>
-            <hr>
-
-            <p><i class="fa fa-envelope" aria-hidden="true"></i>&nbsp;&nbsp; diretor@sagmma.com</p>
-            <p><i class="fa fa-facebook" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;&nbsp; facebook.sagmma.diretor</p>
-            <p><i class="fa fa-phone" aria-hidden="true"></i></i>&nbsp;&nbsp;&nbsp; diretor@sagmma.com</p>
-            <hr>
-
-            <!--------------------------------------------------------------------------------------------------------------->
-            <p><a href="#" class="btn btn-default btn-sm" role="button" data-toggle="modal" data-target="#myModal">Enviar Email</a></p>
-
-            <div id="myModal" class="modal fade" role="dialog" tabindex="-1" data-width="760">
-            <div class="modal-dialog">
-
-            <!-- Modal content-->
-            <div class="modal-content">
-            <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">Modal Header</h4>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
-        <div class="modal-body">
-        <p>Some text in the modal.</p>
     </div>
-    <div class="modal-footer">
-    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-</div>
-</div>
 
 </div>
 </div>

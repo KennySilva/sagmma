@@ -110,12 +110,6 @@
                     </section>
                     <aside class="col-md-3 hidden-xs hidden-sm">
                         @include('_frontend.master.partials.asideNews')
-
-
-
-
-
-
                     </aside>
                 </div>
             </section>
@@ -131,7 +125,16 @@
         $('#custom_carousel').on('slide.bs.carousel', function (evt) {
             $('#custom_carousel .controls li.active').removeClass('active');
             $('#custom_carousel .controls li:eq('+$(evt.relatedTarget).index()+')').addClass('active');
-        })
+        });
+
+        //Changing the url after click on link 'NOTICIA'
+        $("#mmsc").attr("href", "/");
+        $("#valores").attr("href", "/");
+        $("#galeria").attr("href", "/");
+        $("#equipa").attr("href", "/");
+        $("#contactar").attr("href", "/");
     });
+
+
     </script>
 @endpush

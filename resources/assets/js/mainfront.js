@@ -7,13 +7,15 @@ new Vue({
         show: false,
     },
 
+
     methods: {
         showMenu: function(){
-            if(this.show==true){
-                this.show=false;
-            }else {
-                this.show=true;
-            }
+            // return this.show=true;
+            this.$set('show', true)
+        },
+
+        hideMenu: function(){
+            this.show=false;
         },
     },
 

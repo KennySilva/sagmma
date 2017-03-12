@@ -34,7 +34,14 @@
         'resizeDuration': 200,
         'wrapAround': true,
         'albumLabel':	"Imagem %1 of %3"
-    })
+    });
+
+    //Clear the modal on hiddeng
+    $('.modal').on('hidden.bs.modal', function(){
+        $(this).find('form')[0].reset();
+    });
+
+    
     </script>
 
 @endpush

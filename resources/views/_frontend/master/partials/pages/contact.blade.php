@@ -53,7 +53,7 @@
 
 
             </div>
-            {!!Form::textarea('mensagem', null, ['class'=>'form-control', 'placeholder'=>'Escreva  aqui a sua mensagem', 'required', 'size' => '40x6'])!!}
+            {!!Form::textarea('mensagem', null, ['class'=>'form-control', 'placeholder'=>'Escreva a sua mensagem...', 'required', 'size' => '40x6'])!!}
             <br>
             <div class="row">
                 <div class="col-sm-12 form-group">
