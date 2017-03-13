@@ -364,16 +364,6 @@ z-index: 3;
 }
 
 
-/*# sourceMappingURL=front.css.map */
-
-/*# sourceMappingURL=front.css.map */
-
-/*# sourceMappingURL=front.css.map */
-
-/*# sourceMappingURL=front.css.map */
-
-
-
 hr.style1{
     border-top: 1px solid #8c8b8b;
 }
@@ -580,10 +570,6 @@ header,
     border-radius: 0px;
 }
 
-/*.jumbotron .titulo-blog{
-font-size: 80px;
-}*/
-
 /*POST*/
 .main{
     margin-top: 20px;
@@ -625,37 +611,5 @@ font-size: 80px;
 
 
 /*---------------------------------------------------------------------------------------------*/
-
-/*
-.head-link{
-color:#818184;
-}
-
-.head-link:hover{
-color:#ffffff;
-}
-
-.head-link.active{
-color:#ffffff;
-}
-
-.head-link:focus{
-color:#ffffff;
-}
-
-
-a.morelink {
-text-decoration:none;
-
-}
-.morecontent span {
-display: none;
-}*/
-
-
-
-/*# sourceMappingURL=front.css.map */
-
-/*# sourceMappingURL=front.css.map */
 
 /*# sourceMappingURL=front.css.map */

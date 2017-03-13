@@ -21,18 +21,26 @@ export default{
             },
             pagination: {},
             success: false,
+            showRow: 20,
         }
     },
 
     // ---------------------------------------------------------------------------------
 
     ready () {
-        this.fetchPermission(1);
+        this.fetchPermission(1, this.showRow);
+
     },
+
+
+    // watch() {
+    //     this.fetchPermission(1, this.showRow);
+    // },
 
     // ---------------------------------------------------------------------------------
 
     methods: {
+
         createPermission: function() {
             var permission = this.newPermission;
 
@@ -62,8 +70,9 @@ export default{
 
         // --------------------------------------------------------------------------------------------
 
-        fetchPermission: function(page) {
-            this.$http.get('http://localhost:8000/api/v1/permissions?page='+page).then((response) => {
+        fetchPermission: function(page, row) {
+
+            this.$http.get('http://localhost:8000/api/v1/getAllpermissions/'+row+'?page='+page).then((response) => {
                 this.$set('permissions', response.data.data)
                 this.$set('pagination', response.data)
             }, (response) => {
@@ -122,6 +131,11 @@ export default{
         },
 
         // --------------------------------------------------------------------------------------------
+        doFilter: function(ev) {
+            this.$set('filter.term', ev.currentTarget.value)
+        },
+
+
 
         doSort: function(ev, column) {
             var self = this;
@@ -154,7 +168,8 @@ export default{
 
     // ---------------------------------------------------------------------------------
 
-    computed: {
+    computed() {
+        // this.fetchPermission(1, this.showRow);
     },
 
     // ---------------------------------------------------------------------------------

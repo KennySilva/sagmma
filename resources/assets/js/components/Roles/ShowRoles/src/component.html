@@ -1,6 +1,7 @@
 
-<div class="alert alert-success" transition="success" v-if="success">
-	Função Adicionado com sucesso
+<div  id="alert-message" class="alert alert-{{typeAlert}}" transition="success" v-if="success">
+	<button type="button" class="close" data-dismiss="alert">x</button>
+	<i class="fa fa-thumbs-o-up text-center">&nbsp;&nbsp; {{msgSucess}}</i>
 </div>
 
 <div class="row">
@@ -70,7 +71,7 @@
 					<tr class="" v-show="openDetails.indexOf(role.id) > -1 && role.perms != ''">
 						<td colspan="6">
 							<ul class="list-unstyled list-group-flush" v-for="perms in role.perms">
-								<li><span class="label label-primary"><b> <i class="fa fa-unlock"></i> &nbsp;{{ perms.display_name }}</b></span>&nbsp;</li>
+								<li><span class="label label-primary" data-toggle="tooltip" title="{{ perms.description }}"><b> <i class="fa fa-unlock"></i> &nbsp;{{ perms.display_name }}</b></span>&nbsp;</li>
 							</ul>
 
 						</td>
@@ -158,8 +159,7 @@
 									<div class="col-md-12">
 										<div class="col-md-12">
 											<div class="form-group has-feedback">
-												<select class="iform-control" v-model="newRole.permissions" multiple>
-													<option value="" selected>Escolha Permissões</option>
+												<select class="js-example-responsive" multiple="multiple" v-model="newRole.permissions" v-el:perms multiple="multiple">
 													<option v-for="permission in permissions" value="{{permission.id}}">
 														{{permission.display_name}}
 													</option>
@@ -172,9 +172,9 @@
 						</validator>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
+						<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
 
-						<button :disabled = "!$validationew.valid" @click="createRole" class="btn btn-secondary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar Registo</button>
+						<button :disabled = "!$validationew.valid" @click="createRole" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
 					</div>
 				</div>
 			</div>
@@ -198,33 +198,49 @@
 									<div class="col-md-12">
 										<div class="col-md-12">
 											<div class="form-group has-feedback">
-												<input type="text" class="form-control" name="name" v-model="newRole.name" v-validate:name="['required']"/>
+												<input type="text" class="form-control" name="name" placeholder="Nome do  papel para o sistema" v-model="newRole.name" v-validate:name="['required']"/>
 												<span class="fa fa-lock form-control-feedback"></span>
-												<p style="color:red;" v-if="$validation1.name.required && $validation1.name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
+												<p style="color:red;" v-if="$validationew.name.required && $validationew.name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
 											</div>
 										</div>
 									</div>
 								</div>
 
+
 								<div class="row">
 									<div class="col-md-12">
 										<div class="col-md-12">
 											<div class="form-group has-feedback">
-												<input type="text" class="form-control" name="display_name" v-model="newRole.display_name" v-validate:display_name="['required']"/>
+												<input type="text" class="form-control" name="display_name" placeholder="Nome do papel para ser visualizado" v-model="newRole.display_name" v-validate:display_name="['required']"/>
 												<span class="fa fa-eye form-control-feedback"></span>
-												<p style="color:red;" v-if="$validation1.display_name.required && $validation1.display_name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
+												<p style="color:red;" v-if="$validationew.display_name.required && $validationew.display_name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
 											</div>
 										</div>
 									</div>
 								</div>
 
-								<hr><!---------------------------------------------------------------------------------------------------------------->
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<div class="form-group has-feedback">
+												<textarea name="description" placeholder="descrição" class="form-control" rows="5" cols="40" id="description" v-model="newRole.description"></textarea>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<hr>
 
 								<div class="row">
 									<div class="col-md-12">
 										<div class="col-md-12">
 											<div class="form-group has-feedback">
-												<textarea name="description" placeholder="Descrição" class="form-control" rows="5" cols="40" id="description" v-model="newRole.description"></textarea>
+												<select class="form-control" v-model="newRole.permissions" v-el:editperms multiple="multiple">
+													<option v-for="permission in permissions" value="{{permission.id}}">
+														{{permission.display_name}}
+													</option>
+												</select>
+
 											</div>
 										</div>
 									</div>
@@ -234,8 +250,8 @@
 					</div>
 					<div class="modal-footer">
 						<div class="col-md-12">
-							<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Close</button>
-							<button v-on:show="" @click="saveEditedRole(newRole.id)" type="button" class="btn btn-secondary"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar Edição</button>
+							<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Close</button>
+							<button v-on:show="" @click="saveEditedRole(newRole.id)" type="button" class="btn btn-primary"><i class="fa fa-refresh fa-spin"></i>&nbsp; &nbsp;&nbsp;Atualizar</button>
 						</div>
 					</div>
 				</div>

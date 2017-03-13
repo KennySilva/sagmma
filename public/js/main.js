@@ -37650,7 +37650,8 @@ exports.default = {
                 term: ''
             },
             pagination: {},
-            success: false
+            success: false,
+            showRow: 20
         };
     },
 
@@ -37658,13 +37659,18 @@ exports.default = {
     // ---------------------------------------------------------------------------------
 
     ready: function ready() {
-        this.fetchPermission(1);
+        this.fetchPermission(1, this.showRow);
     },
 
+
+    // watch() {
+    //     this.fetchPermission(1, this.showRow);
+    // },
 
     // ---------------------------------------------------------------------------------
 
     methods: {
+
         createPermission: function createPermission() {
             var _this = this;
 
@@ -37694,10 +37700,10 @@ exports.default = {
 
         // --------------------------------------------------------------------------------------------
 
-        fetchPermission: function fetchPermission(page) {
+        fetchPermission: function fetchPermission(page, row) {
             var _this2 = this;
 
-            this.$http.get('http://localhost:8000/api/v1/permissions?page=' + page).then(function (response) {
+            this.$http.get('http://localhost:8000/api/v1/getAllpermissions/' + row + '?page=' + page).then(function (response) {
                 _this2.$set('permissions', response.data.data);
                 _this2.$set('pagination', response.data);
             }, function (response) {
@@ -37762,6 +37768,9 @@ exports.default = {
         },
 
         // --------------------------------------------------------------------------------------------
+        doFilter: function doFilter(ev) {
+            this.$set('filter.term', ev.currentTarget.value);
+        },
 
         doSort: function doSort(ev, column) {
             var self = this;
@@ -37795,7 +37804,10 @@ exports.default = {
 
     // ---------------------------------------------------------------------------------
 
-    computed: {},
+    computed: function computed() {
+        // this.fetchPermission(1, this.showRow);
+    },
+
 
     // ---------------------------------------------------------------------------------
 
@@ -37804,7 +37816,7 @@ exports.default = {
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success>Permissão Adicionado com sucesso</div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=\"Filtrar dados da tabela\" aria-describedby=basic-addon1></div></div></div><hr><div class=row><div class=col-md-12><button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-permission><i class=\"fa fa-plus\"></i> Novo</button></div></div><br><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome da Permissão</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'display_name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'display_name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'display_name')\">Label</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'description')\">Descriçãos</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"permission in permissions | filterBy filter.term | orderBy sortColumn sortInverse\"><td>{{ permission.name }}<td>{{ permission.display_name }}<td>{{ permission.description }}<td align=left><a data-toggle=modal data-target=#modal-edit-permission href=#><i class=\"fa fa-pencil text-primary\" @click=getThisPermission(permission.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-permission href=#><i class=\"fa fa-trash text-danger\" @click=getThisPermission(permission.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div class=\"modal fade\" id=modal-delete-permission tabindex=-1 permission=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar Permissão</h4></div><div class=modal-body><h1>Eliminar Permissão {{newPermission.name}}</h1></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deletePermission(newPermission.id) @click=deletePermission(newPermission.id) type=button class=\"btn btn-default\">Eliminar Permissão</button></div></div></div></div><div id=modal-create-permission class=\"modal fade\" permission=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar permission</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=\"Nome da permissão no sistema\" v-model=newPermission.name v-validate:name=\"['required']\"> <span class=\"fa fa-hand-stop-o form-control-feedback\"></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=display_name placeholder=\"Nome da permissão a ser vizualizado\" v-model=newPermission.display_name v-validate:display_name=\"['required']\"> <span class=\"fa fa-eye form-control-feedback\"></span><p style=color:red v-if=\"$validationew.display_name.required && $validationew.display_name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=\"Descrião da permissão...\" class=form-control rows=5 cols=40 id=description v-model=newPermission.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createPermission class=\"btn btn-secondary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar Registo</button></div></div></div></div><div id=modal-edit-permission class=\"modal fade\" permission=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar Esta função</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name v-model=newPermission.name v-validate:name=\"['required']\"> <span class=\"glyphicon glyphicon-user form-control-feedback\"></span><p style=color:red v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=display_name v-model=newPermission.display_name v-validate:display_name=\"['required']\"> <span class=\"glyphicon glyphicon-user form-control-feedback\"></span><p style=color:red v-if=\"$validation1.display_name.required && $validation1.display_name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=\"Descrição desta função\" class=form-control rows=5 cols=40 id=description v-model=newPermission.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedPermission(newPermission.id) type=button class=\"btn btn-secondary\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp; Salvar as Alterações sobre esta função</button></div></div></div></div></div></div>"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success>Permissão Adicionado com sucesso</div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-on:keyup.enter=doFilter type=text class=form-control placeholder=\"Filtrar dados da tabela\" aria-describedby=basic-addon1></div></div></div><hr><div class=row><div class=col-md-12><button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-permission><i class=\"fa fa-plus\"></i> Novo</button></div></div><br><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome da Permissão</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'display_name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'display_name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'display_name')\">Label</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'description')\">Descriçãos</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><tbody><tr v-for=\"permission in permissions | filterBy filter.term | orderBy sortColumn sortInverse\"><td>{{ permission.name }}<td>{{ permission.display_name }}<td>{{ permission.description }}<td align=left><a data-toggle=modal data-target=#modal-edit-permission href=#><i class=\"fa fa-pencil text-primary\" @click=getThisPermission(permission.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-permission href=#><i class=\"fa fa-trash text-danger\" @click=getThisPermission(permission.id)></i></a></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div class=\"modal fade\" id=modal-delete-permission tabindex=-1 permission=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar Permissão</h4></div><div class=modal-body><h1>Eliminar Permissão {{newPermission.name}}</h1></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deletePermission(newPermission.id) @click=deletePermission(newPermission.id) type=button class=\"btn btn-default\">Eliminar Permissão</button></div></div></div></div><div id=modal-create-permission class=\"modal fade\" permission=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Registar permission</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=\"Nome da permissão no sistema\" v-model=newPermission.name v-validate:name=\"['required']\"> <span class=\"fa fa-hand-stop-o form-control-feedback\"></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=display_name placeholder=\"Nome da permissão a ser vizualizado\" v-model=newPermission.display_name v-validate:display_name=\"['required']\"> <span class=\"fa fa-eye form-control-feedback\"></span><p style=color:red v-if=\"$validationew.display_name.required && $validationew.display_name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=\"Descrião da permissão...\" class=form-control rows=5 cols=40 id=description v-model=newPermission.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createPermission class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button></div></div></div></div><div id=modal-edit-permission class=\"modal fade\" permission=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar Esta função</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=\"Nome da permissão no sistema\" v-model=newPermission.name v-validate:name=\"['required']\"> <span class=\"fa fa-hand-stop-o form-control-feedback\"></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=display_name placeholder=\"Nome da permissão a ser vizualizado\" v-model=newPermission.display_name v-validate:display_name=\"['required']\"> <span class=\"fa fa-eye form-control-feedback\"></span><p style=color:red v-if=\"$validationew.display_name.required && $validationew.display_name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=\"Descrião da permissão...\" class=form-control rows=5 cols=40 id=description v-model=newPermission.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedPermission(newPermission.id) type=button class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button></div></div></div></div></div></div>"
 
 },{"../../../Pagination/src/Component.vue":89,"vueify/lib/insert-css":82}],91:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
@@ -38487,7 +38499,9 @@ exports.default = {
                 term: ''
             },
             pagination: {},
-            success: false
+            success: false,
+            msgSucess: '',
+            typeAlert: ''
         };
     },
 
@@ -38503,6 +38517,23 @@ exports.default = {
     // ---------------------------------------------------------------------------------
 
     methods: {
+
+        resetPermissions: function resetPermissions(ev) {
+            ev.preventDefault();
+            this.newRole.permissions = "";
+        },
+
+        alert: function alert(msg, typeAlert) {
+            var self = this;
+            this.success = true;
+            this.msgSucess = msg;
+            this.typeAlert = typeAlert;
+
+            setTimeout(function () {
+                self.success = false;
+            }, 5000);
+        },
+
         createRole: function createRole() {
             var _this = this;
 
@@ -38522,11 +38553,7 @@ exports.default = {
                     $('#modal-create-role').modal('hide');
                     // console.log(response.data);
                     _this.fetchRole();
-                    var self = _this;
-                    _this.success = true;
-                    setTimeout(function () {
-                        self.success = false;
-                    }, 5000);
+                    _this.alert('Papel Criado com sucesso', 'success');
                 }
             }, function (response) {});
         },
@@ -38534,11 +38561,31 @@ exports.default = {
         // --------------------------------------------------------------------------------------------
 
         fetchRole: function fetchRole(page) {
-            var _this2 = this;
+            var self = this;
+            self.$http.get('http://localhost:8000/api/v1/roles?page=' + page).then(function (response) {
+                self.$set('roles', response.data.data);
+                self.$set('pagination', response.data);
 
-            this.$http.get('http://localhost:8000/api/v1/roles?page=' + page).then(function (response) {
-                _this2.$set('roles', response.data.data);
-                _this2.$set('pagination', response.data);
+                jQuery(self.$els.perms).select2({
+                    placeholder: "Permissões",
+                    allowClear: true,
+                    theme: "bootstrap",
+                    width: '100%',
+                    language: 'pt',
+                    tags: true
+                }).on('change', function () {
+                    self.$set('newRole.permissions', jQuery(this).val());
+                });
+
+                jQuery(self.$els.editperms).select2({
+                    placeholder: "Permissões",
+                    allowClear: true,
+                    theme: "bootstrap",
+                    width: '100%',
+                    language: 'pt'
+                }).on('change', function () {
+                    self.$set('newRole.permissions', jQuery(this).val());
+                });
             }, function (response) {
                 console.log("Ocorreu um erro na operação");
             });
@@ -38547,13 +38594,15 @@ exports.default = {
         // --------------------------------------------------------------------------------------------
 
         getThisRole: function getThisRole(id) {
-            var _this3 = this;
+            var _this2 = this;
 
             this.$http.get('http://localhost:8000/api/v1/roles/' + id).then(function (response) {
-                _this3.newRole.id = response.data.id;
-                _this3.newRole.name = response.data.name;
-                _this3.newRole.display_name = response.data.display_name;
-                _this3.newRole.description = response.data.description;
+                _this2.newRole.id = response.data.id;
+                _this2.newRole.name = response.data.name;
+                _this2.newRole.display_name = response.data.display_name;
+                _this2.newRole.description = response.data.description;
+                // this.newRole.permissions    = response.data.perms;
+                _this2.$set('newRole.permissions', response.data.perms);
             }, function (response) {
                 console.log('Error');
             });
@@ -38562,7 +38611,7 @@ exports.default = {
         // --------------------------------------------------------------------------------------------
 
         saveEditedRole: function saveEditedRole(id) {
-            var _this4 = this;
+            var _this3 = this;
 
             var role = this.newRole;
 
@@ -38577,7 +38626,8 @@ exports.default = {
                 if (response.status == 200) {
                     $('#modal-edit-role').modal('hide');
                     // console.log(response.data);
-                    _this4.fetchRole();
+                    _this3.fetchRole();
+                    _this3.alert('Papel atualizado com sucesso', 'info');
                 }
             }, function (response) {
                 console.log("Ocorreu um erro na operação");
@@ -38587,13 +38637,14 @@ exports.default = {
         // --------------------------------------------------------------------------------------------
 
         deleteRole: function deleteRole(id) {
-            var _this5 = this;
+            var _this4 = this;
 
             this.$http.delete('http://localhost:8000/api/v1/roles/' + id).then(function (response) {
                 $('#modal-delete-role').modal('hide');
                 if (response.status == 200) {
                     // console.log(response.data);
-                    _this5.fetchRole();
+                    _this4.fetchRole();
+                    _this4.alert('Papel eliminado com sucesso', 'warning');
                 }
             }, function (response) {
                 console.log("Ocorreu um erro na operação");
@@ -38602,10 +38653,10 @@ exports.default = {
 
         // -------------------------Metodo de suporte---------------------------------------------------
         permissionrole: function permissionrole() {
-            var _this6 = this;
+            var _this5 = this;
 
             this.$http.get('http://localhost:8000/api/v1/permissionrole').then(function (response) {
-                _this6.$set('permissions', response.data);
+                _this5.$set('permissions', response.data);
             }, function (response) {
                 console.log("Ocorreu um erro na operação");
             });
@@ -38690,7 +38741,7 @@ exports.default = {
 
 // import from 'lodash'
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=success v-if=success>Função Adicionado com sucesso</div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=\"Filtrar dados da tabela\" aria-describedby=basic-addon1></div></div></div><hr><div class=row><div class=col-md-12><button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-role><i class=\"fa fa-plus\"></i> Novo</button></div></div><br><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome do papel</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'display_name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'display_name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'display_name')\">Papel</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'description')\">Descriçãos</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><th width=75 class=text-center><a @click=openAllDetails href=#><span><i data-toggle=tooltip data-placement=left title=\"Ver Todas Permissões\" class=fa :class=\"{'fa-sign-in': openDetails.length == 0, 'fa-sign-out': openDetails.length > 0}\"></i></span></a><tbody v-for=\"role in roles | filterBy filter.term | orderBy sortColumn sortInverse\"><tr><td>{{ role.name }}<td>{{ role.display_name }}<td>{{ role.description }}<td align=left><a data-toggle=modal data-target=#modal-edit-role href=#><i class=\"fa fa-pencil text-primary\" @click=getThisRole(role.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-role href=#><i class=\"fa fa-trash text-danger\" @click=getThisRole(role.id)></i></a><td width=75 class=text-center><a @click=\"doOpenDetails($event, role.id)\" v-show=\"role.perms != ''\" href=#><i data-toggle=tooltip data-placement=left title=\"Ver Permissões\" class=fa :class=\"{'fa-plus-square': openDetails.indexOf(role.id) == -1, 'fa-minus-square': openDetails.indexOf(role.id) > -1}\"></i></a> <i class=\"fa fa-plus-square\" v-show=\"role.perms == ''\" style=\"opacity: 0.3\"></i><tr v-show=\"openDetails.indexOf(role.id) > -1 && role.perms != ''\"><td colspan=6><ul class=\"list-unstyled list-group-flush\" v-for=\"perms in role.perms\"><li><span class=\"label label-primary\"><b><i class=\"fa fa-unlock\"></i> &nbsp;{{ perms.display_name }}</b></span>&nbsp;</ul></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div class=\"modal fade\" id=modal-delete-role tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar Função</h4></div><div class=modal-body><h1>Eliminar Função {{newRole.name}}</h1></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteRole(newRole.id) @click=deleteRole(newRole.id) type=button class=\"btn btn-default\">Eliminar Função</button></div></div></div></div><div id=modal-create-role class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Criar novo Papel</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=\"Nome do  papel para o sistema\" v-model=newRole.name v-validate:name=\"['required']\"> <span class=\"fa fa-lock form-control-feedback\"></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=display_name placeholder=\"Nome do papel para ser visualizado\" v-model=newRole.display_name v-validate:display_name=\"['required']\"> <span class=\"fa fa-eye form-control-feedback\"></span><p style=color:red v-if=\"$validationew.display_name.required && $validationew.display_name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=descrição class=form-control rows=5 cols=40 id=description v-model=newRole.description></textarea></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=iform-control v-model=newRole.permissions multiple><option value=\"\" selected>Escolha Permissões<option v-for=\"permission in permissions\" value={{permission.id}}>{{permission.display_name}}</select></div></div></div></div></form></validator></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createRole class=\"btn btn-secondary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar Registo</button></div></div></div></div><div id=modal-edit-role class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name v-model=newRole.name v-validate:name=\"['required']\"> <span class=\"fa fa-lock form-control-feedback\"></span><p style=color:red v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=display_name v-model=newRole.display_name v-validate:display_name=\"['required']\"> <span class=\"fa fa-eye form-control-feedback\"></span><p style=color:red v-if=\"$validation1.display_name.required && $validation1.display_name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=Descrição class=form-control rows=5 cols=40 id=description v-model=newRole.description></textarea></div></div></div></div></form></validator></div><div class=modal-footer><div class=col-md-12><button @click=clearField type=button class=\"btn btn-default\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedRole(newRole.id) type=button class=\"btn btn-secondary\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar Edição</button></div></div></div></div></div></div></div>"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div id=alert-message class=\"alert alert-{{typeAlert}}\" transition=success v-if=success><button type=button class=close data-dismiss=alert>x</button> <i class=\"fa fa-thumbs-o-up text-center\">&nbsp;&nbsp; {{msgSucess}}</i></div><div class=row><div class=\"col-md-4 pull-right\"><div class=input-group><span class=input-group-addon id=basic-addon1><i class=\"fa fa-search\" aria-hidden=true></i></span> <input v-model=filter.term type=text class=form-control placeholder=\"Filtrar dados da tabela\" aria-describedby=basic-addon1></div></div></div><hr><div class=row><div class=col-md-12><button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=button data-toggle=modal data-target=#modal-create-role><i class=\"fa fa-plus\"></i> Novo</button></div></div><br><div class=row><div class=col-md-12><div class=table-responsive><table class=\"table table-striped table-hover table-condensed\"><thead><tr><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'name')\">Nome do papel</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'display_name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'display_name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'display_name')\">Papel</a><th><i :class=\"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=true></i> <a href=# @click=\"doSort($event, 'description')\">Descriçãos</a><th class=text-center colspan=2><span><i class=\"fa fa-cogs\"></i></span><th width=75 class=text-center><a @click=openAllDetails href=#><span><i data-toggle=tooltip data-placement=left title=\"Ver Todas Permissões\" class=fa :class=\"{'fa-sign-in': openDetails.length == 0, 'fa-sign-out': openDetails.length > 0}\"></i></span></a><tbody v-for=\"role in roles | filterBy filter.term | orderBy sortColumn sortInverse\"><tr><td>{{ role.name }}<td>{{ role.display_name }}<td>{{ role.description }}<td align=left><a data-toggle=modal data-target=#modal-edit-role href=#><i class=\"fa fa-pencil text-primary\" @click=getThisRole(role.id)></i></a><td align=right><a data-toggle=modal data-target=#modal-delete-role href=#><i class=\"fa fa-trash text-danger\" @click=getThisRole(role.id)></i></a><td width=75 class=text-center><a @click=\"doOpenDetails($event, role.id)\" v-show=\"role.perms != ''\" href=#><i data-toggle=tooltip data-placement=left title=\"Ver Permissões\" class=fa :class=\"{'fa-plus-square': openDetails.indexOf(role.id) == -1, 'fa-minus-square': openDetails.indexOf(role.id) > -1}\"></i></a> <i class=\"fa fa-plus-square\" v-show=\"role.perms == ''\" style=\"opacity: 0.3\"></i><tr v-show=\"openDetails.indexOf(role.id) > -1 && role.perms != ''\"><td colspan=6><ul class=\"list-unstyled list-group-flush\" v-for=\"perms in role.perms\"><li><span class=\"label label-primary\" data-toggle=tooltip title=\"{{ perms.description }}\"><b><i class=\"fa fa-unlock\"></i> &nbsp;{{ perms.display_name }}</b></span>&nbsp;</ul></table><div class=\"col-md-12 pull-left\"><pagination :source.sync=pagination @navigate=navigate></pagination></div></div><div class=\"modal fade\" id=modal-delete-role tabindex=-1 role=dialog aria-labelledby=\"\" aria-hidden=true><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal aria-hidden=true>&times;</button><h4 class=modal-title>Eliminar Função</h4></div><div class=modal-body><h1>Eliminar Função {{newRole.name}}</h1></div><div class=modal-footer><button type=button class=\"btn btn-default\" data-dismiss=modal>Cancelar</button> <button @keyup.enter=deleteRole(newRole.id) @click=deleteRole(newRole.id) type=button class=\"btn btn-default\">Eliminar Função</button></div></div></div></div><div id=modal-create-role class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Criar novo Papel</h4></div><div class=modal-body><validator name=validationew><form action=# methods=POST><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=\"Nome do  papel para o sistema\" v-model=newRole.name v-validate:name=\"['required']\"> <span class=\"fa fa-lock form-control-feedback\"></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=display_name placeholder=\"Nome do papel para ser visualizado\" v-model=newRole.display_name v-validate:display_name=\"['required']\"> <span class=\"fa fa-eye form-control-feedback\"></span><p style=color:red v-if=\"$validationew.display_name.required && $validationew.display_name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=descrição class=form-control rows=5 cols=40 id=description v-model=newRole.description></textarea></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=js-example-responsive multiple v-model=newRole.permissions v-el:perms multiple><option v-for=\"permission in permissions\" value={{permission.id}}>{{permission.display_name}}</select></div></div></div></div></form></validator></div><div class=modal-footer><button type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button> <button :disabled=!$validationew.valid @click=createRole class=\"btn btn-primary pull-right\" type=submit><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button></div></div></div></div><div id=modal-edit-role class=\"modal fade\" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><button @click=clearField type=button class=close data-dismiss=modal>&times;</button><h4 class=modal-title>Editar</h4></div><div class=modal-body><validator name=validation1><form methods=patch><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=name placeholder=\"Nome do  papel para o sistema\" v-model=newRole.name v-validate:name=\"['required']\"> <span class=\"fa fa-lock form-control-feedback\"></span><p style=color:red v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><input type=text class=form-control name=display_name placeholder=\"Nome do papel para ser visualizado\" v-model=newRole.display_name v-validate:display_name=\"['required']\"> <span class=\"fa fa-eye form-control-feedback\"></span><p style=color:red v-if=\"$validationew.display_name.required && $validationew.display_name.touched\"><span data-toggle=tooltip title=\"Este campo tem de ser preenchida!\">*</span></div></div></div></div><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><textarea name=description placeholder=descrição class=form-control rows=5 cols=40 id=description v-model=newRole.description></textarea></div></div></div></div><hr><div class=row><div class=col-md-12><div class=col-md-12><div class=\"form-group has-feedback\"><select class=form-control v-model=newRole.permissions v-el:editperms multiple><option v-for=\"permission in permissions\" value={{permission.id}}>{{permission.display_name}}</select></div></div></div></div></form></validator></div><div class=modal-footer><div class=col-md-12><button @click=clearField type=button class=\"btn btn-secondary\" data-dismiss=modal><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button> <button v-on:show=\"\" @click=saveEditedRole(newRole.id) type=button class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp;Atualizar</button></div></div></div></div></div></div></div>"
 
 },{"../../../Pagination/src/Component.vue":89,"lodash":77,"vueify/lib/insert-css":82}],95:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")

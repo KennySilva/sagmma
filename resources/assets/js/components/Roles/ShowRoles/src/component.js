@@ -28,6 +28,8 @@ export default{
             },
             pagination: {},
             success: false,
+            msgSucess: '',
+            typeAlert: '',
         }
     },
 
@@ -41,6 +43,24 @@ export default{
     // ---------------------------------------------------------------------------------
 
     methods: {
+
+        resetPermissions: function(ev) {
+            ev.preventDefault()
+            this.newRole.permissions = ""
+        },
+
+        alert: function(msg, typeAlert) {
+            var self = this;
+            this.success = true;
+            this.msgSucess = msg;
+            this.typeAlert = typeAlert;
+
+
+            setTimeout(function() {
+                self.success = false;
+            }, 5000);
+        },
+
         createRole: function() {
             var role = this.newRole;
 
@@ -58,11 +78,7 @@ export default{
                     $('#modal-create-role').modal('hide');
                     // console.log(response.data);
                     this.fetchRole();
-                    var self = this;
-                    this.success = true;
-                    setTimeout(function() {
-                        self.success = false;
-                    }, 5000);
+                    this.alert('Papel Criado com sucesso', 'success');
                 }
             }, (response) => {
 
@@ -72,9 +88,36 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         fetchRole: function(page) {
-            this.$http.get('http://localhost:8000/api/v1/roles?page='+page).then((response) => {
-                this.$set('roles', response.data.data)
-                this.$set('pagination', response.data)
+            var self = this
+            self.$http.get('http://localhost:8000/api/v1/roles?page='+page).then((response) => {
+                self.$set('roles', response.data.data)
+                self.$set('pagination', response.data)
+
+                jQuery(self.$els.perms).select2({
+                    placeholder: "Permissões",
+                    allowClear: true,
+                    theme: "bootstrap",
+                    width: '100%',
+                    language: 'pt',
+                    tags: true,
+                    //  maximumSelectionLength: 2
+                    //  minimumResultsForSearch: Infinity
+
+                }).on('change', function () {
+                    self.$set('newRole.permissions', jQuery(this).val());
+                });
+
+                jQuery(self.$els.editperms).select2({
+                    placeholder: "Permissões",
+                    allowClear: true,
+                    theme: "bootstrap",
+                    width: '100%',
+                    language: 'pt',
+                }).on('change', function () {
+                    self.$set('newRole.permissions', jQuery(this).val());
+                });
+
+
             }, (response) => {
                 console.log("Ocorreu um erro na operação")
             });
@@ -88,6 +131,8 @@ export default{
                 this.newRole.name     = response.data.name;
                 this.newRole.display_name = response.data.display_name;
                 this.newRole.description    = response.data.description;
+                // this.newRole.permissions    = response.data.perms;
+                this.$set('newRole.permissions', response.data.perms)
             }, (response) => {
                 console.log('Error');
             });
@@ -110,6 +155,8 @@ export default{
                     $('#modal-edit-role').modal('hide');
                     // console.log(response.data);
                     this.fetchRole();
+                    this.alert('Papel atualizado com sucesso', 'info');
+
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -124,6 +171,7 @@ export default{
                 if (response.status == 200) {
                     // console.log(response.data);
                     this.fetchRole();
+                    this.alert('Papel eliminado com sucesso', 'warning');
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");

@@ -30,14 +30,17 @@
                             <a href="#"  class="dropdown-toggle" data-toggle="dropdown"><img src="/uploads/avatars/{!! Auth::user()->avatar !!}" class="user-image" alt="Placeholder"  style="width: 15px; height: 15px;"> <span class="" style="text-transform: uppercase;">{{ Auth::user()->name }} </span><span class="caret"></span></a>
 
                             <ul class="dropdown-menu">
-                                @role(['admin', 'backend'])
-                                @permission(['admin', 'acess-backend'])
+
+                                @role(['sagmma'])
+                                @permission(['acess-backend'])
                                 <li><a href="{{ url('/home') }}"><i class="fa fa-unlock"></i> SAGMMA</a></li>
                                 @endpermission
                                 @endrole
-                                @role(['trader'])
+
+                                @permission(['manage_promotions'])
                                 <li><a href="#"><i class="fa fa-sticky-note"></i> MEU NEGÓCIO</a></li>
-                                @endrole
+                                @endpermission
+                                
                                 <li><a href="#"><i class="fa fa-user-o"></i> PERFIL</a></li>
                                 <li><a href="{{ url('/auth/logout') }}"><i class="fa fa-sign-out"></i> SAIR</a></li>
                             </ul>

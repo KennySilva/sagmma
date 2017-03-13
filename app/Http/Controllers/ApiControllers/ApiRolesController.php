@@ -41,6 +41,7 @@ class ApiRolesController extends Controller
         public function show($id)
         {
             $role = Role::findOrFail($id);
+            $role->perms;
             return $role;
         }
 
@@ -49,10 +50,14 @@ class ApiRolesController extends Controller
             //
         }
 
-        public function update(Req $request, $id)
+        public function update(Request $request, $id)
         {
-            Role::findOrFail($id)->update($request::all());
-            return Response::json($request::all());
+            $role = Role::find($id);
+            $role->fill($request->all());
+            $role->save();
+            $role->perms()->sync($request->permissions);
+            //     $role = Role::findOrFail($id)->update($request::all());
+            // return Response::json($request::all());
 
         }
 
@@ -68,3 +73,4 @@ class ApiRolesController extends Controller
             return $permissions;
         }
     }
+    
