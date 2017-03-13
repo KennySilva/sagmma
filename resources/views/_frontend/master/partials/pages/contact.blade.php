@@ -2,7 +2,7 @@
     <h2 class="text-center">CONTACTAR</h2>
     <hr>
     <div class="row">
-        <div class="col-sm-5">
+        <div class="col-sm-5 slideanim">
             <h4>Mercado Municipal de Achada Riba</h4>
             <p><span class="fa fa-map-marker"></span> Cabo Verde, Santiago, Stª Catarina, Assomada</p>
             <p><span class="fa fa-mobile"></span> +238 2653986</p>

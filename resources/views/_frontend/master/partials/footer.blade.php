@@ -7,7 +7,7 @@
     </div>
     <br>
     <div class="row">
-        <div class="col-md-4 pull-right">
+        <div class="col-md-4 text-center">
             <h4 class="text-center">Mercado nas redes Sociais</h4>
             <hr class="style16">
             <a href="#"><h5><span class="fa fa-facebook"></span>        Facebook</h5></a>
@@ -15,7 +15,7 @@
             <a href="#"><h5><span class="fa fa-envelope"></span>  Hotmail</h5></a>
             <a href="#"><h5><span class="fa fa-twitter"></span>  twitter</h5></a>
         </div>
-        <div class="col-md-4 pull-right">
+        <div class="col-md-4 text-center">
             <h4 class="text-center">Contactos Úteis</h4>
             <hr class="style16">
             <a href="#"><h5>Camara Municipal de Santa Catarina</h5></a>
@@ -24,7 +24,7 @@
             <a href="#"><h5>Pilourinho</h5></a>
             <a href="#"><h5>Água de Santiago</h5></a>
         </div>
-        <div class="col-md-4 pull-right">
+        <div class="col-md-4 text-center">
             <h4 class="text-center">Sites Relacionados</h4>
             <hr class="style16">
             <a href="#"><h5>Camara Municipal de Santa Catarina</h5></a>

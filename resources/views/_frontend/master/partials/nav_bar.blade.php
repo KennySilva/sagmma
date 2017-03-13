@@ -1,13 +1,12 @@
     <nav class="navbar navbar-default navbar-fixed-top">
-        <div class="container">
+        <div class="container-fluid">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a v-if="show" class="navbar-brand" href="#myPage">SAGMMA1</a>
-                <a v-if="!show" class="navbar-brand" href="#myPage">SAGMMA</a>
+                <a id="sagmma" class="navbar-brand" href="#myPage">SAGMMA</a>
             </div>
             <div class="collapse navbar-collapse" id="myNavbar">
                 <ul class="nav navbar-nav navbar-right">

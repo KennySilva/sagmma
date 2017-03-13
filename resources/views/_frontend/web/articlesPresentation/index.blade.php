@@ -128,6 +128,7 @@
         });
 
         //Changing the url after click on link 'NOTICIA'
+        $("#sagmma").attr("href", "/");
         $("#mmsc").attr("href", "/");
         $("#valores").attr("href", "/");
         $("#galeria").attr("href", "/");

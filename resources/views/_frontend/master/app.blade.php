@@ -13,7 +13,7 @@
         {{-- <div id="simplegallery1" class="simplegallery"></div> --}}
         {{-- @include('_frontend.master.partials.animated_image') --}}
         <!--------------------------------------------------------------------------------------->
-        @include('flash::message')
+        {{-- @include('flash::message') --}}
         @yield('content')
 
         {{-- @include('_frontend.master.partials.mapscript') --}}
