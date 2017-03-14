@@ -3,18 +3,51 @@
 	Permissão Adicionado com sucesso
 </div>
 
-
+<!-- <pre>
+	{{$data.pagination | json}}
+</pre> -->
 
 <div class="row">
-	<div class="col-md-4 pull-right">
-		<div class="input-group">
-			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
-			<input
-			v-on:keyup.enter="doFilter"
-			type="text"
-			class="form-control"
-			placeholder="Filtrar dados da tabela"
-			aria-describedby="basic-addon1">
+	<div class="col-md-12">
+		<div class="form-inline pull-right">
+			<div class="input-group">
+				<select data-toggle="tooltip" title="A mostrar linhas na tabela" class="form-control" name="" v-model="showRow" @change="fetchPermission(1, showRow)">
+					<option class="" value="5">05</option>
+					<option class="" value="10" selected>10</option>
+					<option class="" value="20">20</option>
+					<option class="" value="50">50</option>
+					<option class="" value="100">100</option>
+					<option class="" value="200">200</option>
+				</select>
+			</div>
+			&nbsp;&nbsp;
+			<div class="input-group">
+				<select data-toggle="tooltip" title="Escolhe as colunas a serem filtrados" class="form-control" name="" v-model="columnsFiltered" multiple="multiple" v-el:perms>
+					<option class="" value="name"="">Nome</option>
+					<option class="" value="display_name">Label</option>
+					<option class="" value="description">Descrição</option>
+				</select>
+			</div>
+			&nbsp;&nbsp;
+			<div v-if="columnsFiltered.length != 0" class="input-group">
+				<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
+				<input data-toggle="tooltip" title="Escreva o valor a ser procurado na Tabela"
+				v-model="filter.term"
+				@keyup="doFilter"
+				type="text"
+				class="form-control"
+				placeholder="Filtrar dados da tabela"
+				aria-describedby="basic-addon1">
+			</div>
+
+			<div v-else class="input-group">
+				<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
+				<input :disabled="columnsFiltered.length == 0" data-toggle="tooltip" title="Para ativar introduza um valor na Coluna"
+				type="text"
+				class="form-control"
+				placeholder="Filtrar dados da tabela"
+				aria-describedby="basic-addon1">
+			</div>
 		</div>
 	</div>
 </div>
@@ -53,7 +86,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr v-for="permission in permissions | filterBy filter.term | orderBy sortColumn sortInverse">
+					<tr v-for="permission in permissions | orderBy sortColumn sortInverse">
 						<td>{{ permission.name }}</td>
 						<td>{{ permission.display_name }}</td>
 						<td>{{ permission.description }}</td>
@@ -62,8 +95,16 @@
 					</tr>
 				</tbody>
 			</table>
-			<div class="col-md-12 pull-left">
-				<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
+			<div class="row">
+				<div class="col-md-6 pull-left">
+					<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
+				</div>
+
+				<div class="col-md-6 pull-right">
+					<!-- <h5  class="text-right"><span>Mostrando de {{pagination.from}} para {{pagination.to}} de {{pagination.total}} linhas</span></h5> -->
+					<h6 class="text-right text-help"> Mostrar <span class="badge">{{pagination.from}}</span>  De <span class="badge">{{pagination.to}}</span>  De total de <span class="badge">{{pagination.total}}</span></h6>
+				</div>
+
 			</div>
 		</div>
 

@@ -13,9 +13,9 @@ use Input;
 
 class ApiPermissionsController extends Controller
 {
-    public function index()
+    public function index($row)
     {
-        return Permission::paginate(5);
+        return Permission::paginate($row);
     }
 
     public function create()

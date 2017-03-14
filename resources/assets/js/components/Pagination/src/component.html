@@ -14,7 +14,7 @@
 		</li>
 		<li v-for="page in pages" track-by="$index" :class="{ active: source.current_page == page }">
 			<span  id="sear" v-if="page == '...'">{{ page }}</span>
-			<a v-if="page != '...'" href="#" @click="navigate($event, page)">{{ page }}</a>
+			<a v-if="page != '...'" href="#" @click="navigate($event, page, row)">{{ page }}</a>
 		</li>
 		<li :class="{ disabled: source.current_page == this.source.last_page}" v-if="!(source.current_page == this.source.last_page)">
 			<a href="#" aria-label="Next" @click="nextPrev($event, source.current_page+1)">

@@ -10,7 +10,7 @@ export default{
         'source'
     ],
 
-    
+
     data(){
         return {
             pages     : [],

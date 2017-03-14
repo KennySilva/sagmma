@@ -84,7 +84,7 @@ Route::group(['namespace' => 'ApiControllers'], function()
             Route::resource('roles', 'ApiRolesController');
             Route::get('permissionrole', 'ApiRolesController@getPermissionForRole');
             Route::resource('permissions', 'ApiPermissionsController');
-            Route::get('getAllpermissions/{show}', 'ApiPermissionsController@index');
+            Route::get('getAllpermissions/{row}', 'ApiPermissionsController@index');
         });
         // ##################################################################################################################
         // ################################################  API Sagmma  ####################################################
