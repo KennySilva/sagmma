@@ -10,7 +10,7 @@
     <!--------------------------------------------------------------------------------------->
     @include('_frontend.master.partials.indexCarouce')
     <!--------------------------------------------------------------------------------------->
-
+    {{-- <show-promotion-in-front></show-promotion-in-front> --}}
     <!-- Container (About Section) -->
     @include('_frontend.master.partials.pages.market_info')
 

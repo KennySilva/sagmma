@@ -36617,8 +36617,14 @@ exports.default = {
             filter: {
                 term: ''
             },
+            columnsFiltered: [],
             pagination: {},
-            success: false
+            success: false,
+            msgSucess: '',
+            typeAlert: '',
+            showRow: '',
+            all: {},
+            articles: {}
         };
     },
 
@@ -36626,16 +36632,39 @@ exports.default = {
     // ---------------------------------------------------------------------------------
 
     ready: function ready() {
-        this.fetchArticle(1);
+        this.fetchArticle(1, this.showRow);
         this.articleCategory();
         this.articleTag();
         this.articleUser();
+        var self = this;
+        jQuery(self.$els.article).select2({
+            placeholder: "Coluna",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt'
+
+        }).on('change', function () {
+            self.$set('columnsFiltered', jQuery(this).val());
+        });
     },
 
 
     // ---------------------------------------------------------------------------------
 
     methods: {
+
+        alert: function alert(msg, typeAlert) {
+            var self = this;
+            this.success = true;
+            this.msgSucess = msg;
+            this.typeAlert = typeAlert;
+
+            setTimeout(function () {
+                self.success = false;
+            }, 5000);
+        },
+
         clearField: function clearField() {
             this.newArticle = {
                 id: '',
@@ -36663,38 +36692,57 @@ exports.default = {
 
                     $('#modal-create-article').modal('hide');
                     // this.uploadsImages();
-                    _this.fetchArticle();
-                    var self = _this;
-                    _this.success = true;
-                    setTimeout(function () {
-                        self.success = false;
-                    }, 5000);
+                    _this.fetchArticle(1, _this.showRow);
+                    _this.alert('Artigo Criado com sucesso', 'success');
                 }
             }, function (response) {});
         },
 
         // --------------------------------------------------------------------------------------------
 
-        fetchArticle: function fetchArticle(page) {
+        fetchArticle: function fetchArticle(page, row) {
             var self = this;
-            self.$http.get('http://localhost:8000/api/v1/articles?page=' + page).then(function (response) {
+            self.$http.get('http://localhost:8000/api/v1/allArticles/' + row + '?page=' + page).then(function (response) {
                 self.$set('articles', response.data.data);
+                self.$set('all', response.data.data);
                 self.$set('pagination', response.data);
 
                 jQuery(self.$els.category).select2({
-                    placeholder: "Catagerias",
+                    placeholder: "Coluna",
                     allowClear: true,
-                    theme: "classic",
-                    width: '100%'
+                    theme: "bootstrap",
+                    width: '100%',
+                    language: 'pt'
                 }).on('change', function () {
                     self.$set('newArticle.category_id', jQuery(this).val());
                 });
 
                 jQuery(self.$els.tags).select2({
-                    theme: "classic",
-                    placeholder: "Marcadores",
+                    placeholder: "Coluna",
                     allowClear: true,
-                    width: '100%'
+                    theme: "bootstrap",
+                    width: '100%',
+                    language: 'pt'
+                }).on('change', function () {
+                    self.$set('newArticle.tags', jQuery(this).val());
+                });
+                //-----------------------------------------------------------------------------------
+                jQuery(self.$els.categoryedit).select2({
+                    placeholder: "Coluna",
+                    allowClear: true,
+                    theme: "bootstrap",
+                    width: '100%',
+                    language: 'pt'
+                }).on('change', function () {
+                    self.$set('newArticle.category_id', jQuery(this).val());
+                });
+
+                jQuery(self.$els.tagsedit).select2({
+                    placeholder: "Coluna",
+                    allowClear: true,
+                    theme: "bootstrap",
+                    width: '100%',
+                    language: 'pt'
                 }).on('change', function () {
                     self.$set('newArticle.tags', jQuery(this).val());
                 });
@@ -36735,7 +36783,8 @@ exports.default = {
                 if (response.status == 200) {
                     $('#modal-edit-article').modal('hide');
                     // console.log(response.data);
-                    _this3.fetchArticle();
+                    _this3.fetchArticle(1, _this3.showRow);
+                    _this3.alert('Artigo atualizado com sucesso', 'info');
                 }
             }, function (response) {
                 console.log("Ocorreu um erro na operação");
@@ -36751,7 +36800,8 @@ exports.default = {
                 $('#modal-delete-article').modal('hide');
                 if (response.status == 200) {
                     // console.log(response.data);
-                    _this4.fetchArticle();
+                    _this4.fetchArticle(1, _this4.showRow);
+                    _this4.alert('Artigo eliminado com sucesso', 'warning');
                 }
             }, function (response) {
                 console.log("Ocorreu um erro na operação");
@@ -36807,7 +36857,7 @@ exports.default = {
             var postData = { id: _articleStatus };
             this.$http.post('http://localhost:8000/api/v1/articleStatus/', postData).then(function (response) {
                 if (response.status == 200) {
-                    _this8.fetchArticle(_this8.pagination.current_page);
+                    _this8.fetchArticle(_this8.pagination.current_page, _this8.showRow);
                 }
             }, function (response) {});
         },
@@ -36817,7 +36867,7 @@ exports.default = {
             var postData = { id: _articleFeatures };
             this.$http.post('http://localhost:8000/api/v1/articleFeatures/', postData).then(function (response) {
                 if (response.status == 200) {
-                    _this9.fetchArticle(_this9.pagination.current_page);
+                    _this9.fetchArticle(_this9.pagination.current_page, _this9.showRow);
                 }
             }, function (response) {});
         },
@@ -36826,7 +36876,7 @@ exports.default = {
 
         // Outros funções
         navigate: function navigate(page) {
-            this.fetchArticle(page);
+            this.fetchArticle(page, this.showRow);
         },
 
         doOpenContents: function doOpenContents(ev, id) {
@@ -36876,6 +36926,21 @@ exports.default = {
 
             // console.log('editor change!', editor, html, text)
             this.content = html;
+        },
+
+
+        doFilter: function doFilter() {
+
+            var self = this;
+            filtered = self.all;
+            if (self.filter.term != '' && self.columnsFiltered.length > 0) {
+                filtered = _.filter(self.all, function (article) {
+                    return self.columnsFiltered.some(function (column) {
+                        return article[column].toLowerCase().indexOf(self.filter.term.toLowerCase()) > -1;
+                    });
+                });
+            }
+            self.$set('articles', filtered);
         }
     },
 
@@ -36900,7 +36965,7 @@ exports.default = {
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=\"success\" v-if=\"success\">\r\n\t<i class=\"fa fa-thumbs-up\"> Sucesso!!!</i>\r\n</div>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-4 pull-right\">\r\n\t\t<div class=\"input-group\">\r\n\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t<input v-model=\"filter.term\" type=\"text\" class=\"form-control\" placeholder=\"Filtrar...\" aria-describedby=\"basic-addon1\">\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n<div class=\"col-md-12\">\r\n\t<button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-article\"><i class=\"fa fa-plus\"></i> Novo</button>\r\n</div>\r\n\r\n\r\n</div>\r\n<br><br>\r\n\r\n<div class=\"col-md-12\">\r\n\t<div class='table-responsive'>\r\n\t\t<table class='table table-striped table-hover table-condensed'>\r\n\t\t\t<thead>\r\n\t\t\t\t<tr>\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'title' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'title' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'title')\">Titulo</a>\r\n\t\t\t\t\t</th>\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'status' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'status' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'status')\">Publicação</a>\r\n\t\t\t\t\t</th>\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'featured' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'featured' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'featured')\">Destaque</a>\r\n\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\">\r\n\t\t\t\t\t\t<span><i class=\"fa fa-cogs\"></i></span>\r\n\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t<th width=75  class=\"text-center\">\r\n\t\t\t\t\t\t<a @click = \"openAllContents\" href=\"#\">\r\n\t\t\t\t\t\t\t<span><i data-toggle=\"tooltip\" data-placement=\"left\" title=\"Ver Conteúdos de todos os Artigos\" class=\"fa\" :class=\"{'fa-plus': openContents.length == 0, 'fa-minus': openContents.length > 0}\"></i></span>\r\n\t\t\t\t\t\t</a>\r\n\t\t\t\t\t</th>\r\n\t\t\t\t</tr>\r\n\t\t\t</thead>\r\n\t\t\t<tbody v-for=\"article in articles | filterBy filter.term | orderBy sortColumn sortInverse\">\r\n\t\t\t\t<tr>\r\n\t\t\t\t\t<td>{{ article.title }}</td>\r\n\r\n\t\t\t\t\t<td>\r\n\t\t\t\t\t\t<button type=\"submit\" @click = \"articleStatus(article.id)\" class='btn btn-xs btn-flat' :class=\"{ 'btn-info': article.status, 'btn-danger': !article.status }\">{{article.status ? 'Publicado' : 'Pendente'}}</button>\r\n\t\t\t\t\t</td>\r\n\r\n\t\t\t\t\t<td>\r\n\t\t\t\t\t\t<button type=\"submit\" @click = \"articleFeatures(article.id)\" class='btn btn-xs btn-flat' :class=\"{ 'btn-info': article.featured, 'btn-danger': !article.featured }\">{{article.featured ? 'Publicado' : 'Pendente'}}</button>\r\n\t\t\t\t\t</td>\r\n\r\n\t\t\t\t\t<td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-article\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisArticle(article.id)\" > </i></a></td>\r\n\t\t\t\t\t<td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-article\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisArticle(article.id)\"></i></a></td>\r\n\r\n\t\t\t\t\t<td width=75 class=\"text-center\">\r\n\t\t\t\t\t\t<a @click = \"doOpenContents($event, article.id)\" v-show=\"article.content != ''\" href=\"#\"><i data-toggle=\"tooltip\" data-placement=\"left\" title=\"Ver este conteúdo\" class=\"fa\" :class=\"{'fa-plus-square': openContents.indexOf(article.id) == -1, 'fa-minus-square': openContents.indexOf(article.id) > -1}\"></i></a>\r\n\t\t\t\t\t\t<i class=\"fa fa-plus-square\" v-show=\"article.content == ''\" style=\"opacity: 0.3\"></i>\r\n\t\t\t\t\t</td>\r\n\t\t\t\t</tr>\r\n\t\t\t\t<tr class=\"\" v-show=\"openContents.indexOf(article.id) > -1 && article.content != ''\">\r\n\t\t\t\t\t<td colspan=\"6\">\r\n\t\t\t\t\t\t{{ article.content }}\r\n\t\t\t\t\t</td>\r\n\t\t\t\t</tr>\r\n\t\t\t</tbody>\r\n\t\t</table>\r\n\t\t<div class=\"col-md-12 pull-left\">\r\n\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t<div class=\"modal fade\" id=\"modal-delete-article\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t<div class=\"modal-dialog\">\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newArticle.name}}</span></h5>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Cancelar</button>\r\n\t\t\t\t\t<button  @keyup.enter=\"deleteArticle(newArticle.id)\" @click=\"deleteArticle(newArticle.id)\" type=\"button\" class=\"btn btn-danger\">Eliminar</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\t<!-- Modal -->\r\n\t<div id=\"modal-create-article\" class=\"modal fade\" role=\"dialog\">\r\n\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t<!-- Modal content-->\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\">Registar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"title\" placeholder=\"Titulo\" v-model=\"newArticle.title\" v-validate:title=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.title.required && $validationew.title.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newArticle.category_id\" v-el:category>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"category in categories\" value=\"{{category.id}}\">{{category.name}}</option>\r\n\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newArticle.tags\" v-el:tags multiple=\"multiple\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"tag in tags\" value=\"{{tag.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t{{tag.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"content\" placeholder=\"Conteúdo...\" class=\"form-control textarea-conte\" rows=\"5\" cols=\"40\" id=\"content\" v-model=\"newArticle.content\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<quill-editor ref=\"myTextEditor\"\r\n\t\t\t\t\t\t\t\t\t\t\tv-model=\"content\"\r\n\t\t\t\t\t\t\t\t\t\t\t:config=\"editorOption\"\r\n\t\t\t\t\t\t\t\t\t\t\t@blur=\"onEditorBlur($event)\"\r\n\t\t\t\t\t\t\t\t\t\t\t@focus=\"onEditorFocus($event)\"\r\n\t\t\t\t\t\t\t\t\t\t\t@ready=\"onEditorReady($event)\">\r\n\t\t\t\t\t\t\t\t\t\t</quill-editor>\r\n\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<!-- <input  class=\"form-control\" type=\"file\" name=\"articleimage\" id=\"articleimage\" v-el:articleimage> -->\r\n\t\t\t\t\t\t\t\t\t\t<input  class=\"form-control\" type=\"file\" name=\"articleimage\" id=\"articleimage\" v-el:articleimage>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t</form>\r\n\t\t\t\t</validator>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createArticle\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n\r\n\r\n<!--------------------------------------------------------------------------------------------------------->\r\n\r\n<!-- Modal -->\r\n<div id=\"modal-edit-article\" class=\"modal fade\" role=\"dialog\">\r\n\t<div class=\"modal-dialog\">\r\n\t\t<!-- Modal content-->\r\n\t\t<div class=\"modal-content\">\r\n\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t<h4 class=\"modal-title\">Editar</h4>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t<validator name=\"validation1\">\r\n\t\t\t\t\t<form methods=\"patch\">\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" v-model=\"newArticle.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newArticle.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</form>\r\n\t\t\t\t</validator>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedArticle(newArticle.id)\" type=\"button\" class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n</div>\r\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<!-- <div class=\"alert alert-success\" transition=\"success\" v-if=\"success\">\r\n\t<i class=\"fa fa-thumbs-up\"> Sucesso!!!</i>\r\n</div> -->\r\n\r\n<div  id=\"alert-message\" class=\"alert alert-{{typeAlert}}\" transition=\"success\" v-if=\"success\">\r\n\t<button type=\"button\" class=\"close\" data-dismiss=\"alert\">x</button>\r\n\t<i class=\"fa fa-thumbs-o-up text-center\">&nbsp;&nbsp; {{msgSucess}}</i>\r\n</div>\r\n\r\n<!-- <div class=\"row\">\r\n<div class=\"col-md-4 pull-right\">\r\n<div class=\"input-group\">\r\n<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n<input v-model=\"filter.term\" type=\"text\" class=\"form-control\" placeholder=\"Filtrar...\" aria-describedby=\"basic-addon1\">\r\n</div>\r\n</div>\r\n</div> -->\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class=\"form-inline pull-right\">\r\n\t\t\t<div class=\"input-group\">\r\n\t\t\t\t<select data-toggle=\"tooltip\" title=\"A mostrar linhas na tabela\" class=\"form-control\" name=\"\" v-model=\"showRow\" @change=\"fetchArticle(1, showRow)\">\r\n\t\t\t\t\t<option class=\"\" value=\"5\">05</option>\r\n\t\t\t\t\t<option class=\"\" value=\"10\" selected>10</option>\r\n\t\t\t\t\t<option class=\"\" value=\"20\">20</option>\r\n\t\t\t\t\t<option class=\"\" value=\"50\">50</option>\r\n\t\t\t\t\t<option class=\"\" value=\"100\">100</option>\r\n\t\t\t\t\t<option class=\"\" value=\"200\">200</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t&nbsp;&nbsp;\r\n\t\t\t<div class=\"input-group\">\r\n\t\t\t\t<select data-toggle=\"tooltip\" title=\"Escolhe as colunas a serem filtrados\" class=\"form-control\" name=\"\" v-model=\"columnsFiltered\" multiple=\"multiple\" v-el:article>\r\n\t\t\t\t\t<option class=\"\" value=\"title\"=\"\">Titulo</option>\r\n\t\t\t\t\t<option class=\"\" value=\"status\">Publicação</option>\r\n\t\t\t\t\t<option class=\"\" value=\"featured\">Destaque</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t&nbsp;&nbsp;\r\n\t\t\t<div v-if=\"columnsFiltered.length != 0\" class=\"input-group\">\r\n\t\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<input data-toggle=\"tooltip\" title=\"Escreva o valor a ser procurado na Tabela\"\r\n\t\t\t\tv-model=\"filter.term\"\r\n\t\t\t\t@keyup=\"doFilter\"\r\n\t\t\t\ttype=\"text\"\r\n\t\t\t\tclass=\"form-control\"\r\n\t\t\t\tplaceholder=\"Filtrar dados da tabela\"\r\n\t\t\t\taria-describedby=\"basic-addon1\">\r\n\t\t\t</div>\r\n\r\n\t\t\t<div v-else class=\"input-group\">\r\n\t\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<input :disabled=\"columnsFiltered.length == 0\" data-toggle=\"tooltip\" title=\"Para ativar introduza um valor na Coluna\"\r\n\t\t\t\ttype=\"text\"\r\n\t\t\t\tclass=\"form-control\"\r\n\t\t\t\tplaceholder=\"Filtrar dados da tabela\"\r\n\t\t\t\taria-describedby=\"basic-addon1\">\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n<div class=\"col-md-12\">\r\n\t<button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-article\"><i class=\"fa fa-plus\"></i> Novo</button>\r\n</div>\r\n\r\n\r\n</div>\r\n<br><br>\r\n\r\n<div class=\"col-md-12\">\r\n\t<div class='table-responsive'>\r\n\t\t<table class='table table-striped table-hover table-condensed'>\r\n\t\t\t<thead>\r\n\t\t\t\t<tr>\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'title' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'title' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'title')\">Titulo</a>\r\n\t\t\t\t\t</th>\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'status' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'status' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'status')\">Publicação</a>\r\n\t\t\t\t\t</th>\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'featured' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'featured' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'featured')\">Destaque</a>\r\n\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\">\r\n\t\t\t\t\t\t<span><i class=\"fa fa-cogs\"></i></span>\r\n\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t<th width=75  class=\"text-center\">\r\n\t\t\t\t\t\t<a @click = \"openAllContents\" href=\"#\">\r\n\t\t\t\t\t\t\t<span><i data-toggle=\"tooltip\" data-placement=\"left\" title=\"Ver Conteúdos de todos os Artigos\" class=\"fa\" :class=\"{'fa-plus': openContents.length == 0, 'fa-minus': openContents.length > 0}\"></i></span>\r\n\t\t\t\t\t\t</a>\r\n\t\t\t\t\t</th>\r\n\t\t\t\t</tr>\r\n\t\t\t</thead>\r\n\t\t\t<tbody v-for=\"article in articles | orderBy sortColumn sortInverse\">\r\n\t\t\t\t<tr>\r\n\t\t\t\t\t<td>{{ article.title }}</td>\r\n\r\n\t\t\t\t\t<td>\r\n\t\t\t\t\t\t<button type=\"submit\" @click = \"articleStatus(article.id)\" class='btn btn-xs btn-flat' :class=\"{ 'btn-info': article.status, 'btn-danger': !article.status }\">{{article.status ? 'Publicado' : 'Pendente'}}</button>\r\n\t\t\t\t\t</td>\r\n\r\n\t\t\t\t\t<td>\r\n\t\t\t\t\t\t<button type=\"submit\" @click = \"articleFeatures(article.id)\" class='btn btn-xs btn-flat' :class=\"{ 'btn-info': article.featured, 'btn-danger': !article.featured }\">{{article.featured ? 'Publicado' : 'Pendente'}}</button>\r\n\t\t\t\t\t</td>\r\n\r\n\t\t\t\t\t<td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-article\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisArticle(article.id)\" > </i></a></td>\r\n\t\t\t\t\t<td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-article\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisArticle(article.id)\"></i></a></td>\r\n\r\n\t\t\t\t\t<td width=75 class=\"text-center\">\r\n\t\t\t\t\t\t<a @click = \"doOpenContents($event, article.id)\" v-show=\"article.content != ''\" href=\"#\"><i data-toggle=\"tooltip\" data-placement=\"left\" title=\"Ver este conteúdo\" class=\"fa\" :class=\"{'fa-plus-square': openContents.indexOf(article.id) == -1, 'fa-minus-square': openContents.indexOf(article.id) > -1}\"></i></a>\r\n\t\t\t\t\t\t<i class=\"fa fa-plus-square\" v-show=\"article.content == ''\" style=\"opacity: 0.3\"></i>\r\n\t\t\t\t\t</td>\r\n\t\t\t\t</tr>\r\n\t\t\t\t<tr class=\"\" v-show=\"openContents.indexOf(article.id) > -1 && article.content != ''\">\r\n\t\t\t\t\t<td colspan=\"6\">\r\n\t\t\t\t\t\t{{ article.content }}\r\n\t\t\t\t\t</td>\r\n\t\t\t\t</tr>\r\n\t\t\t</tbody>\r\n\t\t</table>\r\n\r\n\t\t<div class=\"row\">\r\n\t\t\t<div class=\"col-md-6 pull-left\">\r\n\t\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"col-md-6 pull-right\">\r\n\t\t\t\t<h6 class=\"text-right text-help\"> Mostrar de <span class=\"badge\">{{pagination.from}}</span>  a <span class=\"badge\">{{pagination.to}}</span>  no total de <span class=\"badge\">{{pagination.total}}</span></h6>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t</div>\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t<div class=\"modal fade\" id=\"modal-delete-article\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t<div class=\"modal-dialog\">\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newArticle.name}}</span></h5>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Cancelar</button>\r\n\t\t\t\t\t<button  @keyup.enter=\"deleteArticle(newArticle.id)\" @click=\"deleteArticle(newArticle.id)\" type=\"button\" class=\"btn btn-danger\">Eliminar</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\t<!-- Modal -->\r\n\t<div id=\"modal-create-article\" class=\"modal fade\" role=\"dialog\">\r\n\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t<!-- Modal content-->\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\">Registar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"title\" placeholder=\"Titulo\" v-model=\"newArticle.title\" v-validate:title=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.title.required && $validationew.title.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newArticle.category_id\" v-el:category>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"category in categories\" value=\"{{category.id}}\">{{category.name}}</option>\r\n\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newArticle.tags\" v-el:tags multiple=\"multiple\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"tag in tags\" value=\"{{tag.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t{{tag.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"content\" placeholder=\"Conteúdo...\" class=\"form-control textarea-conte\" rows=\"5\" cols=\"40\" id=\"content\" v-model=\"newArticle.content\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<quill-editor ref=\"myTextEditor\"\r\n\t\t\t\t\t\t\t\t\t\t\tv-model=\"content\"\r\n\t\t\t\t\t\t\t\t\t\t\t:config=\"editorOption\"\r\n\t\t\t\t\t\t\t\t\t\t\t@blur=\"onEditorBlur($event)\"\r\n\t\t\t\t\t\t\t\t\t\t\t@focus=\"onEditorFocus($event)\"\r\n\t\t\t\t\t\t\t\t\t\t\t@ready=\"onEditorReady($event)\">\r\n\t\t\t\t\t\t\t\t\t\t</quill-editor>\r\n\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<!-- <input  class=\"form-control\" type=\"file\" name=\"articleimage\" id=\"articleimage\" v-el:articleimage> -->\r\n\t\t\t\t\t\t\t\t\t\t<input  class=\"form-control\" type=\"file\" name=\"articleimage\" id=\"articleimage\" v-el:articleimage>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t</form>\r\n\t\t\t\t</validator>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createArticle\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n\r\n\r\n<!--------------------------------------------------------------------------------------------------------->\r\n\r\n<!-- Modal -->\r\n<div id=\"modal-edit-article\" class=\"modal fade\" role=\"dialog\">\r\n\t<div class=\"modal-dialog\">\r\n\t\t<!-- Modal content-->\r\n\t\t<div class=\"modal-content\">\r\n\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t<h4 class=\"modal-title\">Editar</h4>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t<validator name=\"validation1\">\r\n\t\t\t\t\t<form methods=\"patch\">\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"title\" placeholder=\"Titulo\" v-model=\"newArticle.title\" v-validate:title=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.title.required && $validationew.title.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newArticle.category_id\" v-el:categoryedit>\r\n\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"category in categories\" value=\"{{category.id}}\">{{category.name}}</option>\r\n\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newArticle.tags\" v-el:tagsedit multiple=\"multiple\">\r\n\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"tag in tags\" value=\"{{tag.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t{{tag.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<textarea name=\"content\" placeholder=\"Conteúdo...\" class=\"form-control textarea-conte\" rows=\"5\" cols=\"40\" id=\"content\" v-model=\"newArticle.content\"></textarea>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<quill-editor ref=\"myTextEditor\"\r\n\t\t\t\t\t\t\t\t\t\tv-model=\"content\"\r\n\t\t\t\t\t\t\t\t\t\t:config=\"editorOption\"\r\n\t\t\t\t\t\t\t\t\t\t@blur=\"onEditorBlur($event)\"\r\n\t\t\t\t\t\t\t\t\t\t@focus=\"onEditorFocus($event)\"\r\n\t\t\t\t\t\t\t\t\t\t@ready=\"onEditorReady($event)\">\r\n\t\t\t\t\t\t\t\t\t</quill-editor>\r\n\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t</form>\r\n\t\t\t\t</validator>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedArticle(newArticle.id)\" type=\"button\" class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n</div>\r\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -36928,6 +36993,8 @@ var _Component = require('../../../Pagination/src/Component.vue');
 
 var _Component2 = _interopRequireDefault(_Component);
 
+var _lodash = require('lodash');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = {
@@ -36947,8 +37014,14 @@ exports.default = {
             filter: {
                 term: ''
             },
+            columnsFiltered: [],
             pagination: {},
-            success: false
+            success: false,
+            msgSucess: '',
+            typeAlert: '',
+            showRow: '',
+            all: {},
+            categories: {}
         };
     },
 
@@ -36956,13 +37029,35 @@ exports.default = {
     // ---------------------------------------------------------------------------------
 
     ready: function ready() {
-        this.fetchCategory(1);
+        this.fetchCategory(1, this.showRow);
+        var self = this;
+        jQuery(self.$els.colcat).select2({
+            placeholder: "Coluna",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt'
+
+        }).on('change', function () {
+            self.$set(columnsFiltered, jQuery(this).val());
+        });
     },
 
 
     // ---------------------------------------------------------------------------------
 
     methods: {
+        alert: function alert(msg, typeAlert) {
+            var self = this;
+            this.success = true;
+            this.msgSucess = msg;
+            this.typeAlert = typeAlert;
+
+            setTimeout(function () {
+                self.success = false;
+            }, 5000);
+        },
+
         clearField: function clearField() {
             this.newCategory = {
                 id: '',
@@ -36982,23 +37077,20 @@ exports.default = {
                 if (response.status == 200) {
                     console.log('chegando aqui');
                     $('#modal-create-category').modal('hide');
-                    _this.fetchCategory();
-                    var self = _this;
-                    _this.success = true;
-                    setTimeout(function () {
-                        self.success = false;
-                    }, 5000);
+                    _this.fetchCategory(1, _this.showRow);
+                    _this.alert('Categoria Criado com sucesso', 'success');
                 }
             }, function (response) {});
         },
 
         // --------------------------------------------------------------------------------------------
 
-        fetchCategory: function fetchCategory(page) {
+        fetchCategory: function fetchCategory(page, row) {
             var _this2 = this;
 
-            this.$http.get('http://localhost:8000/api/v1/categories?page=' + page).then(function (response) {
+            this.$http.get('http://localhost:8000/api/v1/allCategories/' + row + '?page=' + page).then(function (response) {
                 _this2.$set('categories', response.data.data);
+                _this2.$set('all', response.data.data);
                 _this2.$set('pagination', response.data);
             }, function (response) {
                 console.log("Ocorreu um erro na operação");
@@ -37034,7 +37126,8 @@ exports.default = {
                 if (response.status == 200) {
                     $('#modal-edit-category').modal('hide');
                     // console.log(response.data);
-                    _this4.fetchCategory();
+                    _this4.fetchCategory(1, _this4.showRow);
+                    _this4.alert('Categoria atualizado com sucesso', 'info');
                 }
             }, function (response) {
                 console.log("Ocorreu um erro na operação");
@@ -37050,7 +37143,8 @@ exports.default = {
                 $('#modal-delete-category').modal('hide');
                 if (response.status == 200) {
                     // console.log(response.data);
-                    _this5.fetchCategory();
+                    _this5.fetchCategory(1, _this5.showRow);
+                    _this5.alert('Categoria eliminado com sucesso', 'warning');
                 }
             }, function (response) {
                 console.log("Ocorreu um erro na operação");
@@ -37058,6 +37152,20 @@ exports.default = {
         },
 
         // --------------------------------------------------------------------------------------------
+
+        doFilter: function doFilter() {
+
+            var self = this;
+            filtered = self.all;
+            if (self.filter.term != '' && self.columnsFiltered.length > 0) {
+                filtered = _lodash._.filter(self.all, function (category) {
+                    return self.columnsFiltered.some(function (column) {
+                        return category[column].toLowerCase().indexOf(self.filter.term.toLowerCase()) > -1;
+                    });
+                });
+            }
+            self.$set('categories', filtered);
+        },
 
         doSort: function doSort(ev, column) {
             var self = this;
@@ -37074,21 +37182,13 @@ exports.default = {
 
         // Outros funções
         navigate: function navigate(page) {
-            this.fetchCategory(page);
+            this.fetchCategory(page, this.showRow);
         }
     },
 
     // ---------------------------------------------------------------------------------
 
-    computed: {
-        //     getThisCategory: function(id){
-        //         this.$http.get('http://localhost:8000/api/v1/setPaginate/' + this.entries).then((response) => {
-        //             this.fetchCategory(1);
-        //         }, (response) => {
-        //             console.log('Error');
-        //         });
-        //     },
-    },
+    computed: {},
 
     // ---------------------------------------------------------------------------------
 
@@ -37097,7 +37197,7 @@ exports.default = {
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\r\n<div class=\"alert alert-success\" transition=\"success\" v-if=\"success\">\r\n\t<i class=\"fa fa-thumbs-up\"> Sucesso!!!</i>\r\n</div>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-4 pull-right\">\r\n\t\t<div class=\"input-group\">\r\n\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t<input v-model=\"filter.term\" type=\"text\" class=\"form-control\" placeholder=\"Filtrar...\" aria-describedby=\"basic-addon1\">\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n<div class=\"col-md-12\">\r\n\t<button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-category\"><i class=\"fa fa-plus\"></i> Novo</button>\r\n</div>\r\n\r\n<!-- <div class=\"col-md-12\">\r\n\t<select class=\"form-control\" name=\"\" v-model=\"entries\">\r\n\t\t<option>Seleciona o tipo de utilizador</option>\r\n\t\t<option value=\"10\">10</option>\r\n\t\t<option value=\"20\">20</option>\r\n\t\t<option value=\"50\">50</option>\r\n\t</select> -->\r\n\r\n</div>\r\n<br><br>\r\n\r\n<div class=\"col-md-12\">\r\n\t<div class='table-responsive'>\r\n\t\t<table class='table table-striped table-hover table-condensed'>\r\n\t\t\t<thead>\r\n\t\t\t\t<tr>\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'name')\">Nome</a>\r\n\t\t\t\t\t</th>\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'description')\">Descrição</a>\r\n\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n\t\t\t\t</tr>\r\n\t\t\t</thead>\r\n\t\t\t<tbody>\r\n\t\t\t\t<tr v-for=\"category in categories | filterBy filter.term | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t<td>{{ category.name }}</td>\r\n\t\t\t\t\t<td>{{ category.description }}</td>\r\n\t\t\t\t\t<td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-category\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisCategory(category.id)\" > </i></a></td>\r\n\t\t\t\t\t<td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-category\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisCategory(category.id)\"></i></a></td>\r\n\t\t\t\t</tr>\r\n\t\t\t</tbody>\r\n\t\t</table>\r\n\t\t<div class=\"col-md-12 pull-left\">\r\n\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t<div class=\"modal fade\" id=\"modal-delete-category\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t<div class=\"modal-dialog\">\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newCategory.name}}</span></h5>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Cancelar</button>\r\n\t\t\t\t\t<button  @keyup.enter=\"deleteCategory(newCategory.id)\" @click=\"deleteCategory(newCategory.id)\" type=\"button\" class=\"btn btn-danger\">Eliminar</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\t<!-- Modal -->\r\n\t<div id=\"modal-create-category\" class=\"modal fade\" role=\"dialog\">\r\n\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t<!-- Modal content-->\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\">Registar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome de Categoria\" v-model=\"newCategory.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newCategory.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</form>\r\n\t\t\t\t\t</validator>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createCategory\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t<!-- Modal -->\r\n\t<div id=\"modal-edit-category\" class=\"modal fade\" role=\"dialog\">\r\n\t\t<div class=\"modal-dialog\">\r\n\t\t\t<!-- Modal content-->\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\">Editar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<validator name=\"validation1\">\r\n\t\t\t\t\t\t<form methods=\"patch\">\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" v-model=\"newCategory.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newCategory.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</form>\r\n\t\t\t\t\t</validator>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedCategory(newCategory.id)\" type=\"button\" class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div  id=\"alert-message\" class=\"alert alert-{{typeAlert}}\" transition=\"success\" v-if=\"success\">\r\n\t<button type=\"button\" class=\"close\" data-dismiss=\"alert\">x</button>\r\n\t<i class=\"fa fa-thumbs-o-up text-center\">&nbsp;&nbsp; {{msgSucess}}</i>\r\n</div>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class=\"form-inline pull-right\">\r\n\t\t\t<div class=\"input-group\">\r\n\t\t\t\t<select data-toggle=\"tooltip\" title=\"A mostrar linhas na tabela\" class=\"form-control\" name=\"\" v-model=\"showRow\" @change=\"fetchCategory(1, showRow)\">\r\n\t\t\t\t\t<option class=\"\" value=\"5\">05</option>\r\n\t\t\t\t\t<option class=\"\" value=\"10\" selected>10</option>\r\n\t\t\t\t\t<option class=\"\" value=\"20\">20</option>\r\n\t\t\t\t\t<option class=\"\" value=\"50\">50</option>\r\n\t\t\t\t\t<option class=\"\" value=\"100\">100</option>\r\n\t\t\t\t\t<option class=\"\" value=\"200\">200</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t&nbsp;&nbsp;\r\n\t\t\t<div class=\"input-group\">\r\n\t\t\t\t<select data-toggle=\"tooltip\" title=\"Escolhe as colunas a serem filtrados\" class=\"form-control\" name=\"\" v-model=\"columnsFiltered\" multiple=\"multiple\" v-el:colcat>\r\n\t\t\t\t\t<option class=\"\" value=\"name\"=\"\">Nome</option>\r\n\t\t\t\t\t<option class=\"\" value=\"description\">Descrição</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t&nbsp;&nbsp;\r\n\t\t\t<div v-if=\"columnsFiltered.length != 0\" class=\"input-group\">\r\n\t\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<input data-toggle=\"tooltip\" title=\"Escreva o valor a ser procurado na Tabela\"\r\n\t\t\t\tv-model=\"filter.term\"\r\n\t\t\t\t@keyup=\"doFilter\"\r\n\t\t\t\ttype=\"text\"\r\n\t\t\t\tclass=\"form-control\"\r\n\t\t\t\tplaceholder=\"Filtrar dados da tabela\"\r\n\t\t\t\taria-describedby=\"basic-addon1\">\r\n\t\t\t</div>\r\n\r\n\t\t\t<div v-else class=\"input-group\">\r\n\t\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<input :disabled=\"columnsFiltered.length == 0\" data-toggle=\"tooltip\" title=\"Para ativar introduza um valor na Coluna\"\r\n\t\t\t\ttype=\"text\"\r\n\t\t\t\tclass=\"form-control\"\r\n\t\t\t\tplaceholder=\"Filtrar dados da tabela\"\r\n\t\t\t\taria-describedby=\"basic-addon1\">\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n\r\n<hr>\r\n<div class=\"col-md-12\">\r\n\t<button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-category\"><i class=\"fa fa-plus\"></i> Novo</button>\r\n</div>\r\n\r\n<!-- <div class=\"col-md-12\">\r\n<select class=\"form-control\" name=\"\" v-model=\"entries\">\r\n<option>Seleciona o tipo de utilizador</option>\r\n<option value=\"10\">10</option>\r\n<option value=\"20\">20</option>\r\n<option value=\"50\">50</option>\r\n</select> -->\r\n\r\n</div>\r\n<br><br>\r\n\r\n<div class=\"col-md-12\">\r\n\t<div class='table-responsive'>\r\n\t\t<table class='table table-striped table-hover table-condensed'>\r\n\t\t\t<thead>\r\n\t\t\t\t<tr>\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'name')\">Nome</a>\r\n\t\t\t\t\t</th>\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'description')\">Descrição</a>\r\n\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n\t\t\t\t</tr>\r\n\t\t\t</thead>\r\n\t\t\t<tbody>\r\n\t\t\t\t<tr v-for=\"category in categories | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t<td>{{ category.name }}</td>\r\n\t\t\t\t\t<td>{{ category.description }}</td>\r\n\t\t\t\t\t<td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-category\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisCategory(category.id)\" > </i></a></td>\r\n\t\t\t\t\t<td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-category\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisCategory(category.id)\"></i></a></td>\r\n\t\t\t\t</tr>\r\n\t\t\t</tbody>\r\n\t\t</table>\r\n\t\t<div class=\"row\">\r\n\t\t\t<div class=\"col-md-6 pull-left\">\r\n\t\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"col-md-6 pull-right\">\r\n\t\t\t\t<h6 class=\"text-right text-help\"> Mostrar de <span class=\"badge\">{{pagination.from}}</span>  a <span class=\"badge\">{{pagination.to}}</span>  no total de <span class=\"badge\">{{pagination.total}}</span></h6>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t<div class=\"modal fade\" id=\"modal-delete-category\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t<div class=\"modal-dialog\">\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newCategory.name}}</span></h5>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Cancelar</button>\r\n\t\t\t\t\t<button  @keyup.enter=\"deleteCategory(newCategory.id)\" @click=\"deleteCategory(newCategory.id)\" type=\"button\" class=\"btn btn-danger\">Eliminar</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\t<!-- Modal -->\r\n\t<div id=\"modal-create-category\" class=\"modal fade\" role=\"dialog\">\r\n\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t<!-- Modal content-->\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\">Registar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome de Categoria\" v-model=\"newCategory.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newCategory.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</form>\r\n\t\t\t\t\t</validator>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createCategory\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t<!-- Modal -->\r\n\t<div id=\"modal-edit-category\" class=\"modal fade\" role=\"dialog\">\r\n\t\t<div class=\"modal-dialog\">\r\n\t\t\t<!-- Modal content-->\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\">Editar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<validator name=\"validation1\">\r\n\t\t\t\t\t\t<form methods=\"patch\">\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" v-model=\"newCategory.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newCategory.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</form>\r\n\t\t\t\t\t</validator>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedCategory(newCategory.id)\" type=\"button\" class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -37112,7 +37212,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update("_v-1148d28d", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"../../../Pagination/src/Component.vue":91,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],87:[function(require,module,exports){
+},{"../../../Pagination/src/Component.vue":91,"lodash":77,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],87:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1 {\r\n  color: #00a8ed;\r\n}")
 'use strict';
@@ -38262,29 +38362,41 @@ exports.default = {
 
     methods: {
 
+        alert: function alert(msg, typeAlert) {
+            var self = this;
+            this.success = true;
+            this.msgSucess = msg;
+            this.typeAlert = typeAlert;
+
+            setTimeout(function () {
+                self.success = false;
+            }, 5000);
+        },
+
+        clearField: function clearField() {
+            this.newTag = {
+                id: '',
+                name: '',
+                display_name: '',
+                description: ''
+            };
+        },
+
         createPermission: function createPermission() {
             var _this = this;
 
             var permission = this.newPermission;
 
             //Clear form input
-            this.newPermission = {
-                id: '',
-                name: '',
-                display_name: '',
-                description: ''
-            };
+            this.clearField();
+
             this.$http.post('http://localhost:8000/api/v1/permissions/', permission).then(function (response) {
                 if (response.status == 200) {
                     console.log('chegando aqui');
                     $('#modal-create-permission').modal('hide');
                     // console.log(response.data);
                     _this.fetchPermission(1, _this.showRow);
-                    var self = _this;
-                    _this.success = true;
-                    setTimeout(function () {
-                        self.success = false;
-                    }, 5000);
+                    _this.alert('Permassão Criado com sucesso', 'success');
                 }
             }, function (response) {});
         },
@@ -38338,19 +38450,14 @@ exports.default = {
             var _this4 = this;
 
             var permission = this.newPermission;
-
-            this.newPermission = {
-                id: '',
-                name: '',
-                display_name: '',
-                description: ''
-            };
+            this.clearField();
 
             this.$http.patch('http://localhost:8000/api/v1/permissions/' + id, permission).then(function (response) {
                 if (response.status == 200) {
                     $('#modal-edit-permission').modal('hide');
                     // console.log(response.data);
                     _this4.fetchPermission(1, _this4.showRow);
+                    _this4.alert('Permissão Atualizado com sucesso', 'info');
                 }
             }, function (response) {
                 console.log("Ocorreu um erro na operação");
@@ -38367,6 +38474,7 @@ exports.default = {
                 if (response.status == 200) {
                     // console.log(response.data);
                     _this5.fetchPermission(1, _this5.showRow);
+                    _this5.alert('Permissão eliminado com sucesso', 'warning');
                 }
             }, function (response) {
                 console.log("Ocorreu um erro na operação");
@@ -38423,18 +38531,7 @@ exports.default = {
         // Outros funções
         navigate: function navigate(page) {
             this.fetchPermission(page, this.showRow);
-        },
-
-
-        clearField: function clearField() {
-            this.newPermission = {
-                id: '',
-                name: '',
-                display_name: '',
-                description: ''
-            };
         }
-
     },
 
     // ---------------------------------------------------------------------------------
@@ -38451,7 +38548,7 @@ exports.default = {
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\r\n<div class=\"alert alert-success\" transition=\"success\" v-if=\"success\">\r\n\tPermissão Adicionado com sucesso\r\n</div>\r\n\r\n<!-- <pre>\r\n\t{{$data.pagination | json}}\r\n</pre> -->\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class=\"form-inline pull-right\">\r\n\t\t\t<div class=\"input-group\">\r\n\t\t\t\t<select data-toggle=\"tooltip\" title=\"A mostrar linhas na tabela\" class=\"form-control\" name=\"\" v-model=\"showRow\" @change=\"fetchPermission(1, showRow)\">\r\n\t\t\t\t\t<option class=\"\" value=\"5\">05</option>\r\n\t\t\t\t\t<option class=\"\" value=\"10\" selected>10</option>\r\n\t\t\t\t\t<option class=\"\" value=\"20\">20</option>\r\n\t\t\t\t\t<option class=\"\" value=\"50\">50</option>\r\n\t\t\t\t\t<option class=\"\" value=\"100\">100</option>\r\n\t\t\t\t\t<option class=\"\" value=\"200\">200</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t&nbsp;&nbsp;\r\n\t\t\t<div class=\"input-group\">\r\n\t\t\t\t<select data-toggle=\"tooltip\" title=\"Escolhe as colunas a serem filtrados\" class=\"form-control\" name=\"\" v-model=\"columnsFiltered\" multiple=\"multiple\" v-el:perms>\r\n\t\t\t\t\t<option class=\"\" value=\"name\"=\"\">Nome</option>\r\n\t\t\t\t\t<option class=\"\" value=\"display_name\">Label</option>\r\n\t\t\t\t\t<option class=\"\" value=\"description\">Descrição</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t&nbsp;&nbsp;\r\n\t\t\t<div v-if=\"columnsFiltered.length != 0\" class=\"input-group\">\r\n\t\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<input data-toggle=\"tooltip\" title=\"Escreva o valor a ser procurado na Tabela\"\r\n\t\t\t\tv-model=\"filter.term\"\r\n\t\t\t\t@keyup=\"doFilter\"\r\n\t\t\t\ttype=\"text\"\r\n\t\t\t\tclass=\"form-control\"\r\n\t\t\t\tplaceholder=\"Filtrar dados da tabela\"\r\n\t\t\t\taria-describedby=\"basic-addon1\">\r\n\t\t\t</div>\r\n\r\n\t\t\t<div v-else class=\"input-group\">\r\n\t\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<input :disabled=\"columnsFiltered.length == 0\" data-toggle=\"tooltip\" title=\"Para ativar introduza um valor na Coluna\"\r\n\t\t\t\ttype=\"text\"\r\n\t\t\t\tclass=\"form-control\"\r\n\t\t\t\tplaceholder=\"Filtrar dados da tabela\"\r\n\t\t\t\taria-describedby=\"basic-addon1\">\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-permission\"><i class=\"fa fa-plus\"></i> Novo</button>\r\n\t</div>\r\n</div>\r\n<br>\r\n\r\n<div class=\"row\">\r\n\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class='table-responsive'>\r\n\t\t\t<table class='table table-striped table-hover table-condensed'>\r\n\t\t\t\t<thead>\r\n\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'name')\">Nome da Permissão</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'display_name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'display_name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'display_name')\">Label</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'description')\">Descriçãos</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</thead>\r\n\t\t\t\t<tbody>\r\n\t\t\t\t\t<tr v-for=\"permission in permissions | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t\t<td>{{ permission.name }}</td>\r\n\t\t\t\t\t\t<td>{{ permission.display_name }}</td>\r\n\t\t\t\t\t\t<td>{{ permission.description }}</td>\r\n\t\t\t\t\t\t<td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-permission\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisPermission(permission.id)\" > </i></a></td>\r\n\t\t\t\t\t\t<td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-permission\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisPermission(permission.id)\"></i></a></td>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</tbody>\r\n\t\t\t</table>\r\n\t\t\t<div class=\"row\">\r\n\t\t\t\t<div class=\"col-md-6 pull-left\">\r\n\t\t\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t\t<div class=\"col-md-6 pull-right\">\r\n\t\t\t\t\t<!-- <h5  class=\"text-right\"><span>Mostrando de {{pagination.from}} para {{pagination.to}} de {{pagination.total}} linhas</span></h5> -->\r\n\t\t\t\t\t<h6 class=\"text-right text-help\"> Mostrar <span class=\"badge\">{{pagination.from}}</span>  De <span class=\"badge\">{{pagination.to}}</span>  De total de <span class=\"badge\">{{pagination.total}}</span></h6>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<div class=\"modal fade\" id=\"modal-delete-permission\" tabindex=\"-1\" permission=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar Permissão</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<h1>Eliminar Permissão {{newPermission.name}}</h1>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Cancelar</button>\r\n\t\t\t\t\t\t<button  @keyup.enter=\"deletePermission(newPermission.id)\" @click=\"deletePermission(newPermission.id)\" type=\"button\" class=\"btn btn-default\">Eliminar Permissão</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-create-permission\" class=\"modal fade\" permission=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Registar permission</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome da permissão no sistema\" v-model=\"newPermission.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-hand-stop-o form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"display_name\" placeholder=\"Nome da permissão a ser vizualizado\" v-model=\"newPermission.display_name\" v-validate:display_name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-eye form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.display_name.required && $validationew.display_name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrião da permissão...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newPermission.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createPermission\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-edit-permission\" class=\"modal fade\" permission=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Editar Esta função</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validation1\">\r\n\t\t\t\t\t\t\t<form methods=\"patch\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome da permissão no sistema\" v-model=\"newPermission.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-hand-stop-o form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"display_name\" placeholder=\"Nome da permissão a ser vizualizado\" v-model=\"newPermission.display_name\" v-validate:display_name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-eye form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.display_name.required && $validationew.display_name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrião da permissão...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newPermission.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedPermission(newPermission.id)\" type=\"button\" class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\r\n<div  id=\"alert-message\" class=\"alert alert-{{typeAlert}}\" transition=\"success\" v-if=\"success\">\r\n\t<button type=\"button\" class=\"close\" data-dismiss=\"alert\">x</button>\r\n\t<i class=\"fa fa-thumbs-o-up text-center\">&nbsp;&nbsp; {{msgSucess}}</i>\r\n</div>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class=\"form-inline pull-right\">\r\n\t\t\t<div class=\"input-group\">\r\n\t\t\t\t<select data-toggle=\"tooltip\" title=\"A mostrar linhas na tabela\" class=\"form-control\" name=\"\" v-model=\"showRow\" @change=\"fetchPermission(1, showRow)\">\r\n\t\t\t\t\t<option class=\"\" value=\"5\">05</option>\r\n\t\t\t\t\t<option class=\"\" value=\"10\" selected>10</option>\r\n\t\t\t\t\t<option class=\"\" value=\"20\">20</option>\r\n\t\t\t\t\t<option class=\"\" value=\"50\">50</option>\r\n\t\t\t\t\t<option class=\"\" value=\"100\">100</option>\r\n\t\t\t\t\t<option class=\"\" value=\"200\">200</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t&nbsp;&nbsp;\r\n\t\t\t<div class=\"input-group\">\r\n\t\t\t\t<select data-toggle=\"tooltip\" title=\"Escolhe as colunas a serem filtrados\" class=\"form-control\" name=\"\" v-model=\"columnsFiltered\" multiple=\"multiple\" v-el:perms>\r\n\t\t\t\t\t<option class=\"\" value=\"name\">Nome</option>\r\n\t\t\t\t\t<option class=\"\" value=\"display_name\">Label</option>\r\n\t\t\t\t\t<option class=\"\" value=\"description\">Descrição</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t&nbsp;&nbsp;\r\n\t\t\t<div v-if=\"columnsFiltered.length != 0\" class=\"input-group\">\r\n\t\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<input data-toggle=\"tooltip\" title=\"Escreva o valor a ser procurado na Tabela\"\r\n\t\t\t\tv-model=\"filter.term\"\r\n\t\t\t\t@keyup=\"doFilter\"\r\n\t\t\t\ttype=\"text\"\r\n\t\t\t\tclass=\"form-control\"\r\n\t\t\t\tplaceholder=\"Filtrar dados da tabela\"\r\n\t\t\t\taria-describedby=\"basic-addon1\">\r\n\t\t\t</div>\r\n\r\n\t\t\t<div v-else class=\"input-group\">\r\n\t\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<input :disabled=\"columnsFiltered.length == 0\" data-toggle=\"tooltip\" title=\"Para ativar introduza um valor na Coluna\"\r\n\t\t\t\ttype=\"text\"\r\n\t\t\t\tclass=\"form-control\"\r\n\t\t\t\tplaceholder=\"Filtrar dados da tabela\"\r\n\t\t\t\taria-describedby=\"basic-addon1\">\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-permission\"><i class=\"fa fa-plus\"></i> Novo</button>\r\n\t</div>\r\n</div>\r\n<br>\r\n\r\n<div class=\"row\">\r\n\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class='table-responsive'>\r\n\t\t\t<table class='table table-striped table-hover table-condensed'>\r\n\t\t\t\t<thead>\r\n\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'name')\">Nome da Permissão</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'display_name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'display_name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'display_name')\">Label</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'description')\">Descriçãos</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</thead>\r\n\t\t\t\t<tbody>\r\n\t\t\t\t\t<tr v-for=\"permission in permissions | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t\t<td>{{ permission.name }}</td>\r\n\t\t\t\t\t\t<td>{{ permission.display_name }}</td>\r\n\t\t\t\t\t\t<td>{{ permission.description }}</td>\r\n\t\t\t\t\t\t<td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-permission\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisPermission(permission.id)\" > </i></a></td>\r\n\t\t\t\t\t\t<td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-permission\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisPermission(permission.id)\"></i></a></td>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</tbody>\r\n\t\t\t</table>\r\n\t\t\t<div class=\"row\">\r\n\t\t\t\t<div class=\"col-md-6 pull-left\">\r\n\t\t\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t\t<div class=\"col-md-6 pull-right\">\r\n\t\t\t\t\t<!-- <h5  class=\"text-right\"><span>Mostrando de {{pagination.from}} para {{pagination.to}} de {{pagination.total}} linhas</span></h5> -->\r\n\t\t\t\t\t<h6 class=\"text-right text-help\"> Mostrar de <span class=\"badge\">{{pagination.from}}</span>  a <span class=\"badge\">{{pagination.to}}</span>  no total de <span class=\"badge\">{{pagination.total}}</span></h6>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<div class=\"modal fade\" id=\"modal-delete-permission\" tabindex=\"-1\" permission=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar Permissão</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<h1>Eliminar Permissão {{newPermission.name}}</h1>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Cancelar</button>\r\n\t\t\t\t\t\t<button  @keyup.enter=\"deletePermission(newPermission.id)\" @click=\"deletePermission(newPermission.id)\" type=\"button\" class=\"btn btn-default\">Eliminar Permissão</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-create-permission\" class=\"modal fade\" permission=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Registar permission</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome da permissão no sistema\" v-model=\"newPermission.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-hand-stop-o form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"display_name\" placeholder=\"Nome da permissão a ser vizualizado\" v-model=\"newPermission.display_name\" v-validate:display_name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-eye form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.display_name.required && $validationew.display_name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrião da permissão...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newPermission.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createPermission\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-edit-permission\" class=\"modal fade\" permission=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Editar Esta função</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validation1\">\r\n\t\t\t\t\t\t\t<form methods=\"patch\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome da permissão no sistema\" v-model=\"newPermission.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-hand-stop-o form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"display_name\" placeholder=\"Nome da permissão a ser vizualizado\" v-model=\"newPermission.display_name\" v-validate:display_name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-eye form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.display_name.required && $validationew.display_name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrião da permissão...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newPermission.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedPermission(newPermission.id)\" type=\"button\" class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -39456,6 +39553,8 @@ var _Component = require('../../../Pagination/src/Component.vue');
 
 var _Component2 = _interopRequireDefault(_Component);
 
+var _lodash = require('lodash');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = {
@@ -39469,14 +39568,19 @@ exports.default = {
                 name: '',
                 description: ''
             },
-
+            tags: {},
+            all: {},
             sortColumn: 'name',
             sortInverse: 1,
             filter: {
                 term: ''
             },
+            columnsTagToFilter: [],
             pagination: {},
-            success: false
+            success: false,
+            msgSucess: '',
+            typeAlert: '',
+            showRow: ''
         };
     },
 
@@ -39484,13 +39588,34 @@ exports.default = {
     // ---------------------------------------------------------------------------------
 
     ready: function ready() {
-        this.fetchTag(1);
+        this.fetchTag(1, this.showRow);
+        var self = this;
+        jQuery(self.$els.coltag).select2({
+            placeholder: "Coluna",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt'
+        }).on('change', function () {
+            self.$set('columnsTagToFilter', jQuery(this).val());
+        });
     },
 
 
     // ---------------------------------------------------------------------------------
 
     methods: {
+        alert: function alert(msg, typeAlert) {
+            var self = this;
+            this.success = true;
+            this.msgSucess = msg;
+            this.typeAlert = typeAlert;
+
+            setTimeout(function () {
+                self.success = false;
+            }, 5000);
+        },
+
         clearField: function clearField() {
             this.newTag = {
                 id: '',
@@ -39510,23 +39635,20 @@ exports.default = {
                 if (response.status == 200) {
                     console.log('chegando aqui');
                     $('#modal-create-tag').modal('hide');
-                    _this.fetchTag();
-                    var self = _this;
-                    _this.success = true;
-                    setTimeout(function () {
-                        self.success = false;
-                    }, 5000);
+                    _this.fetchTag(1, _this.showRow);
+                    _this.alert('Marcador Criado com sucesso', 'success');
                 }
             }, function (response) {});
         },
 
         // --------------------------------------------------------------------------------------------
 
-        fetchTag: function fetchTag(page) {
+        fetchTag: function fetchTag(page, row) {
             var _this2 = this;
 
-            this.$http.get('http://localhost:8000/api/v1/tags?page=' + page).then(function (response) {
+            this.$http.get('http://localhost:8000/api/v1/allTags/' + row + '?page=' + page).then(function (response) {
                 _this2.$set('tags', response.data.data);
+                _this2.$set('all', response.data.data);
                 _this2.$set('pagination', response.data);
             }, function (response) {
                 console.log("Ocorreu um erro na operação");
@@ -39562,7 +39684,8 @@ exports.default = {
                 if (response.status == 200) {
                     $('#modal-edit-tag').modal('hide');
                     // console.log(response.data);
-                    _this4.fetchTag();
+                    _this4.fetchTag(1, _this4.showRow);
+                    _this4.alert('Marcador atualizado com sucesso', 'info');
                 }
             }, function (response) {
                 console.log("Ocorreu um erro na operação");
@@ -39578,7 +39701,8 @@ exports.default = {
                 $('#modal-delete-tag').modal('hide');
                 if (response.status == 200) {
                     // console.log(response.data);
-                    _this5.fetchTag();
+                    _this5.fetchTag(1, _this5.showRow);
+                    _this5.alert('Maracdor eliminado com sucesso', 'warning');
                 }
             }, function (response) {
                 console.log("Ocorreu um erro na operação");
@@ -39586,6 +39710,19 @@ exports.default = {
         },
 
         // --------------------------------------------------------------------------------------------
+        doFilter: function doFilter() {
+
+            var self = this;
+            filtered = self.all;
+            if (self.filter.term != '' && self.columnsTagToFilter.length > 0) {
+                filtered = _lodash._.filter(self.all, function (tag) {
+                    return self.columnsTagToFilter.some(function (column) {
+                        return tag[column].toLowerCase().indexOf(self.filter.term.toLowerCase()) > -1;
+                    });
+                });
+            }
+            self.$set('tags', filtered);
+        },
 
         doSort: function doSort(ev, column) {
             var self = this;
@@ -39602,21 +39739,13 @@ exports.default = {
 
         // Outros funções
         navigate: function navigate(page) {
-            this.fetchTag(page);
+            this.fetchTag(page, this.showRow);
         }
     },
 
     // ---------------------------------------------------------------------------------
 
-    computed: {
-        //     getThisTag: function(id){
-        //         this.$http.get('http://localhost:8000/api/v1/setPaginate/' + this.entries).then((response) => {
-        //             this.fetchTag(1);
-        //         }, (response) => {
-        //             console.log('Error');
-        //         });
-        //     },
-    },
+    computed: {},
 
     // ---------------------------------------------------------------------------------
 
@@ -39625,7 +39754,7 @@ exports.default = {
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\r\n<div class=\"alert alert-success\" transition=\"success\" v-if=\"success\">\r\n\t<i class=\"fa fa-thumbs-up\"> Sucesso!!!</i>\r\n</div>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-4 pull-right\">\r\n\t\t<div class=\"input-group\">\r\n\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t<input v-model=\"filter.term\" type=\"text\" class=\"form-control\" placeholder=\"Filtrar...\" aria-describedby=\"basic-addon1\">\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n<div class=\"col-md-12\">\r\n\t<button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-tag\"><i class=\"fa fa-plus\"></i> Novo</button>\r\n</div>\r\n\r\n\r\n</div>\r\n<br><br>\r\n\r\n<div class=\"col-md-12\">\r\n\t<div class='table-responsive'>\r\n\t\t<table class='table table-striped table-hover table-condensed'>\r\n\t\t\t<thead>\r\n\t\t\t\t<tr>\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'name')\">Nome</a>\r\n\t\t\t\t\t</th>\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'description')\">Descrição</a>\r\n\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n\t\t\t\t</tr>\r\n\t\t\t</thead>\r\n\t\t\t<tbody>\r\n\t\t\t\t<tr v-for=\"tag in tags | filterBy filter.term | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t<td>{{ tag.name }}</td>\r\n\t\t\t\t\t<td>{{ tag.description }}</td>\r\n\t\t\t\t\t<td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-tag\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisTag(tag.id)\" > </i></a></td>\r\n\t\t\t\t\t<td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-tag\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisTag(tag.id)\"></i></a></td>\r\n\t\t\t\t</tr>\r\n\t\t\t</tbody>\r\n\t\t</table>\r\n\t\t<div class=\"col-md-12 pull-left\">\r\n\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t<div class=\"modal fade\" id=\"modal-delete-tag\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t<div class=\"modal-dialog\">\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newTag.name}}</span></h5>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Cancelar</button>\r\n\t\t\t\t\t<button  @keyup.enter=\"deleteTag(newTag.id)\" @click=\"deleteTag(newTag.id)\" type=\"button\" class=\"btn btn-danger\">Eliminar</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\t<!-- Modal -->\r\n\t<div id=\"modal-create-tag\" class=\"modal fade\" role=\"dialog\">\r\n\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t<!-- Modal content-->\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\">Registar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome de Marcador\" v-model=\"newTag.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newTag.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</form>\r\n\t\t\t\t\t</validator>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createTag\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t<!-- Modal -->\r\n\t<div id=\"modal-edit-tag\" class=\"modal fade\" role=\"dialog\">\r\n\t\t<div class=\"modal-dialog\">\r\n\t\t\t<!-- Modal content-->\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\">Editar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<validator name=\"validation1\">\r\n\t\t\t\t\t\t<form methods=\"patch\">\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" v-model=\"newTag.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newTag.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</form>\r\n\t\t\t\t\t</validator>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedTag(newTag.id)\" type=\"button\" class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div  id=\"alert-message\" class=\"alert alert-{{typeAlert}}\" transition=\"success\" v-if=\"success\">\r\n\t<button type=\"button\" class=\"close\" data-dismiss=\"alert\">x</button>\r\n\t<i class=\"fa fa-thumbs-o-up text-center\">&nbsp;&nbsp; {{msgSucess}}</i>\r\n</div>\r\n\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class=\"form-inline pull-right\">\r\n\t\t\t<div class=\"input-group\">\r\n\t\t\t\t<select data-toggle=\"tooltip\" title=\"A mostrar linhas na tabela\" class=\"form-control\" name=\"\" v-model=\"showRow\" @change=\"fetchTag(1, showRow)\">\r\n\t\t\t\t\t<option class=\"\" value=\"5\">05</option>\r\n\t\t\t\t\t<option class=\"\" value=\"10\" selected>10</option>\r\n\t\t\t\t\t<option class=\"\" value=\"20\">20</option>\r\n\t\t\t\t\t<option class=\"\" value=\"50\">50</option>\r\n\t\t\t\t\t<option class=\"\" value=\"100\">100</option>\r\n\t\t\t\t\t<option class=\"\" value=\"200\">200</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t&nbsp;&nbsp;\r\n\t\t\t<div class=\"input-group\">\r\n\t\t\t\t<select data-toggle=\"tooltip\" title=\"Escolhe as colunas a serem filtrados\" class=\"form-control\" name=\"\" v-model=\"columnsTagToFilter\" multiple=\"multiple\" v-el:coltag>\r\n\t\t\t\t\t<option class=\"\" value=\"name\">Nome</option>\r\n\t\t\t\t\t<option class=\"\" value=\"description\">Descrição</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t&nbsp;&nbsp;\r\n\t\t\t<div v-if=\"columnsTagToFilter.length != 0\" class=\"input-group\">\r\n\t\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<input data-toggle=\"tooltip\" title=\"Escreva o valor a ser procurado na Tabela\"\r\n\t\t\t\tv-model=\"filter.term\"\r\n\t\t\t\t@keyup=\"doFilter\"\r\n\t\t\t\ttype=\"text\"\r\n\t\t\t\tclass=\"form-control\"\r\n\t\t\t\tplaceholder=\"Filtrar dados da tabela\"\r\n\t\t\t\taria-describedby=\"basic-addon1\">\r\n\t\t\t</div>\r\n\r\n\t\t\t<div v-else class=\"input-group\">\r\n\t\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<input :disabled=\"columnsTagToFilter.length == 0\" data-toggle=\"tooltip\" title=\"Para ativar introduza um valor na Coluna\"\r\n\t\t\t\ttype=\"text\"\r\n\t\t\t\tclass=\"form-control\"\r\n\t\t\t\tplaceholder=\"Filtrar dados da tabela\"\r\n\t\t\t\taria-describedby=\"basic-addon1\">\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n\r\n<hr>\r\n<div class=\"col-md-12\">\r\n\t<button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-tag\"><i class=\"fa fa-plus\"></i> Novo</button>\r\n</div>\r\n\r\n\r\n</div>\r\n<br><br>\r\n\r\n<div class=\"col-md-12\">\r\n\t<div class='table-responsive'>\r\n\t\t<table class='table table-striped table-hover table-condensed'>\r\n\t\t\t<thead>\r\n\t\t\t\t<tr>\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'name')\">Nome</a>\r\n\t\t\t\t\t</th>\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'description')\">Descrição</a>\r\n\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n\t\t\t\t</tr>\r\n\t\t\t</thead>\r\n\t\t\t<tbody>\r\n\t\t\t\t<tr v-for=\"tag in tags | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t<td>{{ tag.name }}</td>\r\n\t\t\t\t\t<td>{{ tag.description }}</td>\r\n\t\t\t\t\t<td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-tag\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisTag(tag.id)\" > </i></a></td>\r\n\t\t\t\t\t<td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-tag\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisTag(tag.id)\"></i></a></td>\r\n\t\t\t\t</tr>\r\n\t\t\t</tbody>\r\n\t\t</table>\r\n\t\t<div class=\"row\">\r\n\t\t\t<div class=\"col-md-6 pull-left\">\r\n\t\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"col-md-6 pull-right\">\r\n\t\t\t\t<h6 class=\"text-right text-help\"> Mostrar de <span class=\"badge\">{{pagination.from}}</span>  a <span class=\"badge\">{{pagination.to}}</span>  no total de <span class=\"badge\">{{pagination.total}}</span></h6>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t<div class=\"modal fade\" id=\"modal-delete-tag\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t<div class=\"modal-dialog\">\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newTag.name}}</span></h5>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Cancelar</button>\r\n\t\t\t\t\t<button  @keyup.enter=\"deleteTag(newTag.id)\" @click=\"deleteTag(newTag.id)\" type=\"button\" class=\"btn btn-danger\">Eliminar</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\t<!-- Modal -->\r\n\t<div id=\"modal-create-tag\" class=\"modal fade\" role=\"dialog\">\r\n\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t<!-- Modal content-->\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\">Registar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome de Marcador\" v-model=\"newTag.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newTag.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</form>\r\n\t\t\t\t\t</validator>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createTag\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t<!-- Modal -->\r\n\t<div id=\"modal-edit-tag\" class=\"modal fade\" role=\"dialog\">\r\n\t\t<div class=\"modal-dialog\">\r\n\t\t\t<!-- Modal content-->\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\">Editar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<validator name=\"validation1\">\r\n\t\t\t\t\t\t<form methods=\"patch\">\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" v-model=\"newTag.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validation1.name.required && $validation1.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newTag.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</form>\r\n\t\t\t\t\t</validator>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedTag(newTag.id)\" type=\"button\" class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -39640,7 +39769,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update("_v-5c3cdd6d", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"../../../Pagination/src/Component.vue":91,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],98:[function(require,module,exports){
+},{"../../../Pagination/src/Component.vue":91,"lodash":77,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],98:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1 {\n  color: #00a8ed;\n}")
 'use strict';

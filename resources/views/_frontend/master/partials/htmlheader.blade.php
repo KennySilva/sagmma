@@ -3,7 +3,7 @@
     <title> Mercado Municipal de Achada Riba - @yield('htmlheader_title', 'SAGMMA') </title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <meta name="token" id="token" value="{{ csrf_token() }}">
     <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.css">
     <link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.css" media="screen" title="no title"/>
     <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="/bower_components/flexisel/css/style.css">
 
 
-    <link rel="stylesheet" href="/bower_components/lightbox2/dist/css/lightbox.css">    
+    <link rel="stylesheet" href="/bower_components/lightbox2/dist/css/lightbox.css">
 
 
 

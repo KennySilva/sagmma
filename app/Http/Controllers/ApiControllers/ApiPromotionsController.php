@@ -17,9 +17,9 @@ use Auth;
 
 class ApiPromotionsController extends Controller
 {
-    public function index()
+    public function index($row)
     {
-        $promotion = Promotion::paginate(5);
+        $promotion = Promotion::paginate($row);
         $promotion->each(function($promotion){
             $promotion->product;
             $promotion->trader;

@@ -3,7 +3,7 @@
 
 @include('_frontend.master.partials.htmlheader')
 
-<body class="container-fluid frontPage" id="myPage" data-spy="scroll" data-target=".navbar" data-offset="60">
+<body class="container-fluid front_page" id="myPage" data-spy="scroll" data-target=".navbar" data-offset="60">
     @yield('message')
     {{-- @include('_frontend.master.partials.header') --}}
     @include('_frontend.master.partials.nav_bar')

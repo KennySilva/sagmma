@@ -1,4 +1,5 @@
 import Pagination from '../../../Pagination/src/Component.vue'
+import { _ } from 'lodash'
 
 export default{
 
@@ -17,20 +18,50 @@ export default{
             filter: {
                 term: ''
             },
+            columnsFiltered: [],
             pagination: {},
             success: false,
+            msgSucess: '',
+            typeAlert: '',
+            showRow: '',
+            all: {},
+            categories: {},
         }
     },
 
     // ---------------------------------------------------------------------------------
 
     ready () {
-        this.fetchCategory(1);
+        this.fetchCategory(1, this.showRow);
+        var self = this
+        jQuery(self.$els.colcat).select2({
+            placeholder: "Coluna",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set(columnsFiltered, jQuery(this).val());
+        });
     },
 
     // ---------------------------------------------------------------------------------
 
     methods: {
+        alert: function(msg, typeAlert) {
+            var self = this;
+            this.success = true;
+            this.msgSucess = msg;
+            this.typeAlert = typeAlert;
+
+
+            setTimeout(function() {
+                self.success = false;
+            }, 5000);
+        },
+
         clearField: function(){
             this.newCategory = {
                 id         : '',
@@ -48,12 +79,8 @@ export default{
                 if (response.status == 200) {
                     console.log('chegando aqui');
                     $('#modal-create-category').modal('hide');
-                    this.fetchCategory();
-                    var self = this;
-                    this.success = true;
-                    setTimeout(function() {
-                        self.success = false;
-                    }, 5000);
+                    this.fetchCategory(1, this.showRow);
+                    this.alert('Categoria Criado com sucesso', 'success');
                 }
             }, (response) => {
 
@@ -62,9 +89,10 @@ export default{
 
         // --------------------------------------------------------------------------------------------
 
-        fetchCategory: function(page) {
-            this.$http.get('http://localhost:8000/api/v1/categories?page='+page).then((response) => {
+        fetchCategory: function(page, row) {
+            this.$http.get('http://localhost:8000/api/v1/allCategories/'+row+'?page='+page).then((response) => {
                 this.$set('categories', response.data.data)
+                this.$set('all', response.data.data)
                 this.$set('pagination', response.data)
             }, (response) => {
                 console.log("Ocorreu um erro na operação")
@@ -96,7 +124,8 @@ export default{
                 if (response.status == 200) {
                     $('#modal-edit-category').modal('hide');
                     // console.log(response.data);
-                    this.fetchCategory();
+                    this.fetchCategory(1, this.showRow);
+                        this.alert('Categoria atualizado com sucesso', 'info');
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -110,7 +139,8 @@ export default{
                 $('#modal-delete-category').modal('hide');
                 if (response.status == 200) {
                     // console.log(response.data);
-                    this.fetchCategory();
+                    this.fetchCategory(1, this.showRow);
+                    this.alert('Categoria eliminado com sucesso', 'warning');
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -118,6 +148,20 @@ export default{
         },
 
         // --------------------------------------------------------------------------------------------
+
+        doFilter: function() {
+
+            var self = this
+            filtered = self.all
+            if (self.filter.term != '' && self.columnsFiltered.length > 0) {
+                filtered = _.filter(self.all, function(category) {
+                    return self.columnsFiltered.some(function(column) {
+                        return category[column].toLowerCase().indexOf(self.filter.term.toLowerCase()) > -1
+                    })
+                })
+            }
+            self.$set('categories', filtered)
+        },
 
         doSort: function(ev, column) {
             var self = this;
@@ -134,7 +178,7 @@ export default{
 
         // Outros funções
         navigate (page) {
-            this.fetchCategory(page);
+            this.fetchCategory(page, this.showRow);
         },
 
 
@@ -144,13 +188,7 @@ export default{
     // ---------------------------------------------------------------------------------
 
     computed: {
-    //     getThisCategory: function(id){
-    //         this.$http.get('http://localhost:8000/api/v1/setPaginate/' + this.entries).then((response) => {
-    //             this.fetchCategory(1);
-    //         }, (response) => {
-    //             console.log('Error');
-    //         });
-    //     },
+
     },
 
     // ---------------------------------------------------------------------------------

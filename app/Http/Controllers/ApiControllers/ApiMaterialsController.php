@@ -14,9 +14,9 @@ use Input;
 
 class ApiMaterialsController extends Controller
 {
-    public function index()
+    public function index($row)
     {
-        return Material::paginate(5);
+        return Material::paginate($row);
     }
 
     public function create()

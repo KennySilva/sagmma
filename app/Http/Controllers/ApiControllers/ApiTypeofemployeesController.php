@@ -14,14 +14,14 @@ use Input;
 
 class ApiTypeofemployeesController extends Controller
 {
-    public function index()
+    public function index($row)
     {
-        return Typeofemployee::paginate(5);
+        return Typeofemployee::paginate($row);
     }
 
     public function create()
     {}
-        
+
         public function store(TypeofemployeesRequest $request)
         {
             $typeofemployee              = new Typeofemployee($request->all());

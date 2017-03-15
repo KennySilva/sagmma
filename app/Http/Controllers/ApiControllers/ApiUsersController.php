@@ -15,12 +15,12 @@ use Auth;
 
 class ApiUsersController extends Controller
 {
-    public function index()
+    public function index($row)
     {
         //
         // $ex= User::where('name', '!=', 'Admin')->get();
         // return $ex;
-        $user = User::paginate(5);
+        $user = User::paginate($row);
         $user->each(function($user){
             $user->roles;
         });
@@ -57,6 +57,43 @@ class ApiUsersController extends Controller
         $user->social      = false;
         $user->save();
         $user->roles()->sync($request->roles);
+        // ('member', 'emp', 'trad')
+        // if ($request->type == 'trad') {
+        //     $trader                  = new Trader();
+        //     $trader->name            = $request->name;
+        //     $trader->ic              = $request->ic;
+        //     $trader->age             = $request->age;
+        //     $trader->gender          = $request->gender;
+        //     $trader->email           = $request->email;
+        //     $trader->state           = $request->state;
+        //     $trader->council         = $request->council;
+        //     $trader->parish          = $request->parish;
+        //     $trader->zone            = $request->zone;
+        //     $trader->phone           = $request->phone;
+        //     $trader->photo           = $request->photo;
+        //     $trader->description     = $request->description;
+        //     $trader->save();
+        // }
+        // if ($request->type == 'emp') {
+        //     $employee                    = new Employee();
+        //     $employee->name              = $request->name;
+        //     $employee->ic                = $request->ic;
+        //     $employee->age               = $request->age;
+        //     $employee->gender            = $request->gender;
+        //     $employee->email             = $request->email;
+        //     $employee->state             = $request->state;
+        //     $employee->council           = $request->council;
+        //     $employee->parish            = $request->parish;
+        //     $employee->zone              = $request->zone;
+        //     $employee->phone             = $request->phone;
+        //     $employee->echelon           = $request->echelon;
+        //     $employee->service_beginning = $request->service_beginning;
+        //     $employee->typeofemployee_id = $request->typeofemployee_id;
+        //     $employee->photo             = $request->photo;
+        //     $employee->description       = $request->description;
+        //     $employee->save();
+        //     $employee->markets()->sync($request->markets);
+        // }
 
         // if($test)
         // {

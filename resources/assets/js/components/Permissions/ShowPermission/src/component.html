@@ -1,11 +1,8 @@
 
-<div class="alert alert-success" transition="success" v-if="success">
-	Permissão Adicionado com sucesso
+<div  id="alert-message" class="alert alert-{{typeAlert}}" transition="success" v-if="success">
+	<button type="button" class="close" data-dismiss="alert">x</button>
+	<i class="fa fa-thumbs-o-up text-center">&nbsp;&nbsp; {{msgSucess}}</i>
 </div>
-
-<!-- <pre>
-	{{$data.pagination | json}}
-</pre> -->
 
 <div class="row">
 	<div class="col-md-12">
@@ -23,7 +20,7 @@
 			&nbsp;&nbsp;
 			<div class="input-group">
 				<select data-toggle="tooltip" title="Escolhe as colunas a serem filtrados" class="form-control" name="" v-model="columnsFiltered" multiple="multiple" v-el:perms>
-					<option class="" value="name"="">Nome</option>
+					<option class="" value="name">Nome</option>
 					<option class="" value="display_name">Label</option>
 					<option class="" value="description">Descrição</option>
 				</select>
@@ -102,7 +99,7 @@
 
 				<div class="col-md-6 pull-right">
 					<!-- <h5  class="text-right"><span>Mostrando de {{pagination.from}} para {{pagination.to}} de {{pagination.total}} linhas</span></h5> -->
-					<h6 class="text-right text-help"> Mostrar <span class="badge">{{pagination.from}}</span>  De <span class="badge">{{pagination.to}}</span>  De total de <span class="badge">{{pagination.total}}</span></h6>
+					<h6 class="text-right text-help"> Mostrar de <span class="badge">{{pagination.from}}</span>  a <span class="badge">{{pagination.to}}</span>  no total de <span class="badge">{{pagination.total}}</span></h6>
 				</div>
 
 			</div>

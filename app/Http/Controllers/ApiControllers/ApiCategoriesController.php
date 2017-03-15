@@ -14,11 +14,11 @@ use Input;
 
 class ApiCategoriesController extends Controller
 {
-    public function index()
+    public function index($row)
     {
-        return Category::paginate(10);
+        return Category::paginate($row);
     }
-    
+
     public function create()
     {}
 

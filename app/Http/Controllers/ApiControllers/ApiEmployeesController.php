@@ -16,9 +16,9 @@ use Input;
 
 class ApiEmployeesController extends Controller
 {
-    public function index(Request $request)
+    public function index($row)
     {
-        $employee = Employee::paginate(5);
+        $employee = Employee::paginate($row);
         $employee->each(function($employee){
             $employee->typeofemployees;
             $employee->markets;

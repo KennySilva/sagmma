@@ -16,9 +16,9 @@ use Input;
 
 class ApiControlsController extends Controller
 {
-    public function index()
+    public function index($row)
     {
-        $control = Control::paginate(5);
+        $control = Control::paginate($row);
         $control->each(function($control){
             $control->employees;
             $control->materials;

@@ -13,9 +13,9 @@ use Input;
 
 class ApiMarketsController extends Controller
 {
-    public function index()
+    public function index($row)
     {
-        return Market::paginate(5);
+        return Market::paginate($row);
     }
 
     public function create()

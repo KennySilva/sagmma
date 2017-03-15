@@ -14,9 +14,9 @@ use Input;
 
 class ApiTypeofplacesController extends Controller
 {
-    public function index()
+    public function index($row)
     {
-        return Typeofplace::paginate(5);
+        return Typeofplace::paginate($row);
     }
 
     public function create()
@@ -41,7 +41,7 @@ class ApiTypeofplacesController extends Controller
         {
             //
         }
-        
+
         public function update(Req $request, $id)
         {
             Typeofplace::findOrFail($id)->update($request::all());

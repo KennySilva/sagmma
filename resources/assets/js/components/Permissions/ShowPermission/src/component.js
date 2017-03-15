@@ -56,27 +56,42 @@ export default{
 
     methods: {
 
-        createPermission: function() {
-            var permission = this.newPermission;
+        alert: function(msg, typeAlert) {
+            var self = this;
+            this.success = true;
+            this.msgSucess = msg;
+            this.typeAlert = typeAlert;
 
-            //Clear form input
-            this.newPermission = {
+
+            setTimeout(function() {
+                self.success = false;
+            }, 5000);
+        },
+
+        clearField: function(){
+            this.newTag = {
                 id           : '',
                 name         : '',
                 display_name : '',
                 description  : '',
             };
+        },
+
+
+        createPermission: function() {
+            var permission = this.newPermission;
+
+            //Clear form input
+            this.clearField();
+
             this.$http.post('http://localhost:8000/api/v1/permissions/', permission).then((response) => {
                 if (response.status == 200) {
                     console.log('chegando aqui');
                     $('#modal-create-permission').modal('hide');
                     // console.log(response.data);
                     this.fetchPermission(1, this.showRow);
-                    var self = this;
-                    this.success = true;
-                    setTimeout(function() {
-                        self.success = false;
-                    }, 5000);
+                    this.alert('Permassão Criado com sucesso', 'success');
+
                 }
             }, (response) => {
 
@@ -127,19 +142,15 @@ export default{
 
         saveEditedPermission: function(id) {
             var permission = this.newPermission;
-
-            this.newPermission = {
-                id           : '',
-                name         : '',
-                display_name : '',
-                description  : '',
-            };
+            this.clearField();
 
             this.$http.patch('http://localhost:8000/api/v1/permissions/'+ id, permission).then((response) => {
                 if (response.status == 200) {
                     $('#modal-edit-permission').modal('hide');
                     // console.log(response.data);
                     this.fetchPermission(1, this.showRow);
+                    this.alert('Permissão Atualizado com sucesso', 'info');
+
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -154,6 +165,8 @@ export default{
                 if (response.status == 200) {
                     // console.log(response.data);
                     this.fetchPermission(1, this.showRow);
+                    this.alert('Permissão eliminado com sucesso', 'warning');
+
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -215,14 +228,6 @@ export default{
             this.fetchPermission(page, this.showRow);
         },
 
-        clearField: function(){
-            this.newPermission = {
-                id           : '',
-                name         : '',
-                display_name : '',
-                description  : '',
-            };
-        },
 
     },
 

@@ -29,21 +29,41 @@ export default{
             openContents: [],
             sortColumn  : 'name',
             sortInverse : 1,
-            filter      : {
-                term    : ''
+            filter: {
+                term: ''
             },
-            pagination  : {},
-            success     : false,
+            columnsFiltered: [],
+            pagination: {},
+            success: false,
+            msgSucess: '',
+            typeAlert: '',
+            showRow: '',
+            all: {},
+            articles: {},
         }
     },
 
     // ---------------------------------------------------------------------------------
 
     ready () {
-        this.fetchArticle(1);
+        this.fetchArticle(1, this.showRow);
         this.articleCategory();
         this.articleTag();
         this.articleUser();
+        var self = this
+        jQuery(self.$els.article).select2({
+            placeholder: "Coluna",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('columnsFiltered', jQuery(this).val());
+        });
+
+
     },
 
 
@@ -51,6 +71,19 @@ export default{
     // ---------------------------------------------------------------------------------
 
     methods: {
+
+        alert: function(msg, typeAlert) {
+            var self = this;
+            this.success = true;
+            this.msgSucess = msg;
+            this.typeAlert = typeAlert;
+
+
+            setTimeout(function() {
+                self.success = false;
+            }, 5000);
+        },
+
         clearField: function(){
             this.newArticle = {
                 id         : '',
@@ -76,12 +109,8 @@ export default{
 
                     $('#modal-create-article').modal('hide');
                     // this.uploadsImages();
-                    this.fetchArticle();
-                    var self = this;
-                    this.success = true;
-                    setTimeout(function() {
-                        self.success = false;
-                    }, 5000);
+                    this.fetchArticle(1, this.showRow);
+                    this.alert('Artigo Criado com sucesso', 'success');
                 }
             }, (response) => {
 
@@ -90,26 +119,49 @@ export default{
 
         // --------------------------------------------------------------------------------------------
 
-        fetchArticle: function(page) {
+        fetchArticle: function(page, row) {
             var self = this;
-            self.$http.get('http://localhost:8000/api/v1/articles?page='+page).then((response) => {
+            self.$http.get('http://localhost:8000/api/v1/allArticles/'+row+'?page='+page).then((response) => {
                 self.$set('articles', response.data.data)
+                self.$set('all', response.data.data)
                 self.$set('pagination', response.data)
 
                 jQuery(self.$els.category).select2({
-                    placeholder: "Catagerias",
+                    placeholder: "Coluna",
                     allowClear: true,
-                    theme: "classic",
-                    width: '100%'
+                    theme: "bootstrap",
+                    width: '100%',
+                    language: 'pt',
                 }).on('change', function () {
                     self.$set('newArticle.category_id', jQuery(this).val());
                 });
 
                 jQuery(self.$els.tags).select2({
-                    theme: "classic",
-                    placeholder: "Marcadores",
+                    placeholder: "Coluna",
                     allowClear: true,
-                    width: '100%'
+                    theme: "bootstrap",
+                    width: '100%',
+                    language: 'pt',
+                }).on('change', function () {
+                    self.$set('newArticle.tags', jQuery(this).val());
+                });
+                //-----------------------------------------------------------------------------------
+                jQuery(self.$els.categoryedit).select2({
+                    placeholder: "Coluna",
+                    allowClear: true,
+                    theme: "bootstrap",
+                    width: '100%',
+                    language: 'pt',
+                }).on('change', function () {
+                    self.$set('newArticle.category_id', jQuery(this).val());
+                });
+
+                jQuery(self.$els.tagsedit).select2({
+                    placeholder: "Coluna",
+                    allowClear: true,
+                    theme: "bootstrap",
+                    width: '100%',
+                    language: 'pt',
                 }).on('change', function () {
                     self.$set('newArticle.tags', jQuery(this).val());
                 });
@@ -147,7 +199,8 @@ export default{
                 if (response.status == 200) {
                     $('#modal-edit-article').modal('hide');
                     // console.log(response.data);
-                    this.fetchArticle();
+                    this.fetchArticle(1, this.showRow);
+                    this.alert('Artigo atualizado com sucesso', 'info');
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -161,7 +214,8 @@ export default{
                 $('#modal-delete-article').modal('hide');
                 if (response.status == 200) {
                     // console.log(response.data);
-                    this.fetchArticle();
+                    this.fetchArticle(1, this.showRow);
+                    this.alert('Artigo eliminado com sucesso', 'warning');
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -209,7 +263,7 @@ export default{
             var postData = {id: articleStatus};
             this.$http.post('http://localhost:8000/api/v1/articleStatus/', postData).then((response) => {
                 if (response.status == 200) {
-                    this.fetchArticle(this.pagination.current_page);
+                    this.fetchArticle(this.pagination.current_page, this.showRow);
                 }
             }, (response) => {
             });
@@ -218,7 +272,7 @@ export default{
             var postData = {id: articleFeatures};
             this.$http.post('http://localhost:8000/api/v1/articleFeatures/', postData).then((response) => {
                 if (response.status == 200) {
-                    this.fetchArticle(this.pagination.current_page);
+                    this.fetchArticle(this.pagination.current_page, this.showRow);
                 }
             }, (response) => {
             });
@@ -228,7 +282,7 @@ export default{
 
         // Outros funções
         navigate (page) {
-            this.fetchArticle(page);
+            this.fetchArticle(page, this.showRow);
         },
         doOpenContents: function(ev, id)
         {
@@ -280,7 +334,23 @@ export default{
             // console.log('editor change!', editor, html, text)
             this.content = html
         },
+
+        doFilter: function() {
+
+            var self = this
+            filtered = self.all
+            if (self.filter.term != '' && self.columnsFiltered.length > 0) {
+                filtered = _.filter(self.all, function(article) {
+                    return self.columnsFiltered.some(function(column) {
+                        return article[column].toLowerCase().indexOf(self.filter.term.toLowerCase()) > -1
+                    })
+                })
+            }
+            self.$set('articles', filtered)
+        },
     },
+
+
 
     // ---------------------------------------------------------------------------------
 

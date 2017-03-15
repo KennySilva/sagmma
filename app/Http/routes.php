@@ -72,6 +72,7 @@ Route::group(['namespace' => 'ApiControllers'], function()
         // ###############################################################################################################
         Route::group(['middleware' => ['permission:admin']], function () {
             Route::resource('users', 'ApiUsersController');
+            Route::get('allUsers/{row}', 'ApiUsersController@index');
             Route::resource('authUser', 'ApiUsersController@authUser');
             Route::get('roleuser', 'ApiUsersController@getRoleForUser');
 
@@ -82,6 +83,7 @@ Route::group(['namespace' => 'ApiControllers'], function()
             Route::post('estado_utilizador', 'ApiUsersController@estado_utilizador');
             // -------------------------------------------------------------------------
             Route::resource('roles', 'ApiRolesController');
+            Route::get('allRoles/{row}', 'ApiRolesController@index');
             Route::get('permissionrole', 'ApiRolesController@getPermissionForRole');
             Route::resource('permissions', 'ApiPermissionsController');
             Route::get('getAllpermissions/{row}', 'ApiPermissionsController@index');
@@ -92,31 +94,41 @@ Route::group(['namespace' => 'ApiControllers'], function()
         Route::group(['middleware' => ['role:admin']], function () {
             // ----------------------------------------Api-Markets----------------------------------
             Route::resource('markets', 'ApiMarketsController');
+            Route::get('allMarkets/{row}', 'ApiMarketsController@index');
+
 
             // ----------------------------------------Api-Typeofemployees------------------------------
             Route::resource('typeofemployees', 'ApiTypeofemployeesController');
+            Route::get('allTypeofemployees/{row}', 'ApiTypeofemployeesController@index');
 
             // ----------------------------------------Api-Typeofplaces-------------------------------
             Route::resource('typeofplaces', 'ApiTypeofplacesController');
+            Route::get('allTypeofplaces/{row}', 'ApiTypeofplacesController@index');
 
             // ----------------------------------------Api-Materials----------------------------------
             Route::resource('materials', 'ApiMaterialsController');
+            Route::get('allMaterials/{row}', 'ApiMaterialsController@index');
 
             // ----------------------------------------Api-Products----------------------------------
             Route::resource('products', 'ApiProductsController');
+            Route::get('allProducts/{row}', 'ApiProductsController@index');
 
             // ----------------------------------------Api-employee----------------------------------
             Route::resource('employees', 'ApiEmployeesController');
             Route::get('marketEmployee', 'ApiEmployeesController@getMarketforEmployee');
+            Route::get('allEmployees/{row}', 'ApiEmployeesController@index');
 
             // Route::get('employeeMarket', 'ApiEmployeesController@getMarketforEmployee');
             Route::get('employeeType', 'ApiEmployeesController@getTypeforEmployee');
 
             // ----------------------------------------Api-traders----------------------------------
             Route::resource('traders', 'ApiTradersController');
+            Route::get('allTraders/{row}', 'ApiTradersController@index');
 
             // ------------------------------------Api-Control (employee_material)--------------------
             Route::resource('controls', 'ApiControlsController');
+            Route::get('allControls/{row}', 'ApiControlsController@index');
+
             Route::get('controlEmployee', 'ApiControlsController@getEmployeeForControl');
             Route::get('controlMaterial', 'ApiControlsController@getMaterialForControl');
             Route::post('controlStatus', 'ApiControlsController@statusControlsChange');
@@ -124,6 +136,8 @@ Route::group(['namespace' => 'ApiControllers'], function()
             // ------------------------------------Api-Contract (place_trader)--------------------Atores Dpel e Admins
             Route::group(['middleware' => ['role:admin']], function () {
                 Route::resource('contracts', 'ApiContractsController');
+                Route::get('allContracts/{row}', 'ApiContractsController@index');
+
                 Route::get('contractTrader', 'ApiContractsController@getTraderForContract');
                 Route::get('contractPlace', 'ApiContractsController@getPlaceForContract');
                 // Route::post('contractStatus', 'ApiControlsController@statusControlsChange');
@@ -131,17 +145,23 @@ Route::group(['namespace' => 'ApiControllers'], function()
 
             // ------------------------------------Api-Taxation (place_trader)--------------------
             Route::resource('taxations', 'ApiTaxationsController');
+            Route::get('allTaxations/{row}', 'ApiTaxationsController@index');
+
             Route::get('taxationEmployee', 'ApiTaxationsController@getEmployeeForTaxation');
             Route::get('taxationExtPlace', 'ApiTaxationsController@getPlaceExtForTaxation');
             Route::get('taxationIntPlace', 'ApiTaxationsController@getPlaceIntForTaxation');
 
             // ----------------------------------------Api-place----------------------------------
             Route::resource('places', 'ApiPlacesController');
+            Route::get('allPlaces/{row}', 'ApiPlacesController@index');
+
             Route::get('placeType', 'ApiPlacesController@getTypeForPlace');
             Route::post('placeStatus', 'ApiPlacesController@placeStatus');
 
             // ----------------------------------------Api-promotions----------------------------------
             Route::resource('promotions', 'ApiPromotionsController');
+            Route::get('allPromotions/{row}', 'ApiPromotionsController@index');
+
             Route::get('promotionTrader', 'ApiPromotionsController@getTraderForPromotion');
             Route::get('promotionProduct', 'ApiPromotionsController@getProductForPromotion');
             Route::post('promotionStatus', 'ApiPromotionsController@statusPromotionsChange');
@@ -153,11 +173,17 @@ Route::group(['namespace' => 'ApiControllers'], function()
         Route::group(['middleware' => ['role:admin']], function () {
             // -----------------------------------Categories--------------------------------------
             Route::resource('categories', 'ApiCategoriesController');
+            Route::get('allCategories/{row}', 'ApiCategoriesController@index');
+
             // Route::get('setPaginate\{entries}', 'ApiCategoriesController@index');
             // --------------------------------------Tags-----------------------------------------
             Route::resource('tags', 'ApiTagsController');
+            Route::get('allTags/{row}', 'ApiTagsController@index');
+
             // --------------------------------------Articles-----------------------------------------
             Route::resource('articles', 'ApiArticlesController');
+            Route::get('allArticles/{row}', 'ApiArticlesController@index');
+
             Route::post('articleStatus', 'ApiArticlesController@articleStatus');
             Route::post('articleFeatures', 'ApiArticlesController@articleFeatures');
             Route::get('articleTag', 'ApiArticlesController@getTagforArticle');

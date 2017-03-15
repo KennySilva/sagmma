@@ -14,9 +14,9 @@ use Input;
 
 class ApiTagsController extends Controller
 {
-    public function index()
+    public function index($row)
     {
-        return Tag::paginate(10);
+        return Tag::paginate($row);
     }
 
     public function create()

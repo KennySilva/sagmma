@@ -14,9 +14,9 @@ use Input;
 
 class ApiRolesController extends Controller
 {
-    public function index()
+    public function index($row)
     {
-        $role = Role::paginate(5);
+        $role = Role::paginate($row);
         $role->each(function($role){
             $role->perms;
         });
@@ -73,4 +73,3 @@ class ApiRolesController extends Controller
             return $permissions;
         }
     }
-    

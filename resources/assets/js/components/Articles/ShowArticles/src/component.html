@@ -1,12 +1,62 @@
-<div class="alert alert-success" transition="success" v-if="success">
+<!-- <div class="alert alert-success" transition="success" v-if="success">
 	<i class="fa fa-thumbs-up"> Sucesso!!!</i>
+</div> -->
+
+<div  id="alert-message" class="alert alert-{{typeAlert}}" transition="success" v-if="success">
+	<button type="button" class="close" data-dismiss="alert">x</button>
+	<i class="fa fa-thumbs-o-up text-center">&nbsp;&nbsp; {{msgSucess}}</i>
 </div>
 
+<!-- <div class="row">
+<div class="col-md-4 pull-right">
+<div class="input-group">
+<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
+<input v-model="filter.term" type="text" class="form-control" placeholder="Filtrar..." aria-describedby="basic-addon1">
+</div>
+</div>
+</div> -->
+
 <div class="row">
-	<div class="col-md-4 pull-right">
-		<div class="input-group">
-			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
-			<input v-model="filter.term" type="text" class="form-control" placeholder="Filtrar..." aria-describedby="basic-addon1">
+	<div class="col-md-12">
+		<div class="form-inline pull-right">
+			<div class="input-group">
+				<select data-toggle="tooltip" title="A mostrar linhas na tabela" class="form-control" name="" v-model="showRow" @change="fetchArticle(1, showRow)">
+					<option class="" value="5">05</option>
+					<option class="" value="10" selected>10</option>
+					<option class="" value="20">20</option>
+					<option class="" value="50">50</option>
+					<option class="" value="100">100</option>
+					<option class="" value="200">200</option>
+				</select>
+			</div>
+			&nbsp;&nbsp;
+			<div class="input-group">
+				<select data-toggle="tooltip" title="Escolhe as colunas a serem filtrados" class="form-control" name="" v-model="columnsFiltered" multiple="multiple" v-el:article>
+					<option class="" value="title"="">Titulo</option>
+					<option class="" value="status">Publicação</option>
+					<option class="" value="featured">Destaque</option>
+				</select>
+			</div>
+			&nbsp;&nbsp;
+			<div v-if="columnsFiltered.length != 0" class="input-group">
+				<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
+				<input data-toggle="tooltip" title="Escreva o valor a ser procurado na Tabela"
+				v-model="filter.term"
+				@keyup="doFilter"
+				type="text"
+				class="form-control"
+				placeholder="Filtrar dados da tabela"
+				aria-describedby="basic-addon1">
+			</div>
+
+			<div v-else class="input-group">
+				<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
+				<input :disabled="columnsFiltered.length == 0" data-toggle="tooltip" title="Para ativar introduza um valor na Coluna"
+				type="text"
+				class="form-control"
+				placeholder="Filtrar dados da tabela"
+				aria-describedby="basic-addon1">
+			</div>
 		</div>
 	</div>
 </div>
@@ -49,7 +99,7 @@
 					</th>
 				</tr>
 			</thead>
-			<tbody v-for="article in articles | filterBy filter.term | orderBy sortColumn sortInverse">
+			<tbody v-for="article in articles | orderBy sortColumn sortInverse">
 				<tr>
 					<td>{{ article.title }}</td>
 
@@ -76,9 +126,16 @@
 				</tr>
 			</tbody>
 		</table>
-		<div class="col-md-12 pull-left">
-			<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
+
+		<div class="row">
+			<div class="col-md-6 pull-left">
+				<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
+			</div>
+			<div class="col-md-6 pull-right">
+				<h6 class="text-right text-help"> Mostrar de <span class="badge">{{pagination.from}}</span>  a <span class="badge">{{pagination.to}}</span>  no total de <span class="badge">{{pagination.total}}</span></h6>
+			</div>
 		</div>
+
 	</div>
 
 	<!--------------------------------------------------------------------------------------------------------->
@@ -228,13 +285,40 @@
 							<div class="col-md-12">
 								<div class="col-md-12">
 									<div class="form-group has-feedback">
-										<input type="text" class="form-control" name="name" v-model="newArticle.name" v-validate:name="['required']"/>
+										<input type="text" class="form-control" name="title" placeholder="Titulo" v-model="newArticle.title" v-validate:title="['required']"/>
 										<span class="form-control-feedback"></span>
-										<p style="color:red;" v-if="$validation1.name.required && $validation1.name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
+										<p style="color:red;" v-if="$validationew.title.required && $validationew.title.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
 									</div>
 								</div>
 							</div>
 						</div>
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-12">
+									<div class="form-group has-feedback">
+										<select class="form-control" v-model="newArticle.category_id" v-el:categoryedit>
+											<option v-for="category in categories" value="{{category.id}}">{{category.name}}</option>
+										</select>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-12">
+									<div class="form-group has-feedback">
+										<select class="form-control" v-model="newArticle.tags" v-el:tagsedit multiple="multiple">
+											<option v-for="tag in tags" value="{{tag.id}}">
+												{{tag.name}}
+											</option>
+										</select>
+									</div>
+								</div>
+							</div>
+						</div>
+
 
 						<hr><!---------------------------------------------------------------------------------------------------------------->
 
@@ -242,11 +326,29 @@
 							<div class="col-md-12">
 								<div class="col-md-12">
 									<div class="form-group has-feedback">
-										<textarea name="description" placeholder="Descrição..." class="form-control" rows="5" cols="40" id="description" v-model="newArticle.description"></textarea>
+										<textarea name="content" placeholder="Conteúdo..." class="form-control textarea-conte" rows="5" cols="40" id="content" v-model="newArticle.content"></textarea>
 									</div>
 								</div>
 							</div>
 						</div>
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-12">
+									<div class="form-group has-feedback">
+										<quill-editor ref="myTextEditor"
+										v-model="content"
+										:config="editorOption"
+										@blur="onEditorBlur($event)"
+										@focus="onEditorFocus($event)"
+										@ready="onEditorReady($event)">
+									</quill-editor>
+
+								</div>
+							</div>
+						</div>
+					</div>
+
 					</form>
 				</validator>
 			</div>

@@ -17,9 +17,9 @@ use Auth;
 
 class ApiContractsController extends Controller
 {
-    public function index()
+    public function index($row)
     {
-        $contract = Contract::paginate(5);
+        $contract = Contract::paginate($row);
         $contract->each(function($contract){
             $contract->places;
             $contract->traders;

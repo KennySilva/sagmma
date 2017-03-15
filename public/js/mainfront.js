@@ -1,4 +1,4523 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+module.exports = { "default": require("core-js/library/fn/object/define-property"), __esModule: true };
+},{"core-js/library/fn/object/define-property":3}],2:[function(require,module,exports){
+"use strict";
+
+exports.__esModule = true;
+
+var _defineProperty = require("../core-js/object/define-property");
+
+var _defineProperty2 = _interopRequireDefault(_defineProperty);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = function (obj, key, value) {
+  if (key in obj) {
+    (0, _defineProperty2.default)(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+};
+},{"../core-js/object/define-property":1}],3:[function(require,module,exports){
+require('../../modules/es6.object.define-property');
+var $Object = require('../../modules/_core').Object;
+module.exports = function defineProperty(it, key, desc){
+  return $Object.defineProperty(it, key, desc);
+};
+},{"../../modules/_core":6,"../../modules/es6.object.define-property":19}],4:[function(require,module,exports){
+module.exports = function(it){
+  if(typeof it != 'function')throw TypeError(it + ' is not a function!');
+  return it;
+};
+},{}],5:[function(require,module,exports){
+var isObject = require('./_is-object');
+module.exports = function(it){
+  if(!isObject(it))throw TypeError(it + ' is not an object!');
+  return it;
+};
+},{"./_is-object":15}],6:[function(require,module,exports){
+var core = module.exports = {version: '2.4.0'};
+if(typeof __e == 'number')__e = core; // eslint-disable-line no-undef
+},{}],7:[function(require,module,exports){
+// optional / simple context binding
+var aFunction = require('./_a-function');
+module.exports = function(fn, that, length){
+  aFunction(fn);
+  if(that === undefined)return fn;
+  switch(length){
+    case 1: return function(a){
+      return fn.call(that, a);
+    };
+    case 2: return function(a, b){
+      return fn.call(that, a, b);
+    };
+    case 3: return function(a, b, c){
+      return fn.call(that, a, b, c);
+    };
+  }
+  return function(/* ...args */){
+    return fn.apply(that, arguments);
+  };
+};
+},{"./_a-function":4}],8:[function(require,module,exports){
+// Thank's IE8 for his funny defineProperty
+module.exports = !require('./_fails')(function(){
+  return Object.defineProperty({}, 'a', {get: function(){ return 7; }}).a != 7;
+});
+},{"./_fails":11}],9:[function(require,module,exports){
+var isObject = require('./_is-object')
+  , document = require('./_global').document
+  // in old IE typeof document.createElement is 'object'
+  , is = isObject(document) && isObject(document.createElement);
+module.exports = function(it){
+  return is ? document.createElement(it) : {};
+};
+},{"./_global":12,"./_is-object":15}],10:[function(require,module,exports){
+var global    = require('./_global')
+  , core      = require('./_core')
+  , ctx       = require('./_ctx')
+  , hide      = require('./_hide')
+  , PROTOTYPE = 'prototype';
+
+var $export = function(type, name, source){
+  var IS_FORCED = type & $export.F
+    , IS_GLOBAL = type & $export.G
+    , IS_STATIC = type & $export.S
+    , IS_PROTO  = type & $export.P
+    , IS_BIND   = type & $export.B
+    , IS_WRAP   = type & $export.W
+    , exports   = IS_GLOBAL ? core : core[name] || (core[name] = {})
+    , expProto  = exports[PROTOTYPE]
+    , target    = IS_GLOBAL ? global : IS_STATIC ? global[name] : (global[name] || {})[PROTOTYPE]
+    , key, own, out;
+  if(IS_GLOBAL)source = name;
+  for(key in source){
+    // contains in native
+    own = !IS_FORCED && target && target[key] !== undefined;
+    if(own && key in exports)continue;
+    // export native or passed
+    out = own ? target[key] : source[key];
+    // prevent global pollution for namespaces
+    exports[key] = IS_GLOBAL && typeof target[key] != 'function' ? source[key]
+    // bind timers to global for call from export context
+    : IS_BIND && own ? ctx(out, global)
+    // wrap global constructors for prevent change them in library
+    : IS_WRAP && target[key] == out ? (function(C){
+      var F = function(a, b, c){
+        if(this instanceof C){
+          switch(arguments.length){
+            case 0: return new C;
+            case 1: return new C(a);
+            case 2: return new C(a, b);
+          } return new C(a, b, c);
+        } return C.apply(this, arguments);
+      };
+      F[PROTOTYPE] = C[PROTOTYPE];
+      return F;
+    // make static versions for prototype methods
+    })(out) : IS_PROTO && typeof out == 'function' ? ctx(Function.call, out) : out;
+    // export proto methods to core.%CONSTRUCTOR%.methods.%NAME%
+    if(IS_PROTO){
+      (exports.virtual || (exports.virtual = {}))[key] = out;
+      // export proto methods to core.%CONSTRUCTOR%.prototype.%NAME%
+      if(type & $export.R && expProto && !expProto[key])hide(expProto, key, out);
+    }
+  }
+};
+// type bitmap
+$export.F = 1;   // forced
+$export.G = 2;   // global
+$export.S = 4;   // static
+$export.P = 8;   // proto
+$export.B = 16;  // bind
+$export.W = 32;  // wrap
+$export.U = 64;  // safe
+$export.R = 128; // real proto method for `library` 
+module.exports = $export;
+},{"./_core":6,"./_ctx":7,"./_global":12,"./_hide":13}],11:[function(require,module,exports){
+module.exports = function(exec){
+  try {
+    return !!exec();
+  } catch(e){
+    return true;
+  }
+};
+},{}],12:[function(require,module,exports){
+// https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
+var global = module.exports = typeof window != 'undefined' && window.Math == Math
+  ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
+if(typeof __g == 'number')__g = global; // eslint-disable-line no-undef
+},{}],13:[function(require,module,exports){
+var dP         = require('./_object-dp')
+  , createDesc = require('./_property-desc');
+module.exports = require('./_descriptors') ? function(object, key, value){
+  return dP.f(object, key, createDesc(1, value));
+} : function(object, key, value){
+  object[key] = value;
+  return object;
+};
+},{"./_descriptors":8,"./_object-dp":16,"./_property-desc":17}],14:[function(require,module,exports){
+module.exports = !require('./_descriptors') && !require('./_fails')(function(){
+  return Object.defineProperty(require('./_dom-create')('div'), 'a', {get: function(){ return 7; }}).a != 7;
+});
+},{"./_descriptors":8,"./_dom-create":9,"./_fails":11}],15:[function(require,module,exports){
+module.exports = function(it){
+  return typeof it === 'object' ? it !== null : typeof it === 'function';
+};
+},{}],16:[function(require,module,exports){
+var anObject       = require('./_an-object')
+  , IE8_DOM_DEFINE = require('./_ie8-dom-define')
+  , toPrimitive    = require('./_to-primitive')
+  , dP             = Object.defineProperty;
+
+exports.f = require('./_descriptors') ? Object.defineProperty : function defineProperty(O, P, Attributes){
+  anObject(O);
+  P = toPrimitive(P, true);
+  anObject(Attributes);
+  if(IE8_DOM_DEFINE)try {
+    return dP(O, P, Attributes);
+  } catch(e){ /* empty */ }
+  if('get' in Attributes || 'set' in Attributes)throw TypeError('Accessors not supported!');
+  if('value' in Attributes)O[P] = Attributes.value;
+  return O;
+};
+},{"./_an-object":5,"./_descriptors":8,"./_ie8-dom-define":14,"./_to-primitive":18}],17:[function(require,module,exports){
+module.exports = function(bitmap, value){
+  return {
+    enumerable  : !(bitmap & 1),
+    configurable: !(bitmap & 2),
+    writable    : !(bitmap & 4),
+    value       : value
+  };
+};
+},{}],18:[function(require,module,exports){
+// 7.1.1 ToPrimitive(input [, PreferredType])
+var isObject = require('./_is-object');
+// instead of the ES6 spec version, we didn't implement @@toPrimitive case
+// and the second argument - flag - preferred type is a string
+module.exports = function(it, S){
+  if(!isObject(it))return it;
+  var fn, val;
+  if(S && typeof (fn = it.toString) == 'function' && !isObject(val = fn.call(it)))return val;
+  if(typeof (fn = it.valueOf) == 'function' && !isObject(val = fn.call(it)))return val;
+  if(!S && typeof (fn = it.toString) == 'function' && !isObject(val = fn.call(it)))return val;
+  throw TypeError("Can't convert object to primitive value");
+};
+},{"./_is-object":15}],19:[function(require,module,exports){
+var $export = require('./_export');
+// 19.1.2.4 / 15.2.3.6 Object.defineProperty(O, P, Attributes)
+$export($export.S + $export.F * !require('./_descriptors'), 'Object', {defineProperty: require('./_object-dp').f});
+},{"./_descriptors":8,"./_export":10,"./_object-dp":16}],20:[function(require,module,exports){
+//! moment.js
+//! version : 2.17.1
+//! authors : Tim Wood, Iskren Chernev, Moment.js contributors
+//! license : MIT
+//! momentjs.com
+
+;(function (global, factory) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+    typeof define === 'function' && define.amd ? define(factory) :
+    global.moment = factory()
+}(this, (function () { 'use strict';
+
+var hookCallback;
+
+function hooks () {
+    return hookCallback.apply(null, arguments);
+}
+
+// This is done to register the method called with moment()
+// without creating circular dependencies.
+function setHookCallback (callback) {
+    hookCallback = callback;
+}
+
+function isArray(input) {
+    return input instanceof Array || Object.prototype.toString.call(input) === '[object Array]';
+}
+
+function isObject(input) {
+    // IE8 will treat undefined and null as object if it wasn't for
+    // input != null
+    return input != null && Object.prototype.toString.call(input) === '[object Object]';
+}
+
+function isObjectEmpty(obj) {
+    var k;
+    for (k in obj) {
+        // even if its not own property I'd still call it non-empty
+        return false;
+    }
+    return true;
+}
+
+function isNumber(input) {
+    return typeof input === 'number' || Object.prototype.toString.call(input) === '[object Number]';
+}
+
+function isDate(input) {
+    return input instanceof Date || Object.prototype.toString.call(input) === '[object Date]';
+}
+
+function map(arr, fn) {
+    var res = [], i;
+    for (i = 0; i < arr.length; ++i) {
+        res.push(fn(arr[i], i));
+    }
+    return res;
+}
+
+function hasOwnProp(a, b) {
+    return Object.prototype.hasOwnProperty.call(a, b);
+}
+
+function extend(a, b) {
+    for (var i in b) {
+        if (hasOwnProp(b, i)) {
+            a[i] = b[i];
+        }
+    }
+
+    if (hasOwnProp(b, 'toString')) {
+        a.toString = b.toString;
+    }
+
+    if (hasOwnProp(b, 'valueOf')) {
+        a.valueOf = b.valueOf;
+    }
+
+    return a;
+}
+
+function createUTC (input, format, locale, strict) {
+    return createLocalOrUTC(input, format, locale, strict, true).utc();
+}
+
+function defaultParsingFlags() {
+    // We need to deep clone this object.
+    return {
+        empty           : false,
+        unusedTokens    : [],
+        unusedInput     : [],
+        overflow        : -2,
+        charsLeftOver   : 0,
+        nullInput       : false,
+        invalidMonth    : null,
+        invalidFormat   : false,
+        userInvalidated : false,
+        iso             : false,
+        parsedDateParts : [],
+        meridiem        : null
+    };
+}
+
+function getParsingFlags(m) {
+    if (m._pf == null) {
+        m._pf = defaultParsingFlags();
+    }
+    return m._pf;
+}
+
+var some;
+if (Array.prototype.some) {
+    some = Array.prototype.some;
+} else {
+    some = function (fun) {
+        var t = Object(this);
+        var len = t.length >>> 0;
+
+        for (var i = 0; i < len; i++) {
+            if (i in t && fun.call(this, t[i], i, t)) {
+                return true;
+            }
+        }
+
+        return false;
+    };
+}
+
+var some$1 = some;
+
+function isValid(m) {
+    if (m._isValid == null) {
+        var flags = getParsingFlags(m);
+        var parsedParts = some$1.call(flags.parsedDateParts, function (i) {
+            return i != null;
+        });
+        var isNowValid = !isNaN(m._d.getTime()) &&
+            flags.overflow < 0 &&
+            !flags.empty &&
+            !flags.invalidMonth &&
+            !flags.invalidWeekday &&
+            !flags.nullInput &&
+            !flags.invalidFormat &&
+            !flags.userInvalidated &&
+            (!flags.meridiem || (flags.meridiem && parsedParts));
+
+        if (m._strict) {
+            isNowValid = isNowValid &&
+                flags.charsLeftOver === 0 &&
+                flags.unusedTokens.length === 0 &&
+                flags.bigHour === undefined;
+        }
+
+        if (Object.isFrozen == null || !Object.isFrozen(m)) {
+            m._isValid = isNowValid;
+        }
+        else {
+            return isNowValid;
+        }
+    }
+    return m._isValid;
+}
+
+function createInvalid (flags) {
+    var m = createUTC(NaN);
+    if (flags != null) {
+        extend(getParsingFlags(m), flags);
+    }
+    else {
+        getParsingFlags(m).userInvalidated = true;
+    }
+
+    return m;
+}
+
+function isUndefined(input) {
+    return input === void 0;
+}
+
+// Plugins that add properties should also add the key here (null value),
+// so we can properly clone ourselves.
+var momentProperties = hooks.momentProperties = [];
+
+function copyConfig(to, from) {
+    var i, prop, val;
+
+    if (!isUndefined(from._isAMomentObject)) {
+        to._isAMomentObject = from._isAMomentObject;
+    }
+    if (!isUndefined(from._i)) {
+        to._i = from._i;
+    }
+    if (!isUndefined(from._f)) {
+        to._f = from._f;
+    }
+    if (!isUndefined(from._l)) {
+        to._l = from._l;
+    }
+    if (!isUndefined(from._strict)) {
+        to._strict = from._strict;
+    }
+    if (!isUndefined(from._tzm)) {
+        to._tzm = from._tzm;
+    }
+    if (!isUndefined(from._isUTC)) {
+        to._isUTC = from._isUTC;
+    }
+    if (!isUndefined(from._offset)) {
+        to._offset = from._offset;
+    }
+    if (!isUndefined(from._pf)) {
+        to._pf = getParsingFlags(from);
+    }
+    if (!isUndefined(from._locale)) {
+        to._locale = from._locale;
+    }
+
+    if (momentProperties.length > 0) {
+        for (i in momentProperties) {
+            prop = momentProperties[i];
+            val = from[prop];
+            if (!isUndefined(val)) {
+                to[prop] = val;
+            }
+        }
+    }
+
+    return to;
+}
+
+var updateInProgress = false;
+
+// Moment prototype object
+function Moment(config) {
+    copyConfig(this, config);
+    this._d = new Date(config._d != null ? config._d.getTime() : NaN);
+    if (!this.isValid()) {
+        this._d = new Date(NaN);
+    }
+    // Prevent infinite loop in case updateOffset creates new moment
+    // objects.
+    if (updateInProgress === false) {
+        updateInProgress = true;
+        hooks.updateOffset(this);
+        updateInProgress = false;
+    }
+}
+
+function isMoment (obj) {
+    return obj instanceof Moment || (obj != null && obj._isAMomentObject != null);
+}
+
+function absFloor (number) {
+    if (number < 0) {
+        // -0 -> 0
+        return Math.ceil(number) || 0;
+    } else {
+        return Math.floor(number);
+    }
+}
+
+function toInt(argumentForCoercion) {
+    var coercedNumber = +argumentForCoercion,
+        value = 0;
+
+    if (coercedNumber !== 0 && isFinite(coercedNumber)) {
+        value = absFloor(coercedNumber);
+    }
+
+    return value;
+}
+
+// compare two arrays, return the number of differences
+function compareArrays(array1, array2, dontConvert) {
+    var len = Math.min(array1.length, array2.length),
+        lengthDiff = Math.abs(array1.length - array2.length),
+        diffs = 0,
+        i;
+    for (i = 0; i < len; i++) {
+        if ((dontConvert && array1[i] !== array2[i]) ||
+            (!dontConvert && toInt(array1[i]) !== toInt(array2[i]))) {
+            diffs++;
+        }
+    }
+    return diffs + lengthDiff;
+}
+
+function warn(msg) {
+    if (hooks.suppressDeprecationWarnings === false &&
+            (typeof console !==  'undefined') && console.warn) {
+        console.warn('Deprecation warning: ' + msg);
+    }
+}
+
+function deprecate(msg, fn) {
+    var firstTime = true;
+
+    return extend(function () {
+        if (hooks.deprecationHandler != null) {
+            hooks.deprecationHandler(null, msg);
+        }
+        if (firstTime) {
+            var args = [];
+            var arg;
+            for (var i = 0; i < arguments.length; i++) {
+                arg = '';
+                if (typeof arguments[i] === 'object') {
+                    arg += '\n[' + i + '] ';
+                    for (var key in arguments[0]) {
+                        arg += key + ': ' + arguments[0][key] + ', ';
+                    }
+                    arg = arg.slice(0, -2); // Remove trailing comma and space
+                } else {
+                    arg = arguments[i];
+                }
+                args.push(arg);
+            }
+            warn(msg + '\nArguments: ' + Array.prototype.slice.call(args).join('') + '\n' + (new Error()).stack);
+            firstTime = false;
+        }
+        return fn.apply(this, arguments);
+    }, fn);
+}
+
+var deprecations = {};
+
+function deprecateSimple(name, msg) {
+    if (hooks.deprecationHandler != null) {
+        hooks.deprecationHandler(name, msg);
+    }
+    if (!deprecations[name]) {
+        warn(msg);
+        deprecations[name] = true;
+    }
+}
+
+hooks.suppressDeprecationWarnings = false;
+hooks.deprecationHandler = null;
+
+function isFunction(input) {
+    return input instanceof Function || Object.prototype.toString.call(input) === '[object Function]';
+}
+
+function set (config) {
+    var prop, i;
+    for (i in config) {
+        prop = config[i];
+        if (isFunction(prop)) {
+            this[i] = prop;
+        } else {
+            this['_' + i] = prop;
+        }
+    }
+    this._config = config;
+    // Lenient ordinal parsing accepts just a number in addition to
+    // number + (possibly) stuff coming from _ordinalParseLenient.
+    this._ordinalParseLenient = new RegExp(this._ordinalParse.source + '|' + (/\d{1,2}/).source);
+}
+
+function mergeConfigs(parentConfig, childConfig) {
+    var res = extend({}, parentConfig), prop;
+    for (prop in childConfig) {
+        if (hasOwnProp(childConfig, prop)) {
+            if (isObject(parentConfig[prop]) && isObject(childConfig[prop])) {
+                res[prop] = {};
+                extend(res[prop], parentConfig[prop]);
+                extend(res[prop], childConfig[prop]);
+            } else if (childConfig[prop] != null) {
+                res[prop] = childConfig[prop];
+            } else {
+                delete res[prop];
+            }
+        }
+    }
+    for (prop in parentConfig) {
+        if (hasOwnProp(parentConfig, prop) &&
+                !hasOwnProp(childConfig, prop) &&
+                isObject(parentConfig[prop])) {
+            // make sure changes to properties don't modify parent config
+            res[prop] = extend({}, res[prop]);
+        }
+    }
+    return res;
+}
+
+function Locale(config) {
+    if (config != null) {
+        this.set(config);
+    }
+}
+
+var keys;
+
+if (Object.keys) {
+    keys = Object.keys;
+} else {
+    keys = function (obj) {
+        var i, res = [];
+        for (i in obj) {
+            if (hasOwnProp(obj, i)) {
+                res.push(i);
+            }
+        }
+        return res;
+    };
+}
+
+var keys$1 = keys;
+
+var defaultCalendar = {
+    sameDay : '[Today at] LT',
+    nextDay : '[Tomorrow at] LT',
+    nextWeek : 'dddd [at] LT',
+    lastDay : '[Yesterday at] LT',
+    lastWeek : '[Last] dddd [at] LT',
+    sameElse : 'L'
+};
+
+function calendar (key, mom, now) {
+    var output = this._calendar[key] || this._calendar['sameElse'];
+    return isFunction(output) ? output.call(mom, now) : output;
+}
+
+var defaultLongDateFormat = {
+    LTS  : 'h:mm:ss A',
+    LT   : 'h:mm A',
+    L    : 'MM/DD/YYYY',
+    LL   : 'MMMM D, YYYY',
+    LLL  : 'MMMM D, YYYY h:mm A',
+    LLLL : 'dddd, MMMM D, YYYY h:mm A'
+};
+
+function longDateFormat (key) {
+    var format = this._longDateFormat[key],
+        formatUpper = this._longDateFormat[key.toUpperCase()];
+
+    if (format || !formatUpper) {
+        return format;
+    }
+
+    this._longDateFormat[key] = formatUpper.replace(/MMMM|MM|DD|dddd/g, function (val) {
+        return val.slice(1);
+    });
+
+    return this._longDateFormat[key];
+}
+
+var defaultInvalidDate = 'Invalid date';
+
+function invalidDate () {
+    return this._invalidDate;
+}
+
+var defaultOrdinal = '%d';
+var defaultOrdinalParse = /\d{1,2}/;
+
+function ordinal (number) {
+    return this._ordinal.replace('%d', number);
+}
+
+var defaultRelativeTime = {
+    future : 'in %s',
+    past   : '%s ago',
+    s  : 'a few seconds',
+    m  : 'a minute',
+    mm : '%d minutes',
+    h  : 'an hour',
+    hh : '%d hours',
+    d  : 'a day',
+    dd : '%d days',
+    M  : 'a month',
+    MM : '%d months',
+    y  : 'a year',
+    yy : '%d years'
+};
+
+function relativeTime (number, withoutSuffix, string, isFuture) {
+    var output = this._relativeTime[string];
+    return (isFunction(output)) ?
+        output(number, withoutSuffix, string, isFuture) :
+        output.replace(/%d/i, number);
+}
+
+function pastFuture (diff, output) {
+    var format = this._relativeTime[diff > 0 ? 'future' : 'past'];
+    return isFunction(format) ? format(output) : format.replace(/%s/i, output);
+}
+
+var aliases = {};
+
+function addUnitAlias (unit, shorthand) {
+    var lowerCase = unit.toLowerCase();
+    aliases[lowerCase] = aliases[lowerCase + 's'] = aliases[shorthand] = unit;
+}
+
+function normalizeUnits(units) {
+    return typeof units === 'string' ? aliases[units] || aliases[units.toLowerCase()] : undefined;
+}
+
+function normalizeObjectUnits(inputObject) {
+    var normalizedInput = {},
+        normalizedProp,
+        prop;
+
+    for (prop in inputObject) {
+        if (hasOwnProp(inputObject, prop)) {
+            normalizedProp = normalizeUnits(prop);
+            if (normalizedProp) {
+                normalizedInput[normalizedProp] = inputObject[prop];
+            }
+        }
+    }
+
+    return normalizedInput;
+}
+
+var priorities = {};
+
+function addUnitPriority(unit, priority) {
+    priorities[unit] = priority;
+}
+
+function getPrioritizedUnits(unitsObj) {
+    var units = [];
+    for (var u in unitsObj) {
+        units.push({unit: u, priority: priorities[u]});
+    }
+    units.sort(function (a, b) {
+        return a.priority - b.priority;
+    });
+    return units;
+}
+
+function makeGetSet (unit, keepTime) {
+    return function (value) {
+        if (value != null) {
+            set$1(this, unit, value);
+            hooks.updateOffset(this, keepTime);
+            return this;
+        } else {
+            return get(this, unit);
+        }
+    };
+}
+
+function get (mom, unit) {
+    return mom.isValid() ?
+        mom._d['get' + (mom._isUTC ? 'UTC' : '') + unit]() : NaN;
+}
+
+function set$1 (mom, unit, value) {
+    if (mom.isValid()) {
+        mom._d['set' + (mom._isUTC ? 'UTC' : '') + unit](value);
+    }
+}
+
+// MOMENTS
+
+function stringGet (units) {
+    units = normalizeUnits(units);
+    if (isFunction(this[units])) {
+        return this[units]();
+    }
+    return this;
+}
+
+
+function stringSet (units, value) {
+    if (typeof units === 'object') {
+        units = normalizeObjectUnits(units);
+        var prioritized = getPrioritizedUnits(units);
+        for (var i = 0; i < prioritized.length; i++) {
+            this[prioritized[i].unit](units[prioritized[i].unit]);
+        }
+    } else {
+        units = normalizeUnits(units);
+        if (isFunction(this[units])) {
+            return this[units](value);
+        }
+    }
+    return this;
+}
+
+function zeroFill(number, targetLength, forceSign) {
+    var absNumber = '' + Math.abs(number),
+        zerosToFill = targetLength - absNumber.length,
+        sign = number >= 0;
+    return (sign ? (forceSign ? '+' : '') : '-') +
+        Math.pow(10, Math.max(0, zerosToFill)).toString().substr(1) + absNumber;
+}
+
+var formattingTokens = /(\[[^\[]*\])|(\\)?([Hh]mm(ss)?|Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Qo?|YYYYYY|YYYYY|YYYY|YY|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|kk?|mm?|ss?|S{1,9}|x|X|zz?|ZZ?|.)/g;
+
+var localFormattingTokens = /(\[[^\[]*\])|(\\)?(LTS|LT|LL?L?L?|l{1,4})/g;
+
+var formatFunctions = {};
+
+var formatTokenFunctions = {};
+
+// token:    'M'
+// padded:   ['MM', 2]
+// ordinal:  'Mo'
+// callback: function () { this.month() + 1 }
+function addFormatToken (token, padded, ordinal, callback) {
+    var func = callback;
+    if (typeof callback === 'string') {
+        func = function () {
+            return this[callback]();
+        };
+    }
+    if (token) {
+        formatTokenFunctions[token] = func;
+    }
+    if (padded) {
+        formatTokenFunctions[padded[0]] = function () {
+            return zeroFill(func.apply(this, arguments), padded[1], padded[2]);
+        };
+    }
+    if (ordinal) {
+        formatTokenFunctions[ordinal] = function () {
+            return this.localeData().ordinal(func.apply(this, arguments), token);
+        };
+    }
+}
+
+function removeFormattingTokens(input) {
+    if (input.match(/\[[\s\S]/)) {
+        return input.replace(/^\[|\]$/g, '');
+    }
+    return input.replace(/\\/g, '');
+}
+
+function makeFormatFunction(format) {
+    var array = format.match(formattingTokens), i, length;
+
+    for (i = 0, length = array.length; i < length; i++) {
+        if (formatTokenFunctions[array[i]]) {
+            array[i] = formatTokenFunctions[array[i]];
+        } else {
+            array[i] = removeFormattingTokens(array[i]);
+        }
+    }
+
+    return function (mom) {
+        var output = '', i;
+        for (i = 0; i < length; i++) {
+            output += array[i] instanceof Function ? array[i].call(mom, format) : array[i];
+        }
+        return output;
+    };
+}
+
+// format date using native date object
+function formatMoment(m, format) {
+    if (!m.isValid()) {
+        return m.localeData().invalidDate();
+    }
+
+    format = expandFormat(format, m.localeData());
+    formatFunctions[format] = formatFunctions[format] || makeFormatFunction(format);
+
+    return formatFunctions[format](m);
+}
+
+function expandFormat(format, locale) {
+    var i = 5;
+
+    function replaceLongDateFormatTokens(input) {
+        return locale.longDateFormat(input) || input;
+    }
+
+    localFormattingTokens.lastIndex = 0;
+    while (i >= 0 && localFormattingTokens.test(format)) {
+        format = format.replace(localFormattingTokens, replaceLongDateFormatTokens);
+        localFormattingTokens.lastIndex = 0;
+        i -= 1;
+    }
+
+    return format;
+}
+
+var match1         = /\d/;            //       0 - 9
+var match2         = /\d\d/;          //      00 - 99
+var match3         = /\d{3}/;         //     000 - 999
+var match4         = /\d{4}/;         //    0000 - 9999
+var match6         = /[+-]?\d{6}/;    // -999999 - 999999
+var match1to2      = /\d\d?/;         //       0 - 99
+var match3to4      = /\d\d\d\d?/;     //     999 - 9999
+var match5to6      = /\d\d\d\d\d\d?/; //   99999 - 999999
+var match1to3      = /\d{1,3}/;       //       0 - 999
+var match1to4      = /\d{1,4}/;       //       0 - 9999
+var match1to6      = /[+-]?\d{1,6}/;  // -999999 - 999999
+
+var matchUnsigned  = /\d+/;           //       0 - inf
+var matchSigned    = /[+-]?\d+/;      //    -inf - inf
+
+var matchOffset    = /Z|[+-]\d\d:?\d\d/gi; // +00:00 -00:00 +0000 -0000 or Z
+var matchShortOffset = /Z|[+-]\d\d(?::?\d\d)?/gi; // +00 -00 +00:00 -00:00 +0000 -0000 or Z
+
+var matchTimestamp = /[+-]?\d+(\.\d{1,3})?/; // 123456789 123456789.123
+
+// any word (or two) characters or numbers including two/three word month in arabic.
+// includes scottish gaelic two word and hyphenated months
+var matchWord = /[0-9]*['a-z\u00A0-\u05FF\u0700-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+|[\u0600-\u06FF\/]+(\s*?[\u0600-\u06FF]+){1,2}/i;
+
+
+var regexes = {};
+
+function addRegexToken (token, regex, strictRegex) {
+    regexes[token] = isFunction(regex) ? regex : function (isStrict, localeData) {
+        return (isStrict && strictRegex) ? strictRegex : regex;
+    };
+}
+
+function getParseRegexForToken (token, config) {
+    if (!hasOwnProp(regexes, token)) {
+        return new RegExp(unescapeFormat(token));
+    }
+
+    return regexes[token](config._strict, config._locale);
+}
+
+// Code from http://stackoverflow.com/questions/3561493/is-there-a-regexp-escape-function-in-javascript
+function unescapeFormat(s) {
+    return regexEscape(s.replace('\\', '').replace(/\\(\[)|\\(\])|\[([^\]\[]*)\]|\\(.)/g, function (matched, p1, p2, p3, p4) {
+        return p1 || p2 || p3 || p4;
+    }));
+}
+
+function regexEscape(s) {
+    return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+
+var tokens = {};
+
+function addParseToken (token, callback) {
+    var i, func = callback;
+    if (typeof token === 'string') {
+        token = [token];
+    }
+    if (isNumber(callback)) {
+        func = function (input, array) {
+            array[callback] = toInt(input);
+        };
+    }
+    for (i = 0; i < token.length; i++) {
+        tokens[token[i]] = func;
+    }
+}
+
+function addWeekParseToken (token, callback) {
+    addParseToken(token, function (input, array, config, token) {
+        config._w = config._w || {};
+        callback(input, config._w, config, token);
+    });
+}
+
+function addTimeToArrayFromToken(token, input, config) {
+    if (input != null && hasOwnProp(tokens, token)) {
+        tokens[token](input, config._a, config, token);
+    }
+}
+
+var YEAR = 0;
+var MONTH = 1;
+var DATE = 2;
+var HOUR = 3;
+var MINUTE = 4;
+var SECOND = 5;
+var MILLISECOND = 6;
+var WEEK = 7;
+var WEEKDAY = 8;
+
+var indexOf;
+
+if (Array.prototype.indexOf) {
+    indexOf = Array.prototype.indexOf;
+} else {
+    indexOf = function (o) {
+        // I know
+        var i;
+        for (i = 0; i < this.length; ++i) {
+            if (this[i] === o) {
+                return i;
+            }
+        }
+        return -1;
+    };
+}
+
+var indexOf$1 = indexOf;
+
+function daysInMonth(year, month) {
+    return new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+}
+
+// FORMATTING
+
+addFormatToken('M', ['MM', 2], 'Mo', function () {
+    return this.month() + 1;
+});
+
+addFormatToken('MMM', 0, 0, function (format) {
+    return this.localeData().monthsShort(this, format);
+});
+
+addFormatToken('MMMM', 0, 0, function (format) {
+    return this.localeData().months(this, format);
+});
+
+// ALIASES
+
+addUnitAlias('month', 'M');
+
+// PRIORITY
+
+addUnitPriority('month', 8);
+
+// PARSING
+
+addRegexToken('M',    match1to2);
+addRegexToken('MM',   match1to2, match2);
+addRegexToken('MMM',  function (isStrict, locale) {
+    return locale.monthsShortRegex(isStrict);
+});
+addRegexToken('MMMM', function (isStrict, locale) {
+    return locale.monthsRegex(isStrict);
+});
+
+addParseToken(['M', 'MM'], function (input, array) {
+    array[MONTH] = toInt(input) - 1;
+});
+
+addParseToken(['MMM', 'MMMM'], function (input, array, config, token) {
+    var month = config._locale.monthsParse(input, token, config._strict);
+    // if we didn't find a month name, mark the date as invalid.
+    if (month != null) {
+        array[MONTH] = month;
+    } else {
+        getParsingFlags(config).invalidMonth = input;
+    }
+});
+
+// LOCALES
+
+var MONTHS_IN_FORMAT = /D[oD]?(\[[^\[\]]*\]|\s)+MMMM?/;
+var defaultLocaleMonths = 'January_February_March_April_May_June_July_August_September_October_November_December'.split('_');
+function localeMonths (m, format) {
+    if (!m) {
+        return this._months;
+    }
+    return isArray(this._months) ? this._months[m.month()] :
+        this._months[(this._months.isFormat || MONTHS_IN_FORMAT).test(format) ? 'format' : 'standalone'][m.month()];
+}
+
+var defaultLocaleMonthsShort = 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec'.split('_');
+function localeMonthsShort (m, format) {
+    if (!m) {
+        return this._monthsShort;
+    }
+    return isArray(this._monthsShort) ? this._monthsShort[m.month()] :
+        this._monthsShort[MONTHS_IN_FORMAT.test(format) ? 'format' : 'standalone'][m.month()];
+}
+
+function handleStrictParse(monthName, format, strict) {
+    var i, ii, mom, llc = monthName.toLocaleLowerCase();
+    if (!this._monthsParse) {
+        // this is not used
+        this._monthsParse = [];
+        this._longMonthsParse = [];
+        this._shortMonthsParse = [];
+        for (i = 0; i < 12; ++i) {
+            mom = createUTC([2000, i]);
+            this._shortMonthsParse[i] = this.monthsShort(mom, '').toLocaleLowerCase();
+            this._longMonthsParse[i] = this.months(mom, '').toLocaleLowerCase();
+        }
+    }
+
+    if (strict) {
+        if (format === 'MMM') {
+            ii = indexOf$1.call(this._shortMonthsParse, llc);
+            return ii !== -1 ? ii : null;
+        } else {
+            ii = indexOf$1.call(this._longMonthsParse, llc);
+            return ii !== -1 ? ii : null;
+        }
+    } else {
+        if (format === 'MMM') {
+            ii = indexOf$1.call(this._shortMonthsParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$1.call(this._longMonthsParse, llc);
+            return ii !== -1 ? ii : null;
+        } else {
+            ii = indexOf$1.call(this._longMonthsParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$1.call(this._shortMonthsParse, llc);
+            return ii !== -1 ? ii : null;
+        }
+    }
+}
+
+function localeMonthsParse (monthName, format, strict) {
+    var i, mom, regex;
+
+    if (this._monthsParseExact) {
+        return handleStrictParse.call(this, monthName, format, strict);
+    }
+
+    if (!this._monthsParse) {
+        this._monthsParse = [];
+        this._longMonthsParse = [];
+        this._shortMonthsParse = [];
+    }
+
+    // TODO: add sorting
+    // Sorting makes sure if one month (or abbr) is a prefix of another
+    // see sorting in computeMonthsParse
+    for (i = 0; i < 12; i++) {
+        // make the regex if we don't have it already
+        mom = createUTC([2000, i]);
+        if (strict && !this._longMonthsParse[i]) {
+            this._longMonthsParse[i] = new RegExp('^' + this.months(mom, '').replace('.', '') + '$', 'i');
+            this._shortMonthsParse[i] = new RegExp('^' + this.monthsShort(mom, '').replace('.', '') + '$', 'i');
+        }
+        if (!strict && !this._monthsParse[i]) {
+            regex = '^' + this.months(mom, '') + '|^' + this.monthsShort(mom, '');
+            this._monthsParse[i] = new RegExp(regex.replace('.', ''), 'i');
+        }
+        // test the regex
+        if (strict && format === 'MMMM' && this._longMonthsParse[i].test(monthName)) {
+            return i;
+        } else if (strict && format === 'MMM' && this._shortMonthsParse[i].test(monthName)) {
+            return i;
+        } else if (!strict && this._monthsParse[i].test(monthName)) {
+            return i;
+        }
+    }
+}
+
+// MOMENTS
+
+function setMonth (mom, value) {
+    var dayOfMonth;
+
+    if (!mom.isValid()) {
+        // No op
+        return mom;
+    }
+
+    if (typeof value === 'string') {
+        if (/^\d+$/.test(value)) {
+            value = toInt(value);
+        } else {
+            value = mom.localeData().monthsParse(value);
+            // TODO: Another silent failure?
+            if (!isNumber(value)) {
+                return mom;
+            }
+        }
+    }
+
+    dayOfMonth = Math.min(mom.date(), daysInMonth(mom.year(), value));
+    mom._d['set' + (mom._isUTC ? 'UTC' : '') + 'Month'](value, dayOfMonth);
+    return mom;
+}
+
+function getSetMonth (value) {
+    if (value != null) {
+        setMonth(this, value);
+        hooks.updateOffset(this, true);
+        return this;
+    } else {
+        return get(this, 'Month');
+    }
+}
+
+function getDaysInMonth () {
+    return daysInMonth(this.year(), this.month());
+}
+
+var defaultMonthsShortRegex = matchWord;
+function monthsShortRegex (isStrict) {
+    if (this._monthsParseExact) {
+        if (!hasOwnProp(this, '_monthsRegex')) {
+            computeMonthsParse.call(this);
+        }
+        if (isStrict) {
+            return this._monthsShortStrictRegex;
+        } else {
+            return this._monthsShortRegex;
+        }
+    } else {
+        if (!hasOwnProp(this, '_monthsShortRegex')) {
+            this._monthsShortRegex = defaultMonthsShortRegex;
+        }
+        return this._monthsShortStrictRegex && isStrict ?
+            this._monthsShortStrictRegex : this._monthsShortRegex;
+    }
+}
+
+var defaultMonthsRegex = matchWord;
+function monthsRegex (isStrict) {
+    if (this._monthsParseExact) {
+        if (!hasOwnProp(this, '_monthsRegex')) {
+            computeMonthsParse.call(this);
+        }
+        if (isStrict) {
+            return this._monthsStrictRegex;
+        } else {
+            return this._monthsRegex;
+        }
+    } else {
+        if (!hasOwnProp(this, '_monthsRegex')) {
+            this._monthsRegex = defaultMonthsRegex;
+        }
+        return this._monthsStrictRegex && isStrict ?
+            this._monthsStrictRegex : this._monthsRegex;
+    }
+}
+
+function computeMonthsParse () {
+    function cmpLenRev(a, b) {
+        return b.length - a.length;
+    }
+
+    var shortPieces = [], longPieces = [], mixedPieces = [],
+        i, mom;
+    for (i = 0; i < 12; i++) {
+        // make the regex if we don't have it already
+        mom = createUTC([2000, i]);
+        shortPieces.push(this.monthsShort(mom, ''));
+        longPieces.push(this.months(mom, ''));
+        mixedPieces.push(this.months(mom, ''));
+        mixedPieces.push(this.monthsShort(mom, ''));
+    }
+    // Sorting makes sure if one month (or abbr) is a prefix of another it
+    // will match the longer piece.
+    shortPieces.sort(cmpLenRev);
+    longPieces.sort(cmpLenRev);
+    mixedPieces.sort(cmpLenRev);
+    for (i = 0; i < 12; i++) {
+        shortPieces[i] = regexEscape(shortPieces[i]);
+        longPieces[i] = regexEscape(longPieces[i]);
+    }
+    for (i = 0; i < 24; i++) {
+        mixedPieces[i] = regexEscape(mixedPieces[i]);
+    }
+
+    this._monthsRegex = new RegExp('^(' + mixedPieces.join('|') + ')', 'i');
+    this._monthsShortRegex = this._monthsRegex;
+    this._monthsStrictRegex = new RegExp('^(' + longPieces.join('|') + ')', 'i');
+    this._monthsShortStrictRegex = new RegExp('^(' + shortPieces.join('|') + ')', 'i');
+}
+
+// FORMATTING
+
+addFormatToken('Y', 0, 0, function () {
+    var y = this.year();
+    return y <= 9999 ? '' + y : '+' + y;
+});
+
+addFormatToken(0, ['YY', 2], 0, function () {
+    return this.year() % 100;
+});
+
+addFormatToken(0, ['YYYY',   4],       0, 'year');
+addFormatToken(0, ['YYYYY',  5],       0, 'year');
+addFormatToken(0, ['YYYYYY', 6, true], 0, 'year');
+
+// ALIASES
+
+addUnitAlias('year', 'y');
+
+// PRIORITIES
+
+addUnitPriority('year', 1);
+
+// PARSING
+
+addRegexToken('Y',      matchSigned);
+addRegexToken('YY',     match1to2, match2);
+addRegexToken('YYYY',   match1to4, match4);
+addRegexToken('YYYYY',  match1to6, match6);
+addRegexToken('YYYYYY', match1to6, match6);
+
+addParseToken(['YYYYY', 'YYYYYY'], YEAR);
+addParseToken('YYYY', function (input, array) {
+    array[YEAR] = input.length === 2 ? hooks.parseTwoDigitYear(input) : toInt(input);
+});
+addParseToken('YY', function (input, array) {
+    array[YEAR] = hooks.parseTwoDigitYear(input);
+});
+addParseToken('Y', function (input, array) {
+    array[YEAR] = parseInt(input, 10);
+});
+
+// HELPERS
+
+function daysInYear(year) {
+    return isLeapYear(year) ? 366 : 365;
+}
+
+function isLeapYear(year) {
+    return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+}
+
+// HOOKS
+
+hooks.parseTwoDigitYear = function (input) {
+    return toInt(input) + (toInt(input) > 68 ? 1900 : 2000);
+};
+
+// MOMENTS
+
+var getSetYear = makeGetSet('FullYear', true);
+
+function getIsLeapYear () {
+    return isLeapYear(this.year());
+}
+
+function createDate (y, m, d, h, M, s, ms) {
+    //can't just apply() to create a date:
+    //http://stackoverflow.com/questions/181348/instantiating-a-javascript-object-by-calling-prototype-constructor-apply
+    var date = new Date(y, m, d, h, M, s, ms);
+
+    //the date constructor remaps years 0-99 to 1900-1999
+    if (y < 100 && y >= 0 && isFinite(date.getFullYear())) {
+        date.setFullYear(y);
+    }
+    return date;
+}
+
+function createUTCDate (y) {
+    var date = new Date(Date.UTC.apply(null, arguments));
+
+    //the Date.UTC function remaps years 0-99 to 1900-1999
+    if (y < 100 && y >= 0 && isFinite(date.getUTCFullYear())) {
+        date.setUTCFullYear(y);
+    }
+    return date;
+}
+
+// start-of-first-week - start-of-year
+function firstWeekOffset(year, dow, doy) {
+    var // first-week day -- which january is always in the first week (4 for iso, 1 for other)
+        fwd = 7 + dow - doy,
+        // first-week day local weekday -- which local weekday is fwd
+        fwdlw = (7 + createUTCDate(year, 0, fwd).getUTCDay() - dow) % 7;
+
+    return -fwdlw + fwd - 1;
+}
+
+//http://en.wikipedia.org/wiki/ISO_week_date#Calculating_a_date_given_the_year.2C_week_number_and_weekday
+function dayOfYearFromWeeks(year, week, weekday, dow, doy) {
+    var localWeekday = (7 + weekday - dow) % 7,
+        weekOffset = firstWeekOffset(year, dow, doy),
+        dayOfYear = 1 + 7 * (week - 1) + localWeekday + weekOffset,
+        resYear, resDayOfYear;
+
+    if (dayOfYear <= 0) {
+        resYear = year - 1;
+        resDayOfYear = daysInYear(resYear) + dayOfYear;
+    } else if (dayOfYear > daysInYear(year)) {
+        resYear = year + 1;
+        resDayOfYear = dayOfYear - daysInYear(year);
+    } else {
+        resYear = year;
+        resDayOfYear = dayOfYear;
+    }
+
+    return {
+        year: resYear,
+        dayOfYear: resDayOfYear
+    };
+}
+
+function weekOfYear(mom, dow, doy) {
+    var weekOffset = firstWeekOffset(mom.year(), dow, doy),
+        week = Math.floor((mom.dayOfYear() - weekOffset - 1) / 7) + 1,
+        resWeek, resYear;
+
+    if (week < 1) {
+        resYear = mom.year() - 1;
+        resWeek = week + weeksInYear(resYear, dow, doy);
+    } else if (week > weeksInYear(mom.year(), dow, doy)) {
+        resWeek = week - weeksInYear(mom.year(), dow, doy);
+        resYear = mom.year() + 1;
+    } else {
+        resYear = mom.year();
+        resWeek = week;
+    }
+
+    return {
+        week: resWeek,
+        year: resYear
+    };
+}
+
+function weeksInYear(year, dow, doy) {
+    var weekOffset = firstWeekOffset(year, dow, doy),
+        weekOffsetNext = firstWeekOffset(year + 1, dow, doy);
+    return (daysInYear(year) - weekOffset + weekOffsetNext) / 7;
+}
+
+// FORMATTING
+
+addFormatToken('w', ['ww', 2], 'wo', 'week');
+addFormatToken('W', ['WW', 2], 'Wo', 'isoWeek');
+
+// ALIASES
+
+addUnitAlias('week', 'w');
+addUnitAlias('isoWeek', 'W');
+
+// PRIORITIES
+
+addUnitPriority('week', 5);
+addUnitPriority('isoWeek', 5);
+
+// PARSING
+
+addRegexToken('w',  match1to2);
+addRegexToken('ww', match1to2, match2);
+addRegexToken('W',  match1to2);
+addRegexToken('WW', match1to2, match2);
+
+addWeekParseToken(['w', 'ww', 'W', 'WW'], function (input, week, config, token) {
+    week[token.substr(0, 1)] = toInt(input);
+});
+
+// HELPERS
+
+// LOCALES
+
+function localeWeek (mom) {
+    return weekOfYear(mom, this._week.dow, this._week.doy).week;
+}
+
+var defaultLocaleWeek = {
+    dow : 0, // Sunday is the first day of the week.
+    doy : 6  // The week that contains Jan 1st is the first week of the year.
+};
+
+function localeFirstDayOfWeek () {
+    return this._week.dow;
+}
+
+function localeFirstDayOfYear () {
+    return this._week.doy;
+}
+
+// MOMENTS
+
+function getSetWeek (input) {
+    var week = this.localeData().week(this);
+    return input == null ? week : this.add((input - week) * 7, 'd');
+}
+
+function getSetISOWeek (input) {
+    var week = weekOfYear(this, 1, 4).week;
+    return input == null ? week : this.add((input - week) * 7, 'd');
+}
+
+// FORMATTING
+
+addFormatToken('d', 0, 'do', 'day');
+
+addFormatToken('dd', 0, 0, function (format) {
+    return this.localeData().weekdaysMin(this, format);
+});
+
+addFormatToken('ddd', 0, 0, function (format) {
+    return this.localeData().weekdaysShort(this, format);
+});
+
+addFormatToken('dddd', 0, 0, function (format) {
+    return this.localeData().weekdays(this, format);
+});
+
+addFormatToken('e', 0, 0, 'weekday');
+addFormatToken('E', 0, 0, 'isoWeekday');
+
+// ALIASES
+
+addUnitAlias('day', 'd');
+addUnitAlias('weekday', 'e');
+addUnitAlias('isoWeekday', 'E');
+
+// PRIORITY
+addUnitPriority('day', 11);
+addUnitPriority('weekday', 11);
+addUnitPriority('isoWeekday', 11);
+
+// PARSING
+
+addRegexToken('d',    match1to2);
+addRegexToken('e',    match1to2);
+addRegexToken('E',    match1to2);
+addRegexToken('dd',   function (isStrict, locale) {
+    return locale.weekdaysMinRegex(isStrict);
+});
+addRegexToken('ddd',   function (isStrict, locale) {
+    return locale.weekdaysShortRegex(isStrict);
+});
+addRegexToken('dddd',   function (isStrict, locale) {
+    return locale.weekdaysRegex(isStrict);
+});
+
+addWeekParseToken(['dd', 'ddd', 'dddd'], function (input, week, config, token) {
+    var weekday = config._locale.weekdaysParse(input, token, config._strict);
+    // if we didn't get a weekday name, mark the date as invalid
+    if (weekday != null) {
+        week.d = weekday;
+    } else {
+        getParsingFlags(config).invalidWeekday = input;
+    }
+});
+
+addWeekParseToken(['d', 'e', 'E'], function (input, week, config, token) {
+    week[token] = toInt(input);
+});
+
+// HELPERS
+
+function parseWeekday(input, locale) {
+    if (typeof input !== 'string') {
+        return input;
+    }
+
+    if (!isNaN(input)) {
+        return parseInt(input, 10);
+    }
+
+    input = locale.weekdaysParse(input);
+    if (typeof input === 'number') {
+        return input;
+    }
+
+    return null;
+}
+
+function parseIsoWeekday(input, locale) {
+    if (typeof input === 'string') {
+        return locale.weekdaysParse(input) % 7 || 7;
+    }
+    return isNaN(input) ? null : input;
+}
+
+// LOCALES
+
+var defaultLocaleWeekdays = 'Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday'.split('_');
+function localeWeekdays (m, format) {
+    if (!m) {
+        return this._weekdays;
+    }
+    return isArray(this._weekdays) ? this._weekdays[m.day()] :
+        this._weekdays[this._weekdays.isFormat.test(format) ? 'format' : 'standalone'][m.day()];
+}
+
+var defaultLocaleWeekdaysShort = 'Sun_Mon_Tue_Wed_Thu_Fri_Sat'.split('_');
+function localeWeekdaysShort (m) {
+    return (m) ? this._weekdaysShort[m.day()] : this._weekdaysShort;
+}
+
+var defaultLocaleWeekdaysMin = 'Su_Mo_Tu_We_Th_Fr_Sa'.split('_');
+function localeWeekdaysMin (m) {
+    return (m) ? this._weekdaysMin[m.day()] : this._weekdaysMin;
+}
+
+function handleStrictParse$1(weekdayName, format, strict) {
+    var i, ii, mom, llc = weekdayName.toLocaleLowerCase();
+    if (!this._weekdaysParse) {
+        this._weekdaysParse = [];
+        this._shortWeekdaysParse = [];
+        this._minWeekdaysParse = [];
+
+        for (i = 0; i < 7; ++i) {
+            mom = createUTC([2000, 1]).day(i);
+            this._minWeekdaysParse[i] = this.weekdaysMin(mom, '').toLocaleLowerCase();
+            this._shortWeekdaysParse[i] = this.weekdaysShort(mom, '').toLocaleLowerCase();
+            this._weekdaysParse[i] = this.weekdays(mom, '').toLocaleLowerCase();
+        }
+    }
+
+    if (strict) {
+        if (format === 'dddd') {
+            ii = indexOf$1.call(this._weekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+        } else if (format === 'ddd') {
+            ii = indexOf$1.call(this._shortWeekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+        } else {
+            ii = indexOf$1.call(this._minWeekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+        }
+    } else {
+        if (format === 'dddd') {
+            ii = indexOf$1.call(this._weekdaysParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$1.call(this._shortWeekdaysParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$1.call(this._minWeekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+        } else if (format === 'ddd') {
+            ii = indexOf$1.call(this._shortWeekdaysParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$1.call(this._weekdaysParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$1.call(this._minWeekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+        } else {
+            ii = indexOf$1.call(this._minWeekdaysParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$1.call(this._weekdaysParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$1.call(this._shortWeekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+        }
+    }
+}
+
+function localeWeekdaysParse (weekdayName, format, strict) {
+    var i, mom, regex;
+
+    if (this._weekdaysParseExact) {
+        return handleStrictParse$1.call(this, weekdayName, format, strict);
+    }
+
+    if (!this._weekdaysParse) {
+        this._weekdaysParse = [];
+        this._minWeekdaysParse = [];
+        this._shortWeekdaysParse = [];
+        this._fullWeekdaysParse = [];
+    }
+
+    for (i = 0; i < 7; i++) {
+        // make the regex if we don't have it already
+
+        mom = createUTC([2000, 1]).day(i);
+        if (strict && !this._fullWeekdaysParse[i]) {
+            this._fullWeekdaysParse[i] = new RegExp('^' + this.weekdays(mom, '').replace('.', '\.?') + '$', 'i');
+            this._shortWeekdaysParse[i] = new RegExp('^' + this.weekdaysShort(mom, '').replace('.', '\.?') + '$', 'i');
+            this._minWeekdaysParse[i] = new RegExp('^' + this.weekdaysMin(mom, '').replace('.', '\.?') + '$', 'i');
+        }
+        if (!this._weekdaysParse[i]) {
+            regex = '^' + this.weekdays(mom, '') + '|^' + this.weekdaysShort(mom, '') + '|^' + this.weekdaysMin(mom, '');
+            this._weekdaysParse[i] = new RegExp(regex.replace('.', ''), 'i');
+        }
+        // test the regex
+        if (strict && format === 'dddd' && this._fullWeekdaysParse[i].test(weekdayName)) {
+            return i;
+        } else if (strict && format === 'ddd' && this._shortWeekdaysParse[i].test(weekdayName)) {
+            return i;
+        } else if (strict && format === 'dd' && this._minWeekdaysParse[i].test(weekdayName)) {
+            return i;
+        } else if (!strict && this._weekdaysParse[i].test(weekdayName)) {
+            return i;
+        }
+    }
+}
+
+// MOMENTS
+
+function getSetDayOfWeek (input) {
+    if (!this.isValid()) {
+        return input != null ? this : NaN;
+    }
+    var day = this._isUTC ? this._d.getUTCDay() : this._d.getDay();
+    if (input != null) {
+        input = parseWeekday(input, this.localeData());
+        return this.add(input - day, 'd');
+    } else {
+        return day;
+    }
+}
+
+function getSetLocaleDayOfWeek (input) {
+    if (!this.isValid()) {
+        return input != null ? this : NaN;
+    }
+    var weekday = (this.day() + 7 - this.localeData()._week.dow) % 7;
+    return input == null ? weekday : this.add(input - weekday, 'd');
+}
+
+function getSetISODayOfWeek (input) {
+    if (!this.isValid()) {
+        return input != null ? this : NaN;
+    }
+
+    // behaves the same as moment#day except
+    // as a getter, returns 7 instead of 0 (1-7 range instead of 0-6)
+    // as a setter, sunday should belong to the previous week.
+
+    if (input != null) {
+        var weekday = parseIsoWeekday(input, this.localeData());
+        return this.day(this.day() % 7 ? weekday : weekday - 7);
+    } else {
+        return this.day() || 7;
+    }
+}
+
+var defaultWeekdaysRegex = matchWord;
+function weekdaysRegex (isStrict) {
+    if (this._weekdaysParseExact) {
+        if (!hasOwnProp(this, '_weekdaysRegex')) {
+            computeWeekdaysParse.call(this);
+        }
+        if (isStrict) {
+            return this._weekdaysStrictRegex;
+        } else {
+            return this._weekdaysRegex;
+        }
+    } else {
+        if (!hasOwnProp(this, '_weekdaysRegex')) {
+            this._weekdaysRegex = defaultWeekdaysRegex;
+        }
+        return this._weekdaysStrictRegex && isStrict ?
+            this._weekdaysStrictRegex : this._weekdaysRegex;
+    }
+}
+
+var defaultWeekdaysShortRegex = matchWord;
+function weekdaysShortRegex (isStrict) {
+    if (this._weekdaysParseExact) {
+        if (!hasOwnProp(this, '_weekdaysRegex')) {
+            computeWeekdaysParse.call(this);
+        }
+        if (isStrict) {
+            return this._weekdaysShortStrictRegex;
+        } else {
+            return this._weekdaysShortRegex;
+        }
+    } else {
+        if (!hasOwnProp(this, '_weekdaysShortRegex')) {
+            this._weekdaysShortRegex = defaultWeekdaysShortRegex;
+        }
+        return this._weekdaysShortStrictRegex && isStrict ?
+            this._weekdaysShortStrictRegex : this._weekdaysShortRegex;
+    }
+}
+
+var defaultWeekdaysMinRegex = matchWord;
+function weekdaysMinRegex (isStrict) {
+    if (this._weekdaysParseExact) {
+        if (!hasOwnProp(this, '_weekdaysRegex')) {
+            computeWeekdaysParse.call(this);
+        }
+        if (isStrict) {
+            return this._weekdaysMinStrictRegex;
+        } else {
+            return this._weekdaysMinRegex;
+        }
+    } else {
+        if (!hasOwnProp(this, '_weekdaysMinRegex')) {
+            this._weekdaysMinRegex = defaultWeekdaysMinRegex;
+        }
+        return this._weekdaysMinStrictRegex && isStrict ?
+            this._weekdaysMinStrictRegex : this._weekdaysMinRegex;
+    }
+}
+
+
+function computeWeekdaysParse () {
+    function cmpLenRev(a, b) {
+        return b.length - a.length;
+    }
+
+    var minPieces = [], shortPieces = [], longPieces = [], mixedPieces = [],
+        i, mom, minp, shortp, longp;
+    for (i = 0; i < 7; i++) {
+        // make the regex if we don't have it already
+        mom = createUTC([2000, 1]).day(i);
+        minp = this.weekdaysMin(mom, '');
+        shortp = this.weekdaysShort(mom, '');
+        longp = this.weekdays(mom, '');
+        minPieces.push(minp);
+        shortPieces.push(shortp);
+        longPieces.push(longp);
+        mixedPieces.push(minp);
+        mixedPieces.push(shortp);
+        mixedPieces.push(longp);
+    }
+    // Sorting makes sure if one weekday (or abbr) is a prefix of another it
+    // will match the longer piece.
+    minPieces.sort(cmpLenRev);
+    shortPieces.sort(cmpLenRev);
+    longPieces.sort(cmpLenRev);
+    mixedPieces.sort(cmpLenRev);
+    for (i = 0; i < 7; i++) {
+        shortPieces[i] = regexEscape(shortPieces[i]);
+        longPieces[i] = regexEscape(longPieces[i]);
+        mixedPieces[i] = regexEscape(mixedPieces[i]);
+    }
+
+    this._weekdaysRegex = new RegExp('^(' + mixedPieces.join('|') + ')', 'i');
+    this._weekdaysShortRegex = this._weekdaysRegex;
+    this._weekdaysMinRegex = this._weekdaysRegex;
+
+    this._weekdaysStrictRegex = new RegExp('^(' + longPieces.join('|') + ')', 'i');
+    this._weekdaysShortStrictRegex = new RegExp('^(' + shortPieces.join('|') + ')', 'i');
+    this._weekdaysMinStrictRegex = new RegExp('^(' + minPieces.join('|') + ')', 'i');
+}
+
+// FORMATTING
+
+function hFormat() {
+    return this.hours() % 12 || 12;
+}
+
+function kFormat() {
+    return this.hours() || 24;
+}
+
+addFormatToken('H', ['HH', 2], 0, 'hour');
+addFormatToken('h', ['hh', 2], 0, hFormat);
+addFormatToken('k', ['kk', 2], 0, kFormat);
+
+addFormatToken('hmm', 0, 0, function () {
+    return '' + hFormat.apply(this) + zeroFill(this.minutes(), 2);
+});
+
+addFormatToken('hmmss', 0, 0, function () {
+    return '' + hFormat.apply(this) + zeroFill(this.minutes(), 2) +
+        zeroFill(this.seconds(), 2);
+});
+
+addFormatToken('Hmm', 0, 0, function () {
+    return '' + this.hours() + zeroFill(this.minutes(), 2);
+});
+
+addFormatToken('Hmmss', 0, 0, function () {
+    return '' + this.hours() + zeroFill(this.minutes(), 2) +
+        zeroFill(this.seconds(), 2);
+});
+
+function meridiem (token, lowercase) {
+    addFormatToken(token, 0, 0, function () {
+        return this.localeData().meridiem(this.hours(), this.minutes(), lowercase);
+    });
+}
+
+meridiem('a', true);
+meridiem('A', false);
+
+// ALIASES
+
+addUnitAlias('hour', 'h');
+
+// PRIORITY
+addUnitPriority('hour', 13);
+
+// PARSING
+
+function matchMeridiem (isStrict, locale) {
+    return locale._meridiemParse;
+}
+
+addRegexToken('a',  matchMeridiem);
+addRegexToken('A',  matchMeridiem);
+addRegexToken('H',  match1to2);
+addRegexToken('h',  match1to2);
+addRegexToken('HH', match1to2, match2);
+addRegexToken('hh', match1to2, match2);
+
+addRegexToken('hmm', match3to4);
+addRegexToken('hmmss', match5to6);
+addRegexToken('Hmm', match3to4);
+addRegexToken('Hmmss', match5to6);
+
+addParseToken(['H', 'HH'], HOUR);
+addParseToken(['a', 'A'], function (input, array, config) {
+    config._isPm = config._locale.isPM(input);
+    config._meridiem = input;
+});
+addParseToken(['h', 'hh'], function (input, array, config) {
+    array[HOUR] = toInt(input);
+    getParsingFlags(config).bigHour = true;
+});
+addParseToken('hmm', function (input, array, config) {
+    var pos = input.length - 2;
+    array[HOUR] = toInt(input.substr(0, pos));
+    array[MINUTE] = toInt(input.substr(pos));
+    getParsingFlags(config).bigHour = true;
+});
+addParseToken('hmmss', function (input, array, config) {
+    var pos1 = input.length - 4;
+    var pos2 = input.length - 2;
+    array[HOUR] = toInt(input.substr(0, pos1));
+    array[MINUTE] = toInt(input.substr(pos1, 2));
+    array[SECOND] = toInt(input.substr(pos2));
+    getParsingFlags(config).bigHour = true;
+});
+addParseToken('Hmm', function (input, array, config) {
+    var pos = input.length - 2;
+    array[HOUR] = toInt(input.substr(0, pos));
+    array[MINUTE] = toInt(input.substr(pos));
+});
+addParseToken('Hmmss', function (input, array, config) {
+    var pos1 = input.length - 4;
+    var pos2 = input.length - 2;
+    array[HOUR] = toInt(input.substr(0, pos1));
+    array[MINUTE] = toInt(input.substr(pos1, 2));
+    array[SECOND] = toInt(input.substr(pos2));
+});
+
+// LOCALES
+
+function localeIsPM (input) {
+    // IE8 Quirks Mode & IE7 Standards Mode do not allow accessing strings like arrays
+    // Using charAt should be more compatible.
+    return ((input + '').toLowerCase().charAt(0) === 'p');
+}
+
+var defaultLocaleMeridiemParse = /[ap]\.?m?\.?/i;
+function localeMeridiem (hours, minutes, isLower) {
+    if (hours > 11) {
+        return isLower ? 'pm' : 'PM';
+    } else {
+        return isLower ? 'am' : 'AM';
+    }
+}
+
+
+// MOMENTS
+
+// Setting the hour should keep the time, because the user explicitly
+// specified which hour he wants. So trying to maintain the same hour (in
+// a new timezone) makes sense. Adding/subtracting hours does not follow
+// this rule.
+var getSetHour = makeGetSet('Hours', true);
+
+// months
+// week
+// weekdays
+// meridiem
+var baseConfig = {
+    calendar: defaultCalendar,
+    longDateFormat: defaultLongDateFormat,
+    invalidDate: defaultInvalidDate,
+    ordinal: defaultOrdinal,
+    ordinalParse: defaultOrdinalParse,
+    relativeTime: defaultRelativeTime,
+
+    months: defaultLocaleMonths,
+    monthsShort: defaultLocaleMonthsShort,
+
+    week: defaultLocaleWeek,
+
+    weekdays: defaultLocaleWeekdays,
+    weekdaysMin: defaultLocaleWeekdaysMin,
+    weekdaysShort: defaultLocaleWeekdaysShort,
+
+    meridiemParse: defaultLocaleMeridiemParse
+};
+
+// internal storage for locale config files
+var locales = {};
+var localeFamilies = {};
+var globalLocale;
+
+function normalizeLocale(key) {
+    return key ? key.toLowerCase().replace('_', '-') : key;
+}
+
+// pick the locale from the array
+// try ['en-au', 'en-gb'] as 'en-au', 'en-gb', 'en', as in move through the list trying each
+// substring from most specific to least, but move to the next array item if it's a more specific variant than the current root
+function chooseLocale(names) {
+    var i = 0, j, next, locale, split;
+
+    while (i < names.length) {
+        split = normalizeLocale(names[i]).split('-');
+        j = split.length;
+        next = normalizeLocale(names[i + 1]);
+        next = next ? next.split('-') : null;
+        while (j > 0) {
+            locale = loadLocale(split.slice(0, j).join('-'));
+            if (locale) {
+                return locale;
+            }
+            if (next && next.length >= j && compareArrays(split, next, true) >= j - 1) {
+                //the next array item is better than a shallower substring of this one
+                break;
+            }
+            j--;
+        }
+        i++;
+    }
+    return null;
+}
+
+function loadLocale(name) {
+    var oldLocale = null;
+    // TODO: Find a better way to register and load all the locales in Node
+    if (!locales[name] && (typeof module !== 'undefined') &&
+            module && module.exports) {
+        try {
+            oldLocale = globalLocale._abbr;
+            require('./locale/' + name);
+            // because defineLocale currently also sets the global locale, we
+            // want to undo that for lazy loaded locales
+            getSetGlobalLocale(oldLocale);
+        } catch (e) { }
+    }
+    return locales[name];
+}
+
+// This function will load locale and then set the global locale.  If
+// no arguments are passed in, it will simply return the current global
+// locale key.
+function getSetGlobalLocale (key, values) {
+    var data;
+    if (key) {
+        if (isUndefined(values)) {
+            data = getLocale(key);
+        }
+        else {
+            data = defineLocale(key, values);
+        }
+
+        if (data) {
+            // moment.duration._locale = moment._locale = data;
+            globalLocale = data;
+        }
+    }
+
+    return globalLocale._abbr;
+}
+
+function defineLocale (name, config) {
+    if (config !== null) {
+        var parentConfig = baseConfig;
+        config.abbr = name;
+        if (locales[name] != null) {
+            deprecateSimple('defineLocaleOverride',
+                    'use moment.updateLocale(localeName, config) to change ' +
+                    'an existing locale. moment.defineLocale(localeName, ' +
+                    'config) should only be used for creating a new locale ' +
+                    'See http://momentjs.com/guides/#/warnings/define-locale/ for more info.');
+            parentConfig = locales[name]._config;
+        } else if (config.parentLocale != null) {
+            if (locales[config.parentLocale] != null) {
+                parentConfig = locales[config.parentLocale]._config;
+            } else {
+                if (!localeFamilies[config.parentLocale]) {
+                    localeFamilies[config.parentLocale] = [];
+                }
+                localeFamilies[config.parentLocale].push({
+                    name: name,
+                    config: config
+                });
+                return null;
+            }
+        }
+        locales[name] = new Locale(mergeConfigs(parentConfig, config));
+
+        if (localeFamilies[name]) {
+            localeFamilies[name].forEach(function (x) {
+                defineLocale(x.name, x.config);
+            });
+        }
+
+        // backwards compat for now: also set the locale
+        // make sure we set the locale AFTER all child locales have been
+        // created, so we won't end up with the child locale set.
+        getSetGlobalLocale(name);
+
+
+        return locales[name];
+    } else {
+        // useful for testing
+        delete locales[name];
+        return null;
+    }
+}
+
+function updateLocale(name, config) {
+    if (config != null) {
+        var locale, parentConfig = baseConfig;
+        // MERGE
+        if (locales[name] != null) {
+            parentConfig = locales[name]._config;
+        }
+        config = mergeConfigs(parentConfig, config);
+        locale = new Locale(config);
+        locale.parentLocale = locales[name];
+        locales[name] = locale;
+
+        // backwards compat for now: also set the locale
+        getSetGlobalLocale(name);
+    } else {
+        // pass null for config to unupdate, useful for tests
+        if (locales[name] != null) {
+            if (locales[name].parentLocale != null) {
+                locales[name] = locales[name].parentLocale;
+            } else if (locales[name] != null) {
+                delete locales[name];
+            }
+        }
+    }
+    return locales[name];
+}
+
+// returns locale data
+function getLocale (key) {
+    var locale;
+
+    if (key && key._locale && key._locale._abbr) {
+        key = key._locale._abbr;
+    }
+
+    if (!key) {
+        return globalLocale;
+    }
+
+    if (!isArray(key)) {
+        //short-circuit everything else
+        locale = loadLocale(key);
+        if (locale) {
+            return locale;
+        }
+        key = [key];
+    }
+
+    return chooseLocale(key);
+}
+
+function listLocales() {
+    return keys$1(locales);
+}
+
+function checkOverflow (m) {
+    var overflow;
+    var a = m._a;
+
+    if (a && getParsingFlags(m).overflow === -2) {
+        overflow =
+            a[MONTH]       < 0 || a[MONTH]       > 11  ? MONTH :
+            a[DATE]        < 1 || a[DATE]        > daysInMonth(a[YEAR], a[MONTH]) ? DATE :
+            a[HOUR]        < 0 || a[HOUR]        > 24 || (a[HOUR] === 24 && (a[MINUTE] !== 0 || a[SECOND] !== 0 || a[MILLISECOND] !== 0)) ? HOUR :
+            a[MINUTE]      < 0 || a[MINUTE]      > 59  ? MINUTE :
+            a[SECOND]      < 0 || a[SECOND]      > 59  ? SECOND :
+            a[MILLISECOND] < 0 || a[MILLISECOND] > 999 ? MILLISECOND :
+            -1;
+
+        if (getParsingFlags(m)._overflowDayOfYear && (overflow < YEAR || overflow > DATE)) {
+            overflow = DATE;
+        }
+        if (getParsingFlags(m)._overflowWeeks && overflow === -1) {
+            overflow = WEEK;
+        }
+        if (getParsingFlags(m)._overflowWeekday && overflow === -1) {
+            overflow = WEEKDAY;
+        }
+
+        getParsingFlags(m).overflow = overflow;
+    }
+
+    return m;
+}
+
+// iso 8601 regex
+// 0000-00-00 0000-W00 or 0000-W00-0 + T + 00 or 00:00 or 00:00:00 or 00:00:00.000 + +00:00 or +0000 or +00)
+var extendedIsoRegex = /^\s*((?:[+-]\d{6}|\d{4})-(?:\d\d-\d\d|W\d\d-\d|W\d\d|\d\d\d|\d\d))(?:(T| )(\d\d(?::\d\d(?::\d\d(?:[.,]\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
+var basicIsoRegex = /^\s*((?:[+-]\d{6}|\d{4})(?:\d\d\d\d|W\d\d\d|W\d\d|\d\d\d|\d\d))(?:(T| )(\d\d(?:\d\d(?:\d\d(?:[.,]\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
+
+var tzRegex = /Z|[+-]\d\d(?::?\d\d)?/;
+
+var isoDates = [
+    ['YYYYYY-MM-DD', /[+-]\d{6}-\d\d-\d\d/],
+    ['YYYY-MM-DD', /\d{4}-\d\d-\d\d/],
+    ['GGGG-[W]WW-E', /\d{4}-W\d\d-\d/],
+    ['GGGG-[W]WW', /\d{4}-W\d\d/, false],
+    ['YYYY-DDD', /\d{4}-\d{3}/],
+    ['YYYY-MM', /\d{4}-\d\d/, false],
+    ['YYYYYYMMDD', /[+-]\d{10}/],
+    ['YYYYMMDD', /\d{8}/],
+    // YYYYMM is NOT allowed by the standard
+    ['GGGG[W]WWE', /\d{4}W\d{3}/],
+    ['GGGG[W]WW', /\d{4}W\d{2}/, false],
+    ['YYYYDDD', /\d{7}/]
+];
+
+// iso time formats and regexes
+var isoTimes = [
+    ['HH:mm:ss.SSSS', /\d\d:\d\d:\d\d\.\d+/],
+    ['HH:mm:ss,SSSS', /\d\d:\d\d:\d\d,\d+/],
+    ['HH:mm:ss', /\d\d:\d\d:\d\d/],
+    ['HH:mm', /\d\d:\d\d/],
+    ['HHmmss.SSSS', /\d\d\d\d\d\d\.\d+/],
+    ['HHmmss,SSSS', /\d\d\d\d\d\d,\d+/],
+    ['HHmmss', /\d\d\d\d\d\d/],
+    ['HHmm', /\d\d\d\d/],
+    ['HH', /\d\d/]
+];
+
+var aspNetJsonRegex = /^\/?Date\((\-?\d+)/i;
+
+// date from iso format
+function configFromISO(config) {
+    var i, l,
+        string = config._i,
+        match = extendedIsoRegex.exec(string) || basicIsoRegex.exec(string),
+        allowTime, dateFormat, timeFormat, tzFormat;
+
+    if (match) {
+        getParsingFlags(config).iso = true;
+
+        for (i = 0, l = isoDates.length; i < l; i++) {
+            if (isoDates[i][1].exec(match[1])) {
+                dateFormat = isoDates[i][0];
+                allowTime = isoDates[i][2] !== false;
+                break;
+            }
+        }
+        if (dateFormat == null) {
+            config._isValid = false;
+            return;
+        }
+        if (match[3]) {
+            for (i = 0, l = isoTimes.length; i < l; i++) {
+                if (isoTimes[i][1].exec(match[3])) {
+                    // match[2] should be 'T' or space
+                    timeFormat = (match[2] || ' ') + isoTimes[i][0];
+                    break;
+                }
+            }
+            if (timeFormat == null) {
+                config._isValid = false;
+                return;
+            }
+        }
+        if (!allowTime && timeFormat != null) {
+            config._isValid = false;
+            return;
+        }
+        if (match[4]) {
+            if (tzRegex.exec(match[4])) {
+                tzFormat = 'Z';
+            } else {
+                config._isValid = false;
+                return;
+            }
+        }
+        config._f = dateFormat + (timeFormat || '') + (tzFormat || '');
+        configFromStringAndFormat(config);
+    } else {
+        config._isValid = false;
+    }
+}
+
+// date from iso format or fallback
+function configFromString(config) {
+    var matched = aspNetJsonRegex.exec(config._i);
+
+    if (matched !== null) {
+        config._d = new Date(+matched[1]);
+        return;
+    }
+
+    configFromISO(config);
+    if (config._isValid === false) {
+        delete config._isValid;
+        hooks.createFromInputFallback(config);
+    }
+}
+
+hooks.createFromInputFallback = deprecate(
+    'value provided is not in a recognized ISO format. moment construction falls back to js Date(), ' +
+    'which is not reliable across all browsers and versions. Non ISO date formats are ' +
+    'discouraged and will be removed in an upcoming major release. Please refer to ' +
+    'http://momentjs.com/guides/#/warnings/js-date/ for more info.',
+    function (config) {
+        config._d = new Date(config._i + (config._useUTC ? ' UTC' : ''));
+    }
+);
+
+// Pick the first defined of two or three arguments.
+function defaults(a, b, c) {
+    if (a != null) {
+        return a;
+    }
+    if (b != null) {
+        return b;
+    }
+    return c;
+}
+
+function currentDateArray(config) {
+    // hooks is actually the exported moment object
+    var nowValue = new Date(hooks.now());
+    if (config._useUTC) {
+        return [nowValue.getUTCFullYear(), nowValue.getUTCMonth(), nowValue.getUTCDate()];
+    }
+    return [nowValue.getFullYear(), nowValue.getMonth(), nowValue.getDate()];
+}
+
+// convert an array to a date.
+// the array should mirror the parameters below
+// note: all values past the year are optional and will default to the lowest possible value.
+// [year, month, day , hour, minute, second, millisecond]
+function configFromArray (config) {
+    var i, date, input = [], currentDate, yearToUse;
+
+    if (config._d) {
+        return;
+    }
+
+    currentDate = currentDateArray(config);
+
+    //compute day of the year from weeks and weekdays
+    if (config._w && config._a[DATE] == null && config._a[MONTH] == null) {
+        dayOfYearFromWeekInfo(config);
+    }
+
+    //if the day of the year is set, figure out what it is
+    if (config._dayOfYear) {
+        yearToUse = defaults(config._a[YEAR], currentDate[YEAR]);
+
+        if (config._dayOfYear > daysInYear(yearToUse)) {
+            getParsingFlags(config)._overflowDayOfYear = true;
+        }
+
+        date = createUTCDate(yearToUse, 0, config._dayOfYear);
+        config._a[MONTH] = date.getUTCMonth();
+        config._a[DATE] = date.getUTCDate();
+    }
+
+    // Default to current date.
+    // * if no year, month, day of month are given, default to today
+    // * if day of month is given, default month and year
+    // * if month is given, default only year
+    // * if year is given, don't default anything
+    for (i = 0; i < 3 && config._a[i] == null; ++i) {
+        config._a[i] = input[i] = currentDate[i];
+    }
+
+    // Zero out whatever was not defaulted, including time
+    for (; i < 7; i++) {
+        config._a[i] = input[i] = (config._a[i] == null) ? (i === 2 ? 1 : 0) : config._a[i];
+    }
+
+    // Check for 24:00:00.000
+    if (config._a[HOUR] === 24 &&
+            config._a[MINUTE] === 0 &&
+            config._a[SECOND] === 0 &&
+            config._a[MILLISECOND] === 0) {
+        config._nextDay = true;
+        config._a[HOUR] = 0;
+    }
+
+    config._d = (config._useUTC ? createUTCDate : createDate).apply(null, input);
+    // Apply timezone offset from input. The actual utcOffset can be changed
+    // with parseZone.
+    if (config._tzm != null) {
+        config._d.setUTCMinutes(config._d.getUTCMinutes() - config._tzm);
+    }
+
+    if (config._nextDay) {
+        config._a[HOUR] = 24;
+    }
+}
+
+function dayOfYearFromWeekInfo(config) {
+    var w, weekYear, week, weekday, dow, doy, temp, weekdayOverflow;
+
+    w = config._w;
+    if (w.GG != null || w.W != null || w.E != null) {
+        dow = 1;
+        doy = 4;
+
+        // TODO: We need to take the current isoWeekYear, but that depends on
+        // how we interpret now (local, utc, fixed offset). So create
+        // a now version of current config (take local/utc/offset flags, and
+        // create now).
+        weekYear = defaults(w.GG, config._a[YEAR], weekOfYear(createLocal(), 1, 4).year);
+        week = defaults(w.W, 1);
+        weekday = defaults(w.E, 1);
+        if (weekday < 1 || weekday > 7) {
+            weekdayOverflow = true;
+        }
+    } else {
+        dow = config._locale._week.dow;
+        doy = config._locale._week.doy;
+
+        var curWeek = weekOfYear(createLocal(), dow, doy);
+
+        weekYear = defaults(w.gg, config._a[YEAR], curWeek.year);
+
+        // Default to current week.
+        week = defaults(w.w, curWeek.week);
+
+        if (w.d != null) {
+            // weekday -- low day numbers are considered next week
+            weekday = w.d;
+            if (weekday < 0 || weekday > 6) {
+                weekdayOverflow = true;
+            }
+        } else if (w.e != null) {
+            // local weekday -- counting starts from begining of week
+            weekday = w.e + dow;
+            if (w.e < 0 || w.e > 6) {
+                weekdayOverflow = true;
+            }
+        } else {
+            // default to begining of week
+            weekday = dow;
+        }
+    }
+    if (week < 1 || week > weeksInYear(weekYear, dow, doy)) {
+        getParsingFlags(config)._overflowWeeks = true;
+    } else if (weekdayOverflow != null) {
+        getParsingFlags(config)._overflowWeekday = true;
+    } else {
+        temp = dayOfYearFromWeeks(weekYear, week, weekday, dow, doy);
+        config._a[YEAR] = temp.year;
+        config._dayOfYear = temp.dayOfYear;
+    }
+}
+
+// constant that refers to the ISO standard
+hooks.ISO_8601 = function () {};
+
+// date from string and format string
+function configFromStringAndFormat(config) {
+    // TODO: Move this to another part of the creation flow to prevent circular deps
+    if (config._f === hooks.ISO_8601) {
+        configFromISO(config);
+        return;
+    }
+
+    config._a = [];
+    getParsingFlags(config).empty = true;
+
+    // This array is used to make a Date, either with `new Date` or `Date.UTC`
+    var string = '' + config._i,
+        i, parsedInput, tokens, token, skipped,
+        stringLength = string.length,
+        totalParsedInputLength = 0;
+
+    tokens = expandFormat(config._f, config._locale).match(formattingTokens) || [];
+
+    for (i = 0; i < tokens.length; i++) {
+        token = tokens[i];
+        parsedInput = (string.match(getParseRegexForToken(token, config)) || [])[0];
+        // console.log('token', token, 'parsedInput', parsedInput,
+        //         'regex', getParseRegexForToken(token, config));
+        if (parsedInput) {
+            skipped = string.substr(0, string.indexOf(parsedInput));
+            if (skipped.length > 0) {
+                getParsingFlags(config).unusedInput.push(skipped);
+            }
+            string = string.slice(string.indexOf(parsedInput) + parsedInput.length);
+            totalParsedInputLength += parsedInput.length;
+        }
+        // don't parse if it's not a known token
+        if (formatTokenFunctions[token]) {
+            if (parsedInput) {
+                getParsingFlags(config).empty = false;
+            }
+            else {
+                getParsingFlags(config).unusedTokens.push(token);
+            }
+            addTimeToArrayFromToken(token, parsedInput, config);
+        }
+        else if (config._strict && !parsedInput) {
+            getParsingFlags(config).unusedTokens.push(token);
+        }
+    }
+
+    // add remaining unparsed input length to the string
+    getParsingFlags(config).charsLeftOver = stringLength - totalParsedInputLength;
+    if (string.length > 0) {
+        getParsingFlags(config).unusedInput.push(string);
+    }
+
+    // clear _12h flag if hour is <= 12
+    if (config._a[HOUR] <= 12 &&
+        getParsingFlags(config).bigHour === true &&
+        config._a[HOUR] > 0) {
+        getParsingFlags(config).bigHour = undefined;
+    }
+
+    getParsingFlags(config).parsedDateParts = config._a.slice(0);
+    getParsingFlags(config).meridiem = config._meridiem;
+    // handle meridiem
+    config._a[HOUR] = meridiemFixWrap(config._locale, config._a[HOUR], config._meridiem);
+
+    configFromArray(config);
+    checkOverflow(config);
+}
+
+
+function meridiemFixWrap (locale, hour, meridiem) {
+    var isPm;
+
+    if (meridiem == null) {
+        // nothing to do
+        return hour;
+    }
+    if (locale.meridiemHour != null) {
+        return locale.meridiemHour(hour, meridiem);
+    } else if (locale.isPM != null) {
+        // Fallback
+        isPm = locale.isPM(meridiem);
+        if (isPm && hour < 12) {
+            hour += 12;
+        }
+        if (!isPm && hour === 12) {
+            hour = 0;
+        }
+        return hour;
+    } else {
+        // this is not supposed to happen
+        return hour;
+    }
+}
+
+// date from string and array of format strings
+function configFromStringAndArray(config) {
+    var tempConfig,
+        bestMoment,
+
+        scoreToBeat,
+        i,
+        currentScore;
+
+    if (config._f.length === 0) {
+        getParsingFlags(config).invalidFormat = true;
+        config._d = new Date(NaN);
+        return;
+    }
+
+    for (i = 0; i < config._f.length; i++) {
+        currentScore = 0;
+        tempConfig = copyConfig({}, config);
+        if (config._useUTC != null) {
+            tempConfig._useUTC = config._useUTC;
+        }
+        tempConfig._f = config._f[i];
+        configFromStringAndFormat(tempConfig);
+
+        if (!isValid(tempConfig)) {
+            continue;
+        }
+
+        // if there is any input that was not parsed add a penalty for that format
+        currentScore += getParsingFlags(tempConfig).charsLeftOver;
+
+        //or tokens
+        currentScore += getParsingFlags(tempConfig).unusedTokens.length * 10;
+
+        getParsingFlags(tempConfig).score = currentScore;
+
+        if (scoreToBeat == null || currentScore < scoreToBeat) {
+            scoreToBeat = currentScore;
+            bestMoment = tempConfig;
+        }
+    }
+
+    extend(config, bestMoment || tempConfig);
+}
+
+function configFromObject(config) {
+    if (config._d) {
+        return;
+    }
+
+    var i = normalizeObjectUnits(config._i);
+    config._a = map([i.year, i.month, i.day || i.date, i.hour, i.minute, i.second, i.millisecond], function (obj) {
+        return obj && parseInt(obj, 10);
+    });
+
+    configFromArray(config);
+}
+
+function createFromConfig (config) {
+    var res = new Moment(checkOverflow(prepareConfig(config)));
+    if (res._nextDay) {
+        // Adding is smart enough around DST
+        res.add(1, 'd');
+        res._nextDay = undefined;
+    }
+
+    return res;
+}
+
+function prepareConfig (config) {
+    var input = config._i,
+        format = config._f;
+
+    config._locale = config._locale || getLocale(config._l);
+
+    if (input === null || (format === undefined && input === '')) {
+        return createInvalid({nullInput: true});
+    }
+
+    if (typeof input === 'string') {
+        config._i = input = config._locale.preparse(input);
+    }
+
+    if (isMoment(input)) {
+        return new Moment(checkOverflow(input));
+    } else if (isDate(input)) {
+        config._d = input;
+    } else if (isArray(format)) {
+        configFromStringAndArray(config);
+    } else if (format) {
+        configFromStringAndFormat(config);
+    }  else {
+        configFromInput(config);
+    }
+
+    if (!isValid(config)) {
+        config._d = null;
+    }
+
+    return config;
+}
+
+function configFromInput(config) {
+    var input = config._i;
+    if (input === undefined) {
+        config._d = new Date(hooks.now());
+    } else if (isDate(input)) {
+        config._d = new Date(input.valueOf());
+    } else if (typeof input === 'string') {
+        configFromString(config);
+    } else if (isArray(input)) {
+        config._a = map(input.slice(0), function (obj) {
+            return parseInt(obj, 10);
+        });
+        configFromArray(config);
+    } else if (typeof(input) === 'object') {
+        configFromObject(config);
+    } else if (isNumber(input)) {
+        // from milliseconds
+        config._d = new Date(input);
+    } else {
+        hooks.createFromInputFallback(config);
+    }
+}
+
+function createLocalOrUTC (input, format, locale, strict, isUTC) {
+    var c = {};
+
+    if (locale === true || locale === false) {
+        strict = locale;
+        locale = undefined;
+    }
+
+    if ((isObject(input) && isObjectEmpty(input)) ||
+            (isArray(input) && input.length === 0)) {
+        input = undefined;
+    }
+    // object construction must be done this way.
+    // https://github.com/moment/moment/issues/1423
+    c._isAMomentObject = true;
+    c._useUTC = c._isUTC = isUTC;
+    c._l = locale;
+    c._i = input;
+    c._f = format;
+    c._strict = strict;
+
+    return createFromConfig(c);
+}
+
+function createLocal (input, format, locale, strict) {
+    return createLocalOrUTC(input, format, locale, strict, false);
+}
+
+var prototypeMin = deprecate(
+    'moment().min is deprecated, use moment.max instead. http://momentjs.com/guides/#/warnings/min-max/',
+    function () {
+        var other = createLocal.apply(null, arguments);
+        if (this.isValid() && other.isValid()) {
+            return other < this ? this : other;
+        } else {
+            return createInvalid();
+        }
+    }
+);
+
+var prototypeMax = deprecate(
+    'moment().max is deprecated, use moment.min instead. http://momentjs.com/guides/#/warnings/min-max/',
+    function () {
+        var other = createLocal.apply(null, arguments);
+        if (this.isValid() && other.isValid()) {
+            return other > this ? this : other;
+        } else {
+            return createInvalid();
+        }
+    }
+);
+
+// Pick a moment m from moments so that m[fn](other) is true for all
+// other. This relies on the function fn to be transitive.
+//
+// moments should either be an array of moment objects or an array, whose
+// first element is an array of moment objects.
+function pickBy(fn, moments) {
+    var res, i;
+    if (moments.length === 1 && isArray(moments[0])) {
+        moments = moments[0];
+    }
+    if (!moments.length) {
+        return createLocal();
+    }
+    res = moments[0];
+    for (i = 1; i < moments.length; ++i) {
+        if (!moments[i].isValid() || moments[i][fn](res)) {
+            res = moments[i];
+        }
+    }
+    return res;
+}
+
+// TODO: Use [].sort instead?
+function min () {
+    var args = [].slice.call(arguments, 0);
+
+    return pickBy('isBefore', args);
+}
+
+function max () {
+    var args = [].slice.call(arguments, 0);
+
+    return pickBy('isAfter', args);
+}
+
+var now = function () {
+    return Date.now ? Date.now() : +(new Date());
+};
+
+function Duration (duration) {
+    var normalizedInput = normalizeObjectUnits(duration),
+        years = normalizedInput.year || 0,
+        quarters = normalizedInput.quarter || 0,
+        months = normalizedInput.month || 0,
+        weeks = normalizedInput.week || 0,
+        days = normalizedInput.day || 0,
+        hours = normalizedInput.hour || 0,
+        minutes = normalizedInput.minute || 0,
+        seconds = normalizedInput.second || 0,
+        milliseconds = normalizedInput.millisecond || 0;
+
+    // representation for dateAddRemove
+    this._milliseconds = +milliseconds +
+        seconds * 1e3 + // 1000
+        minutes * 6e4 + // 1000 * 60
+        hours * 1000 * 60 * 60; //using 1000 * 60 * 60 instead of 36e5 to avoid floating point rounding errors https://github.com/moment/moment/issues/2978
+    // Because of dateAddRemove treats 24 hours as different from a
+    // day when working around DST, we need to store them separately
+    this._days = +days +
+        weeks * 7;
+    // It is impossible translate months into days without knowing
+    // which months you are are talking about, so we have to store
+    // it separately.
+    this._months = +months +
+        quarters * 3 +
+        years * 12;
+
+    this._data = {};
+
+    this._locale = getLocale();
+
+    this._bubble();
+}
+
+function isDuration (obj) {
+    return obj instanceof Duration;
+}
+
+function absRound (number) {
+    if (number < 0) {
+        return Math.round(-1 * number) * -1;
+    } else {
+        return Math.round(number);
+    }
+}
+
+// FORMATTING
+
+function offset (token, separator) {
+    addFormatToken(token, 0, 0, function () {
+        var offset = this.utcOffset();
+        var sign = '+';
+        if (offset < 0) {
+            offset = -offset;
+            sign = '-';
+        }
+        return sign + zeroFill(~~(offset / 60), 2) + separator + zeroFill(~~(offset) % 60, 2);
+    });
+}
+
+offset('Z', ':');
+offset('ZZ', '');
+
+// PARSING
+
+addRegexToken('Z',  matchShortOffset);
+addRegexToken('ZZ', matchShortOffset);
+addParseToken(['Z', 'ZZ'], function (input, array, config) {
+    config._useUTC = true;
+    config._tzm = offsetFromString(matchShortOffset, input);
+});
+
+// HELPERS
+
+// timezone chunker
+// '+10:00' > ['10',  '00']
+// '-1530'  > ['-15', '30']
+var chunkOffset = /([\+\-]|\d\d)/gi;
+
+function offsetFromString(matcher, string) {
+    var matches = (string || '').match(matcher);
+
+    if (matches === null) {
+        return null;
+    }
+
+    var chunk   = matches[matches.length - 1] || [];
+    var parts   = (chunk + '').match(chunkOffset) || ['-', 0, 0];
+    var minutes = +(parts[1] * 60) + toInt(parts[2]);
+
+    return minutes === 0 ?
+      0 :
+      parts[0] === '+' ? minutes : -minutes;
+}
+
+// Return a moment from input, that is local/utc/zone equivalent to model.
+function cloneWithOffset(input, model) {
+    var res, diff;
+    if (model._isUTC) {
+        res = model.clone();
+        diff = (isMoment(input) || isDate(input) ? input.valueOf() : createLocal(input).valueOf()) - res.valueOf();
+        // Use low-level api, because this fn is low-level api.
+        res._d.setTime(res._d.valueOf() + diff);
+        hooks.updateOffset(res, false);
+        return res;
+    } else {
+        return createLocal(input).local();
+    }
+}
+
+function getDateOffset (m) {
+    // On Firefox.24 Date#getTimezoneOffset returns a floating point.
+    // https://github.com/moment/moment/pull/1871
+    return -Math.round(m._d.getTimezoneOffset() / 15) * 15;
+}
+
+// HOOKS
+
+// This function will be called whenever a moment is mutated.
+// It is intended to keep the offset in sync with the timezone.
+hooks.updateOffset = function () {};
+
+// MOMENTS
+
+// keepLocalTime = true means only change the timezone, without
+// affecting the local hour. So 5:31:26 +0300 --[utcOffset(2, true)]-->
+// 5:31:26 +0200 It is possible that 5:31:26 doesn't exist with offset
+// +0200, so we adjust the time as needed, to be valid.
+//
+// Keeping the time actually adds/subtracts (one hour)
+// from the actual represented time. That is why we call updateOffset
+// a second time. In case it wants us to change the offset again
+// _changeInProgress == true case, then we have to adjust, because
+// there is no such time in the given timezone.
+function getSetOffset (input, keepLocalTime) {
+    var offset = this._offset || 0,
+        localAdjust;
+    if (!this.isValid()) {
+        return input != null ? this : NaN;
+    }
+    if (input != null) {
+        if (typeof input === 'string') {
+            input = offsetFromString(matchShortOffset, input);
+            if (input === null) {
+                return this;
+            }
+        } else if (Math.abs(input) < 16) {
+            input = input * 60;
+        }
+        if (!this._isUTC && keepLocalTime) {
+            localAdjust = getDateOffset(this);
+        }
+        this._offset = input;
+        this._isUTC = true;
+        if (localAdjust != null) {
+            this.add(localAdjust, 'm');
+        }
+        if (offset !== input) {
+            if (!keepLocalTime || this._changeInProgress) {
+                addSubtract(this, createDuration(input - offset, 'm'), 1, false);
+            } else if (!this._changeInProgress) {
+                this._changeInProgress = true;
+                hooks.updateOffset(this, true);
+                this._changeInProgress = null;
+            }
+        }
+        return this;
+    } else {
+        return this._isUTC ? offset : getDateOffset(this);
+    }
+}
+
+function getSetZone (input, keepLocalTime) {
+    if (input != null) {
+        if (typeof input !== 'string') {
+            input = -input;
+        }
+
+        this.utcOffset(input, keepLocalTime);
+
+        return this;
+    } else {
+        return -this.utcOffset();
+    }
+}
+
+function setOffsetToUTC (keepLocalTime) {
+    return this.utcOffset(0, keepLocalTime);
+}
+
+function setOffsetToLocal (keepLocalTime) {
+    if (this._isUTC) {
+        this.utcOffset(0, keepLocalTime);
+        this._isUTC = false;
+
+        if (keepLocalTime) {
+            this.subtract(getDateOffset(this), 'm');
+        }
+    }
+    return this;
+}
+
+function setOffsetToParsedOffset () {
+    if (this._tzm != null) {
+        this.utcOffset(this._tzm);
+    } else if (typeof this._i === 'string') {
+        var tZone = offsetFromString(matchOffset, this._i);
+        if (tZone != null) {
+            this.utcOffset(tZone);
+        }
+        else {
+            this.utcOffset(0, true);
+        }
+    }
+    return this;
+}
+
+function hasAlignedHourOffset (input) {
+    if (!this.isValid()) {
+        return false;
+    }
+    input = input ? createLocal(input).utcOffset() : 0;
+
+    return (this.utcOffset() - input) % 60 === 0;
+}
+
+function isDaylightSavingTime () {
+    return (
+        this.utcOffset() > this.clone().month(0).utcOffset() ||
+        this.utcOffset() > this.clone().month(5).utcOffset()
+    );
+}
+
+function isDaylightSavingTimeShifted () {
+    if (!isUndefined(this._isDSTShifted)) {
+        return this._isDSTShifted;
+    }
+
+    var c = {};
+
+    copyConfig(c, this);
+    c = prepareConfig(c);
+
+    if (c._a) {
+        var other = c._isUTC ? createUTC(c._a) : createLocal(c._a);
+        this._isDSTShifted = this.isValid() &&
+            compareArrays(c._a, other.toArray()) > 0;
+    } else {
+        this._isDSTShifted = false;
+    }
+
+    return this._isDSTShifted;
+}
+
+function isLocal () {
+    return this.isValid() ? !this._isUTC : false;
+}
+
+function isUtcOffset () {
+    return this.isValid() ? this._isUTC : false;
+}
+
+function isUtc () {
+    return this.isValid() ? this._isUTC && this._offset === 0 : false;
+}
+
+// ASP.NET json date format regex
+var aspNetRegex = /^(\-)?(?:(\d*)[. ])?(\d+)\:(\d+)(?:\:(\d+)(\.\d*)?)?$/;
+
+// from http://docs.closure-library.googlecode.com/git/closure_goog_date_date.js.source.html
+// somewhat more in line with 4.4.3.2 2004 spec, but allows decimal anywhere
+// and further modified to allow for strings containing both week and day
+var isoRegex = /^(-)?P(?:(-?[0-9,.]*)Y)?(?:(-?[0-9,.]*)M)?(?:(-?[0-9,.]*)W)?(?:(-?[0-9,.]*)D)?(?:T(?:(-?[0-9,.]*)H)?(?:(-?[0-9,.]*)M)?(?:(-?[0-9,.]*)S)?)?$/;
+
+function createDuration (input, key) {
+    var duration = input,
+        // matching against regexp is expensive, do it on demand
+        match = null,
+        sign,
+        ret,
+        diffRes;
+
+    if (isDuration(input)) {
+        duration = {
+            ms : input._milliseconds,
+            d  : input._days,
+            M  : input._months
+        };
+    } else if (isNumber(input)) {
+        duration = {};
+        if (key) {
+            duration[key] = input;
+        } else {
+            duration.milliseconds = input;
+        }
+    } else if (!!(match = aspNetRegex.exec(input))) {
+        sign = (match[1] === '-') ? -1 : 1;
+        duration = {
+            y  : 0,
+            d  : toInt(match[DATE])                         * sign,
+            h  : toInt(match[HOUR])                         * sign,
+            m  : toInt(match[MINUTE])                       * sign,
+            s  : toInt(match[SECOND])                       * sign,
+            ms : toInt(absRound(match[MILLISECOND] * 1000)) * sign // the millisecond decimal point is included in the match
+        };
+    } else if (!!(match = isoRegex.exec(input))) {
+        sign = (match[1] === '-') ? -1 : 1;
+        duration = {
+            y : parseIso(match[2], sign),
+            M : parseIso(match[3], sign),
+            w : parseIso(match[4], sign),
+            d : parseIso(match[5], sign),
+            h : parseIso(match[6], sign),
+            m : parseIso(match[7], sign),
+            s : parseIso(match[8], sign)
+        };
+    } else if (duration == null) {// checks for null or undefined
+        duration = {};
+    } else if (typeof duration === 'object' && ('from' in duration || 'to' in duration)) {
+        diffRes = momentsDifference(createLocal(duration.from), createLocal(duration.to));
+
+        duration = {};
+        duration.ms = diffRes.milliseconds;
+        duration.M = diffRes.months;
+    }
+
+    ret = new Duration(duration);
+
+    if (isDuration(input) && hasOwnProp(input, '_locale')) {
+        ret._locale = input._locale;
+    }
+
+    return ret;
+}
+
+createDuration.fn = Duration.prototype;
+
+function parseIso (inp, sign) {
+    // We'd normally use ~~inp for this, but unfortunately it also
+    // converts floats to ints.
+    // inp may be undefined, so careful calling replace on it.
+    var res = inp && parseFloat(inp.replace(',', '.'));
+    // apply sign while we're at it
+    return (isNaN(res) ? 0 : res) * sign;
+}
+
+function positiveMomentsDifference(base, other) {
+    var res = {milliseconds: 0, months: 0};
+
+    res.months = other.month() - base.month() +
+        (other.year() - base.year()) * 12;
+    if (base.clone().add(res.months, 'M').isAfter(other)) {
+        --res.months;
+    }
+
+    res.milliseconds = +other - +(base.clone().add(res.months, 'M'));
+
+    return res;
+}
+
+function momentsDifference(base, other) {
+    var res;
+    if (!(base.isValid() && other.isValid())) {
+        return {milliseconds: 0, months: 0};
+    }
+
+    other = cloneWithOffset(other, base);
+    if (base.isBefore(other)) {
+        res = positiveMomentsDifference(base, other);
+    } else {
+        res = positiveMomentsDifference(other, base);
+        res.milliseconds = -res.milliseconds;
+        res.months = -res.months;
+    }
+
+    return res;
+}
+
+// TODO: remove 'name' arg after deprecation is removed
+function createAdder(direction, name) {
+    return function (val, period) {
+        var dur, tmp;
+        //invert the arguments, but complain about it
+        if (period !== null && !isNaN(+period)) {
+            deprecateSimple(name, 'moment().' + name  + '(period, number) is deprecated. Please use moment().' + name + '(number, period). ' +
+            'See http://momentjs.com/guides/#/warnings/add-inverted-param/ for more info.');
+            tmp = val; val = period; period = tmp;
+        }
+
+        val = typeof val === 'string' ? +val : val;
+        dur = createDuration(val, period);
+        addSubtract(this, dur, direction);
+        return this;
+    };
+}
+
+function addSubtract (mom, duration, isAdding, updateOffset) {
+    var milliseconds = duration._milliseconds,
+        days = absRound(duration._days),
+        months = absRound(duration._months);
+
+    if (!mom.isValid()) {
+        // No op
+        return;
+    }
+
+    updateOffset = updateOffset == null ? true : updateOffset;
+
+    if (milliseconds) {
+        mom._d.setTime(mom._d.valueOf() + milliseconds * isAdding);
+    }
+    if (days) {
+        set$1(mom, 'Date', get(mom, 'Date') + days * isAdding);
+    }
+    if (months) {
+        setMonth(mom, get(mom, 'Month') + months * isAdding);
+    }
+    if (updateOffset) {
+        hooks.updateOffset(mom, days || months);
+    }
+}
+
+var add      = createAdder(1, 'add');
+var subtract = createAdder(-1, 'subtract');
+
+function getCalendarFormat(myMoment, now) {
+    var diff = myMoment.diff(now, 'days', true);
+    return diff < -6 ? 'sameElse' :
+            diff < -1 ? 'lastWeek' :
+            diff < 0 ? 'lastDay' :
+            diff < 1 ? 'sameDay' :
+            diff < 2 ? 'nextDay' :
+            diff < 7 ? 'nextWeek' : 'sameElse';
+}
+
+function calendar$1 (time, formats) {
+    // We want to compare the start of today, vs this.
+    // Getting start-of-today depends on whether we're local/utc/offset or not.
+    var now = time || createLocal(),
+        sod = cloneWithOffset(now, this).startOf('day'),
+        format = hooks.calendarFormat(this, sod) || 'sameElse';
+
+    var output = formats && (isFunction(formats[format]) ? formats[format].call(this, now) : formats[format]);
+
+    return this.format(output || this.localeData().calendar(format, this, createLocal(now)));
+}
+
+function clone () {
+    return new Moment(this);
+}
+
+function isAfter (input, units) {
+    var localInput = isMoment(input) ? input : createLocal(input);
+    if (!(this.isValid() && localInput.isValid())) {
+        return false;
+    }
+    units = normalizeUnits(!isUndefined(units) ? units : 'millisecond');
+    if (units === 'millisecond') {
+        return this.valueOf() > localInput.valueOf();
+    } else {
+        return localInput.valueOf() < this.clone().startOf(units).valueOf();
+    }
+}
+
+function isBefore (input, units) {
+    var localInput = isMoment(input) ? input : createLocal(input);
+    if (!(this.isValid() && localInput.isValid())) {
+        return false;
+    }
+    units = normalizeUnits(!isUndefined(units) ? units : 'millisecond');
+    if (units === 'millisecond') {
+        return this.valueOf() < localInput.valueOf();
+    } else {
+        return this.clone().endOf(units).valueOf() < localInput.valueOf();
+    }
+}
+
+function isBetween (from, to, units, inclusivity) {
+    inclusivity = inclusivity || '()';
+    return (inclusivity[0] === '(' ? this.isAfter(from, units) : !this.isBefore(from, units)) &&
+        (inclusivity[1] === ')' ? this.isBefore(to, units) : !this.isAfter(to, units));
+}
+
+function isSame (input, units) {
+    var localInput = isMoment(input) ? input : createLocal(input),
+        inputMs;
+    if (!(this.isValid() && localInput.isValid())) {
+        return false;
+    }
+    units = normalizeUnits(units || 'millisecond');
+    if (units === 'millisecond') {
+        return this.valueOf() === localInput.valueOf();
+    } else {
+        inputMs = localInput.valueOf();
+        return this.clone().startOf(units).valueOf() <= inputMs && inputMs <= this.clone().endOf(units).valueOf();
+    }
+}
+
+function isSameOrAfter (input, units) {
+    return this.isSame(input, units) || this.isAfter(input,units);
+}
+
+function isSameOrBefore (input, units) {
+    return this.isSame(input, units) || this.isBefore(input,units);
+}
+
+function diff (input, units, asFloat) {
+    var that,
+        zoneDelta,
+        delta, output;
+
+    if (!this.isValid()) {
+        return NaN;
+    }
+
+    that = cloneWithOffset(input, this);
+
+    if (!that.isValid()) {
+        return NaN;
+    }
+
+    zoneDelta = (that.utcOffset() - this.utcOffset()) * 6e4;
+
+    units = normalizeUnits(units);
+
+    if (units === 'year' || units === 'month' || units === 'quarter') {
+        output = monthDiff(this, that);
+        if (units === 'quarter') {
+            output = output / 3;
+        } else if (units === 'year') {
+            output = output / 12;
+        }
+    } else {
+        delta = this - that;
+        output = units === 'second' ? delta / 1e3 : // 1000
+            units === 'minute' ? delta / 6e4 : // 1000 * 60
+            units === 'hour' ? delta / 36e5 : // 1000 * 60 * 60
+            units === 'day' ? (delta - zoneDelta) / 864e5 : // 1000 * 60 * 60 * 24, negate dst
+            units === 'week' ? (delta - zoneDelta) / 6048e5 : // 1000 * 60 * 60 * 24 * 7, negate dst
+            delta;
+    }
+    return asFloat ? output : absFloor(output);
+}
+
+function monthDiff (a, b) {
+    // difference in months
+    var wholeMonthDiff = ((b.year() - a.year()) * 12) + (b.month() - a.month()),
+        // b is in (anchor - 1 month, anchor + 1 month)
+        anchor = a.clone().add(wholeMonthDiff, 'months'),
+        anchor2, adjust;
+
+    if (b - anchor < 0) {
+        anchor2 = a.clone().add(wholeMonthDiff - 1, 'months');
+        // linear across the month
+        adjust = (b - anchor) / (anchor - anchor2);
+    } else {
+        anchor2 = a.clone().add(wholeMonthDiff + 1, 'months');
+        // linear across the month
+        adjust = (b - anchor) / (anchor2 - anchor);
+    }
+
+    //check for negative zero, return zero if negative zero
+    return -(wholeMonthDiff + adjust) || 0;
+}
+
+hooks.defaultFormat = 'YYYY-MM-DDTHH:mm:ssZ';
+hooks.defaultFormatUtc = 'YYYY-MM-DDTHH:mm:ss[Z]';
+
+function toString () {
+    return this.clone().locale('en').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
+}
+
+function toISOString () {
+    var m = this.clone().utc();
+    if (0 < m.year() && m.year() <= 9999) {
+        if (isFunction(Date.prototype.toISOString)) {
+            // native implementation is ~50x faster, use it when we can
+            return this.toDate().toISOString();
+        } else {
+            return formatMoment(m, 'YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
+        }
+    } else {
+        return formatMoment(m, 'YYYYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
+    }
+}
+
+/**
+ * Return a human readable representation of a moment that can
+ * also be evaluated to get a new moment which is the same
+ *
+ * @link https://nodejs.org/dist/latest/docs/api/util.html#util_custom_inspect_function_on_objects
+ */
+function inspect () {
+    if (!this.isValid()) {
+        return 'moment.invalid(/* ' + this._i + ' */)';
+    }
+    var func = 'moment';
+    var zone = '';
+    if (!this.isLocal()) {
+        func = this.utcOffset() === 0 ? 'moment.utc' : 'moment.parseZone';
+        zone = 'Z';
+    }
+    var prefix = '[' + func + '("]';
+    var year = (0 < this.year() && this.year() <= 9999) ? 'YYYY' : 'YYYYYY';
+    var datetime = '-MM-DD[T]HH:mm:ss.SSS';
+    var suffix = zone + '[")]';
+
+    return this.format(prefix + year + datetime + suffix);
+}
+
+function format (inputString) {
+    if (!inputString) {
+        inputString = this.isUtc() ? hooks.defaultFormatUtc : hooks.defaultFormat;
+    }
+    var output = formatMoment(this, inputString);
+    return this.localeData().postformat(output);
+}
+
+function from (time, withoutSuffix) {
+    if (this.isValid() &&
+            ((isMoment(time) && time.isValid()) ||
+             createLocal(time).isValid())) {
+        return createDuration({to: this, from: time}).locale(this.locale()).humanize(!withoutSuffix);
+    } else {
+        return this.localeData().invalidDate();
+    }
+}
+
+function fromNow (withoutSuffix) {
+    return this.from(createLocal(), withoutSuffix);
+}
+
+function to (time, withoutSuffix) {
+    if (this.isValid() &&
+            ((isMoment(time) && time.isValid()) ||
+             createLocal(time).isValid())) {
+        return createDuration({from: this, to: time}).locale(this.locale()).humanize(!withoutSuffix);
+    } else {
+        return this.localeData().invalidDate();
+    }
+}
+
+function toNow (withoutSuffix) {
+    return this.to(createLocal(), withoutSuffix);
+}
+
+// If passed a locale key, it will set the locale for this
+// instance.  Otherwise, it will return the locale configuration
+// variables for this instance.
+function locale (key) {
+    var newLocaleData;
+
+    if (key === undefined) {
+        return this._locale._abbr;
+    } else {
+        newLocaleData = getLocale(key);
+        if (newLocaleData != null) {
+            this._locale = newLocaleData;
+        }
+        return this;
+    }
+}
+
+var lang = deprecate(
+    'moment().lang() is deprecated. Instead, use moment().localeData() to get the language configuration. Use moment().locale() to change languages.',
+    function (key) {
+        if (key === undefined) {
+            return this.localeData();
+        } else {
+            return this.locale(key);
+        }
+    }
+);
+
+function localeData () {
+    return this._locale;
+}
+
+function startOf (units) {
+    units = normalizeUnits(units);
+    // the following switch intentionally omits break keywords
+    // to utilize falling through the cases.
+    switch (units) {
+        case 'year':
+            this.month(0);
+            /* falls through */
+        case 'quarter':
+        case 'month':
+            this.date(1);
+            /* falls through */
+        case 'week':
+        case 'isoWeek':
+        case 'day':
+        case 'date':
+            this.hours(0);
+            /* falls through */
+        case 'hour':
+            this.minutes(0);
+            /* falls through */
+        case 'minute':
+            this.seconds(0);
+            /* falls through */
+        case 'second':
+            this.milliseconds(0);
+    }
+
+    // weeks are a special case
+    if (units === 'week') {
+        this.weekday(0);
+    }
+    if (units === 'isoWeek') {
+        this.isoWeekday(1);
+    }
+
+    // quarters are also special
+    if (units === 'quarter') {
+        this.month(Math.floor(this.month() / 3) * 3);
+    }
+
+    return this;
+}
+
+function endOf (units) {
+    units = normalizeUnits(units);
+    if (units === undefined || units === 'millisecond') {
+        return this;
+    }
+
+    // 'date' is an alias for 'day', so it should be considered as such.
+    if (units === 'date') {
+        units = 'day';
+    }
+
+    return this.startOf(units).add(1, (units === 'isoWeek' ? 'week' : units)).subtract(1, 'ms');
+}
+
+function valueOf () {
+    return this._d.valueOf() - ((this._offset || 0) * 60000);
+}
+
+function unix () {
+    return Math.floor(this.valueOf() / 1000);
+}
+
+function toDate () {
+    return new Date(this.valueOf());
+}
+
+function toArray () {
+    var m = this;
+    return [m.year(), m.month(), m.date(), m.hour(), m.minute(), m.second(), m.millisecond()];
+}
+
+function toObject () {
+    var m = this;
+    return {
+        years: m.year(),
+        months: m.month(),
+        date: m.date(),
+        hours: m.hours(),
+        minutes: m.minutes(),
+        seconds: m.seconds(),
+        milliseconds: m.milliseconds()
+    };
+}
+
+function toJSON () {
+    // new Date(NaN).toJSON() === null
+    return this.isValid() ? this.toISOString() : null;
+}
+
+function isValid$1 () {
+    return isValid(this);
+}
+
+function parsingFlags () {
+    return extend({}, getParsingFlags(this));
+}
+
+function invalidAt () {
+    return getParsingFlags(this).overflow;
+}
+
+function creationData() {
+    return {
+        input: this._i,
+        format: this._f,
+        locale: this._locale,
+        isUTC: this._isUTC,
+        strict: this._strict
+    };
+}
+
+// FORMATTING
+
+addFormatToken(0, ['gg', 2], 0, function () {
+    return this.weekYear() % 100;
+});
+
+addFormatToken(0, ['GG', 2], 0, function () {
+    return this.isoWeekYear() % 100;
+});
+
+function addWeekYearFormatToken (token, getter) {
+    addFormatToken(0, [token, token.length], 0, getter);
+}
+
+addWeekYearFormatToken('gggg',     'weekYear');
+addWeekYearFormatToken('ggggg',    'weekYear');
+addWeekYearFormatToken('GGGG',  'isoWeekYear');
+addWeekYearFormatToken('GGGGG', 'isoWeekYear');
+
+// ALIASES
+
+addUnitAlias('weekYear', 'gg');
+addUnitAlias('isoWeekYear', 'GG');
+
+// PRIORITY
+
+addUnitPriority('weekYear', 1);
+addUnitPriority('isoWeekYear', 1);
+
+
+// PARSING
+
+addRegexToken('G',      matchSigned);
+addRegexToken('g',      matchSigned);
+addRegexToken('GG',     match1to2, match2);
+addRegexToken('gg',     match1to2, match2);
+addRegexToken('GGGG',   match1to4, match4);
+addRegexToken('gggg',   match1to4, match4);
+addRegexToken('GGGGG',  match1to6, match6);
+addRegexToken('ggggg',  match1to6, match6);
+
+addWeekParseToken(['gggg', 'ggggg', 'GGGG', 'GGGGG'], function (input, week, config, token) {
+    week[token.substr(0, 2)] = toInt(input);
+});
+
+addWeekParseToken(['gg', 'GG'], function (input, week, config, token) {
+    week[token] = hooks.parseTwoDigitYear(input);
+});
+
+// MOMENTS
+
+function getSetWeekYear (input) {
+    return getSetWeekYearHelper.call(this,
+            input,
+            this.week(),
+            this.weekday(),
+            this.localeData()._week.dow,
+            this.localeData()._week.doy);
+}
+
+function getSetISOWeekYear (input) {
+    return getSetWeekYearHelper.call(this,
+            input, this.isoWeek(), this.isoWeekday(), 1, 4);
+}
+
+function getISOWeeksInYear () {
+    return weeksInYear(this.year(), 1, 4);
+}
+
+function getWeeksInYear () {
+    var weekInfo = this.localeData()._week;
+    return weeksInYear(this.year(), weekInfo.dow, weekInfo.doy);
+}
+
+function getSetWeekYearHelper(input, week, weekday, dow, doy) {
+    var weeksTarget;
+    if (input == null) {
+        return weekOfYear(this, dow, doy).year;
+    } else {
+        weeksTarget = weeksInYear(input, dow, doy);
+        if (week > weeksTarget) {
+            week = weeksTarget;
+        }
+        return setWeekAll.call(this, input, week, weekday, dow, doy);
+    }
+}
+
+function setWeekAll(weekYear, week, weekday, dow, doy) {
+    var dayOfYearData = dayOfYearFromWeeks(weekYear, week, weekday, dow, doy),
+        date = createUTCDate(dayOfYearData.year, 0, dayOfYearData.dayOfYear);
+
+    this.year(date.getUTCFullYear());
+    this.month(date.getUTCMonth());
+    this.date(date.getUTCDate());
+    return this;
+}
+
+// FORMATTING
+
+addFormatToken('Q', 0, 'Qo', 'quarter');
+
+// ALIASES
+
+addUnitAlias('quarter', 'Q');
+
+// PRIORITY
+
+addUnitPriority('quarter', 7);
+
+// PARSING
+
+addRegexToken('Q', match1);
+addParseToken('Q', function (input, array) {
+    array[MONTH] = (toInt(input) - 1) * 3;
+});
+
+// MOMENTS
+
+function getSetQuarter (input) {
+    return input == null ? Math.ceil((this.month() + 1) / 3) : this.month((input - 1) * 3 + this.month() % 3);
+}
+
+// FORMATTING
+
+addFormatToken('D', ['DD', 2], 'Do', 'date');
+
+// ALIASES
+
+addUnitAlias('date', 'D');
+
+// PRIOROITY
+addUnitPriority('date', 9);
+
+// PARSING
+
+addRegexToken('D',  match1to2);
+addRegexToken('DD', match1to2, match2);
+addRegexToken('Do', function (isStrict, locale) {
+    return isStrict ? locale._ordinalParse : locale._ordinalParseLenient;
+});
+
+addParseToken(['D', 'DD'], DATE);
+addParseToken('Do', function (input, array) {
+    array[DATE] = toInt(input.match(match1to2)[0], 10);
+});
+
+// MOMENTS
+
+var getSetDayOfMonth = makeGetSet('Date', true);
+
+// FORMATTING
+
+addFormatToken('DDD', ['DDDD', 3], 'DDDo', 'dayOfYear');
+
+// ALIASES
+
+addUnitAlias('dayOfYear', 'DDD');
+
+// PRIORITY
+addUnitPriority('dayOfYear', 4);
+
+// PARSING
+
+addRegexToken('DDD',  match1to3);
+addRegexToken('DDDD', match3);
+addParseToken(['DDD', 'DDDD'], function (input, array, config) {
+    config._dayOfYear = toInt(input);
+});
+
+// HELPERS
+
+// MOMENTS
+
+function getSetDayOfYear (input) {
+    var dayOfYear = Math.round((this.clone().startOf('day') - this.clone().startOf('year')) / 864e5) + 1;
+    return input == null ? dayOfYear : this.add((input - dayOfYear), 'd');
+}
+
+// FORMATTING
+
+addFormatToken('m', ['mm', 2], 0, 'minute');
+
+// ALIASES
+
+addUnitAlias('minute', 'm');
+
+// PRIORITY
+
+addUnitPriority('minute', 14);
+
+// PARSING
+
+addRegexToken('m',  match1to2);
+addRegexToken('mm', match1to2, match2);
+addParseToken(['m', 'mm'], MINUTE);
+
+// MOMENTS
+
+var getSetMinute = makeGetSet('Minutes', false);
+
+// FORMATTING
+
+addFormatToken('s', ['ss', 2], 0, 'second');
+
+// ALIASES
+
+addUnitAlias('second', 's');
+
+// PRIORITY
+
+addUnitPriority('second', 15);
+
+// PARSING
+
+addRegexToken('s',  match1to2);
+addRegexToken('ss', match1to2, match2);
+addParseToken(['s', 'ss'], SECOND);
+
+// MOMENTS
+
+var getSetSecond = makeGetSet('Seconds', false);
+
+// FORMATTING
+
+addFormatToken('S', 0, 0, function () {
+    return ~~(this.millisecond() / 100);
+});
+
+addFormatToken(0, ['SS', 2], 0, function () {
+    return ~~(this.millisecond() / 10);
+});
+
+addFormatToken(0, ['SSS', 3], 0, 'millisecond');
+addFormatToken(0, ['SSSS', 4], 0, function () {
+    return this.millisecond() * 10;
+});
+addFormatToken(0, ['SSSSS', 5], 0, function () {
+    return this.millisecond() * 100;
+});
+addFormatToken(0, ['SSSSSS', 6], 0, function () {
+    return this.millisecond() * 1000;
+});
+addFormatToken(0, ['SSSSSSS', 7], 0, function () {
+    return this.millisecond() * 10000;
+});
+addFormatToken(0, ['SSSSSSSS', 8], 0, function () {
+    return this.millisecond() * 100000;
+});
+addFormatToken(0, ['SSSSSSSSS', 9], 0, function () {
+    return this.millisecond() * 1000000;
+});
+
+
+// ALIASES
+
+addUnitAlias('millisecond', 'ms');
+
+// PRIORITY
+
+addUnitPriority('millisecond', 16);
+
+// PARSING
+
+addRegexToken('S',    match1to3, match1);
+addRegexToken('SS',   match1to3, match2);
+addRegexToken('SSS',  match1to3, match3);
+
+var token;
+for (token = 'SSSS'; token.length <= 9; token += 'S') {
+    addRegexToken(token, matchUnsigned);
+}
+
+function parseMs(input, array) {
+    array[MILLISECOND] = toInt(('0.' + input) * 1000);
+}
+
+for (token = 'S'; token.length <= 9; token += 'S') {
+    addParseToken(token, parseMs);
+}
+// MOMENTS
+
+var getSetMillisecond = makeGetSet('Milliseconds', false);
+
+// FORMATTING
+
+addFormatToken('z',  0, 0, 'zoneAbbr');
+addFormatToken('zz', 0, 0, 'zoneName');
+
+// MOMENTS
+
+function getZoneAbbr () {
+    return this._isUTC ? 'UTC' : '';
+}
+
+function getZoneName () {
+    return this._isUTC ? 'Coordinated Universal Time' : '';
+}
+
+var proto = Moment.prototype;
+
+proto.add               = add;
+proto.calendar          = calendar$1;
+proto.clone             = clone;
+proto.diff              = diff;
+proto.endOf             = endOf;
+proto.format            = format;
+proto.from              = from;
+proto.fromNow           = fromNow;
+proto.to                = to;
+proto.toNow             = toNow;
+proto.get               = stringGet;
+proto.invalidAt         = invalidAt;
+proto.isAfter           = isAfter;
+proto.isBefore          = isBefore;
+proto.isBetween         = isBetween;
+proto.isSame            = isSame;
+proto.isSameOrAfter     = isSameOrAfter;
+proto.isSameOrBefore    = isSameOrBefore;
+proto.isValid           = isValid$1;
+proto.lang              = lang;
+proto.locale            = locale;
+proto.localeData        = localeData;
+proto.max               = prototypeMax;
+proto.min               = prototypeMin;
+proto.parsingFlags      = parsingFlags;
+proto.set               = stringSet;
+proto.startOf           = startOf;
+proto.subtract          = subtract;
+proto.toArray           = toArray;
+proto.toObject          = toObject;
+proto.toDate            = toDate;
+proto.toISOString       = toISOString;
+proto.inspect           = inspect;
+proto.toJSON            = toJSON;
+proto.toString          = toString;
+proto.unix              = unix;
+proto.valueOf           = valueOf;
+proto.creationData      = creationData;
+
+// Year
+proto.year       = getSetYear;
+proto.isLeapYear = getIsLeapYear;
+
+// Week Year
+proto.weekYear    = getSetWeekYear;
+proto.isoWeekYear = getSetISOWeekYear;
+
+// Quarter
+proto.quarter = proto.quarters = getSetQuarter;
+
+// Month
+proto.month       = getSetMonth;
+proto.daysInMonth = getDaysInMonth;
+
+// Week
+proto.week           = proto.weeks        = getSetWeek;
+proto.isoWeek        = proto.isoWeeks     = getSetISOWeek;
+proto.weeksInYear    = getWeeksInYear;
+proto.isoWeeksInYear = getISOWeeksInYear;
+
+// Day
+proto.date       = getSetDayOfMonth;
+proto.day        = proto.days             = getSetDayOfWeek;
+proto.weekday    = getSetLocaleDayOfWeek;
+proto.isoWeekday = getSetISODayOfWeek;
+proto.dayOfYear  = getSetDayOfYear;
+
+// Hour
+proto.hour = proto.hours = getSetHour;
+
+// Minute
+proto.minute = proto.minutes = getSetMinute;
+
+// Second
+proto.second = proto.seconds = getSetSecond;
+
+// Millisecond
+proto.millisecond = proto.milliseconds = getSetMillisecond;
+
+// Offset
+proto.utcOffset            = getSetOffset;
+proto.utc                  = setOffsetToUTC;
+proto.local                = setOffsetToLocal;
+proto.parseZone            = setOffsetToParsedOffset;
+proto.hasAlignedHourOffset = hasAlignedHourOffset;
+proto.isDST                = isDaylightSavingTime;
+proto.isLocal              = isLocal;
+proto.isUtcOffset          = isUtcOffset;
+proto.isUtc                = isUtc;
+proto.isUTC                = isUtc;
+
+// Timezone
+proto.zoneAbbr = getZoneAbbr;
+proto.zoneName = getZoneName;
+
+// Deprecations
+proto.dates  = deprecate('dates accessor is deprecated. Use date instead.', getSetDayOfMonth);
+proto.months = deprecate('months accessor is deprecated. Use month instead', getSetMonth);
+proto.years  = deprecate('years accessor is deprecated. Use year instead', getSetYear);
+proto.zone   = deprecate('moment().zone is deprecated, use moment().utcOffset instead. http://momentjs.com/guides/#/warnings/zone/', getSetZone);
+proto.isDSTShifted = deprecate('isDSTShifted is deprecated. See http://momentjs.com/guides/#/warnings/dst-shifted/ for more information', isDaylightSavingTimeShifted);
+
+function createUnix (input) {
+    return createLocal(input * 1000);
+}
+
+function createInZone () {
+    return createLocal.apply(null, arguments).parseZone();
+}
+
+function preParsePostFormat (string) {
+    return string;
+}
+
+var proto$1 = Locale.prototype;
+
+proto$1.calendar        = calendar;
+proto$1.longDateFormat  = longDateFormat;
+proto$1.invalidDate     = invalidDate;
+proto$1.ordinal         = ordinal;
+proto$1.preparse        = preParsePostFormat;
+proto$1.postformat      = preParsePostFormat;
+proto$1.relativeTime    = relativeTime;
+proto$1.pastFuture      = pastFuture;
+proto$1.set             = set;
+
+// Month
+proto$1.months            =        localeMonths;
+proto$1.monthsShort       =        localeMonthsShort;
+proto$1.monthsParse       =        localeMonthsParse;
+proto$1.monthsRegex       = monthsRegex;
+proto$1.monthsShortRegex  = monthsShortRegex;
+
+// Week
+proto$1.week = localeWeek;
+proto$1.firstDayOfYear = localeFirstDayOfYear;
+proto$1.firstDayOfWeek = localeFirstDayOfWeek;
+
+// Day of Week
+proto$1.weekdays       =        localeWeekdays;
+proto$1.weekdaysMin    =        localeWeekdaysMin;
+proto$1.weekdaysShort  =        localeWeekdaysShort;
+proto$1.weekdaysParse  =        localeWeekdaysParse;
+
+proto$1.weekdaysRegex       =        weekdaysRegex;
+proto$1.weekdaysShortRegex  =        weekdaysShortRegex;
+proto$1.weekdaysMinRegex    =        weekdaysMinRegex;
+
+// Hours
+proto$1.isPM = localeIsPM;
+proto$1.meridiem = localeMeridiem;
+
+function get$1 (format, index, field, setter) {
+    var locale = getLocale();
+    var utc = createUTC().set(setter, index);
+    return locale[field](utc, format);
+}
+
+function listMonthsImpl (format, index, field) {
+    if (isNumber(format)) {
+        index = format;
+        format = undefined;
+    }
+
+    format = format || '';
+
+    if (index != null) {
+        return get$1(format, index, field, 'month');
+    }
+
+    var i;
+    var out = [];
+    for (i = 0; i < 12; i++) {
+        out[i] = get$1(format, i, field, 'month');
+    }
+    return out;
+}
+
+// ()
+// (5)
+// (fmt, 5)
+// (fmt)
+// (true)
+// (true, 5)
+// (true, fmt, 5)
+// (true, fmt)
+function listWeekdaysImpl (localeSorted, format, index, field) {
+    if (typeof localeSorted === 'boolean') {
+        if (isNumber(format)) {
+            index = format;
+            format = undefined;
+        }
+
+        format = format || '';
+    } else {
+        format = localeSorted;
+        index = format;
+        localeSorted = false;
+
+        if (isNumber(format)) {
+            index = format;
+            format = undefined;
+        }
+
+        format = format || '';
+    }
+
+    var locale = getLocale(),
+        shift = localeSorted ? locale._week.dow : 0;
+
+    if (index != null) {
+        return get$1(format, (index + shift) % 7, field, 'day');
+    }
+
+    var i;
+    var out = [];
+    for (i = 0; i < 7; i++) {
+        out[i] = get$1(format, (i + shift) % 7, field, 'day');
+    }
+    return out;
+}
+
+function listMonths (format, index) {
+    return listMonthsImpl(format, index, 'months');
+}
+
+function listMonthsShort (format, index) {
+    return listMonthsImpl(format, index, 'monthsShort');
+}
+
+function listWeekdays (localeSorted, format, index) {
+    return listWeekdaysImpl(localeSorted, format, index, 'weekdays');
+}
+
+function listWeekdaysShort (localeSorted, format, index) {
+    return listWeekdaysImpl(localeSorted, format, index, 'weekdaysShort');
+}
+
+function listWeekdaysMin (localeSorted, format, index) {
+    return listWeekdaysImpl(localeSorted, format, index, 'weekdaysMin');
+}
+
+getSetGlobalLocale('en', {
+    ordinalParse: /\d{1,2}(th|st|nd|rd)/,
+    ordinal : function (number) {
+        var b = number % 10,
+            output = (toInt(number % 100 / 10) === 1) ? 'th' :
+            (b === 1) ? 'st' :
+            (b === 2) ? 'nd' :
+            (b === 3) ? 'rd' : 'th';
+        return number + output;
+    }
+});
+
+// Side effect imports
+hooks.lang = deprecate('moment.lang is deprecated. Use moment.locale instead.', getSetGlobalLocale);
+hooks.langData = deprecate('moment.langData is deprecated. Use moment.localeData instead.', getLocale);
+
+var mathAbs = Math.abs;
+
+function abs () {
+    var data           = this._data;
+
+    this._milliseconds = mathAbs(this._milliseconds);
+    this._days         = mathAbs(this._days);
+    this._months       = mathAbs(this._months);
+
+    data.milliseconds  = mathAbs(data.milliseconds);
+    data.seconds       = mathAbs(data.seconds);
+    data.minutes       = mathAbs(data.minutes);
+    data.hours         = mathAbs(data.hours);
+    data.months        = mathAbs(data.months);
+    data.years         = mathAbs(data.years);
+
+    return this;
+}
+
+function addSubtract$1 (duration, input, value, direction) {
+    var other = createDuration(input, value);
+
+    duration._milliseconds += direction * other._milliseconds;
+    duration._days         += direction * other._days;
+    duration._months       += direction * other._months;
+
+    return duration._bubble();
+}
+
+// supports only 2.0-style add(1, 's') or add(duration)
+function add$1 (input, value) {
+    return addSubtract$1(this, input, value, 1);
+}
+
+// supports only 2.0-style subtract(1, 's') or subtract(duration)
+function subtract$1 (input, value) {
+    return addSubtract$1(this, input, value, -1);
+}
+
+function absCeil (number) {
+    if (number < 0) {
+        return Math.floor(number);
+    } else {
+        return Math.ceil(number);
+    }
+}
+
+function bubble () {
+    var milliseconds = this._milliseconds;
+    var days         = this._days;
+    var months       = this._months;
+    var data         = this._data;
+    var seconds, minutes, hours, years, monthsFromDays;
+
+    // if we have a mix of positive and negative values, bubble down first
+    // check: https://github.com/moment/moment/issues/2166
+    if (!((milliseconds >= 0 && days >= 0 && months >= 0) ||
+            (milliseconds <= 0 && days <= 0 && months <= 0))) {
+        milliseconds += absCeil(monthsToDays(months) + days) * 864e5;
+        days = 0;
+        months = 0;
+    }
+
+    // The following code bubbles up values, see the tests for
+    // examples of what that means.
+    data.milliseconds = milliseconds % 1000;
+
+    seconds           = absFloor(milliseconds / 1000);
+    data.seconds      = seconds % 60;
+
+    minutes           = absFloor(seconds / 60);
+    data.minutes      = minutes % 60;
+
+    hours             = absFloor(minutes / 60);
+    data.hours        = hours % 24;
+
+    days += absFloor(hours / 24);
+
+    // convert days to months
+    monthsFromDays = absFloor(daysToMonths(days));
+    months += monthsFromDays;
+    days -= absCeil(monthsToDays(monthsFromDays));
+
+    // 12 months -> 1 year
+    years = absFloor(months / 12);
+    months %= 12;
+
+    data.days   = days;
+    data.months = months;
+    data.years  = years;
+
+    return this;
+}
+
+function daysToMonths (days) {
+    // 400 years have 146097 days (taking into account leap year rules)
+    // 400 years have 12 months === 4800
+    return days * 4800 / 146097;
+}
+
+function monthsToDays (months) {
+    // the reverse of daysToMonths
+    return months * 146097 / 4800;
+}
+
+function as (units) {
+    var days;
+    var months;
+    var milliseconds = this._milliseconds;
+
+    units = normalizeUnits(units);
+
+    if (units === 'month' || units === 'year') {
+        days   = this._days   + milliseconds / 864e5;
+        months = this._months + daysToMonths(days);
+        return units === 'month' ? months : months / 12;
+    } else {
+        // handle milliseconds separately because of floating point math errors (issue #1867)
+        days = this._days + Math.round(monthsToDays(this._months));
+        switch (units) {
+            case 'week'   : return days / 7     + milliseconds / 6048e5;
+            case 'day'    : return days         + milliseconds / 864e5;
+            case 'hour'   : return days * 24    + milliseconds / 36e5;
+            case 'minute' : return days * 1440  + milliseconds / 6e4;
+            case 'second' : return days * 86400 + milliseconds / 1000;
+            // Math.floor prevents floating point math errors here
+            case 'millisecond': return Math.floor(days * 864e5) + milliseconds;
+            default: throw new Error('Unknown unit ' + units);
+        }
+    }
+}
+
+// TODO: Use this.as('ms')?
+function valueOf$1 () {
+    return (
+        this._milliseconds +
+        this._days * 864e5 +
+        (this._months % 12) * 2592e6 +
+        toInt(this._months / 12) * 31536e6
+    );
+}
+
+function makeAs (alias) {
+    return function () {
+        return this.as(alias);
+    };
+}
+
+var asMilliseconds = makeAs('ms');
+var asSeconds      = makeAs('s');
+var asMinutes      = makeAs('m');
+var asHours        = makeAs('h');
+var asDays         = makeAs('d');
+var asWeeks        = makeAs('w');
+var asMonths       = makeAs('M');
+var asYears        = makeAs('y');
+
+function get$2 (units) {
+    units = normalizeUnits(units);
+    return this[units + 's']();
+}
+
+function makeGetter(name) {
+    return function () {
+        return this._data[name];
+    };
+}
+
+var milliseconds = makeGetter('milliseconds');
+var seconds      = makeGetter('seconds');
+var minutes      = makeGetter('minutes');
+var hours        = makeGetter('hours');
+var days         = makeGetter('days');
+var months       = makeGetter('months');
+var years        = makeGetter('years');
+
+function weeks () {
+    return absFloor(this.days() / 7);
+}
+
+var round = Math.round;
+var thresholds = {
+    s: 45,  // seconds to minute
+    m: 45,  // minutes to hour
+    h: 22,  // hours to day
+    d: 26,  // days to month
+    M: 11   // months to year
+};
+
+// helper function for moment.fn.from, moment.fn.fromNow, and moment.duration.fn.humanize
+function substituteTimeAgo(string, number, withoutSuffix, isFuture, locale) {
+    return locale.relativeTime(number || 1, !!withoutSuffix, string, isFuture);
+}
+
+function relativeTime$1 (posNegDuration, withoutSuffix, locale) {
+    var duration = createDuration(posNegDuration).abs();
+    var seconds  = round(duration.as('s'));
+    var minutes  = round(duration.as('m'));
+    var hours    = round(duration.as('h'));
+    var days     = round(duration.as('d'));
+    var months   = round(duration.as('M'));
+    var years    = round(duration.as('y'));
+
+    var a = seconds < thresholds.s && ['s', seconds]  ||
+            minutes <= 1           && ['m']           ||
+            minutes < thresholds.m && ['mm', minutes] ||
+            hours   <= 1           && ['h']           ||
+            hours   < thresholds.h && ['hh', hours]   ||
+            days    <= 1           && ['d']           ||
+            days    < thresholds.d && ['dd', days]    ||
+            months  <= 1           && ['M']           ||
+            months  < thresholds.M && ['MM', months]  ||
+            years   <= 1           && ['y']           || ['yy', years];
+
+    a[2] = withoutSuffix;
+    a[3] = +posNegDuration > 0;
+    a[4] = locale;
+    return substituteTimeAgo.apply(null, a);
+}
+
+// This function allows you to set the rounding function for relative time strings
+function getSetRelativeTimeRounding (roundingFunction) {
+    if (roundingFunction === undefined) {
+        return round;
+    }
+    if (typeof(roundingFunction) === 'function') {
+        round = roundingFunction;
+        return true;
+    }
+    return false;
+}
+
+// This function allows you to set a threshold for relative time strings
+function getSetRelativeTimeThreshold (threshold, limit) {
+    if (thresholds[threshold] === undefined) {
+        return false;
+    }
+    if (limit === undefined) {
+        return thresholds[threshold];
+    }
+    thresholds[threshold] = limit;
+    return true;
+}
+
+function humanize (withSuffix) {
+    var locale = this.localeData();
+    var output = relativeTime$1(this, !withSuffix, locale);
+
+    if (withSuffix) {
+        output = locale.pastFuture(+this, output);
+    }
+
+    return locale.postformat(output);
+}
+
+var abs$1 = Math.abs;
+
+function toISOString$1() {
+    // for ISO strings we do not use the normal bubbling rules:
+    //  * milliseconds bubble up until they become hours
+    //  * days do not bubble at all
+    //  * months bubble up until they become years
+    // This is because there is no context-free conversion between hours and days
+    // (think of clock changes)
+    // and also not between days and months (28-31 days per month)
+    var seconds = abs$1(this._milliseconds) / 1000;
+    var days         = abs$1(this._days);
+    var months       = abs$1(this._months);
+    var minutes, hours, years;
+
+    // 3600 seconds -> 60 minutes -> 1 hour
+    minutes           = absFloor(seconds / 60);
+    hours             = absFloor(minutes / 60);
+    seconds %= 60;
+    minutes %= 60;
+
+    // 12 months -> 1 year
+    years  = absFloor(months / 12);
+    months %= 12;
+
+
+    // inspired by https://github.com/dordille/moment-isoduration/blob/master/moment.isoduration.js
+    var Y = years;
+    var M = months;
+    var D = days;
+    var h = hours;
+    var m = minutes;
+    var s = seconds;
+    var total = this.asSeconds();
+
+    if (!total) {
+        // this is the same as C#'s (Noda) and python (isodate)...
+        // but not other JS (goog.date)
+        return 'P0D';
+    }
+
+    return (total < 0 ? '-' : '') +
+        'P' +
+        (Y ? Y + 'Y' : '') +
+        (M ? M + 'M' : '') +
+        (D ? D + 'D' : '') +
+        ((h || m || s) ? 'T' : '') +
+        (h ? h + 'H' : '') +
+        (m ? m + 'M' : '') +
+        (s ? s + 'S' : '');
+}
+
+var proto$2 = Duration.prototype;
+
+proto$2.abs            = abs;
+proto$2.add            = add$1;
+proto$2.subtract       = subtract$1;
+proto$2.as             = as;
+proto$2.asMilliseconds = asMilliseconds;
+proto$2.asSeconds      = asSeconds;
+proto$2.asMinutes      = asMinutes;
+proto$2.asHours        = asHours;
+proto$2.asDays         = asDays;
+proto$2.asWeeks        = asWeeks;
+proto$2.asMonths       = asMonths;
+proto$2.asYears        = asYears;
+proto$2.valueOf        = valueOf$1;
+proto$2._bubble        = bubble;
+proto$2.get            = get$2;
+proto$2.milliseconds   = milliseconds;
+proto$2.seconds        = seconds;
+proto$2.minutes        = minutes;
+proto$2.hours          = hours;
+proto$2.days           = days;
+proto$2.weeks          = weeks;
+proto$2.months         = months;
+proto$2.years          = years;
+proto$2.humanize       = humanize;
+proto$2.toISOString    = toISOString$1;
+proto$2.toString       = toISOString$1;
+proto$2.toJSON         = toISOString$1;
+proto$2.locale         = locale;
+proto$2.localeData     = localeData;
+
+// Deprecations
+proto$2.toIsoString = deprecate('toIsoString() is deprecated. Please use toISOString() instead (notice the capitals)', toISOString$1);
+proto$2.lang = lang;
+
+// Side effect imports
+
+// FORMATTING
+
+addFormatToken('X', 0, 0, 'unix');
+addFormatToken('x', 0, 0, 'valueOf');
+
+// PARSING
+
+addRegexToken('x', matchSigned);
+addRegexToken('X', matchTimestamp);
+addParseToken('X', function (input, array, config) {
+    config._d = new Date(parseFloat(input, 10) * 1000);
+});
+addParseToken('x', function (input, array, config) {
+    config._d = new Date(toInt(input));
+});
+
+// Side effect imports
+
+
+hooks.version = '2.17.1';
+
+setHookCallback(createLocal);
+
+hooks.fn                    = proto;
+hooks.min                   = min;
+hooks.max                   = max;
+hooks.now                   = now;
+hooks.utc                   = createUTC;
+hooks.unix                  = createUnix;
+hooks.months                = listMonths;
+hooks.isDate                = isDate;
+hooks.locale                = getSetGlobalLocale;
+hooks.invalid               = createInvalid;
+hooks.duration              = createDuration;
+hooks.isMoment              = isMoment;
+hooks.weekdays              = listWeekdays;
+hooks.parseZone             = createInZone;
+hooks.localeData            = getLocale;
+hooks.isDuration            = isDuration;
+hooks.monthsShort           = listMonthsShort;
+hooks.weekdaysMin           = listWeekdaysMin;
+hooks.defineLocale          = defineLocale;
+hooks.updateLocale          = updateLocale;
+hooks.locales               = listLocales;
+hooks.weekdaysShort         = listWeekdaysShort;
+hooks.normalizeUnits        = normalizeUnits;
+hooks.relativeTimeRounding = getSetRelativeTimeRounding;
+hooks.relativeTimeThreshold = getSetRelativeTimeThreshold;
+hooks.calendarFormat        = getCalendarFormat;
+hooks.prototype             = proto;
+
+return hooks;
+
+})));
+
+},{}],21:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -180,7 +4699,3671 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],2:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
+var Vue // late bind
+var map = Object.create(null)
+var shimmed = false
+var isBrowserify = false
+
+/**
+ * Determine compatibility and apply patch.
+ *
+ * @param {Function} vue
+ * @param {Boolean} browserify
+ */
+
+exports.install = function (vue, browserify) {
+  if (shimmed) return
+  shimmed = true
+
+  Vue = vue
+  isBrowserify = browserify
+
+  exports.compatible = !!Vue.internalDirectives
+  if (!exports.compatible) {
+    console.warn(
+      '[HMR] vue-loader hot reload is only compatible with ' +
+      'Vue.js 1.0.0+.'
+    )
+    return
+  }
+
+  // patch view directive
+  patchView(Vue.internalDirectives.component)
+  console.log('[HMR] Vue component hot reload shim applied.')
+  // shim router-view if present
+  var routerView = Vue.elementDirective('router-view')
+  if (routerView) {
+    patchView(routerView)
+    console.log('[HMR] vue-router <router-view> hot reload shim applied.')
+  }
+}
+
+/**
+ * Shim the view directive (component or router-view).
+ *
+ * @param {Object} View
+ */
+
+function patchView (View) {
+  var unbuild = View.unbuild
+  View.unbuild = function (defer) {
+    if (!this.hotUpdating) {
+      var prevComponent = this.childVM && this.childVM.constructor
+      removeView(prevComponent, this)
+      // defer = true means we are transitioning to a new
+      // Component. Register this new component to the list.
+      if (defer) {
+        addView(this.Component, this)
+      }
+    }
+    // call original
+    return unbuild.call(this, defer)
+  }
+}
+
+/**
+ * Add a component view to a Component's hot list
+ *
+ * @param {Function} Component
+ * @param {Directive} view - view directive instance
+ */
+
+function addView (Component, view) {
+  var id = Component && Component.options.hotID
+  if (id) {
+    if (!map[id]) {
+      map[id] = {
+        Component: Component,
+        views: [],
+        instances: []
+      }
+    }
+    map[id].views.push(view)
+  }
+}
+
+/**
+ * Remove a component view from a Component's hot list
+ *
+ * @param {Function} Component
+ * @param {Directive} view - view directive instance
+ */
+
+function removeView (Component, view) {
+  var id = Component && Component.options.hotID
+  if (id) {
+    map[id].views.$remove(view)
+  }
+}
+
+/**
+ * Create a record for a hot module, which keeps track of its construcotr,
+ * instnaces and views (component directives or router-views).
+ *
+ * @param {String} id
+ * @param {Object} options
+ */
+
+exports.createRecord = function (id, options) {
+  if (typeof options === 'function') {
+    options = options.options
+  }
+  if (typeof options.el !== 'string' && typeof options.data !== 'object') {
+    makeOptionsHot(id, options)
+    map[id] = {
+      Component: null,
+      views: [],
+      instances: []
+    }
+  }
+}
+
+/**
+ * Make a Component options object hot.
+ *
+ * @param {String} id
+ * @param {Object} options
+ */
+
+function makeOptionsHot (id, options) {
+  options.hotID = id
+  injectHook(options, 'created', function () {
+    var record = map[id]
+    if (!record.Component) {
+      record.Component = this.constructor
+    }
+    record.instances.push(this)
+  })
+  injectHook(options, 'beforeDestroy', function () {
+    map[id].instances.$remove(this)
+  })
+}
+
+/**
+ * Inject a hook to a hot reloadable component so that
+ * we can keep track of it.
+ *
+ * @param {Object} options
+ * @param {String} name
+ * @param {Function} hook
+ */
+
+function injectHook (options, name, hook) {
+  var existing = options[name]
+  options[name] = existing
+    ? Array.isArray(existing)
+      ? existing.concat(hook)
+      : [existing, hook]
+    : [hook]
+}
+
+/**
+ * Update a hot component.
+ *
+ * @param {String} id
+ * @param {Object|null} newOptions
+ * @param {String|null} newTemplate
+ */
+
+exports.update = function (id, newOptions, newTemplate) {
+  var record = map[id]
+  // force full-reload if an instance of the component is active but is not
+  // managed by a view
+  if (!record || (record.instances.length && !record.views.length)) {
+    console.log('[HMR] Root or manually-mounted instance modified. Full reload may be required.')
+    if (!isBrowserify) {
+      window.location.reload()
+    } else {
+      // browserify-hmr somehow sends incomplete bundle if we reload here
+      return
+    }
+  }
+  if (!isBrowserify) {
+    // browserify-hmr already logs this
+    console.log('[HMR] Updating component: ' + format(id))
+  }
+  var Component = record.Component
+  // update constructor
+  if (newOptions) {
+    // in case the user exports a constructor
+    Component = record.Component = typeof newOptions === 'function'
+      ? newOptions
+      : Vue.extend(newOptions)
+    makeOptionsHot(id, Component.options)
+  }
+  if (newTemplate) {
+    Component.options.template = newTemplate
+  }
+  // handle recursive lookup
+  if (Component.options.name) {
+    Component.options.components[Component.options.name] = Component
+  }
+  // reset constructor cached linker
+  Component.linker = null
+  // reload all views
+  record.views.forEach(function (view) {
+    updateView(view, Component)
+  })
+  // flush devtools
+  if (window.__VUE_DEVTOOLS_GLOBAL_HOOK__) {
+    window.__VUE_DEVTOOLS_GLOBAL_HOOK__.emit('flush')
+  }
+}
+
+/**
+ * Update a component view instance
+ *
+ * @param {Directive} view
+ * @param {Function} Component
+ */
+
+function updateView (view, Component) {
+  if (!view._bound) {
+    return
+  }
+  view.Component = Component
+  view.hotUpdating = true
+  // disable transitions
+  view.vm._isCompiled = false
+  // save state
+  var state = extractState(view.childVM)
+  // remount, make sure to disable keep-alive
+  var keepAlive = view.keepAlive
+  view.keepAlive = false
+  view.mountComponent()
+  view.keepAlive = keepAlive
+  // restore state
+  restoreState(view.childVM, state, true)
+  // re-eanble transitions
+  view.vm._isCompiled = true
+  view.hotUpdating = false
+}
+
+/**
+ * Extract state from a Vue instance.
+ *
+ * @param {Vue} vm
+ * @return {Object}
+ */
+
+function extractState (vm) {
+  return {
+    cid: vm.constructor.cid,
+    data: vm.$data,
+    children: vm.$children.map(extractState)
+  }
+}
+
+/**
+ * Restore state to a reloaded Vue instance.
+ *
+ * @param {Vue} vm
+ * @param {Object} state
+ */
+
+function restoreState (vm, state, isRoot) {
+  var oldAsyncConfig
+  if (isRoot) {
+    // set Vue into sync mode during state rehydration
+    oldAsyncConfig = Vue.config.async
+    Vue.config.async = false
+  }
+  // actual restore
+  if (isRoot || !vm._props) {
+    vm.$data = state.data
+  } else {
+    Object.keys(state.data).forEach(function (key) {
+      if (!vm._props[key]) {
+        // for non-root, only restore non-props fields
+        vm.$data[key] = state.data[key]
+      }
+    })
+  }
+  // verify child consistency
+  var hasSameChildren = vm.$children.every(function (c, i) {
+    return state.children[i] && state.children[i].cid === c.constructor.cid
+  })
+  if (hasSameChildren) {
+    // rehydrate children
+    vm.$children.forEach(function (c, i) {
+      restoreState(c, state.children[i])
+    })
+  }
+  if (isRoot) {
+    Vue.config.async = oldAsyncConfig
+  }
+}
+
+function format (id) {
+  var match = id.match(/[^\/]+\.vue$/)
+  return match ? match[0] : id
+}
+
+},{}],23:[function(require,module,exports){
+/*!
+ * vue-resource v0.9.3
+ * https://github.com/vuejs/vue-resource
+ * Released under the MIT License.
+ */
+
+'use strict';
+
+/**
+ * Promises/A+ polyfill v1.1.4 (https://github.com/bramstein/promis)
+ */
+
+var RESOLVED = 0;
+var REJECTED = 1;
+var PENDING = 2;
+
+function Promise$2(executor) {
+
+    this.state = PENDING;
+    this.value = undefined;
+    this.deferred = [];
+
+    var promise = this;
+
+    try {
+        executor(function (x) {
+            promise.resolve(x);
+        }, function (r) {
+            promise.reject(r);
+        });
+    } catch (e) {
+        promise.reject(e);
+    }
+}
+
+Promise$2.reject = function (r) {
+    return new Promise$2(function (resolve, reject) {
+        reject(r);
+    });
+};
+
+Promise$2.resolve = function (x) {
+    return new Promise$2(function (resolve, reject) {
+        resolve(x);
+    });
+};
+
+Promise$2.all = function all(iterable) {
+    return new Promise$2(function (resolve, reject) {
+        var count = 0,
+            result = [];
+
+        if (iterable.length === 0) {
+            resolve(result);
+        }
+
+        function resolver(i) {
+            return function (x) {
+                result[i] = x;
+                count += 1;
+
+                if (count === iterable.length) {
+                    resolve(result);
+                }
+            };
+        }
+
+        for (var i = 0; i < iterable.length; i += 1) {
+            Promise$2.resolve(iterable[i]).then(resolver(i), reject);
+        }
+    });
+};
+
+Promise$2.race = function race(iterable) {
+    return new Promise$2(function (resolve, reject) {
+        for (var i = 0; i < iterable.length; i += 1) {
+            Promise$2.resolve(iterable[i]).then(resolve, reject);
+        }
+    });
+};
+
+var p$1 = Promise$2.prototype;
+
+p$1.resolve = function resolve(x) {
+    var promise = this;
+
+    if (promise.state === PENDING) {
+        if (x === promise) {
+            throw new TypeError('Promise settled with itself.');
+        }
+
+        var called = false;
+
+        try {
+            var then = x && x['then'];
+
+            if (x !== null && typeof x === 'object' && typeof then === 'function') {
+                then.call(x, function (x) {
+                    if (!called) {
+                        promise.resolve(x);
+                    }
+                    called = true;
+                }, function (r) {
+                    if (!called) {
+                        promise.reject(r);
+                    }
+                    called = true;
+                });
+                return;
+            }
+        } catch (e) {
+            if (!called) {
+                promise.reject(e);
+            }
+            return;
+        }
+
+        promise.state = RESOLVED;
+        promise.value = x;
+        promise.notify();
+    }
+};
+
+p$1.reject = function reject(reason) {
+    var promise = this;
+
+    if (promise.state === PENDING) {
+        if (reason === promise) {
+            throw new TypeError('Promise settled with itself.');
+        }
+
+        promise.state = REJECTED;
+        promise.value = reason;
+        promise.notify();
+    }
+};
+
+p$1.notify = function notify() {
+    var promise = this;
+
+    nextTick(function () {
+        if (promise.state !== PENDING) {
+            while (promise.deferred.length) {
+                var deferred = promise.deferred.shift(),
+                    onResolved = deferred[0],
+                    onRejected = deferred[1],
+                    resolve = deferred[2],
+                    reject = deferred[3];
+
+                try {
+                    if (promise.state === RESOLVED) {
+                        if (typeof onResolved === 'function') {
+                            resolve(onResolved.call(undefined, promise.value));
+                        } else {
+                            resolve(promise.value);
+                        }
+                    } else if (promise.state === REJECTED) {
+                        if (typeof onRejected === 'function') {
+                            resolve(onRejected.call(undefined, promise.value));
+                        } else {
+                            reject(promise.value);
+                        }
+                    }
+                } catch (e) {
+                    reject(e);
+                }
+            }
+        }
+    });
+};
+
+p$1.then = function then(onResolved, onRejected) {
+    var promise = this;
+
+    return new Promise$2(function (resolve, reject) {
+        promise.deferred.push([onResolved, onRejected, resolve, reject]);
+        promise.notify();
+    });
+};
+
+p$1.catch = function (onRejected) {
+    return this.then(undefined, onRejected);
+};
+
+var PromiseObj = window.Promise || Promise$2;
+
+function Promise$1(executor, context) {
+
+    if (executor instanceof PromiseObj) {
+        this.promise = executor;
+    } else {
+        this.promise = new PromiseObj(executor.bind(context));
+    }
+
+    this.context = context;
+}
+
+Promise$1.all = function (iterable, context) {
+    return new Promise$1(PromiseObj.all(iterable), context);
+};
+
+Promise$1.resolve = function (value, context) {
+    return new Promise$1(PromiseObj.resolve(value), context);
+};
+
+Promise$1.reject = function (reason, context) {
+    return new Promise$1(PromiseObj.reject(reason), context);
+};
+
+Promise$1.race = function (iterable, context) {
+    return new Promise$1(PromiseObj.race(iterable), context);
+};
+
+var p = Promise$1.prototype;
+
+p.bind = function (context) {
+    this.context = context;
+    return this;
+};
+
+p.then = function (fulfilled, rejected) {
+
+    if (fulfilled && fulfilled.bind && this.context) {
+        fulfilled = fulfilled.bind(this.context);
+    }
+
+    if (rejected && rejected.bind && this.context) {
+        rejected = rejected.bind(this.context);
+    }
+
+    return new Promise$1(this.promise.then(fulfilled, rejected), this.context);
+};
+
+p.catch = function (rejected) {
+
+    if (rejected && rejected.bind && this.context) {
+        rejected = rejected.bind(this.context);
+    }
+
+    return new Promise$1(this.promise.catch(rejected), this.context);
+};
+
+p.finally = function (callback) {
+
+    return this.then(function (value) {
+        callback.call(this);
+        return value;
+    }, function (reason) {
+        callback.call(this);
+        return PromiseObj.reject(reason);
+    });
+};
+
+var debug = false;
+var util = {};
+var array = [];
+function Util (Vue) {
+    util = Vue.util;
+    debug = Vue.config.debug || !Vue.config.silent;
+}
+
+function warn(msg) {
+    if (typeof console !== 'undefined' && debug) {
+        console.warn('[VueResource warn]: ' + msg);
+    }
+}
+
+function error(msg) {
+    if (typeof console !== 'undefined') {
+        console.error(msg);
+    }
+}
+
+function nextTick(cb, ctx) {
+    return util.nextTick(cb, ctx);
+}
+
+function trim(str) {
+    return str.replace(/^\s*|\s*$/g, '');
+}
+
+var isArray = Array.isArray;
+
+function isString(val) {
+    return typeof val === 'string';
+}
+
+function isBoolean(val) {
+    return val === true || val === false;
+}
+
+function isFunction(val) {
+    return typeof val === 'function';
+}
+
+function isObject(obj) {
+    return obj !== null && typeof obj === 'object';
+}
+
+function isPlainObject(obj) {
+    return isObject(obj) && Object.getPrototypeOf(obj) == Object.prototype;
+}
+
+function isFormData(obj) {
+    return typeof FormData !== 'undefined' && obj instanceof FormData;
+}
+
+function when(value, fulfilled, rejected) {
+
+    var promise = Promise$1.resolve(value);
+
+    if (arguments.length < 2) {
+        return promise;
+    }
+
+    return promise.then(fulfilled, rejected);
+}
+
+function options(fn, obj, opts) {
+
+    opts = opts || {};
+
+    if (isFunction(opts)) {
+        opts = opts.call(obj);
+    }
+
+    return merge(fn.bind({ $vm: obj, $options: opts }), fn, { $options: opts });
+}
+
+function each(obj, iterator) {
+
+    var i, key;
+
+    if (typeof obj.length == 'number') {
+        for (i = 0; i < obj.length; i++) {
+            iterator.call(obj[i], obj[i], i);
+        }
+    } else if (isObject(obj)) {
+        for (key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                iterator.call(obj[key], obj[key], key);
+            }
+        }
+    }
+
+    return obj;
+}
+
+var assign = Object.assign || _assign;
+
+function merge(target) {
+
+    var args = array.slice.call(arguments, 1);
+
+    args.forEach(function (source) {
+        _merge(target, source, true);
+    });
+
+    return target;
+}
+
+function defaults(target) {
+
+    var args = array.slice.call(arguments, 1);
+
+    args.forEach(function (source) {
+
+        for (var key in source) {
+            if (target[key] === undefined) {
+                target[key] = source[key];
+            }
+        }
+    });
+
+    return target;
+}
+
+function _assign(target) {
+
+    var args = array.slice.call(arguments, 1);
+
+    args.forEach(function (source) {
+        _merge(target, source);
+    });
+
+    return target;
+}
+
+function _merge(target, source, deep) {
+    for (var key in source) {
+        if (deep && (isPlainObject(source[key]) || isArray(source[key]))) {
+            if (isPlainObject(source[key]) && !isPlainObject(target[key])) {
+                target[key] = {};
+            }
+            if (isArray(source[key]) && !isArray(target[key])) {
+                target[key] = [];
+            }
+            _merge(target[key], source[key], deep);
+        } else if (source[key] !== undefined) {
+            target[key] = source[key];
+        }
+    }
+}
+
+function root (options, next) {
+
+    var url = next(options);
+
+    if (isString(options.root) && !url.match(/^(https?:)?\//)) {
+        url = options.root + '/' + url;
+    }
+
+    return url;
+}
+
+function query (options, next) {
+
+    var urlParams = Object.keys(Url.options.params),
+        query = {},
+        url = next(options);
+
+    each(options.params, function (value, key) {
+        if (urlParams.indexOf(key) === -1) {
+            query[key] = value;
+        }
+    });
+
+    query = Url.params(query);
+
+    if (query) {
+        url += (url.indexOf('?') == -1 ? '?' : '&') + query;
+    }
+
+    return url;
+}
+
+/**
+ * URL Template v2.0.6 (https://github.com/bramstein/url-template)
+ */
+
+function expand(url, params, variables) {
+
+    var tmpl = parse(url),
+        expanded = tmpl.expand(params);
+
+    if (variables) {
+        variables.push.apply(variables, tmpl.vars);
+    }
+
+    return expanded;
+}
+
+function parse(template) {
+
+    var operators = ['+', '#', '.', '/', ';', '?', '&'],
+        variables = [];
+
+    return {
+        vars: variables,
+        expand: function (context) {
+            return template.replace(/\{([^\{\}]+)\}|([^\{\}]+)/g, function (_, expression, literal) {
+                if (expression) {
+
+                    var operator = null,
+                        values = [];
+
+                    if (operators.indexOf(expression.charAt(0)) !== -1) {
+                        operator = expression.charAt(0);
+                        expression = expression.substr(1);
+                    }
+
+                    expression.split(/,/g).forEach(function (variable) {
+                        var tmp = /([^:\*]*)(?::(\d+)|(\*))?/.exec(variable);
+                        values.push.apply(values, getValues(context, operator, tmp[1], tmp[2] || tmp[3]));
+                        variables.push(tmp[1]);
+                    });
+
+                    if (operator && operator !== '+') {
+
+                        var separator = ',';
+
+                        if (operator === '?') {
+                            separator = '&';
+                        } else if (operator !== '#') {
+                            separator = operator;
+                        }
+
+                        return (values.length !== 0 ? operator : '') + values.join(separator);
+                    } else {
+                        return values.join(',');
+                    }
+                } else {
+                    return encodeReserved(literal);
+                }
+            });
+        }
+    };
+}
+
+function getValues(context, operator, key, modifier) {
+
+    var value = context[key],
+        result = [];
+
+    if (isDefined(value) && value !== '') {
+        if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+            value = value.toString();
+
+            if (modifier && modifier !== '*') {
+                value = value.substring(0, parseInt(modifier, 10));
+            }
+
+            result.push(encodeValue(operator, value, isKeyOperator(operator) ? key : null));
+        } else {
+            if (modifier === '*') {
+                if (Array.isArray(value)) {
+                    value.filter(isDefined).forEach(function (value) {
+                        result.push(encodeValue(operator, value, isKeyOperator(operator) ? key : null));
+                    });
+                } else {
+                    Object.keys(value).forEach(function (k) {
+                        if (isDefined(value[k])) {
+                            result.push(encodeValue(operator, value[k], k));
+                        }
+                    });
+                }
+            } else {
+                var tmp = [];
+
+                if (Array.isArray(value)) {
+                    value.filter(isDefined).forEach(function (value) {
+                        tmp.push(encodeValue(operator, value));
+                    });
+                } else {
+                    Object.keys(value).forEach(function (k) {
+                        if (isDefined(value[k])) {
+                            tmp.push(encodeURIComponent(k));
+                            tmp.push(encodeValue(operator, value[k].toString()));
+                        }
+                    });
+                }
+
+                if (isKeyOperator(operator)) {
+                    result.push(encodeURIComponent(key) + '=' + tmp.join(','));
+                } else if (tmp.length !== 0) {
+                    result.push(tmp.join(','));
+                }
+            }
+        }
+    } else {
+        if (operator === ';') {
+            result.push(encodeURIComponent(key));
+        } else if (value === '' && (operator === '&' || operator === '?')) {
+            result.push(encodeURIComponent(key) + '=');
+        } else if (value === '') {
+            result.push('');
+        }
+    }
+
+    return result;
+}
+
+function isDefined(value) {
+    return value !== undefined && value !== null;
+}
+
+function isKeyOperator(operator) {
+    return operator === ';' || operator === '&' || operator === '?';
+}
+
+function encodeValue(operator, value, key) {
+
+    value = operator === '+' || operator === '#' ? encodeReserved(value) : encodeURIComponent(value);
+
+    if (key) {
+        return encodeURIComponent(key) + '=' + value;
+    } else {
+        return value;
+    }
+}
+
+function encodeReserved(str) {
+    return str.split(/(%[0-9A-Fa-f]{2})/g).map(function (part) {
+        if (!/%[0-9A-Fa-f]/.test(part)) {
+            part = encodeURI(part);
+        }
+        return part;
+    }).join('');
+}
+
+function template (options) {
+
+    var variables = [],
+        url = expand(options.url, options.params, variables);
+
+    variables.forEach(function (key) {
+        delete options.params[key];
+    });
+
+    return url;
+}
+
+/**
+ * Service for URL templating.
+ */
+
+var ie = document.documentMode;
+var el = document.createElement('a');
+
+function Url(url, params) {
+
+    var self = this || {},
+        options = url,
+        transform;
+
+    if (isString(url)) {
+        options = { url: url, params: params };
+    }
+
+    options = merge({}, Url.options, self.$options, options);
+
+    Url.transforms.forEach(function (handler) {
+        transform = factory(handler, transform, self.$vm);
+    });
+
+    return transform(options);
+}
+
+/**
+ * Url options.
+ */
+
+Url.options = {
+    url: '',
+    root: null,
+    params: {}
+};
+
+/**
+ * Url transforms.
+ */
+
+Url.transforms = [template, query, root];
+
+/**
+ * Encodes a Url parameter string.
+ *
+ * @param {Object} obj
+ */
+
+Url.params = function (obj) {
+
+    var params = [],
+        escape = encodeURIComponent;
+
+    params.add = function (key, value) {
+
+        if (isFunction(value)) {
+            value = value();
+        }
+
+        if (value === null) {
+            value = '';
+        }
+
+        this.push(escape(key) + '=' + escape(value));
+    };
+
+    serialize(params, obj);
+
+    return params.join('&').replace(/%20/g, '+');
+};
+
+/**
+ * Parse a URL and return its components.
+ *
+ * @param {String} url
+ */
+
+Url.parse = function (url) {
+
+    if (ie) {
+        el.href = url;
+        url = el.href;
+    }
+
+    el.href = url;
+
+    return {
+        href: el.href,
+        protocol: el.protocol ? el.protocol.replace(/:$/, '') : '',
+        port: el.port,
+        host: el.host,
+        hostname: el.hostname,
+        pathname: el.pathname.charAt(0) === '/' ? el.pathname : '/' + el.pathname,
+        search: el.search ? el.search.replace(/^\?/, '') : '',
+        hash: el.hash ? el.hash.replace(/^#/, '') : ''
+    };
+};
+
+function factory(handler, next, vm) {
+    return function (options) {
+        return handler.call(vm, options, next);
+    };
+}
+
+function serialize(params, obj, scope) {
+
+    var array = isArray(obj),
+        plain = isPlainObject(obj),
+        hash;
+
+    each(obj, function (value, key) {
+
+        hash = isObject(value) || isArray(value);
+
+        if (scope) {
+            key = scope + '[' + (plain || hash ? key : '') + ']';
+        }
+
+        if (!scope && array) {
+            params.add(value.name, value.value);
+        } else if (hash) {
+            serialize(params, value, key);
+        } else {
+            params.add(key, value);
+        }
+    });
+}
+
+function xdrClient (request) {
+    return new Promise$1(function (resolve) {
+
+        var xdr = new XDomainRequest(),
+            handler = function (event) {
+
+            var response = request.respondWith(xdr.responseText, {
+                status: xdr.status,
+                statusText: xdr.statusText
+            });
+
+            resolve(response);
+        };
+
+        request.abort = function () {
+            return xdr.abort();
+        };
+
+        xdr.open(request.method, request.getUrl(), true);
+        xdr.timeout = 0;
+        xdr.onload = handler;
+        xdr.onerror = handler;
+        xdr.ontimeout = function () {};
+        xdr.onprogress = function () {};
+        xdr.send(request.getBody());
+    });
+}
+
+var ORIGIN_URL = Url.parse(location.href);
+var SUPPORTS_CORS = 'withCredentials' in new XMLHttpRequest();
+
+function cors (request, next) {
+
+    if (!isBoolean(request.crossOrigin) && crossOrigin(request)) {
+        request.crossOrigin = true;
+    }
+
+    if (request.crossOrigin) {
+
+        if (!SUPPORTS_CORS) {
+            request.client = xdrClient;
+        }
+
+        delete request.emulateHTTP;
+    }
+
+    next();
+}
+
+function crossOrigin(request) {
+
+    var requestUrl = Url.parse(Url(request));
+
+    return requestUrl.protocol !== ORIGIN_URL.protocol || requestUrl.host !== ORIGIN_URL.host;
+}
+
+function body (request, next) {
+
+    if (request.emulateJSON && isPlainObject(request.body)) {
+        request.body = Url.params(request.body);
+        request.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+    }
+
+    if (isFormData(request.body)) {
+        delete request.headers['Content-Type'];
+    }
+
+    if (isPlainObject(request.body)) {
+        request.body = JSON.stringify(request.body);
+    }
+
+    next(function (response) {
+
+        var contentType = response.headers['Content-Type'];
+
+        if (isString(contentType) && contentType.indexOf('application/json') === 0) {
+
+            try {
+                response.data = response.json();
+            } catch (e) {
+                response.data = null;
+            }
+        } else {
+            response.data = response.text();
+        }
+    });
+}
+
+function jsonpClient (request) {
+    return new Promise$1(function (resolve) {
+
+        var name = request.jsonp || 'callback',
+            callback = '_jsonp' + Math.random().toString(36).substr(2),
+            body = null,
+            handler,
+            script;
+
+        handler = function (event) {
+
+            var status = 0;
+
+            if (event.type === 'load' && body !== null) {
+                status = 200;
+            } else if (event.type === 'error') {
+                status = 404;
+            }
+
+            resolve(request.respondWith(body, { status: status }));
+
+            delete window[callback];
+            document.body.removeChild(script);
+        };
+
+        request.params[name] = callback;
+
+        window[callback] = function (result) {
+            body = JSON.stringify(result);
+        };
+
+        script = document.createElement('script');
+        script.src = request.getUrl();
+        script.type = 'text/javascript';
+        script.async = true;
+        script.onload = handler;
+        script.onerror = handler;
+
+        document.body.appendChild(script);
+    });
+}
+
+function jsonp (request, next) {
+
+    if (request.method == 'JSONP') {
+        request.client = jsonpClient;
+    }
+
+    next(function (response) {
+
+        if (request.method == 'JSONP') {
+            response.data = response.json();
+        }
+    });
+}
+
+function before (request, next) {
+
+    if (isFunction(request.before)) {
+        request.before.call(this, request);
+    }
+
+    next();
+}
+
+/**
+ * HTTP method override Interceptor.
+ */
+
+function method (request, next) {
+
+    if (request.emulateHTTP && /^(PUT|PATCH|DELETE)$/i.test(request.method)) {
+        request.headers['X-HTTP-Method-Override'] = request.method;
+        request.method = 'POST';
+    }
+
+    next();
+}
+
+function header (request, next) {
+
+    request.method = request.method.toUpperCase();
+    request.headers = assign({}, Http.headers.common, !request.crossOrigin ? Http.headers.custom : {}, Http.headers[request.method.toLowerCase()], request.headers);
+
+    next();
+}
+
+/**
+ * Timeout Interceptor.
+ */
+
+function timeout (request, next) {
+
+    var timeout;
+
+    if (request.timeout) {
+        timeout = setTimeout(function () {
+            request.abort();
+        }, request.timeout);
+    }
+
+    next(function (response) {
+
+        clearTimeout(timeout);
+    });
+}
+
+function xhrClient (request) {
+    return new Promise$1(function (resolve) {
+
+        var xhr = new XMLHttpRequest(),
+            handler = function (event) {
+
+            var response = request.respondWith('response' in xhr ? xhr.response : xhr.responseText, {
+                status: xhr.status === 1223 ? 204 : xhr.status, // IE9 status bug
+                statusText: xhr.status === 1223 ? 'No Content' : trim(xhr.statusText),
+                headers: parseHeaders(xhr.getAllResponseHeaders())
+            });
+
+            resolve(response);
+        };
+
+        request.abort = function () {
+            return xhr.abort();
+        };
+
+        xhr.open(request.method, request.getUrl(), true);
+        xhr.timeout = 0;
+        xhr.onload = handler;
+        xhr.onerror = handler;
+
+        if (request.progress) {
+            if (request.method === 'GET') {
+                xhr.addEventListener('progress', request.progress);
+            } else if (/^(POST|PUT)$/i.test(request.method)) {
+                xhr.upload.addEventListener('progress', request.progress);
+            }
+        }
+
+        if (request.credentials === true) {
+            xhr.withCredentials = true;
+        }
+
+        each(request.headers || {}, function (value, header) {
+            xhr.setRequestHeader(header, value);
+        });
+
+        xhr.send(request.getBody());
+    });
+}
+
+function parseHeaders(str) {
+
+    var headers = {},
+        value,
+        name,
+        i;
+
+    each(trim(str).split('\n'), function (row) {
+
+        i = row.indexOf(':');
+        name = trim(row.slice(0, i));
+        value = trim(row.slice(i + 1));
+
+        if (headers[name]) {
+
+            if (isArray(headers[name])) {
+                headers[name].push(value);
+            } else {
+                headers[name] = [headers[name], value];
+            }
+        } else {
+
+            headers[name] = value;
+        }
+    });
+
+    return headers;
+}
+
+function Client (context) {
+
+    var reqHandlers = [sendRequest],
+        resHandlers = [],
+        handler;
+
+    if (!isObject(context)) {
+        context = null;
+    }
+
+    function Client(request) {
+        return new Promise$1(function (resolve) {
+
+            function exec() {
+
+                handler = reqHandlers.pop();
+
+                if (isFunction(handler)) {
+                    handler.call(context, request, next);
+                } else {
+                    warn('Invalid interceptor of type ' + typeof handler + ', must be a function');
+                    next();
+                }
+            }
+
+            function next(response) {
+
+                if (isFunction(response)) {
+
+                    resHandlers.unshift(response);
+                } else if (isObject(response)) {
+
+                    resHandlers.forEach(function (handler) {
+                        response = when(response, function (response) {
+                            return handler.call(context, response) || response;
+                        });
+                    });
+
+                    when(response, resolve);
+
+                    return;
+                }
+
+                exec();
+            }
+
+            exec();
+        }, context);
+    }
+
+    Client.use = function (handler) {
+        reqHandlers.push(handler);
+    };
+
+    return Client;
+}
+
+function sendRequest(request, resolve) {
+
+    var client = request.client || xhrClient;
+
+    resolve(client(request));
+}
+
+var classCallCheck = function (instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
+
+/**
+ * HTTP Response.
+ */
+
+var Response = function () {
+    function Response(body, _ref) {
+        var url = _ref.url;
+        var headers = _ref.headers;
+        var status = _ref.status;
+        var statusText = _ref.statusText;
+        classCallCheck(this, Response);
+
+
+        this.url = url;
+        this.body = body;
+        this.headers = headers || {};
+        this.status = status || 0;
+        this.statusText = statusText || '';
+        this.ok = status >= 200 && status < 300;
+    }
+
+    Response.prototype.text = function text() {
+        return this.body;
+    };
+
+    Response.prototype.blob = function blob() {
+        return new Blob([this.body]);
+    };
+
+    Response.prototype.json = function json() {
+        return JSON.parse(this.body);
+    };
+
+    return Response;
+}();
+
+var Request = function () {
+    function Request(options) {
+        classCallCheck(this, Request);
+
+
+        this.method = 'GET';
+        this.body = null;
+        this.params = {};
+        this.headers = {};
+
+        assign(this, options);
+    }
+
+    Request.prototype.getUrl = function getUrl() {
+        return Url(this);
+    };
+
+    Request.prototype.getBody = function getBody() {
+        return this.body;
+    };
+
+    Request.prototype.respondWith = function respondWith(body, options) {
+        return new Response(body, assign(options || {}, { url: this.getUrl() }));
+    };
+
+    return Request;
+}();
+
+/**
+ * Service for sending network requests.
+ */
+
+var CUSTOM_HEADERS = { 'X-Requested-With': 'XMLHttpRequest' };
+var COMMON_HEADERS = { 'Accept': 'application/json, text/plain, */*' };
+var JSON_CONTENT_TYPE = { 'Content-Type': 'application/json;charset=utf-8' };
+
+function Http(options) {
+
+    var self = this || {},
+        client = Client(self.$vm);
+
+    defaults(options || {}, self.$options, Http.options);
+
+    Http.interceptors.forEach(function (handler) {
+        client.use(handler);
+    });
+
+    return client(new Request(options)).then(function (response) {
+
+        return response.ok ? response : Promise$1.reject(response);
+    }, function (response) {
+
+        if (response instanceof Error) {
+            error(response);
+        }
+
+        return Promise$1.reject(response);
+    });
+}
+
+Http.options = {};
+
+Http.headers = {
+    put: JSON_CONTENT_TYPE,
+    post: JSON_CONTENT_TYPE,
+    patch: JSON_CONTENT_TYPE,
+    delete: JSON_CONTENT_TYPE,
+    custom: CUSTOM_HEADERS,
+    common: COMMON_HEADERS
+};
+
+Http.interceptors = [before, timeout, method, body, jsonp, header, cors];
+
+['get', 'delete', 'head', 'jsonp'].forEach(function (method) {
+
+    Http[method] = function (url, options) {
+        return this(assign(options || {}, { url: url, method: method }));
+    };
+});
+
+['post', 'put', 'patch'].forEach(function (method) {
+
+    Http[method] = function (url, body, options) {
+        return this(assign(options || {}, { url: url, method: method, body: body }));
+    };
+});
+
+function Resource(url, params, actions, options) {
+
+    var self = this || {},
+        resource = {};
+
+    actions = assign({}, Resource.actions, actions);
+
+    each(actions, function (action, name) {
+
+        action = merge({ url: url, params: params || {} }, options, action);
+
+        resource[name] = function () {
+            return (self.$http || Http)(opts(action, arguments));
+        };
+    });
+
+    return resource;
+}
+
+function opts(action, args) {
+
+    var options = assign({}, action),
+        params = {},
+        body;
+
+    switch (args.length) {
+
+        case 2:
+
+            params = args[0];
+            body = args[1];
+
+            break;
+
+        case 1:
+
+            if (/^(POST|PUT|PATCH)$/i.test(options.method)) {
+                body = args[0];
+            } else {
+                params = args[0];
+            }
+
+            break;
+
+        case 0:
+
+            break;
+
+        default:
+
+            throw 'Expected up to 4 arguments [params, body], got ' + args.length + ' arguments';
+    }
+
+    options.body = body;
+    options.params = assign({}, options.params, params);
+
+    return options;
+}
+
+Resource.actions = {
+
+    get: { method: 'GET' },
+    save: { method: 'POST' },
+    query: { method: 'GET' },
+    update: { method: 'PUT' },
+    remove: { method: 'DELETE' },
+    delete: { method: 'DELETE' }
+
+};
+
+function plugin(Vue) {
+
+    if (plugin.installed) {
+        return;
+    }
+
+    Util(Vue);
+
+    Vue.url = Url;
+    Vue.http = Http;
+    Vue.resource = Resource;
+    Vue.Promise = Promise$1;
+
+    Object.defineProperties(Vue.prototype, {
+
+        $url: {
+            get: function () {
+                return options(Vue.url, this, this.$options.url);
+            }
+        },
+
+        $http: {
+            get: function () {
+                return options(Vue.http, this, this.$options.http);
+            }
+        },
+
+        $resource: {
+            get: function () {
+                return Vue.resource.bind(this);
+            }
+        },
+
+        $promise: {
+            get: function () {
+                var _this = this;
+
+                return function (executor) {
+                    return new Vue.Promise(executor, _this);
+                };
+            }
+        }
+
+    });
+}
+
+if (typeof window !== 'undefined' && window.Vue) {
+    window.Vue.use(plugin);
+}
+
+module.exports = plugin;
+},{}],24:[function(require,module,exports){
+/*!
+ * vue-validator v3.0.0-alpha.2 
+ * (c) 2016 kazuya kawaguchi
+ * Released under the MIT License.
+ */
+'use strict';
+
+/*  */
+
+function warn (msg, err) {
+  if (window.console) {
+    console.warn('[vue-validator] ' + msg);
+    if (err) {
+      console.warn(err.stack);
+    }
+  }
+}
+
+/*  */
+
+// validator configrations
+var validator = {
+  classes: {}
+};
+
+var Config = function (Vue) {
+  // define Vue.config.validator configration
+  // $FlowFixMe: https://github.com/facebook/flow/issues/285
+  Object.defineProperty(Vue.config, 'validator', {
+    enumerable: true,
+    configurable: true,
+    get: function () { return validator },
+    set: function (val) { validator = val; }
+  });
+};
+
+/*  */
+/**
+ * build-in validators
+ */
+
+/**
+ * required
+ * This function validate whether the value has been filled out.
+ */
+function required (val, arg) {
+  var isRequired = arg === undefined ? true : arg;
+  if (Array.isArray(val)) {
+    if (val.length !== 0) {
+      var valid = true;
+      for (var i = 0, l = val.length; i < l; i++) {
+        valid = required(val[i], isRequired);
+        if ((isRequired && !valid) || (!isRequired && valid)) {
+          break
+        }
+      }
+      return valid
+    } else {
+      return !isRequired
+    }
+  } else if (typeof val === 'number' || typeof val === 'function') {
+    return isRequired
+  } else if (typeof val === 'boolean') {
+    return val === isRequired
+  } else if (typeof val === 'string') {
+    return isRequired ? (val.length > 0) : (val.length <= 0)
+  } else if (val !== null && typeof val === 'object') {
+    return isRequired ? (Object.keys(val).length > 0) : (Object.keys(val).length <= 0)
+  } else if (val === null || val === undefined) {
+    return !isRequired
+  } else {
+    return !isRequired
+  }
+}
+
+/**
+ * pattern
+ * This function validate whether the value matches the regex pattern
+ */
+function pattern (val, pat) {
+  if (typeof pat !== 'string') { return false }
+
+  var match = pat.match(new RegExp('^/(.*?)/([gimy]*)$'));
+  if (!match) { return false }
+
+  return new RegExp(match[1], match[2]).test(val)
+}
+
+/**
+ * minlength
+ * This function validate whether the minimum length.
+ */
+function minlength (val, min) {
+  if (typeof val === 'string') {
+    return isInteger(min, 10) && val.length >= parseInt(min, 10)
+  } else if (Array.isArray(val)) {
+    return val.length >= parseInt(min, 10)
+  } else {
+    return false
+  }
+}
+
+/**
+ * maxlength
+ * This function validate whether the maximum length.
+ */
+function maxlength (val, max) {
+  if (typeof val === 'string') {
+    return isInteger(max, 10) && val.length <= parseInt(max, 10)
+  } else if (Array.isArray(val)) {
+    return val.length <= parseInt(max, 10)
+  } else {
+    return false
+  }
+}
+
+/**
+ * min
+ * This function validate whether the minimum value of the numberable value.
+ */
+function min (val, arg) {
+  return !isNaN(+(val)) && !isNaN(+(arg)) && (+(val) >= +(arg))
+}
+
+/**
+ * max
+ * This function validate whether the maximum value of the numberable value.
+ */
+function max (val, arg) {
+  return !isNaN(+(val)) && !isNaN(+(arg)) && (+(val) <= +(arg))
+}
+
+/**
+ * isInteger
+ * This function check whether the value of the string is integer.
+ */
+function isInteger (val) {
+  return /^(-?[1-9]\d*|0)$/.test(val)
+}
+
+
+var validators = Object.freeze({
+	required: required,
+	pattern: pattern,
+	minlength: minlength,
+	maxlength: maxlength,
+	min: min,
+	max: max
+});
+
+/*  */
+var Asset = function (Vue) {
+  var ref = Vue.util;
+  var extend = ref.extend;
+
+  // set global validators asset
+  var assets = Object.create(null);
+  extend(assets, validators);
+  Vue.options.validators = assets;
+
+  // set option merge strategy
+  var strats = Vue.config.optionMergeStrategies;
+  if (strats) {
+    strats.validators = function (parent, child) {
+      if (!child) { return parent }
+      if (!parent) { return child }
+      var ret = Object.create(null);
+      extend(ret, parent);
+      var key;
+      for (key in child) {
+        ret[key] = child[key];
+      }
+      return ret
+    };
+  }
+
+  /**
+   * Register or retrieve a global validator definition.
+   */
+  function validator (
+    id,
+    def
+  ) {
+    if (def === undefined) {
+      return Vue.options['validators'][id]
+    } else {
+      Vue.options['validators'][id] = def;
+      if (def === null) {
+        delete Vue.options['validators']['id'];
+      }
+    }
+  }
+  Vue['validator'] = validator;
+};
+
+/*  */
+
+var Group = function (Vue) {
+  var ref = Vue.util;
+  var extend = ref.extend;
+
+  return {
+    data: function data () {
+      return {
+        valid: true,
+        dirty: false,
+        touched: false,
+        modified: false,
+        results: {}
+      }
+    },
+    computed: {
+      invalid: function invalid () { return !this.valid },
+      pristine: function pristine () { return !this.dirty },
+      untouched: function untouched () { return !this.touched },
+      result: function result () {
+        var ret = {
+          valid: this.valid,
+          invalid: this.invalid,
+          dirty: this.dirty,
+          pristine: this.pristine,
+          touched: this.touched,
+          untouched: this.untouched,
+          modified: this.modified
+        };
+        var results = this.results;
+        this._validityKeys.forEach(function (key) {
+          ret[key] = results[key];
+          if (ret[key].errors) {
+            var errors = ret.errors || [];
+            ret[key].errors.forEach(function (error) {
+              errors.push(error);
+            });
+            ret.errors = errors;
+          }
+        });
+        return ret
+      }
+    },
+    watch: {
+      results: function results (val, old) {
+        var keys = this._validityKeys;
+        var results = this.results;
+        this.valid = this.checkResults(keys, results, 'valid', true);
+        this.dirty = this.checkResults(keys, results, 'dirty', false);
+        this.touched = this.checkResults(keys, results, 'touched', false);
+        this.modified = this.checkResults(keys, results, 'modified', false);
+      }
+    },
+    created: function created () {
+      this._validities = Object.create(null);
+      this._validityWatchers = Object.create(null);
+      this._validityKeys = [];
+      this._committing = false;
+    },
+    destroyed: function destroyed () {
+      var this$1 = this;
+
+      this._validityKeys.forEach(function (key) {
+        this$1._validityWatchers[key]();
+        delete this$1._validityWatchers[key];
+        delete this$1._validities[key];
+      });
+      delete this._validityWatchers;
+      delete this._validities;
+      delete this._validityKeys;
+    },
+    methods: {
+      register: function register (name, validity) {
+        var this$1 = this;
+
+        this._validities[name] = validity;
+        this._validityKeys = Object.keys(this._validities);
+        this.setResults(name, {});
+        this.withCommit(function () {
+          this$1._validityWatchers[name] = validity.$watch('result', function (val, old) {
+            this$1.setResults(name, val);
+          }, { deep: true, immediate: true });
+        });
+      },
+      unregister: function unregister (name) {
+        var this$1 = this;
+
+        this._validityWatchers[name]();
+        delete this._validityWatchers[name];
+        delete this._validities[name];
+        this._validityKeys = Object.keys(this._validities);
+        this.withCommit(function () {
+          this$1.resetResults(name);
+        });
+      },
+      validityCount: function validityCount () {
+        return this._validityKeys.length
+      },
+      isRegistered: function isRegistered (name) {
+        return name in this._validities
+      },
+      getValidityKeys: function getValidityKeys () {
+        return this._validityKeys
+      },
+      checkResults: function checkResults (
+        keys,
+        results,
+        prop,
+        checking
+      ) {
+        var ret = checking;
+        for (var i = 0; i < keys.length; i++) {
+          var result = results[keys[i]];
+          if (result[prop] !== checking) {
+            ret = !checking;
+            break
+          }
+        }
+        return ret
+      },
+      setResults: function setResults (name, val) {
+        var this$1 = this;
+
+        var newVal = {};
+        this._validityKeys.forEach(function (key) {
+          newVal[key] = extend({}, this$1.results[key]);
+        });
+        newVal[name] = extend({}, val);
+        this.results = newVal;
+      },
+      resetResults: function resetResults (ignore) {
+        var this$1 = this;
+
+        var newVal = {};
+        this._validityKeys.forEach(function (key) {
+          if (ignore && ignore !== key) {
+            newVal[key] = extend({}, this$1.results[key]);
+          }
+        });
+        this.results = newVal;
+      },
+      withCommit: function withCommit (fn) {
+        var committing = this._committing;
+        this._committing = true;
+        fn();
+        this._committing = committing;
+      }
+    }
+  }
+};
+
+/*  */
+var ValidationClass = function (Vue) {
+  var ValidityGroup = Group(Vue);
+
+  var Validation = function Validation (options) {
+    if ( options === void 0 ) options = {};
+
+    this._result = {};
+    this._host = options.host;
+    this._named = Object.create(null);
+    this._group = Object.create(null);
+    this._validities = Object.create(null);
+    this._beginDestroy = false;
+    Vue.util.defineReactive(this._host, '$validation', this._result);
+  };
+
+  Validation.prototype.register = function register (
+    field,
+    validity,
+    options
+  ) {
+      if ( options === void 0 ) options = {};
+
+    // NOTE: lazy setup (in constructor, occured callstack recursive errors ...)
+    if (!this._validityManager) {
+      this._validityManager = new Vue(ValidityGroup);
+      this._watchValidityResult();
+    }
+
+    if (this._validities[field]) {
+      // TODO: should be output console.error
+      return
+    }
+    this._validities[field] = validity;
+
+    var named = options.named;
+      var group = options.group;
+    var groupValidity = group
+      ? this._getValidityGroup('group', group) || this._registerValidityGroup('group', group)
+      : null;
+    var namedValidity = named
+      ? this._getValidityGroup('named', named) || this._registerValidityGroup('named', named)
+      : null;
+    if (named && group && namedValidity && groupValidity) {
+      groupValidity.register(field, validity);
+      !namedValidity.isRegistered(group) && namedValidity.register(group, groupValidity);
+      !this._validityManager.isRegistered(named) && this._validityManager.register(named, namedValidity);
+    } else if (namedValidity) {
+      namedValidity.register(field, validity);
+      !this._validityManager.isRegistered(named) && this._validityManager.register(named, namedValidity);
+    } else if (groupValidity) {
+      groupValidity.register(field, validity);
+      !this._validityManager.isRegistered(group) && this._validityManager.register(group, groupValidity);
+    } else {
+      this._validityManager.register(field, validity);
+    }
+  };
+
+  Validation.prototype.unregister = function unregister (
+    field,
+    options
+  ) {
+      if ( options === void 0 ) options = {};
+
+    if (!this._validityManager) {
+      // TODO: should be output error
+      return
+    }
+
+    if (!this._validities[field]) {
+      // TODO: should be output error
+      return
+    }
+    delete this._validities[field];
+
+    var named = options.named;
+      var group = options.group;
+    var groupValidity = group ? this._getValidityGroup('group', group) : null;
+    var namedValidity = named ? this._getValidityGroup('named', named) : null;
+    if (named && group && namedValidity && groupValidity) {
+      groupValidity.unregister(field);
+      if (groupValidity.validityCount() === 0) {
+        namedValidity.isRegistered(group) && namedValidity.unregister(group);
+        this._unregisterValidityGroup('group', group);
+      }
+      if (namedValidity.validityCount() === 0) {
+        this._validityManager.isRegistered(named) && this._validityManager.unregister(named);
+        this._unregisterValidityGroup('named', named);
+      }
+    } else if (named && namedValidity) {
+      namedValidity.unregister(field);
+      if (namedValidity.validityCount() === 0) {
+        this._validityManager.isRegistered(named) && this._validityManager.unregister(named);
+        this._unregisterValidityGroup('named', named);
+      }
+    } else if (group && groupValidity) {
+      groupValidity.unregister(field);
+      if (groupValidity.validityCount() === 0) {
+        this._validityManager.isRegistered(group) && this._validityManager.unregister(group);
+        this._unregisterValidityGroup('group', group);
+      }
+    } else {
+      this._validityManager.unregister(field);
+    }
+  };
+
+  Validation.prototype.destroy = function destroy () {
+      var this$1 = this;
+
+    var validityKeys = Object.keys(this._validities);
+    var namedKeys = Object.keys(this._named);
+    var groupKeys = Object.keys(this._group);
+
+    // unregister validity
+    validityKeys.forEach(function (validityKey) {
+      groupKeys.forEach(function (groupKey) {
+        var group = this$1._getValidityGroup('group', groupKey);
+        if (group && group.isRegistered(groupKey)) {
+          group.unregister(validityKey);
+        }
+      });
+      namedKeys.forEach(function (namedKey) {
+        var named = this$1._getValidityGroup('named', namedKey);
+        if (named && named.isRegistered(validityKey)) {
+          named.unregister(validityKey);
+        }
+      });
+      if (this$1._validityManager.isRegistered(validityKey)) {
+        this$1._validityManager.unregister(validityKey);
+      }
+      delete this$1._validities[validityKey];
+    });
+
+    // unregister grouped validity
+    groupKeys.forEach(function (groupKey) {
+      namedKeys.forEach(function (namedKey) {
+        var named = this$1._getValidityGroup('named', namedKey);
+        if (named && named.isRegistered(groupKey)) {
+          named.unregister(groupKey);
+        }
+      });
+      if (this$1._validityManager.isRegistered(groupKey)) {
+        this$1._validityManager.unregister(groupKey);
+      }
+      this$1._unregisterValidityGroup('group', groupKey);
+    });
+
+    // unregister named validity
+    namedKeys.forEach(function (namedKey) {
+      if (this$1._validityManager.isRegistered(namedKey)) {
+        this$1._validityManager.unregister(namedKey);
+      }
+      this$1._unregisterValidityGroup('named', namedKey);
+    });
+
+    this._beginDestroy = true;
+  };
+
+  Validation.prototype._getValidityGroup = function _getValidityGroup (type, name) {
+    return type === 'named' ? this._named[name] : this._group[name]
+  };
+
+  Validation.prototype._registerValidityGroup = function _registerValidityGroup (type, name) {
+    var groups = type === 'named' ? this._named : this._group;
+    groups[name] = new Vue(ValidityGroup);
+    return groups[name]
+  };
+
+  Validation.prototype._unregisterValidityGroup = function _unregisterValidityGroup (type, name) {
+    var groups = type === 'named' ? this._named : this._group;
+    if (!groups[name]) {
+      // TODO: should be warn
+      return
+    }
+
+    groups[name].$destroy();
+    delete groups[name];
+  };
+
+  Validation.prototype._watchValidityResult = function _watchValidityResult () {
+      var this$1 = this;
+
+    this._watcher = this._validityManager.$watch('results', function (val, old) {
+      Vue.set(this$1._host, '$validation', val);
+      if (this$1._beginDestroy) {
+        this$1._destroyValidityMananger();
+      }
+    }, { deep: true });
+  };
+
+  Validation.prototype._unwatchValidityResult = function _unwatchValidityResult () {
+    this._watcher();
+    delete this._watcher;
+  };
+
+  Validation.prototype._destroyValidityMananger = function _destroyValidityMananger () {
+    this._unwatchValidityResult();
+    this._validityManager.$destroy();
+    this._validityManager = null;
+  };
+
+  return Validation
+};
+
+/*  */
+
+var Mixin = function (Vue) {
+  var Validation = ValidationClass(Vue);
+
+  return {
+    beforeCreate: function beforeCreate () {
+      this._validation = new Validation({ host: this });
+    }
+  }
+};
+
+/*  */
+
+var baseProps = {
+  field: {
+    type: String,
+    required: true
+  },
+  validators: {
+    type: [String, Array, Object],
+    required: true
+  },
+  group: {
+    type: String
+  },
+  multiple: {
+    type: Boolean
+  },
+  autotouch: {
+    type: String,
+    default: function () {
+      return 'on'
+    }
+  },
+  classes: {
+    type: Object,
+    default: function () {
+      return {}
+    }
+  }
+};
+
+var DEFAULT_CLASSES = {
+  valid: 'valid',
+  invalid: 'invalid',
+  touched: 'touched',
+  untouched: 'untouched',
+  pristine: 'pristine',
+  dirty: 'dirty',
+  modified: 'modified'
+};
+
+/*  */
+var States = function (Vue) {
+  var ref = Vue.util;
+  var extend = ref.extend;
+  var isPlainObject = ref.isPlainObject;
+
+  function initialStates (states, validators, init) {
+    if ( init === void 0 ) init = undefined;
+
+    if (Array.isArray(validators)) {
+      validators.forEach(function (validator) {
+        states[validator] = init;
+      });
+    } else {
+      Object.keys(validators).forEach(function (validator) {
+        var props = (validators[validator] &&
+          validators[validator]['props'] &&
+          isPlainObject(validators[validator]['props']))
+            ? validators[validator]['props']
+            : null;
+        if (props) {
+          Object.keys(props).forEach(function (prop) {
+            states[validator] = {};
+            states[validator][prop] = init;
+          });
+        } else {
+          states[validator] = init;
+        }
+      });
+    }
+  }
+
+  function getInitialResults (validators) {
+    var results = {};
+    initialStates(results, validators, undefined);
+    return results
+  }
+
+  function getInitialProgresses (validators) {
+    var progresses = {};
+    initialStates(progresses, validators, '');
+    return progresses
+  }
+
+  var props = extend({
+    child: {
+      type: Object,
+      required: true
+    },
+    value: {
+      type: Object
+    }
+  }, baseProps);
+
+  function data () {
+    var validators = nomalizeValidators(this.validators);
+    return {
+      results: getInitialResults(validators),
+      valid: true,
+      dirty: false,
+      touched: false,
+      modified: false,
+      progresses: getInitialProgresses(validators)
+    }
+  }
+
+  return {
+    props: props,
+    data: data
+  }
+};
+
+function nomalizeValidators (target) {
+  return typeof target === 'string' ? [target] : target
+}
+
+/*  */
+
+var Computed = function (Vue) {
+  var ref = Vue.util;
+  var isPlainObject = ref.isPlainObject;
+
+  function setError (
+    result,
+    field,
+    validator,
+    message,
+    prop
+  ) {
+    var error = { field: field, validator: validator };
+    if (message) {
+      error.message = message;
+    }
+    if (prop) {
+      error.prop = prop;
+    }
+    result.errors = result.errors || [];
+    result.errors.push(error);
+  }
+
+  function walkProgresses (keys, target) {
+    var progress = '';
+    for (var i = 0; i < keys.length; i++) {
+      var result = target[keys[i]];
+      if (typeof result === 'string' && result) {
+        progress = result;
+        break
+      }
+      if (isPlainObject(result)) {
+        var nestedKeys = Object.keys(result);
+        progress = walkProgresses(nestedKeys, result);
+        if (!progress) {
+          break
+        }
+      }
+    }
+    return progress
+  }
+
+  function invalid () {
+    return !this.valid
+  }
+
+  function pristine () {
+    return !this.dirty
+  }
+
+  function untouched () {
+    return !this.touched
+  }
+
+  function result () {
+    var this$1 = this;
+
+    var ret = {
+      valid: this.valid,
+      invalid: this.invalid,
+      dirty: this.dirty,
+      pristine: this.pristine,
+      touched: this.touched,
+      untouched: this.untouched,
+      modified: this.modified
+    };
+
+    var keys = this._keysCached(this._uid.toString(), this.results);
+    keys.forEach(function (validator) {
+      var result = this$1.results[validator];
+      if (typeof result === 'boolean') {
+        if (result) {
+          ret[validator] = false;
+        } else {
+          setError(ret, this$1.field, validator);
+          ret[validator] = !result;
+        }
+      } else if (typeof result === 'string') {
+        setError(ret, this$1.field, validator, result);
+        ret[validator] = result;
+      } else if (isPlainObject(result)) { // object
+        var props = Object.keys(result);
+        props.forEach(function (prop) {
+          var propRet = result[prop];
+          ret[prop] = ret[prop] || {};
+          if (typeof propRet === 'boolean') {
+            if (propRet) {
+              ret[prop][validator] = false;
+            } else {
+              setError(ret, this$1.field, validator, undefined, prop);
+              ret[prop][validator] = !propRet;
+            }
+          } else if (typeof propRet === 'string') {
+            setError(ret, this$1.field, validator, propRet, prop);
+            ret[prop][validator] = propRet;
+          } else {
+            ret[prop][validator] = false;
+          }
+        });
+      } else {
+        ret[validator] = false;
+      }
+    });
+
+    return ret
+  }
+
+  function progress () {
+    var ret = '';
+    ret = walkProgresses(
+      this._keysCached(this._uid.toString(), this.results),
+      this.progresses
+    );
+    return ret
+  }
+
+  return {
+    invalid: invalid,
+    pristine: pristine,
+    untouched: untouched,
+    result: result,
+    progress: progress
+  }
+};
+
+/*  */
+
+var Render = function (Vue) {
+  return {
+    render: function render (h) {
+      return this.child
+    }
+  }
+};
+
+/*  */
+
+var SingleElementClass = function (Vue) {
+  var ref = Vue.util;
+  var looseEqual = ref.looseEqual;
+
+  var SingleElement = function SingleElement (vm) {
+    this._vm = vm;
+    this.initValue = this.getValue();
+    this.attachValidity();
+  };
+
+  SingleElement.prototype.attachValidity = function attachValidity () {
+    this._vm.$el.$validity = this._vm;
+  };
+
+  SingleElement.prototype.getValue = function getValue () {
+    var el = this._vm.$el;
+    if (el.tagName === 'SELECT') {
+      return getSelectValue(el)
+    } else {
+      if (el.type === 'checkbox') {
+        return el.checked
+      } else {
+        return el.value
+      }
+    }
+  };
+
+  SingleElement.prototype.checkModified = function checkModified () {
+    var el = this._vm.$el;
+    if (el.tagName === 'SELECT') {
+      return !looseEqual(this.initValue, getSelectValue(el))
+    } else {
+      if (el.type === 'checkbox') {
+        return !looseEqual(this.initValue, el.checked)
+      } else {
+        return !looseEqual(this.initValue, el.value)
+      }
+    }
+  };
+
+  SingleElement.prototype.listenToucheableEvent = function listenToucheableEvent () {
+    this._vm.$el.addEventListener('focusout', this._vm.willUpdateTouched);
+  };
+
+  SingleElement.prototype.unlistenToucheableEvent = function unlistenToucheableEvent () {
+    this._vm.$el.removeEventListener('focusout', this._vm.willUpdateTouched);
+  };
+
+  SingleElement.prototype.listenInputableEvent = function listenInputableEvent () {
+    var vm = this._vm;
+    var el = vm.$el;
+    if (el.tagName === 'SELECT') {
+      el.addEventListener('change', vm.handleInputable);
+    } else {
+      if (el.type === 'checkbox') {
+        el.addEventListener('change', vm.handleInputable);
+      } else {
+        el.addEventListener('input', vm.handleInputable);
+      }
+    }
+  };
+
+  SingleElement.prototype.unlistenInputableEvent = function unlistenInputableEvent () {
+    var vm = this._vm;
+    var el = vm.$el;
+    if (el.tagName === 'SELECT') {
+      el.removeEventListener('change', vm.handleInputable);
+    } else {
+      if (el.type === 'checkbox') {
+        el.removeEventListener('change', vm.handleInputable);
+      } else {
+        el.removeEventListener('input', vm.handleInputable);
+      }
+    }
+  };
+
+  return SingleElement
+};
+
+function getSelectValue (el) {
+  var value = [];
+  for (var i = 0, l = el.options.length; i < l; i++) {
+    var option = el.options[i];
+    if (!option.disabled && option.selected) {
+      value.push(option.value);
+    }
+  }
+  return value
+}
+
+/*  */
+
+var MultiElementClass = function (Vue) {
+  var ref = Vue.util;
+  var looseEqual = ref.looseEqual;
+
+  var MultiElement = function MultiElement (vm) {
+    // TODO: should be checked whether included radio or checkbox
+    this._vm = vm;
+    this.initValue = this.getValue();
+    this.attachValidity();
+  };
+
+  MultiElement.prototype.attachValidity = function attachValidity () {
+      var this$1 = this;
+
+    this._vm.$el.$validity = this._vm;
+    this._eachItems(function (item) {
+      item.$validity = this$1._vm;
+    });
+  };
+
+  MultiElement.prototype.getValue = function getValue () {
+    return this._getCheckedValue()
+  };
+
+  MultiElement.prototype.checkModified = function checkModified () {
+    return !looseEqual(this.initValue, this._getCheckedValue())
+  };
+
+  MultiElement.prototype.listenToucheableEvent = function listenToucheableEvent () {
+      var this$1 = this;
+
+    this._eachItems(function (item) {
+      item.addEventListener('focusout', this$1._vm.willUpdateTouched);
+    });
+  };
+
+  MultiElement.prototype.unlistenToucheableEvent = function unlistenToucheableEvent () {
+      var this$1 = this;
+
+    this._eachItems(function (item) {
+      item.removeEventListener('focusout', this$1._vm.willUpdateTouched);
+    });
+  };
+
+  MultiElement.prototype.listenInputableEvent = function listenInputableEvent () {
+      var this$1 = this;
+
+    this._eachItems(function (item) {
+      item.addEventListener('change', this$1._vm.handleInputable);
+    });
+  };
+
+  MultiElement.prototype.unlistenInputableEvent = function unlistenInputableEvent () {
+      var this$1 = this;
+
+    this._eachItems(function (item) {
+      item.removeEventListener('change', this$1._vm.handleInputable);
+    });
+  };
+
+  MultiElement.prototype._getCheckedValue = function _getCheckedValue () {
+    var value = [];
+    this._eachItems(function (item) {
+      if (!item.disabled && item.checked) {
+        value.push(item.value);
+      }
+    });
+    return value
+  };
+
+  MultiElement.prototype._getItems = function _getItems () {
+    return this._vm.$el.querySelectorAll('input[type="checkbox"], input[type="radio"]')
+  };
+
+  MultiElement.prototype._eachItems = function _eachItems (cb) {
+    var items = this._getItems();
+    for (var i = 0; i < items.length; i++) {
+      cb(items[i]);
+    }
+  };
+
+  return MultiElement
+};
+
+/*  */
+
+var inBrowser =
+  typeof window !== 'undefined' &&
+  Object.prototype.toString.call(window) !== '[object Object]';
+var UA = inBrowser && window.navigator.userAgent.toLowerCase();
+var isIE9 = UA && UA.indexOf('msie 9.0') > 0;
+
+function getClass (el) {
+  var classname = el.className;
+  if (typeof classname === 'object') {
+    classname = classname.baseVal || '';
+  }
+  return classname
+}
+
+function setClass (el, cls) {
+  if (isIE9 && !/svg$/.test(el.namespaceURI)) {
+    el.className = cls;
+  } else {
+    el.setAttribute('class', cls);
+  }
+}
+
+function addClass (el, cls) {
+  if (el.classList) {
+    el.classList.add(cls);
+  } else {
+    var cur = ' ' + getClass(el) + ' ';
+    if (cur.indexOf(' ' + cls + ' ') < 0) {
+      setClass(el, (cur + cls).trim());
+    }
+  }
+}
+
+function removeClass (el, cls) {
+  if (el.classList) {
+    el.classList.remove(cls);
+  } else {
+    var cur = ' ' + getClass(el) + ' ';
+    var tar = ' ' + cls + ' ';
+    while (cur.indexOf(tar) >= 0) {
+      cur = cur.replace(tar, ' ');
+    }
+    setClass(el, cur.trim());
+  }
+  if (!el.className) {
+    el.removeAttribute('class');
+  }
+}
+
+function toggleClasses (el, key, fn) {
+  if (!el) { return }
+
+  key = key.trim();
+  if (key.indexOf(' ') === -1) {
+    fn(el, key);
+    return
+  }
+
+  var keys = key.split(/\s+/);
+  for (var i = 0, l = keys.length; i < l; i++) {
+    fn(el, keys[i]);
+  }
+}
+
+function memoize (fn) {
+  var cache = Object.create(null);
+  return function memoizeFn (id) {
+    var args = [], len = arguments.length - 1;
+    while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
+
+    var hit = cache[id];
+    return hit || (cache[id] = fn.apply(void 0, args))
+  }
+}
+
+/*  */
+var ComponentElementClass = function (Vue) {
+  var ref = Vue.util;
+  var looseEqual = ref.looseEqual;
+  var isPlainObject = ref.isPlainObject;
+
+  function getValidatorProps (validators) {
+    var normalized = typeof validators === 'string' ? [validators] : validators;
+    var targets = [];
+    if (isPlainObject(normalized)) {
+      Object.keys(normalized).forEach(function (validator) {
+        var props = (normalized[validator] &&
+          normalized[validator]['props'] &&
+          isPlainObject(normalized[validator]['props']))
+            ? normalized[validator]['props']
+            : null;
+        if (props) {
+          Object.keys(props).forEach(function (prop) {
+            if (!~targets.indexOf(prop)) {
+              targets.push(prop);
+            }
+          });
+        }
+      });
+    }
+    return targets
+  }
+
+  var ComponentElement = function ComponentElement (vm, vnode, validatorProps) {
+    this._vm = vm;
+    this._vnode = vnode;
+    this._validatorProps = validatorProps || memoize(getValidatorProps);
+    this.initValue = this.getValue();
+    this._watchers = [];
+    this.attachValidity();
+  };
+
+  ComponentElement.prototype.attachValidity = function attachValidity () {
+    this._vm.$el.$validity = this._vm;
+  };
+
+  ComponentElement.prototype.getValidatorProps = function getValidatorProps$1 () {
+    var vm = this._vm;
+    return this._validatorProps(vm._uid.toString(), vm.validators)
+  };
+
+  ComponentElement.prototype.getValue = function getValue () {
+      var this$1 = this;
+
+    var value = {};
+    this.getValidatorProps().forEach(function (prop) {
+      value[prop] = this$1._vnode.child[prop];
+    });
+    return value
+  };
+
+  ComponentElement.prototype.checkModified = function checkModified () {
+    return !looseEqual(this.initValue, this.getValue())
+  };
+
+  ComponentElement.prototype.listenToucheableEvent = function listenToucheableEvent () {
+    this._vm.$el.addEventListener('focusout', this._vm.willUpdateTouched);
+  };
+
+  ComponentElement.prototype.unlistenToucheableEvent = function unlistenToucheableEvent () {
+    this._vm.$el.removeEventListener('focusout', this._vm.willUpdateTouched);
+  };
+
+  ComponentElement.prototype.listenInputableEvent = function listenInputableEvent () {
+      var this$1 = this;
+
+    this.getValidatorProps().forEach(function (prop) {
+      this$1._watchers.push(this$1._vnode.child.$watch(prop, this$1._vm.watchInputable));
+    });
+  };
+
+  ComponentElement.prototype.unlistenInputableEvent = function unlistenInputableEvent () {
+    this._watchers.forEach(function (watcher) { watcher(); });
+    this._watchers = [];
+  };
+
+  return ComponentElement
+};
+
+/*  */
+var Elements = function (Vue) {
+  var SingleElement = SingleElementClass(Vue);
+  var MultiElement = MultiElementClass(Vue);
+  var ComponentElement = ComponentElementClass(Vue);
+
+  return {
+    SingleElement: SingleElement,
+    MultiElement: MultiElement,
+    ComponentElement: ComponentElement
+  }
+};
+
+/*  */
+var Lifecycles = function (Vue) {
+  var ref = Elements(Vue);
+  var SingleElement = ref.SingleElement;
+  var MultiElement = ref.MultiElement;
+  var ComponentElement = ref.ComponentElement;
+
+  function createValidityElement (vm, vnode) {
+    return vm.multiple
+      ? new MultiElement(vm)
+      : checkBuiltInElement(vnode)
+        ? new SingleElement(vm)
+        : checkComponentElement(vnode)
+          ? new ComponentElement(vm, vnode)
+          : null
+  }
+
+  function watchModelable (val) {
+    this.$emit('input', {
+      result: this.result,
+      progress: this.progress,
+      progresses: this.progresses
+    });
+  }
+
+  function created () {
+    this._elementable = null;
+
+    this._keysCached = memoize(function (results) {
+      return Object.keys(results)
+    });
+
+    // for event control flags
+    this._modified = false;
+
+    // watch validation raw results
+    this._watchValidationRawResults();
+
+    var validation = this.$options.propsData ? this.$options.propsData.validation : null;
+    if (validation) {
+      var instance = validation.instance;
+      var name = validation.name;
+      var group = this.group;
+      instance.register(this.field, this, { named: name, group: group });
+    }
+  }
+
+  function destroyed () {
+    var validation = this.$options.propsData ? this.$options.propsData.validation : null;
+    if (validation) {
+      var instance = validation.instance;
+      var name = validation.name;
+      var group = this.group;
+      instance.unregister(this.field, { named: name, group: group });
+    }
+
+    if (this._unwatchResultProp) {
+      this._unwatchResultProp();
+      this._unwatchResultProp = null;
+    }
+
+    if (this._unwatchProgressProp) {
+      this._unwatchProgressProp();
+      this._unwatchProgressProp = null;
+    }
+
+    this._unwatchValidationRawResults();
+
+    this._elementable.unlistenInputableEvent();
+    if (this.autotouch === 'on') {
+      this._elementable.unlistenToucheableEvent();
+    }
+    this._elementable = null;
+  }
+
+  function mounted () {
+    this._elementable = createValidityElement(this, this._vnode);
+    if (this._elementable) {
+      if (this.autotouch === 'on') {
+        this._elementable.listenToucheableEvent();
+      }
+      this._elementable.listenInputableEvent();
+    } else {
+      // TODO: should be warn
+    }
+
+    if (hasModelDirective(this.$vnode)) {
+      this._unwatchResultProp = this.$watch('result', watchModelable);
+      this._unwatchProgressProp = this.$watch('progress', watchModelable);
+    }
+
+    toggleClasses(this.$el, this.classes.untouched, addClass);
+    toggleClasses(this.$el, this.classes.pristine, addClass);
+  }
+
+  return {
+    created: created,
+    destroyed: destroyed,
+    mounted: mounted
+  }
+};
+
+function checkComponentElement (vnode) {
+  return vnode.child &&
+    vnode.componentOptions &&
+    vnode.tag &&
+    vnode.tag.match(/vue-component/)
+}
+
+function checkBuiltInElement (vnode) {
+  return !vnode.child &&
+    !vnode.componentOptions &&
+    vnode.tag
+}
+
+function hasModelDirective (vnode) {
+  return ((vnode && vnode.data && vnode.data.directives) || []).find(function (dir) { return dir.name === 'model'; })
+}
+
+/*  */
+
+var Event = function (Vue) {
+  function _fireEvent (type) {
+    var args = [], len = arguments.length - 1;
+    while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
+
+    (ref = this).$emit.apply(ref, [ type ].concat( args ));
+    var ref;
+  }
+
+  return {
+    _fireEvent: _fireEvent
+  }
+};
+
+/*  */
+var State = function (Vue) {
+  var ref = Vue.util;
+  var isPlainObject = ref.isPlainObject;
+
+  function getValue (options) {
+    return this._elementable.getValue()
+  }
+
+  function checkModified () {
+    return this._elementable.checkModified()
+  }
+
+  function willUpdateTouched (options) {
+    if (!this.touched) {
+      this.touched = true;
+      toggleClasses(this.$el, this.classes.touched, addClass);
+      toggleClasses(this.$el, this.classes.untouched, removeClass);
+      this._fireEvent('touched');
+    }
+  }
+
+  function willUpdateDirty () {
+    if (!this.dirty && this.checkModified()) {
+      this.dirty = true;
+      toggleClasses(this.$el, this.classes.dirty, addClass);
+      toggleClasses(this.$el, this.classes.pristine, removeClass);
+      this._fireEvent('dirty');
+    }
+  }
+
+  function willUpdateModified () {
+    var modified = this.modified = this.checkModified();
+    if (this._modified !== modified) {
+      this._modified = modified;
+      toggleClasses(this.$el, this.classes.modified, modified ? addClass : removeClass);
+      this._fireEvent('modified', modified);
+    }
+  }
+
+  function handleInputable (e) {
+    this.willUpdateDirty();
+    this.willUpdateModified();
+  }
+
+  function watchInputable (val) {
+    this.willUpdateDirty();
+    this.willUpdateModified();
+  }
+
+  function _initStates (keys, target, init) {
+    if ( init === void 0 ) init = undefined;
+
+    for (var i = 0; i < keys.length; i++) {
+      var result = target[keys[i]];
+      if (isPlainObject(result)) {
+        var nestedKeys = Object.keys(result);
+        _initStates(nestedKeys, result, init);
+      } else {
+        target[keys[i]] = init;
+      }
+    }
+  }
+
+  function reset () {
+    this._unwatchValidationRawResults();
+    var keys = this._keysCached(this._uid.toString(), this.results);
+    _initStates(keys, this.results, undefined);
+    _initStates(keys, this.progresses, '');
+    toggleClasses(this.$el, this.classes.valid, removeClass);
+    toggleClasses(this.$el, this.classes.invalid, removeClass);
+    toggleClasses(this.$el, this.classes.touched, removeClass);
+    toggleClasses(this.$el, this.classes.untouched, addClass);
+    toggleClasses(this.$el, this.classes.dirty, removeClass);
+    toggleClasses(this.$el, this.classes.pristine, addClass);
+    toggleClasses(this.$el, this.classes.modified, removeClass);
+    this.valid = true;
+    this.dirty = false;
+    this.touched = false;
+    this.modified = false;
+    this._modified = false;
+    this._watchValidationRawResults();
+  }
+
+  function _walkValid (keys, target) {
+    var valid = true;
+    for (var i = 0; i < keys.length; i++) {
+      var result = target[keys[i]];
+      if (typeof result === 'boolean' && !result) {
+        valid = false;
+        break
+      }
+      if (typeof result === 'string' && result) {
+        valid = false;
+        break
+      }
+      if (isPlainObject(result)) {
+        var nestedKeys = Object.keys(result);
+        valid = _walkValid(nestedKeys, result);
+        if (!valid) {
+          break
+        }
+      }
+    }
+    return valid
+  }
+
+  function _watchValidationRawResults () {
+    var this$1 = this;
+
+    this._unwatchResults = this.$watch('results', function (val) {
+      this$1.valid = _walkValid(
+        this$1._keysCached(this$1._uid.toString(), this$1.results),
+        this$1.results
+      );
+      if (this$1.valid) {
+        toggleClasses(this$1.$el, this$1.classes.valid, addClass);
+        toggleClasses(this$1.$el, this$1.classes.invalid, removeClass);
+      } else {
+        toggleClasses(this$1.$el, this$1.classes.valid, removeClass);
+        toggleClasses(this$1.$el, this$1.classes.invalid, addClass);
+      }
+
+      this$1._fireEvent(this$1.valid ? 'valid' : 'invalid');
+    }, { deep: true });
+  }
+
+  function _unwatchValidationRawResults () {
+    this._unwatchResults();
+    this._unwatchResults = undefined;
+    delete this._unwatchResults;
+  }
+
+  function touch () {
+    this.willUpdateTouched();
+  }
+
+  return {
+    getValue: getValue,
+    checkModified: checkModified,
+    willUpdateTouched: willUpdateTouched,
+    willUpdateDirty: willUpdateDirty,
+    willUpdateModified: willUpdateModified,
+    handleInputable: handleInputable,
+    watchInputable: watchInputable,
+    reset: reset,
+    _walkValid: _walkValid,
+    _watchValidationRawResults: _watchValidationRawResults,
+    _unwatchValidationRawResults: _unwatchValidationRawResults,
+    touch: touch
+  }
+};
+
+/*  */
+
+/**
+ * Forgiving check for a promise
+ */
+function isPromise (p) {
+  return p && typeof p.then === 'function'
+}
+
+var Validate = function (Vue) {
+  var ref = Vue.util;
+  var extend = ref.extend;
+  var isPlainObject = ref.isPlainObject;
+  var resolveAsset = ref.resolveAsset;
+
+  function _resolveValidator (name) {
+    var options = (this.child && this.child.context)
+      ? this.child.context.$options
+      : this.$options;
+    return resolveAsset(options, 'validators', name)
+  }
+
+  function _getValidateRawDescriptor (
+    validator,
+    field,
+    value
+  ) {
+    var asset = this._resolveValidator(validator);
+    if (!asset) {
+      // TODO: should be warned
+      return null
+    }
+
+    var fn = null;
+    var rule = null;
+    var msg = null;
+    if (isPlainObject(asset)) {
+      if (asset.check && typeof asset.check === 'function') {
+        fn = asset.check;
+      }
+      if (asset.message) {
+        msg = asset.message;
+      }
+    } else if (typeof asset === 'function') {
+      fn = asset;
+    } else {
+      // TODO: should be warned
+      return null
+    }
+
+    if (!fn) {
+      // TODO: should be warned
+      return null
+    }
+
+    var props = null;
+    var validators = this.validators;
+    if (isPlainObject(validators)) {
+      if (isPlainObject(validators[validator])) {
+        if (validators[validator].props && isPlainObject(validators[validator].props)) {
+          props = validators[validator].props;
+        } else {
+          if (validators[validator].rule) {
+            rule = validators[validator].rule;
+          }
+          if (validators[validator].message) {
+            msg = validators[validator].message;
+          }
+        }
+      } else {
+        rule = validators[validator];
+      }
+    }
+
+    var descriptor = { fn: fn, value: value, field: field };
+    if (rule) {
+      descriptor.rule = rule;
+    }
+    if (msg) {
+      descriptor.msg = msg;
+    }
+    if (props) {
+      descriptor.props = props;
+    }
+
+    return descriptor
+  }
+
+  function _resolveMessage (
+    field,
+    msg,
+    override
+  ) {
+    if (override) { return override }
+    return msg
+      ? typeof msg === 'function'
+        ? msg(field)
+        : msg
+      : undefined
+  }
+
+  function _invokeValidator (
+    ref,
+    value,
+    cb
+  ) {
+    var this$1 = this;
+    var fn = ref.fn;
+    var field = ref.field;
+    var rule = ref.rule;
+    var msg = ref.msg;
+
+    var future = fn.call(this.child.context, value, rule);
+    if (typeof future === 'function') { // function
+      future(function () { // resolve
+        cb(true);
+      }, function (err) { // reject
+        cb(false, this$1._resolveMessage(field, msg, err));
+      });
+    } else if (isPromise(future)) { // promise
+      future.then(function () { // resolve
+        cb(true);
+      }, function (err) { // reject
+        cb(false, this$1._resolveMessage(field, msg, err));
+      }).catch(function (err) {
+        cb(false, this$1._resolveMessage(field, msg, err.message));
+      });
+    } else { // sync
+      cb(future, future === false ? this._resolveMessage(field, msg) : undefined);
+    }
+  }
+
+  function _getValidateDescriptors (
+    validator,
+    field,
+    value
+  ) {
+    var descriptors = [];
+
+    var rawDescriptor = this._getValidateRawDescriptor(validator, this.field, value);
+    if (!rawDescriptor) { return descriptors }
+
+    if (!rawDescriptor.props) {
+      var descriptor = { name: validator };
+      extend(descriptor, rawDescriptor);
+      descriptors.push(descriptor);
+    } else {
+      var propsKeys = Object.keys(!rawDescriptor.props);
+      propsKeys.forEach(function (prop) {
+        var descriptor = {
+          fn: rawDescriptor.fn,
+          name: validator,
+          value: rawDescriptor.value[prop],
+          field: rawDescriptor.field,
+          prop: prop
+        };
+        if (rawDescriptor.props[prop].rule) {
+          descriptor.rule = rawDescriptor.props[prop].rule;
+        }
+        if (rawDescriptor.props[prop].message) {
+          descriptor.msg = rawDescriptor.props[prop].message;
+        }
+        descriptors.push(descriptor);
+      });
+    }
+
+    return descriptors
+  }
+
+  function _syncValidates (field, cb) {
+    var this$1 = this;
+
+    var validators = this._keysCached(this._uid.toString(), this.results);
+    var value = this.getValue();
+    var descriptors = [];
+    validators.forEach(function (validator) {
+      this$1._getValidateDescriptors(validator, field, value).forEach(function (desc) {
+        descriptors.push(desc);
+      });
+    });
+
+    var count = 0;
+    var len = descriptors.length;
+    descriptors.forEach(function (desc) {
+      var validator = desc.name;
+      var prop = desc.prop;
+      if ((!prop && this$1.progresses[validator]) || (prop && this$1.progresses[validator][prop])) {
+        count++;
+        if (count === len) {
+          cb(this$1._walkValid(this$1._keysCached(this$1._uid.toString(), this$1.results), this$1.results));
+        }
+        return
+      }
+
+      if (!prop) {
+        this$1.progresses[validator] = 'running';
+      } else {
+        this$1.progresses[validator][prop] = 'running';
+      }
+
+      this$1.$nextTick(function () {
+        this$1._invokeValidator(desc, desc.value, function (ret, msg) {
+          if (!prop) {
+            this$1.progresses[validator] = '';
+            this$1.results[validator] = msg || ret;
+          } else {
+            this$1.progresses[validator][prop] = '';
+            this$1.results[validator][prop] = msg || ret;
+          }
+
+          count++;
+          if (count === len) {
+            cb(this$1._walkValid(this$1._keysCached(this$1._uid.toString(), this$1.results), this$1.results));
+          }
+        });
+      });
+    });
+  }
+
+  // TODO:should be refactor!!
+  function _validate (validator, value, cb) {
+    var this$1 = this;
+
+    var descriptor = this._getValidateRawDescriptor(validator, this.field, value);
+    if (descriptor && !descriptor.props) {
+      if (this.progresses[validator]) { return false }
+      this.progresses[validator] = 'running';
+      this.$nextTick(function () {
+        this$1._invokeValidator(descriptor, descriptor.value, function (ret, msg) {
+          this$1.progresses[validator] = '';
+          this$1.results[validator] = msg || ret;
+          if (cb) {
+            this$1.$nextTick(function () {
+              cb.call(this$1, null, ret, msg);
+            });
+          } else {
+            var e = { result: ret };
+            if (msg) {
+              e['msg'] = msg;
+            }
+            this$1._fireEvent('validate', validator, e);
+          }
+        });
+      });
+    } else if (descriptor && descriptor.props) {
+      var propsKeys = Object.keys(descriptor.props);
+      propsKeys.forEach(function (prop) {
+        if (this$1.progresses[validator][prop]) { return }
+        this$1.progresses[validator][prop] = 'running';
+        var values = descriptor.value;
+        var propDescriptor = {
+          fn: descriptor.fn,
+          value: values[prop],
+          field: descriptor.field
+        };
+        if (descriptor.props[prop].rule) {
+          propDescriptor.rule = descriptor.props[prop].rule;
+        }
+        if (descriptor.props[prop].message) {
+          propDescriptor.msg = descriptor.props[prop].message;
+        }
+        this$1.$nextTick(function () {
+          this$1._invokeValidator(propDescriptor, propDescriptor.value, function (result, msg) {
+            this$1.progresses[validator][prop] = '';
+            this$1.results[validator][prop] = msg || result;
+            var e = { prop: prop, result: result };
+            if (msg) {
+              e['msg'] = msg;
+            }
+            this$1._fireEvent('validate', validator, e);
+          });
+        });
+      });
+    } else {
+      // TODO:
+      var err = new Error();
+      cb ? cb.call(this, err) : this._fireEvent('validate', validator, err);
+    }
+    return true
+  }
+
+  // TODO: should be re-design of API
+  function validate () {
+    var this$1 = this;
+    var args = [], len = arguments.length;
+    while ( len-- ) args[ len ] = arguments[ len ];
+
+    var validators;
+    var value;
+    var cb;
+    var ret = true;
+
+    if (args.length === 3) {
+      validators = [args[0]];
+      value = args[1];
+      cb = args[2];
+    } else if (args.length === 2) {
+      if (isPlainObject(args[0])) {
+        validators = [args[0].validator];
+        value = args[0].value || this.getValue();
+        cb = args[1];
+      } else {
+        validators = this._keysCached(this._uid.toString(), this.results);
+        value = args[0];
+        cb = args[1];
+      }
+    } else if (args.length === 1) {
+      validators = this._keysCached(this._uid.toString(), this.results);
+      value = this.getValue();
+      cb = args[0];
+    } else {
+      validators = this._keysCached(this._uid.toString(), this.results);
+      value = this.getValue();
+      cb = null;
+    }
+
+    if (args.length === 3 || (args.length === 2 && isPlainObject(args[0]))) {
+      ret = this._validate(validators[0], value, cb);
+    } else {
+      validators.forEach(function (validator) {
+        ret = this$1._validate(validator, value, cb);
+      });
+    }
+
+    return ret
+  }
+
+  return {
+    _resolveValidator: _resolveValidator,
+    _getValidateRawDescriptor: _getValidateRawDescriptor,
+    _getValidateDescriptors: _getValidateDescriptors,
+    _resolveMessage: _resolveMessage,
+    _invokeValidator: _invokeValidator,
+    _validate: _validate,
+    _syncValidates: _syncValidates,
+    validate: validate
+  }
+};
+
+/*  */
+
+var Methods = function (Vue) {
+  var ref = Vue.util;
+  var extend = ref.extend;
+
+  var methods = {};
+  extend(methods, Event(Vue));
+  extend(methods, State(Vue));
+  extend(methods, Validate(Vue));
+
+  return methods
+};
+
+/*  */
+
+var ValidityControl = function (Vue) {
+  var ref = Vue.util;
+  var extend = ref.extend;
+
+  var ref$1 = States(Vue);
+  var props = ref$1.props;
+  var data = ref$1.data;
+  var computed = Computed(Vue);
+  var lifecycles = Lifecycles(Vue);
+  var ref$2 = Render(Vue);
+  var render = ref$2.render;
+  var methods = Methods(Vue);
+
+  var validity = {
+    props: props,
+    data: data,
+    render: render,
+    computed: computed,
+    methods: methods
+  };
+  extend(validity, lifecycles);
+
+  return validity
+};
+
+/*  */
+var Validity = function (Vue) {
+  var ref = Vue.util;
+  var extend = ref.extend;
+
+  return {
+    functional: true,
+    props: baseProps,
+    render: function render (
+      h,
+      ref
+    ) {
+      var props = ref.props;
+      var data = ref.data;
+      var children = ref.children;
+
+      return children.map(function (child) {
+        if (!child.tag) { return child }
+        var newData = extend({}, data);
+        newData.props = extend({}, props);
+        // TODO: should be refactored
+        newData.props.classes = extend(extend(extend({}, DEFAULT_CLASSES), Vue.config.validator.classes), newData.props.classes);
+        newData.props.child = child;
+        return h('validity-control', newData)
+      })
+    }
+  }
+};
+
+/*  */
+var ValidityGroup = function (Vue) {
+  var ref = Vue.util;
+  var extend = ref.extend;
+
+  var props = extend({
+    tag: {
+      type: String,
+      default: 'fieldset'
+    }
+  }, baseProps);
+
+  return {
+    functional: true,
+    props: props,
+    render: function render (
+      h,
+      ref
+    ) {
+      var props = ref.props;
+      var data = ref.data;
+      var children = ref.children;
+
+      var child = h(props.tag, children);
+      var newData = extend({}, data);
+      newData.props = extend({}, props);
+      // TODO: should be refactored
+      newData.props.classes = extend(extend(extend({}, DEFAULT_CLASSES), Vue.config.validator.classes), newData.props.classes);
+      newData.props.child = child;
+      newData.props.multiple = true;
+      return h('validity-control', newData)
+    }
+  }
+};
+
+/*  */
+
+var Validation = function (Vue) {
+  var ref = Vue.util;
+  var extend = ref.extend;
+
+  return {
+    functional: true,
+    props: {
+      name: {
+        type: String
+      },
+      tag: {
+        type: String,
+        default: 'form'
+      }
+    },
+    render: function render (
+      h,
+      ref
+    ) {
+      var props = ref.props;
+      var data = ref.data;
+      var parent = ref.parent;
+      var children = ref.children;
+      var slots = ref.slots;
+
+      if (!parent._validation) {
+        // TODO: should be warned
+        return children
+      }
+      var tag = props.tag || 'form';
+      walkChildren(parent._validation, props.name, children);
+      var newData = extend({ attrs: {}}, data);
+      if (tag === 'form') {
+        newData.attrs.novalidate = true;
+      }
+      return h(tag, newData, children)
+    }
+  }
+};
+
+function walkChildren (validation, name, children) {
+  children.forEach(function (child) {
+    if (child &&
+        child.componentOptions &&
+        child.componentOptions.propsData && child.componentOptions.tag === 'validity-control') {
+      child.componentOptions.propsData.validation = {
+        instance: validation,
+        name: name
+      };
+    }
+    child.children && walkChildren(validation, name, child.children);
+  });
+}
+
+/*  */
+var Component = function (Vue) {
+  return {
+    'validity-control': ValidityControl(Vue),
+    'validity': Validity(Vue),
+    'validity-group': ValidityGroup(Vue),
+    'validation': Validation(Vue)
+  }
+};
+
+/*  */
+// TODO: should be defined strict type
+function mapValidation (results) {
+  var res = {};
+
+  normalizeMap(results).forEach(function (ref) {
+    var key = ref.key;
+    var val = ref.val;
+
+    res[key] = function mappedValidation () {
+      var validation = this.$validation;
+      if (!this._isMounted) {
+        return null
+      }
+      var paths = val.split('.');
+      var first = paths.shift();
+      if (first !== '$validation') {
+        warn(("unknown validation result path: " + val));
+        return null
+      }
+      var path;
+      var value = validation;
+      do {
+        path = paths.shift();
+        value = value[path];
+      } while (paths.length > 0 && value !== undefined)
+      return value
+    };
+  });
+
+  return res
+}
+
+// TODO: should be defined strict type
+function normalizeMap (map) {
+  return Array.isArray(map)
+    ? map.map(function (key) { return ({ key: key, val: key }); })
+    : Object.keys(map).map(function (key) { return ({ key: key, val: map[key] }); })
+}
+
+/*  */
+var installed = false;
+
+function plugin (Vue, options) {
+  if ( options === void 0 ) options = {};
+
+  if (installed) {
+    warn('already installed.');
+    return
+  }
+
+  Config(Vue);
+  Asset(Vue);
+  installMixin(Vue);
+  installComponent(Vue);
+  installed = true;
+}
+
+function installMixin (Vue) {
+  Vue.mixin(Mixin(Vue));
+}
+
+function installComponent (Vue) {
+  var components = Component(Vue);
+  Object.keys(components).forEach(function (id) {
+    Vue.component(id, components[id]);
+  });
+}
+
+plugin.mapValidation = mapValidation; // for standalone
+plugin.version = '__VERSION__';
+
+if (typeof window !== 'undefined' && window.Vue) {
+  window.Vue.use(plugin);
+}
+
+var index = {
+  install: plugin,
+  mapValidation: mapValidation
+};
+
+module.exports = index;
+
+},{}],25:[function(require,module,exports){
 (function (process){
 /*!
  * Vue.js v1.0.28
@@ -10421,32 +18604,660 @@ setTimeout(function () {
 
 module.exports = Vue;
 }).call(this,require('_process'))
-},{"_process":1}],3:[function(require,module,exports){
+},{"_process":21}],26:[function(require,module,exports){
+var inserted = exports.cache = {}
+
+exports.insert = function (css) {
+  if (inserted[css]) return
+  inserted[css] = true
+
+  var elem = document.createElement('style')
+  elem.setAttribute('type', 'text/css')
+
+  if ('textContent' in elem) {
+    elem.textContent = css
+  } else {
+    elem.styleSheet.cssText = css
+  }
+
+  document.getElementsByTagName('head')[0].appendChild(elem)
+  return elem
+}
+
+},{}],27:[function(require,module,exports){
+var __vueify_insert__ = require("vueify/lib/insert-css")
+var __vueify_style__ = __vueify_insert__.insert("h1 {\n  color: #00a8ed;\n}")
 'use strict';
 
-var Vue = require('vue');
-new Vue({
-    el: '.frontPage',
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+// import { range } from 'lodash' /*usado no comentado abaixo no metodo source*/
+// import from 'lodash' este chamaria biblioteca completa
+// import { range, map, outros } from 'lodash' -> Exemplo do biblioteca personalizados que podem ser chamados
+exports.default = {
 
-    data: {
-        text: 'Hola mundo',
-        show: false
+    name: 'Pagination',
+
+    props: ['source'],
+
+    data: function data() {
+        return {
+            pages: [],
+            searchPage: '',
+            input: false
+        };
     },
 
+
     methods: {
-        showMenu: function showMenu() {
-            // return this.show=true;
-            this.$set('show', true);
+        showInput: function showInput(ev) {
+            ev.preventDefault();
+            if (this.input == false) {
+                this.input = true;
+                this.searchPage = '';
+            } else {
+                this.input = false;
+            }
+        },
+        navigate: function navigate(ev, page) {
+            ev.preventDefault();
+            this.$dispatch('navigate', page);
         },
 
-        hideMenu: function hideMenu() {
-            this.show = false;
+
+        // --------------------------------------------------------------------
+
+
+        nextPrev: function nextPrev(ev, page) {
+            if (page == 0 || page == this.source.last_page + 1) {
+                return;
+            }
+            this.navigate(ev, page);
+        },
+
+
+        //--------------------------------------------------------------------
+
+
+        generatePagesArray: function generatePagesArray(currentPage, collectionLength, rowsPerPage, paginationRange) {
+            var pages = [];
+            var totalPages = Math.ceil(collectionLength / rowsPerPage);
+            var halfWay = Math.ceil(paginationRange / 2);
+            var position;
+
+            if (currentPage <= halfWay) {
+                position = 'start';
+            } else if (totalPages - halfWay < currentPage) {
+                position = 'end';
+            } else {
+                position = 'middle';
+            }
+
+            var ellipsesNeeded = paginationRange < totalPages;
+            var i = 1;
+            while (i <= totalPages && i <= paginationRange) {
+                var pageNumber = this.calculatePageNumber(i, currentPage, paginationRange, totalPages);
+                var openingEllipsesNeeded = i === 2 && (position === 'middle' || position === 'end');
+                var closingEllipsesNeeded = i === paginationRange - 1 && (position === 'middle' || position === 'start');
+                if (ellipsesNeeded && (openingEllipsesNeeded || closingEllipsesNeeded)) {
+                    pages.push('...');
+                } else {
+                    pages.push(pageNumber);
+                }
+                i++;
+            }
+            return pages;
+        },
+
+        // --------------------------------------------------------------------
+
+
+        calculatePageNumber: function calculatePageNumber(i, currentPage, paginationRange, totalPages) {
+            var halfWay = Math.ceil(paginationRange / 2);
+            if (i === paginationRange) {
+                return totalPages;
+            } else if (i === 1) {
+                return i;
+            } else if (paginationRange < totalPages) {
+                if (totalPages - halfWay < currentPage) {
+                    return totalPages - paginationRange + i;
+                } else if (halfWay < currentPage) {
+                    return currentPage - halfWay + i;
+                } else {
+                    return i;
+                }
+            } else {
+                return i;
+            }
+        }
+
+    },
+
+    watch: {
+        source: function source() {
+            var s = this.source;
+            this.pages = this.generatePagesArray(s.current_page, s.total, s.per_page, 5);
+            this.searchPage = '';
+            this.input = false;
         }
     },
 
+    ready: function ready() {
+        console.log('Component is ready');
+    },
+
+
+    // computed: {
+    //     showSearchBotton (){
+    //         if (this.source.last_page < 8) {
+    //             searchBotton: false
+    //         }else {
+    //             searchBotton: true
+    //         }
+    //     },
+    // },
+    //
     components: {}
+};
+if (module.exports.__esModule) module.exports = module.exports.default
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\r\n\r\n<!-- <div class=\"form-inline\">\r\n\t<a @click=\"showInput\" href=\"#\" id=\"showSearchInput\"><span data-toggle=\"tooltip\" data-placement=\"left\" title=\"Pagina?\"><i :class=\"{'fa fa-search-plus': !input, 'fa fa-search-minus': input}\"></i></span></a>&nbsp;&nbsp;\r\n\t<input v-model=\"searchPage\" v-show=\"input\" type=\"number\" name=\"name\"  id=\"searchPage\" value=\"\"  class=\"form-control\" min=\"1\" max=\"5\" style=\"width: 60px;\" @keyup.enter=\"navigate($event, searchPage)\">\r\n</div> -->\r\n\r\n<nav aria-label=\"Page navigation\">\r\n\t<ul class=\"pagination\">\r\n\t\t<li :class=\"{ disabled: source.current_page == 1}\" v-if=\"!(source.current_page == 1)\">\r\n\t\t\t<a href=\"#\" aria-label=\"Previous\"  @click=\"nextPrev($event, source.current_page-1)\">\r\n\t\t\t\t<span aria-hidden=\"true\">&laquo;</span>\r\n\t\t\t</a>\r\n\t\t</li>\r\n\t\t<li v-for=\"page in pages\" track-by=\"$index\" :class=\"{ active: source.current_page == page }\">\r\n\t\t\t<span  id=\"sear\" v-if=\"page == '...'\">{{ page }}</span>\r\n\t\t\t<a v-if=\"page != '...'\" href=\"#\" @click=\"navigate($event, page, row)\">{{ page }}</a>\r\n\t\t</li>\r\n\t\t<li :class=\"{ disabled: source.current_page == this.source.last_page}\" v-if=\"!(source.current_page == this.source.last_page)\">\r\n\t\t\t<a href=\"#\" aria-label=\"Next\" @click=\"nextPrev($event, source.current_page+1)\">\r\n\t\t\t\t<span aria-hidden=\"true\">&raquo;</span>\r\n\t\t\t</a>\r\n\t\t</li>\r\n\t</ul>\r\n</nav>\r\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  module.hot.dispose(function () {
+    __vueify_insert__.cache["h1 {\n  color: #00a8ed;\n}"] = false
+    document.head.removeChild(__vueify_style__)
+  })
+  if (!module.hot.data) {
+    hotAPI.createRecord("_v-5673fc70", module.exports)
+  } else {
+    hotAPI.update("_v-5673fc70", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+  }
+})()}
+},{"vue":25,"vue-hot-reload-api":22,"vueify/lib/insert-css":26}],28:[function(require,module,exports){
+var __vueify_insert__ = require("vueify/lib/insert-css")
+var __vueify_style__ = __vueify_insert__.insert("h1 {\r\n  color: #00a8ed;\r\n}")
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
 });
 
-},{"vue":2}]},{},[3]);
+var _defineProperty2 = require('babel-runtime/helpers/defineProperty');
+
+var _defineProperty3 = _interopRequireDefault(_defineProperty2);
+
+var _Component = require('../../../Pagination/src/Component.vue');
+
+var _Component2 = _interopRequireDefault(_Component);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = {
+
+    name: 'show-product',
+
+    data: function data() {
+        return {
+            newProduct: {
+                id: '',
+                name: '',
+                price: '',
+                description: '',
+                photo: '',
+                author: ''
+            },
+
+            products: {},
+            sortColumn: 'name',
+            sortInverse: 1,
+            filter: {
+                term: ''
+            },
+            pagination: {},
+            success: false
+        };
+    },
+
+
+    // ---------------------------------------------------------------------------------
+
+    ready: function ready() {
+        this.fetchProduct(1);
+    },
+
+
+    // ---------------------------------------------------------------------------------
+
+    methods: (0, _defineProperty3.default)({
+        clearField: function clearField() {
+            this.newProduct = {
+                id: '',
+                name: '',
+                price: '',
+                description: '',
+                photo: '',
+                author: ''
+            };
+        },
+
+        createProduct: function createProduct() {
+            var _this = this;
+
+            var product = this.newProduct;
+
+            //Clear form input
+            this.clearField();
+
+            this.$http.post('http://localhost:8000/api/v1/products/', product).then(function (response) {
+                if (response.status == 200) {
+                    console.log('chegando aqui');
+                    $('#modal-create-product').modal('hide');
+                    // console.log(response.data);
+                    _this.fetchProduct();
+                    var self = _this;
+                    _this.success = true;
+                    setTimeout(function () {
+                        self.success = false;
+                    }, 5000);
+                }
+            }, function (response) {});
+        },
+
+        // --------------------------------------------------------------------------------------------
+
+        fetchProduct: function fetchProduct(page) {
+            var _this2 = this;
+
+            this.$http.get('http://localhost:8000/api/v1/products?page=' + page).then(function (response) {
+                _this2.$set('products', response.data.data);
+                _this2.$set('pagination', response.data);
+            }, function (response) {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+        // --------------------------------------------------------------------------------------------
+
+        getThisProduct: function getThisProduct(id) {
+            var _this3 = this;
+
+            this.$http.get('http://localhost:8000/api/v1/products/' + id).then(function (response) {
+                _this3.newProduct.id = response.data.id;
+                _this3.newProduct.name = response.data.name;
+                _this3.newProduct.price = response.data.price;
+                _this3.newProduct.description = response.data.description;
+                _this3.newProduct.photo = response.data.photo;
+                _this3.newProduct.author = response.data.author;
+            }, function (response) {
+                console.log('Error');
+            });
+        },
+
+        // --------------------------------------------------------------------------------------------
+
+        saveEditedProduct: function saveEditedProduct(id) {
+            var _this4 = this;
+
+            var product = this.newProduct;
+
+            this.clearField();
+            this.$http.patch('http://localhost:8000/api/v1/products/' + id, product).then(function (response) {
+                if (response.status == 200) {
+                    $('#modal-edit-product').modal('hide');
+                    // console.log(response.data);
+                    _this4.fetchProduct();
+                }
+            }, function (response) {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+        // --------------------------------------------------------------------------------------------
+
+        deleteProduct: function deleteProduct(id) {
+            var _this5 = this;
+
+            this.clearField();
+            this.$http.delete('http://localhost:8000/api/v1/products/' + id).then(function (response) {
+                $('#modal-delete-product').modal('hide');
+                if (response.status == 200) {
+                    // console.log(response.data);
+                    _this5.fetchProduct();
+                }
+            }, function (response) {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+        // --------------------------------------------------------------------------------------------
+
+        doSort: function doSort(ev, column) {
+            var self = this;
+            ev.preventDefault();
+            self.sortColumn = column;
+            if (self.sortInverse == 1) {
+                self.sortInverse = -1;
+            } else {
+                self.sortInverse = 1;
+            }
+        },
+
+        // --------------------------------------------------------------------------------------------
+
+        // Outros funções
+        navigate: function navigate(page) {
+            this.fetchProduct(page);
+        }
+    }, 'clearField', function clearField() {
+        this.newProduct = {
+            id: '',
+            name: '',
+            description: '',
+            photo: ''
+
+        };
+    }),
+
+    // ---------------------------------------------------------------------------------
+
+    computed: {},
+
+    // ---------------------------------------------------------------------------------
+
+    components: {
+        'Pagination': _Component2.default
+    }
+};
+if (module.exports.__esModule) module.exports = module.exports.default
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\r\n<div class=\"alert alert-success\" transition=\"success\" v-if=\"success\">\r\n\t<i class=\"fa fa-thumbs-up\"> Sucesso!!</i>\r\n</div>\r\n\r\n<!-- <pre>\r\n    {{ $data.newProduct | json }}\r\n</pre> -->\r\n\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-4 pull-right\">\r\n\t\t<div class=\"input-group\">\r\n\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t<input v-model=\"filter.term\" type=\"text\" class=\"form-control\" placeholder=\"Filtrar...\" aria-describedby=\"basic-addon1\">\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-product\"><i class=\"fa fa-plus\"></i> Novo</button>\r\n\t</div>\r\n</div>\r\n\r\n<br>\r\n<div class=\"row\">\r\n\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class='table-responsive'>\r\n\t\t\t<table class='table table-striped table-hover table-success'>\r\n\t\t\t\t<thead>\r\n\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'name')\">Nome</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'price' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'price' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'price')\">Preço</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'description')\">Descrição</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</thead>\r\n\t\t\t\t<tbody>\r\n\t\t\t\t\t<tr v-for=\"product in products | filterBy filter.term | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t\t<td><a href=\"#\" data-toggle=\"modal\" data-target=\"#show-product\" @click=\"getThisProduct(product.id)\">{{ product.name }}</a></td>\r\n\t\t\t\t\t\t<td>{{ product.price }}</td>\r\n\t\t\t\t\t\t<td>{{ product.description }}</td>\r\n\t\t\t\t\t\t<td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-product\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisProduct(product.id)\" > </i></a></td>\r\n\t\t\t\t\t\t<td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-product\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisProduct(product.id)\"></i></a></td>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</tbody>\r\n\t\t\t</table>\r\n\t\t\t<div class=\"col-md-12 pull-left\">\r\n\t\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<div id=\"show-product\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Detalhes do {{ newProduct.name }}</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class='table-responsive'>\r\n\t\t\t\t\t\t\t\t\t<table class='table table-striped table-hover'>\r\n\t\t\t\t\t\t\t\t\t\t<thead>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<th class=\"text-center\" colspan=\"2\">INFORMAÇOES DO PRODUTO</th>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t</thead>\r\n\t\t\t\t\t\t\t\t\t\t<tbody>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>ID</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newProduct.id }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Nome</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newProduct.name }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Preço</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><span class=\"label label-info\"><i>{{ newProduct.price }}</i></span></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Responsável</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newProduct.author }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Descrição</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newProduct.description }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Data da criação</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ product.created_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Data de atualização</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ product.updated_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t\t\t</tbody>\r\n\t\t\t\t\t\t\t\t\t</table>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-primary\" data-dismiss=\"modal\"><i class=\"fa fa-check\"></i></button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<div class=\"modal fade\" id=\"modal-delete-product\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newProduct.name}}</span></h5>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\">Cancelar</button>\r\n\t\t\t\t\t\t<button  @keyup.enter=\"deleteProduct(newProduct.id)\" @click=\"deleteProduct(newProduct.id)\" type=\"button\" class=\"btn btn-danger\">Eliminar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-create-product\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Registar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome\" v-model=\"newProduct.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-shopping-basket form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"number\" class=\"form-control\" name=\"price\" placeholder=\"Preço\" v-model=\"newProduct.price\" v-validate:price=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-usd form-control-feedback\">00</span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newProduct.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createProduct\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-edit-product\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Editar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validation1\">\r\n\t\t\t\t\t\t\t<form methods=\"patch\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome\" v-model=\"newProduct.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-shopping-basket form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"number\" class=\"form-control\" name=\"price\" placeholder=\"Preço\" v-model=\"newProduct.price\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-usd form-control-feedback\">00</span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newProduct.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedProduct(newProduct.id)\" type=\"button\" class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  module.hot.dispose(function () {
+    __vueify_insert__.cache["h1 {\r\n  color: #00a8ed;\r\n}"] = false
+    document.head.removeChild(__vueify_style__)
+  })
+  if (!module.hot.data) {
+    hotAPI.createRecord("_v-4df99288", module.exports)
+  } else {
+    hotAPI.update("_v-4df99288", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+  }
+})()}
+},{"../../../Pagination/src/Component.vue":27,"babel-runtime/helpers/defineProperty":2,"vue":25,"vue-hot-reload-api":22,"vueify/lib/insert-css":26}],29:[function(require,module,exports){
+var __vueify_insert__ = require("vueify/lib/insert-css")
+var __vueify_style__ = __vueify_insert__.insert("h1 {\r\n  color: #00a8ed;\r\n}")
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _Component = require('../../../Pagination/src/Component.vue');
+
+var _Component2 = _interopRequireDefault(_Component);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// import vSelect from "vue-select"
+exports.default = {
+    name: 'ShowPromotion',
+
+    data: function data() {
+        return {
+            showColumn: {
+                ic: '',
+                service_beginning: ''
+            },
+            newPromotion: {
+                id: '',
+                name: '',
+                begnning_date: '',
+                ending_date: '',
+                trader_id: '',
+                product_id: '',
+                status: '',
+                description: ''
+            },
+
+            promotions: {},
+            traders: [],
+            products: [],
+
+            sortColumn: 'name',
+            sortInverse: 1,
+            filter: {
+                term: ''
+            },
+            pagination: {},
+            success: false
+        };
+    },
+
+
+    methods: {
+        clearField: function clearField() {
+            this.newPromotion = {
+                id: '',
+                name: '',
+                begnning_date: '',
+                ending_date: '',
+                trader_id: '',
+                product_id: '',
+                status: '',
+                description: ''
+            };
+        },
+
+        // --------------------------------------------------------------------------------------------
+
+        createPromotion: function createPromotion() {
+            var _this = this;
+
+            //Promotion input
+            var promotion = this.newPromotion;
+
+            //Clear form input
+            this.clearField();
+            this.$http.post('http://localhost:8000/api/v1/promotions/', promotion).then(function (response) {
+                if (response.status == 200) {
+                    console.log('chegando aqui');
+                    $('#modal-create-promotion').modal('hide');
+                    console.log(response.data);
+                    _this.fetchPromotion(_this.pagination.last_Page);
+                    var self = _this;
+                    _this.success = true;
+                    setTimeout(function () {
+                        self.success = false;
+                    }, 5000);
+                }
+            }, function (response) {});
+        },
+
+        // --------------------------------------------------------------------------------------------
+
+        fetchPromotion: function fetchPromotion(page) {
+            var _this2 = this;
+
+            this.$http.get('http://localhost:8000/api/v1/promotions?page=' + page).then(function (response) {
+                _this2.$set('promotions', response.data.data);
+                _this2.$set('pagination', response.data);
+            }, function (response) {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+        // --------------------------------------------------------------------------------------------
+
+        getThisPromotion: function getThisPromotion(id) {
+            var _this3 = this;
+
+            this.$http.get('http://localhost:8000/api/v1/promotions/' + id).then(function (response) {
+                _this3.newPromotion.id = response.data.id;
+                _this3.newPromotion.name = response.data.name;
+                _this3.newPromotion.begnning_date = response.data.begnning_date;
+                _this3.newPromotion.ending_date = response.data.ending_date;
+                _this3.newPromotion.trader_id = response.data.trader_id;
+                _this3.newPromotion.product_id = response.data.product_id;
+                _this3.newPromotion.status = response.data.status;
+                _this3.newPromotion.description = response.data.description;
+            }, function (response) {
+                console.log('Error');
+            });
+        },
+
+        // --------------------------------------------------------------------------------------------
+
+        saveEditedPromotion: function saveEditedPromotion(id) {
+            var _this4 = this;
+
+            var promotion = this.newPromotion;
+            this.clearField();
+            this.$http.patch('http://localhost:8000/api/v1/promotions/' + id, promotion).then(function (response) {
+                if (response.status == 200) {
+                    $('#modal-edit-promotion').modal('hide');
+                    // console.log(response.data);
+                    _this4.fetchPromotion(_this4.pagination.current_page);
+                }
+            }, function (response) {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+        // --------------------------------------------------------------------------------------------
+
+
+        deletePromotion: function deletePromotion(id) {
+            var _this5 = this;
+
+            this.$http.delete('http://localhost:8000/api/v1/promotions/' + id).then(function (response) {
+                $('#modal-delete-promotion').modal('hide');
+                if (response.status == 200) {
+                    // console.log(response.data);
+                    _this5.fetchPromotion();
+                }
+            }, function (response) {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+        promotionTrader: function promotionTrader() {
+            var _this6 = this;
+
+            this.$http.get('http://localhost:8000/api/v1/promotionTrader').then(function (response) {
+                _this6.$set('traders', response.data);
+            }, function (response) {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+        promotionProduct: function promotionProduct() {
+            var _this7 = this;
+
+            this.$http.get('http://localhost:8000/api/v1/promotionProduct').then(function (response) {
+                _this7.$set('products', response.data);
+            }, function (response) {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+        promotionStatus: function promotionStatus(status) {
+            var _this8 = this;
+
+            var postData = { id: status };
+
+            this.$http.post('http://localhost:8000/api/v1/promotionStatus/', postData).then(function (response) {
+                console.log(response.status);
+                console.log(response.data);
+                if (response.status == 200) {
+                    _this8.fetchPromotion(_this8.pagination.current_page);
+                }
+            }, function (response) {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+        // -------------------------Metodo de suporte---------------------------------------------------
+
+        doSort: function doSort(ev, column) {
+            var self = this;
+            ev.preventDefault();
+            self.sortColumn = column;
+            if (self.sortInverse == 1) {
+                self.sortInverse = -1;
+            } else {
+                self.sortInverse = 1;
+            }
+            // console.log(ev);
+        },
+
+        // --------------------------------------------------------------------------------------------
+
+        // Outros funções
+        navigate: function navigate(page) {
+            this.fetchPromotion(page);
+        }
+    },
+
+    ready: function ready() {
+        this.fetchPromotion(this.pagination.current_Page);
+        this.promotionTrader();
+        this.promotionProduct();
+    },
+
+
+    components: {
+        'Pagination': _Component2.default
+    }
+};
+if (module.exports.__esModule) module.exports = module.exports.default
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=\"success\" v-if=\"success\">\r\n\t<i class=\"fa fa-thumbs-up\"> Sucesso!!</i>\r\n</div>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"pull right col-md-8\">\r\n\t\t<label class=\"checkbox-inline\"><input type=\"checkbox\" id=\"\" value=\"\" v-model=\"showColumn.begnning_date\">Início</label>\r\n\t\t<label class=\"checkbox-inline\"><input type=\"checkbox\" id=\"\" value=\"\" v-model=\"showColumn.ending_date\">Término</label>\r\n\t\t<label class=\"checkbox-inline\"><input type=\"checkbox\" id=\"\" value=\"\" v-model=\"showColumn.trader_id\">Comerciante</label>\r\n\t</div>\r\n\r\n\t<div class=\"col-md-4 pull-left\">\r\n\t\t<div class=\"input-group\">\r\n\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t<input v-model=\"filter.term\" type=\"text\" class=\"form-control\" placeholder=\"Filtrar...\" aria-describedby=\"basic-addon1\">\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n\r\n<div class=\"row\">\r\n\t<div v-if = \"traders.length > 0 && products.length > 0\" class=\"col-md-12\">\r\n\t\t<button @click=\"clearField\" class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-promotion\"><i class=\"fa fa-plus\"></i> Novo</button>&nbsp;&nbsp;\r\n\t</div>\r\n\r\n\t<div v-else class=\"col-md-12\">\r\n\t\t<button data-toggle=\"tooltip\" title=\"Não podes criar promoção referenciar comerciante e produtos\" type=\"button\" class=\"btn btn-danger btn-flat\"><i class=\"fa fa-minus\"></i> Novo</button>&nbsp;&nbsp;\r\n\t</div>\r\n\r\n</div>\r\n\r\n<br>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class='table-responsive'>\r\n\t\t\t<table class='table table-striped table-hover table-condensed'>\r\n\t\t\t\t<thead>\r\n\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'name')\">Nome</a>\r\n\t\t\t\t\t\t</th>\r\n\t\t\t\t\t\t<th class=\"info\" v-if=\"showColumn.begnning_date\">\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'begnning_date' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'begnning_date' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'begnning_date')\">Início</a>\r\n\t\t\t\t\t\t</th>\r\n\t\t\t\t\t\t<th class=\"info\" v-if=\"showColumn.ending_date\">\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'ending_date' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'ending_date' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'ending_date')\">Término</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th   class=\"text-center\">\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'state' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'state' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'state')\">Publicação</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\r\n\t\t\t\t\t\t<th class=\"info\" v-if=\"showColumn.trader_id\">\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'trader_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'trader_id' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'trader_id')\">Comerciante</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\r\n\t\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</thead>\r\n\t\t\t\t<tbody>\r\n\t\t\t\t\t<tr v-for=\"promotion in promotions | filterBy filter.term | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t\t<td><a href=\"#\" data-toggle=\"modal\" data-target=\"#show-promotion\" @click=\"getThisPromotion(promotion.id)\">{{ promotion.name }}</a></td>\r\n\t\t\t\t\t\t<td class=\"info\" v-if=\"showColumn.begnning_date\">{{ promotion.begnning_date }}</td>\r\n\t\t\t\t\t\t<td class=\"info\" v-if=\"showColumn.ending_date\">{{ promotion.ending_date }}</td>\r\n\r\n\r\n\t\t\t\t\t\t<!------------------------------------------------------------------------------------>\r\n\t\t\t\t\t\t<td  class=\"text-center\" v-if=\"promotion.status\">\r\n\t\t\t\t\t\t\t<button data-toggle=\"tooltip\" title=\"Despublicar esta promoção\" type=\"submit\" @click = \"promotionStatus(promotion.id)\" class='btn btn-xs btn-flat' :class=\"{ 'btn-success': promotion.status, 'btn-warning': !promotion.status }\"><i class=\"fa fa-check\"></i></button>\r\n\t\t\t\t\t\t</td>\r\n\r\n\t\t\t\t\t\t<td  class=\"text-center\" v-if=\"!promotion.status\">\r\n\t\t\t\t\t\t\t<button data-toggle=\"tooltip\" title=\"Publicar esta promoção\" type=\"submit\" @click = \"promotionStatus(promotion.id)\" class='btn btn-xs btn-flat' :class=\"{ 'btn-success': promotion.status, 'btn-warning': !promotion.status }\"><i class=\"fa fa-times\"></i></button>\r\n\t\t\t\t\t\t</td>\r\n\t\t\t\t\t\t<!------------------------------------------------------------------------------------>\r\n\r\n\r\n\t\t\t\t\t\t<td class=\"info\" v-if=\"showColumn.service_beginning\">{{ promotion.trader.name }}</td>\r\n\r\n\t\t\t\t\t\t<td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-promotion\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisPromotion(promotion.id)\" > </i></a></td>\r\n\t\t\t\t\t\t<td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-promotion\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisPromotion(promotion.id)\" ></i></a></td>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</tbody>\r\n\t\t\t</table>\r\n\t\t\t<div class=\"col-md-12 pull-left\">\r\n\t\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<div id=\"show-promotion\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Detalhes do(a) {{ newPromotion.name }}</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class='table-responsive'>\r\n\t\t\t\t\t\t\t\t\t<table class='table table-striped table-hover'>\r\n\t\t\t\t\t\t\t\t\t\t<thead>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<th class=\"text-center\" colspan=\"2\">INFORMAÇOES DE PROMOÇÃO</th>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t</thead>\r\n\t\t\t\t\t\t\t\t\t\t<tbody>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>ID</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newPromotion.id }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Nome</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newPromotion.name }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Início</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><span class=\"label label-info\"><i>{{ newPromotion.begnning_date }}</i></span></td>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Término</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newPromotion.ending_date }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Publicação</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><span class='label' :class=\"{ 'label-success': newPromotion.status, 'label-warning': !newPromotion.status }\"><i>{{newPromotion.status ? 'Publicado' : 'Aguardando'}}</i></span></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Descrição</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newPromotion.description }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Data da criação</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ promotion.created_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Data de atualização</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ promotion.updated_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t\t\t</tbody>\r\n\t\t\t\t\t\t\t\t\t</table>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-success\" data-dismiss=\"modal\"><i class=\"fa fa-check\"></i></button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<div class=\"modal fade\" id=\"modal-delete-promotion\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newPromotion.name}}</span></h5>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i> Cancelar</button>\r\n\t\t\t\t\t\t<button  @keyup.enter=\"deletePromotion(newPromotion.id)\" @click=\"deletePromotion(newPromotion.id)\" type=\"button\" class=\"btn btn-danger\"><i class=\"fa fa-trash-o\"></i> Eliminar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-create-promotion\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Registar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome\" v-model=\"newPromotion.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-user form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type='date' name=\"begnning_date\" class='form-control' placeholder='' v-model=\"newPromotion.begnning_date\" v-validate:begnning_date = \"['required']\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<!-- <span class=\"fa fa-calendar-check-o form-control-feedback\"></span> -->\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p class=\"text-help\">Data de início da promoção</p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type='date' name=\"ending_date\" class='form-control' placeholder='' v-model=\"newPromotion.ending_date\"  v-validate:ending_date = \"['required']\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<!-- <span class=\"fa fa-calendar-times-o form-control-feedback\"></span> -->\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p class=\"text-help\">Término da promoção</p>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!------------------------------------------------------------>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select name=\"trader_id\" class=\"form-control\" v-model=\"newPromotion.trader_id\" v-validate:trader_id = \"['required']\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Comerciantes</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"trader in traders\" value=\"{{trader.id}}\">{{trader.name}}</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select name=\"product_id\" class=\"form-control\" v-model=\"newPromotion.product_id\" v-validate:product_id = \"['required']\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Produtos</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"product in products\" value=\"{{product.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{product.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!------------------------------------------------------------>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newPromotion.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createPromotion\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-edit-promotion\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Editar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validation1\">\r\n\t\t\t\t\t\t\t<form methods=\"patch\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome\" v-model=\"newPromotion.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-user form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type='date' class='form-control' placeholder='' v-model=\"newPromotion.begnning_date\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p class=\"text-help\">Data de início da promoção</p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type='date' class='form-control' placeholder='' v-model=\"newPromotion.ending_date\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p class=\"text-help\">Término da promoção</p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!------------------------------------------------------------>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newPromotion.trader_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Comerciantes</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"trader in traders\" value=\"{{trader.id}}\">{{trader.name}}</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newPromotion.product_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Produtos</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"product in products\" value=\"{{product.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{product.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!------------------------------------------------------------>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newPromotion.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedPromotion(newPromotion.id)\" type=\"button\" class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  module.hot.dispose(function () {
+    __vueify_insert__.cache["h1 {\r\n  color: #00a8ed;\r\n}"] = false
+    document.head.removeChild(__vueify_style__)
+  })
+  if (!module.hot.data) {
+    hotAPI.createRecord("_v-aa575270", module.exports)
+  } else {
+    hotAPI.update("_v-aa575270", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+  }
+})()}
+},{"../../../Pagination/src/Component.vue":27,"vue":25,"vue-hot-reload-api":22,"vueify/lib/insert-css":26}],30:[function(require,module,exports){
+'use strict';
+
+var Vue = require('vue');
+Vue.use(require('vue-resource'));
+Vue.use(require('vue-validator'));
+var moment = require('moment');
+//-------------------------------------------------------------------------------------------------
+Vue.filter('formatDate', function (value, formatString) {
+    if (formatString != undefined) {
+        return moment(value).format(formatString);
+    }
+    return moment(value).format('DD/MMM/YYYY');
+});
+//-------------------------------------------------------------------------------------------------
+Vue.http.headers.common['X-CSRF-TOKEN'] = document.querySelector('#token').getAttribute('value');
+new Vue({
+    el: '.front_page',
+
+    data: {},
+
+    components: {
+        //------------------------------Product-----------------------------------
+        'show-product-in-front': require('./components/Products/ShowProduct'),
+        //------------------------------Promotion-----------------------------------
+        'show-promotion-in-front': require('./components/Promotions/ShowPromotion')
+    }
+});
+
+},{"./components/Products/ShowProduct":28,"./components/Promotions/ShowPromotion":29,"moment":20,"vue":25,"vue-resource":23,"vue-validator":24}]},{},[30]);
 
 //# sourceMappingURL=mainfront.js.map

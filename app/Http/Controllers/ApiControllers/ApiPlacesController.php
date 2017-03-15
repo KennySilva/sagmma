@@ -15,9 +15,9 @@ use Input;
 
 class ApiPlacesController extends Controller
 {
-    public function index()
+    public function index($row)
     {
-        $place = Place::paginate(5);
+        $place = Place::paginate($row);
         $place->each(function($place){
             $place->typeofplace;
         });

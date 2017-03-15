@@ -17,9 +17,9 @@ use Auth;
 
 class ApiTaxationsController extends Controller
 {
-    public function index()
+    public function index($row)
     {
-        $taxation = Taxation::paginate(5);
+        $taxation = Taxation::paginate($row);
 
         $taxation->each(function($taxation){
             $taxation->employees;

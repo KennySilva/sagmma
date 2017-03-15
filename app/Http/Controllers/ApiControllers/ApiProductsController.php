@@ -14,9 +14,9 @@ use Input;
 
 class ApiProductsController extends Controller
 {
-    public function index()
+    public function index($row)
     {
-        return Product::paginate(5);
+        return Product::paginate($row);
     }
 
     public function create()

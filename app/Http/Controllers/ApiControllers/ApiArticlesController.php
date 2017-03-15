@@ -22,9 +22,9 @@ use Settings;
 
 class ApiArticlesController extends Controller
 {
-    public function index()
+    public function index($row)
     {
-        $article = Article::paginate();
+        $article = Article::paginate($row);
         $article->each(function($article){
             $article->tags;
             $article->categories;

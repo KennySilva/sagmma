@@ -16,9 +16,9 @@ use User;
 
 class ApiTradersController extends Controller
 {
-    public function index()
+    public function index($row)
     {
-        $trader = Trader::paginate(5);
+        $trader = Trader::paginate($row);
         return $trader;
     }
 
