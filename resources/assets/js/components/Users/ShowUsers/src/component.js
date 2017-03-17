@@ -1,6 +1,8 @@
 import Pagination from '../../../Pagination/src/Component.vue'
 
 import { map } from 'lodash'
+import { _ } from 'lodash'
+
 export default{
     name: 'ShowUser',
 
@@ -44,8 +46,13 @@ export default{
             filter: {
                 term: ''
             },
+            columnsFiltered: [],
             pagination: {},
             success: false,
+            msgSucess: '',
+            typeAlert: '',
+            showRow: '',
+            all: {},
         }
     },
 
@@ -53,6 +60,18 @@ export default{
     methods: {
 
         // --------------------------------------------------------------------------------------------
+        alert: function(msg, typeAlert) {
+            var self = this;
+            this.success = true;
+            this.msgSucess = msg;
+            this.typeAlert = typeAlert;
+
+
+            setTimeout(function() {
+                self.success = false;
+            }, 5000);
+        },
+
 
         clearField: function(){
             this.newUser = {
@@ -90,12 +109,8 @@ export default{
                     console.log('chegando aqui');
                     $('#modal-create-user').modal('hide');
                     console.log(response.data);
-                    this.fetchUser(this.pagination.last_Page);
-                    var self = this;
-                    this.success = true;
-                    setTimeout(function() {
-                        self.success = false;
-                    }, 5000);
+                    this.fetchUser(this.pagination.last_Page, this.showRow);
+                    this.alert('Utilizador Criado com sucesso', 'success');
                 }
             }, (response) => {
 
@@ -106,11 +121,12 @@ export default{
 
 
 
-        fetchUser: function(page) {
-            var _this2 = this;
-            this.$http.get('http://localhost:8000/api/v1/users?page='+page).then((response) => {
-                _this2.$set('users', response.data.data);
-                _this2.$set('pagination', response.data);
+        fetchUser: function(page, row) {
+            var self = this;
+            this.$http.get('http://localhost:8000/api/v1/allUsers/'+row+'?page='+page).then((response) => {
+                self.$set('users', response.data.data);
+                self.$set('all', response.data.data);
+                self.$set('pagination', response.data);
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
             });
@@ -160,7 +176,9 @@ export default{
                 if (response.status == 200) {
                     $('#modal-edit-user').modal('hide');
                     // console.log(response.data);
-                    this.fetchUser(this.pagination.current_page);
+                    this.fetchUser(this.pagination.current_page, this.showRow);
+                    this.alert('Utilizador atualizado com sucesso', 'info');
+
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -177,7 +195,9 @@ export default{
                     $('#modal-delete-user').modal('hide');
                     if (response.status == 200) {
                         // console.log(response.data);
-                        this.fetchUser();
+                        this.fetchUser(1, this.showRow);
+                        this.alert('Utilizador eliminado com sucesso', 'warning');
+
                     }
                 }, (response) => {
                     console.log("Ocorreu um erro na operação");
@@ -217,7 +237,7 @@ export default{
                 console.log(response.status);
                 console.log(response.data);
                 if (response.status == 200) {
-                    this.fetchUser(this.pagination.current_page);
+                    this.fetchUser(this.pagination.current_page, this.showRow);
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -284,9 +304,24 @@ export default{
 
         // --------------------------------------------------------------------------------------------
 
+        doFilter: function() {
+
+            var self = this
+            filtered = self.all
+            if (self.filter.term != '' && self.columnsFiltered.length > 0) {
+                filtered = _.filter(self.all, function(user) {
+                    return self.columnsFiltered.some(function(column) {
+                        return user[column].toLowerCase().indexOf(self.filter.term.toLowerCase()) > -1
+                    })
+                })
+            }
+            self.$set('users', filtered)
+        },
+
+
         // Outros funções
         navigate (page) {
-            this.fetchUser(page);
+            this.fetchUser(page, this.showRow);
         },
 
         doOpenDetails: function(ev, id)
@@ -318,8 +353,96 @@ export default{
 
 
     ready () {
-        this.fetchUser(this.pagination.current_Page);
+        this.fetchUser(this.pagination.current_Page, this.showRow);
         this.roleUser();
+        var self = this
+        jQuery(self.$els.usercols).select2({
+            placeholder: "Coluna",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('columnsFiltered', jQuery(this).val());
+        });
+
+        jQuery(self.$els.state).select2({
+            placeholder: "Seleciona a ilha",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('newUser.state', jQuery(this).val());
+        });
+
+        jQuery(self.$els.type).select2({
+            placeholder: "Seleciona o tipo",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('newUser.type', jQuery(this).val());
+        });
+
+
+        jQuery(self.$els.roles).select2({
+            placeholder: "Função",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('newUser.roles', jQuery(this).val());
+        });
+
+
+        jQuery(self.$els.stateedit).select2({
+            placeholder: "Seleciona a ilha",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('newUser.state', jQuery(this).val());
+        });
+
+        jQuery(self.$els.typeedit).select2({
+            placeholder: "Seleciona o tipo",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('newUser.type', jQuery(this).val());
+        });
+
+
+        jQuery(self.$els.rolesedit).select2({
+            placeholder: "Função",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('newUser.roles', jQuery(this).val());
+        });
+
     },
 
     computed: {

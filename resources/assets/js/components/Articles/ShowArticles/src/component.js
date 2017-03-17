@@ -1,4 +1,5 @@
 import Pagination from '../../../Pagination/src/Component.vue'
+import { _ } from 'lodash'
 
 export default{
 

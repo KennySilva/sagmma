@@ -1,4 +1,5 @@
 import Pagination from '../../../Pagination/src/Component.vue'
+import { _ } from 'lodash'
 
 // import from 'lodash'
 
@@ -36,8 +37,20 @@ export default{
     // ---------------------------------------------------------------------------------
 
     ready () {
-        this.fetchRole(1);
+        this.fetchRole(1, this.showRow);
         this.permissionrole();
+        var self = this
+        jQuery(self.$els.rolecols).select2({
+            placeholder: "Coluna",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('columnsFiltered', jQuery(this).val());
+        });
     },
 
     // ---------------------------------------------------------------------------------
@@ -77,7 +90,7 @@ export default{
                     console.log('chegando aqui');
                     $('#modal-create-role').modal('hide');
                     // console.log(response.data);
-                    this.fetchRole();
+                    this.fetchRole(1, this.showRow);
                     this.alert('Papel Criado com sucesso', 'success');
                 }
             }, (response) => {
@@ -87,10 +100,11 @@ export default{
 
         // --------------------------------------------------------------------------------------------
 
-        fetchRole: function(page) {
+        fetchRole: function(page, row) {
             var self = this
-            self.$http.get('http://localhost:8000/api/v1/roles?page='+page).then((response) => {
+            self.$http.get('http://localhost:8000/api/v1/allRoles/'+row+'?page='+page).then((response) => {
                 self.$set('roles', response.data.data)
+                self.$set('all', response.data.data)
                 self.$set('pagination', response.data)
 
                 jQuery(self.$els.perms).select2({
@@ -154,7 +168,7 @@ export default{
                 if (response.status == 200) {
                     $('#modal-edit-role').modal('hide');
                     // console.log(response.data);
-                    this.fetchRole();
+                    this.fetchRole(1, this.showRow);
                     this.alert('Papel atualizado com sucesso', 'info');
 
                 }
@@ -170,7 +184,7 @@ export default{
                 $('#modal-delete-role').modal('hide');
                 if (response.status == 200) {
                     // console.log(response.data);
-                    this.fetchRole();
+                    this.fetchRole(1, this.showRow);
                     this.alert('Papel eliminado com sucesso', 'warning');
                 }
             }, (response) => {
@@ -201,10 +215,22 @@ export default{
         },
 
         // --------------------------------------------------------------------------------------------
+        doFilter: function() {
 
+            var self = this
+            filtered = self.all
+            if (self.filter.term != '' && self.columnsFiltered.length > 0) {
+                filtered = _.filter(self.all, function(role) {
+                    return self.columnsFiltered.some(function(column) {
+                        return role[column].toLowerCase().indexOf(self.filter.term.toLowerCase()) > -1
+                    })
+                })
+            }
+            self.$set('roles', filtered)
+        },
         // Outros funções
         navigate (page) {
-            this.fetchRole(page);
+            this.fetchRole(page, this.showUser);
         },
 
         clearField: function(){

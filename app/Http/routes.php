@@ -378,8 +378,8 @@ Route::resource('employees', 'ApiControllers\ApiEmployeesController');
 Route::get('testevariavel', 'ApiControllers\ApiArticlesController@test2');
 
 // ###################################################################################################################
-
-//------------------------------------Services Routes---------------------------------------
+// ###################################################  Contact ######################################################
+// ###################################################################################################################
 Route::group(['namespace' => 'ServicesControllers'], function()
 {
     Route::Post('/mailSagmma',  array('as' => 'mailToSagmma', 'uses' => 'MailController@mailToSagmma'));
@@ -387,17 +387,27 @@ Route::group(['namespace' => 'ServicesControllers'], function()
     Route::post('/maiManager', array('as' => 'mailToManager', 'uses' => 'MailController@mailToManager'));
     Route::post('/mailAux', array('as' => 'mailToAux', 'uses' => 'MailController@mailToAux'));
 });
+// ###################################################################################################################
 
 
 
+//
+//
+// Route::get('/fullcalendar', function () {
+//     return view('_backend.fullcalendar');
+// });
 
-
-Route::get('/fullcalendar', function () {
-    return view('_backend.fullcalendar');
-});
-
-
+// ###################################################################################################################
+// ###################################################  Ajax form events #############################################
+// ###################################################################################################################
 Route::get('showEvents{id?}','PluginsControllers\CalendareventsController@index');
 Route::post('saveEvents', array('as' => 'guardaEventos','uses' => 'PluginsControllers\CalendareventsController@create'));
 Route::post('updateEvents','PluginsControllers\CalendareventsController@update');
 Route::post('deleteEvents','PluginsControllers\CalendareventsController@delete');
+// ###################################################################################################################
+
+// ###################################################################################################################
+// ###################################################  Google analytics #############################################
+// ###################################################################################################################
+Route::get('data','PluginsControllers\AnalyticsController@index');
+// ###################################################################################################################
