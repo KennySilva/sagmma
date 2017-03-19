@@ -43,14 +43,23 @@
         <!-- Settings tab content -->
         <div class="tab-pane" id="control-sidebar-settings-tab">
             <form method="post">
-                <h3 class="control-sidebar-heading">General Settings</h3>
+                <h3 class="control-sidebar-heading">Configurações</h3>
                 <div class="form-group">
                     <label class="control-sidebar-subheading">
-                        Report panel usage
+                        Gráficos Estatistico
                         <input type="checkbox" class="pull-right" checked />
                     </label>
-                    <p>
-                        Some information about this general settings option
+                    <p class="text-help">
+                        Gráficos para controlar as atividades da gestão e as atividades do sistema
+                    </p>
+                </div><!-- /.form-group -->
+                <div class="form-group">
+                    <label class="control-sidebar-subheading">
+                        Calendário de Tarefas
+                        <input type="checkbox" class="pull-right" checked />
+                    </label>
+                    <p class="text-help">
+                        Controlar as minhas atividaes diárias com Calendário dinamico de atividades
                     </p>
                 </div><!-- /.form-group -->
             </form>

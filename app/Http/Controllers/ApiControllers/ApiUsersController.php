@@ -19,14 +19,30 @@ class ApiUsersController extends Controller
 {
     public function index($row)
     {
-        //
-        // $ex= User::where('name', '!=', 'Admin')->get();
-        // return $ex;
         $user = User::paginate($row);
         $user->each(function($user){
             $user->roles;
         });
         return $user;
+        // foreach (Auth::user()->roles as $role) {
+        //     if ($role->name == 'super-admin') {
+        //         $user = User::paginate($row);
+        //         $user->each(function($user){
+        //             $user->roles;
+        //         });
+        //         return $user;
+        //     }else{
+        //         // $thisUserRole = $role->where('name', 'admin')->where('name', 'super-admin')
+        //
+        //         $user = User::paginate($row);
+        //         $user->each(function($user){
+        //             // $user->roles;
+        //             $user->roles->where('name', '!=', 'admin');
+        //         });
+        //         return $user;
+        //         // $roles= Role::where('name', '!=', 'admin')->where('name', '!=', 'super-admin')->get();
+        //     }
+        // }
     }
 
     public function create()
@@ -59,41 +75,41 @@ class ApiUsersController extends Controller
         $user->social      = false;
         $user->save();
         $user->roles()->sync($request->roles);
-        // if ($request->type == 'trad') {
-        //     $trader                  = new Trader();
-        //     $trader->name            = $request->name;
-        //     $trader->ic              = $request->ic;
-        //     $trader->age             = $request->age;
-        //     $trader->gender          = $request->gender;
-        //     $trader->email           = $request->email;
-        //     $trader->state           = $request->state;
-        //     $trader->council         = $request->council;
-        //     $trader->parish          = $request->parish;
-        //     $trader->zone            = $request->zone;
-        //     $trader->phone           = $request->phone;
-        //     $trader->photo           = $request->photo;
-        //     $trader->description     = $request->description;
-        //     $trader->save();
-        // }
-        // if ($request->type == 'emp') {
-        //     $employee                    = new Employee();
-        //     $employee->name              = $request->name;
-        //     $employee->ic                = $request->ic;
-        //     $employee->age               = $request->age;
-        //     $employee->gender            = $request->gender;
-        //     $employee->email             = $request->email;
-        //     $employee->state             = $request->state;
-        //     $employee->council           = $request->council;
-        //     $employee->parish            = $request->parish;
-        //     $employee->zone              = $request->zone;
-        //     $employee->phone             = $request->phone;
-        //     $employee->echelon           = 'A';
-        //     $employee->service_beginning = $request->service_beginning;
-        //     $employee->typeofemployee_id = $request->typeofemployee_id;
-        //     $employee->photo             = $request->photo;
-        //     $employee->description       = $request->description;
-        //     $employee->save();
-        // }
+        if ($request->type == 'trad') {
+            $trader                  = new Trader();
+            $trader->name            = $request->name;
+            $trader->ic              = $request->ic;
+            $trader->age             = $request->age;
+            $trader->gender          = $request->gender;
+            $trader->email           = $request->email;
+            $trader->state           = $request->state;
+            $trader->council         = $request->council;
+            $trader->parish          = $request->parish;
+            $trader->zone            = $request->zone;
+            $trader->phone           = $request->phone;
+            $trader->photo           = 'default.png';
+            $trader->description     = $request->description;
+            $trader->save();
+        }
+        if ($request->type == 'emp') {
+            $employee                    = new Employee();
+            $employee->name              = $request->name;
+            $employee->ic                = $request->ic;
+            $employee->age               = $request->age;
+            $employee->gender            = $request->gender;
+            $employee->email             = $request->email;
+            $employee->state             = $request->state;
+            $employee->council           = $request->council;
+            $employee->parish            = $request->parish;
+            $employee->zone              = $request->zone;
+            $employee->phone             = $request->phone;
+            $employee->echelon           = 'A';
+            $employee->service_beginning = date('Y-m-d H:i:s');
+            $employee->typeofemployee_id = 1;
+            $employee->photo             = 'default.png';
+            $employee->description       = $request->description;
+            $employee->save();
+        }
 
         // if($test)
         // {
@@ -170,5 +186,28 @@ class ApiUsersController extends Controller
         $user = Auth::user();
         $user->roles;
         return $user;
+        // foreach (Auth::user()->roles as $role) {
+        //     if ($role->name == 'super-admin') {
+        //         $user = User::paginate($row);
+        //         $user->each(function($user){
+        //             $user->roles;
+        //         });
+        //         return $user;
+        //     }else{
+        //         // $thisUserRole = $role->where('name', 'admin')->where('name', 'super-admin')
+        //
+        //         // Supplier::has('products')->where('name', $name)->get();
+        //
+        //         // $user = User::has('roles')->where('name', '!=', 'admin')->paginate(10);
+        //         $user = User::with('roles')->whereName(!$role->name)->paginate(10);
+        //
+        //
+        //         // $user->each(function($user){
+        //         //     $user->roles;
+        //         // });
+        //         return $user;
+        //         // $roles= Role::where('name', '!=', 'admin')->where('name', '!=', 'super-admin')->get();
+        //     }
+        // }
     }
 }

@@ -76,7 +76,7 @@ class ApiRolesController extends Controller
                 if ($role->name == 'super-admin') {
                     $permissions = Permission::all();
                 }else{
-                    $permissions= Permission::where('name', '!=', 'admin')->get();
+                    $permissions= Permission::where('name', '!=', 'admin')->where('name', '!=', 'manage-admins')->get();
                 }
             }
             return $permissions;

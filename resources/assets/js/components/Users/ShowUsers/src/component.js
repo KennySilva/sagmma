@@ -214,7 +214,6 @@ export default{
 
     methods: {
 
-
         // --------------------------------------------------------------------------------------------
         alert: function(msg, typeAlert) {
             var self = this;

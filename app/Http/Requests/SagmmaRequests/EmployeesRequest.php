@@ -17,7 +17,7 @@ class EmployeesRequest extends Request
             'name'              => 'required|max:60|min:4',
             'ic'                => 'required|digits:6|Integer|unique:employees',
             'email'             => 'unique:employees|email',
-            'phone'             => 'digits:7|unique:employees',
+            'phone'             => 'digits:7',
             'service_beginning' => 'date',
         ];
     }
