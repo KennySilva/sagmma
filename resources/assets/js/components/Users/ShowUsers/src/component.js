@@ -53,11 +53,167 @@ export default{
             typeAlert: '',
             showRow: '',
             all: {},
+            auth: [],
         }
+    },
+
+    ready () {
+        this.fetchUser(this.pagination.current_Page, this.showRow);
+        this.roleUser();
+        this.authUser();
+        var self = this
+        jQuery(self.$els.usercols).select2({
+            placeholder: "Coluna",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('columnsFiltered', jQuery(this).val());
+        });
+
+        jQuery(self.$els.typecreate).select2({
+            placeholder: "Seleciona o tipo",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('newUser.type', jQuery(this).val());
+        });
+
+
+        jQuery(self.$els.rolescreate).select2({
+            placeholder: "Função",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('newUser.roles', jQuery(this).val());
+        });
+
+
+        jQuery(self.$els.stateedit).select2({
+            placeholder: "Seleciona a ilha",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('newUser.state', jQuery(this).val());
+        });
+
+        jQuery(self.$els.typeedit).select2({
+            placeholder: "Seleciona o tipo",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('newUser.type', jQuery(this).val());
+        });
+
+
+        jQuery(self.$els.rolesedit).select2({
+            placeholder: "Função",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('newUser.roles', jQuery(this).val());
+        });
+
+        jQuery(self.$els.statecreate).select2({
+            placeholder: "Ilha",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('newUser.state', jQuery(this).val());
+        });
+
+        jQuery(self.$els.stateedit).select2({
+            placeholder: "Ilha",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('newUser.state', jQuery(this).val());
+        });
+
+        jQuery(self.$els.councilcreate).select2({
+            placeholder: "Concelho",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('newUser.council', jQuery(this).val());
+        });
+
+        jQuery(self.$els.counciledit).select2({
+            placeholder: "Concelho",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('newUser.council', jQuery(this).val());
+        });
+
+        jQuery(self.$els.parishcreate).select2({
+            placeholder: "Freguesia",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('newUser.parish', jQuery(this).val());
+        });
+
+        jQuery(self.$els.parishedit).select2({
+            placeholder: "Freguesia",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('newUser.parish', jQuery(this).val());
+        });
+
     },
 
 
     methods: {
+
 
         // --------------------------------------------------------------------------------------------
         alert: function(msg, typeAlert) {
@@ -244,6 +400,14 @@ export default{
             });
         },
 
+        authUser: function() {
+            this.$http.get('http://localhost:8000/api/v1/authUser').then((response) => {
+                this.$set('auth', response.data);
+            }, (response) => {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
 
         // --------------------------------------------------------------------------------------------
 
@@ -347,103 +511,12 @@ export default{
             }else {
                 self.$set('openDetails', map(self.users, 'id'));
             }
-        }
+        },
+
 
     },
 
 
-    ready () {
-        this.fetchUser(this.pagination.current_Page, this.showRow);
-        this.roleUser();
-        var self = this
-        jQuery(self.$els.usercols).select2({
-            placeholder: "Coluna",
-            allowClear: true,
-            theme: "bootstrap",
-            width: '100%',
-            language: 'pt',
-
-
-        }).on('change', function () {
-            self.$set('columnsFiltered', jQuery(this).val());
-        });
-
-        jQuery(self.$els.state).select2({
-            placeholder: "Seleciona a ilha",
-            allowClear: true,
-            theme: "bootstrap",
-            width: '100%',
-            language: 'pt',
-
-
-        }).on('change', function () {
-            self.$set('newUser.state', jQuery(this).val());
-        });
-
-        jQuery(self.$els.type).select2({
-            placeholder: "Seleciona o tipo",
-            allowClear: true,
-            theme: "bootstrap",
-            width: '100%',
-            language: 'pt',
-
-
-        }).on('change', function () {
-            self.$set('newUser.type', jQuery(this).val());
-        });
-
-
-        jQuery(self.$els.roles).select2({
-            placeholder: "Função",
-            allowClear: true,
-            theme: "bootstrap",
-            width: '100%',
-            language: 'pt',
-
-
-        }).on('change', function () {
-            self.$set('newUser.roles', jQuery(this).val());
-        });
-
-
-        jQuery(self.$els.stateedit).select2({
-            placeholder: "Seleciona a ilha",
-            allowClear: true,
-            theme: "bootstrap",
-            width: '100%',
-            language: 'pt',
-
-
-        }).on('change', function () {
-            self.$set('newUser.state', jQuery(this).val());
-        });
-
-        jQuery(self.$els.typeedit).select2({
-            placeholder: "Seleciona o tipo",
-            allowClear: true,
-            theme: "bootstrap",
-            width: '100%',
-            language: 'pt',
-
-
-        }).on('change', function () {
-            self.$set('newUser.type', jQuery(this).val());
-        });
-
-
-        jQuery(self.$els.rolesedit).select2({
-            placeholder: "Função",
-            allowClear: true,
-            theme: "bootstrap",
-            width: '100%',
-            language: 'pt',
-
-
-        }).on('change', function () {
-            self.$set('newUser.roles', jQuery(this).val());
-        });
-
-    },
 
     computed: {
         myValidation: function() {
@@ -459,8 +532,10 @@ export default{
             return Object.keys(validation).every(function(key){
                 return validation[key];
             });
-        }
+        },
     },
+
+
 
 
     components: {

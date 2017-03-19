@@ -57,7 +57,7 @@ return [
         Sagmma\Providers\RouteServiceProvider::class,
 
         Sagmma\Providers\ComposerServiceProvider::class,
-        Spatie\LaravelAnalytics\LaravelAnalyticsServiceProvider::class,
+
 
         /*
         * Providers instalado e personalizados para SAGMMA...
@@ -81,6 +81,7 @@ return [
         //12/01/2016
         // Greggilbert\Recaptcha\RecaptchaServiceProvider::class,
         // Anhskohbo\NoCaptcha\NoCaptchaServiceProvider::class,
+        // Spatie\Analytics\AnalyticsServiceProvider::class,
         //Gráficos
         ConsoleTVs\Charts\ChartsServiceProvider::class,
 
@@ -89,7 +90,6 @@ return [
         Cviebrock\EloquentSluggable\ServiceProvider::class,
 
         Krucas\Settings\Providers\SettingsServiceProvider::class,
-
 
 
     ],
@@ -129,9 +129,9 @@ return [
         'URL'       => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View'      => Illuminate\Support\Facades\View::class,
-        
+
         //Meus Alias
-        'Analytics' => Spatie\LaravelAnalytics\LaravelAnalyticsFacade::class,
+
         'Image'        => Intervention\Image\Facades\Image               ::class,
 
         'Socialite'    => Laravel\Socialite\Facades\Socialite            ::class,
@@ -149,12 +149,12 @@ return [
 
         // 'Recaptcha' => Greggilbert\Recaptcha\Facades\Recaptcha        ::class,
 
+        // 'Analytics' => Spatie\Analytics\AnalyticsFacade               ::class,
         'Charts'       => ConsoleTVs\Charts\Facades\Charts               ::class,
 
         'Flash' => Caffeinated\Flash\Facades\Flash::class,
 
         'Settings' => Krucas\Settings\Facades\Settings::class,
-
 
 
 

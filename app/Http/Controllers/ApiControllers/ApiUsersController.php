@@ -9,6 +9,8 @@ use Sagmma\Http\Controllers\Controller;
 use Sagmma\Http\Requests\UsersRequest;
 use User;
 use Role;
+use Trader;
+use Employee;
 use Response;
 use Input;
 use Auth;
@@ -57,7 +59,6 @@ class ApiUsersController extends Controller
         $user->social      = false;
         $user->save();
         $user->roles()->sync($request->roles);
-        // ('member', 'emp', 'trad')
         // if ($request->type == 'trad') {
         //     $trader                  = new Trader();
         //     $trader->name            = $request->name;
@@ -86,13 +87,12 @@ class ApiUsersController extends Controller
         //     $employee->parish            = $request->parish;
         //     $employee->zone              = $request->zone;
         //     $employee->phone             = $request->phone;
-        //     $employee->echelon           = $request->echelon;
+        //     $employee->echelon           = 'A';
         //     $employee->service_beginning = $request->service_beginning;
         //     $employee->typeofemployee_id = $request->typeofemployee_id;
         //     $employee->photo             = $request->photo;
         //     $employee->description       = $request->description;
         //     $employee->save();
-        //     $employee->markets()->sync($request->markets);
         // }
 
         // if($test)
@@ -154,13 +154,21 @@ class ApiUsersController extends Controller
     // // Outros Metodos
     public function getRoleForUser()
     {
-        $roles = Role::all();
+        foreach (Auth::user()->roles as $role) {
+            # code...
+            if ($role->name == 'super-admin') {
+                $roles = Role::all();
+            }else{
+                $roles= Role::where('name', '!=', 'admin')->where('name', '!=', 'super-admin')->get();
+            }
+        }
         return $roles;
     }
 
     public function authUser()
     {
         $user = Auth::user();
+        $user->roles;
         return $user;
     }
 }

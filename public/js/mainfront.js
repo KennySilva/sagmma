@@ -18771,9 +18771,9 @@ if (module.hot) {(function () {  module.hot.accept()
     document.head.removeChild(__vueify_style__)
   })
   if (!module.hot.data) {
-    hotAPI.createRecord("_v-5673fc70", module.exports)
+    hotAPI.createRecord("_v-0f74e9a8", module.exports)
   } else {
-    hotAPI.update("_v-5673fc70", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+    hotAPI.update("_v-0f74e9a8", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
 },{"vue":25,"vue-hot-reload-api":22,"vueify/lib/insert-css":26}],28:[function(require,module,exports){
@@ -18982,9 +18982,9 @@ if (module.hot) {(function () {  module.hot.accept()
     document.head.removeChild(__vueify_style__)
   })
   if (!module.hot.data) {
-    hotAPI.createRecord("_v-4df99288", module.exports)
+    hotAPI.createRecord("_v-2c902268", module.exports)
   } else {
-    hotAPI.update("_v-4df99288", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+    hotAPI.update("_v-2c902268", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
 },{"../../../Pagination/src/Component.vue":27,"babel-runtime/helpers/defineProperty":2,"vue":25,"vue-hot-reload-api":22,"vueify/lib/insert-css":26}],29:[function(require,module,exports){
@@ -19224,9 +19224,9 @@ if (module.hot) {(function () {  module.hot.accept()
     document.head.removeChild(__vueify_style__)
   })
   if (!module.hot.data) {
-    hotAPI.createRecord("_v-aa575270", module.exports)
+    hotAPI.createRecord("_v-39dff6a8", module.exports)
   } else {
-    hotAPI.update("_v-aa575270", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+    hotAPI.update("_v-39dff6a8", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
 },{"../../../Pagination/src/Component.vue":27,"vue":25,"vue-hot-reload-api":22,"vueify/lib/insert-css":26}],30:[function(require,module,exports){

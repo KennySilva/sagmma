@@ -11,6 +11,8 @@ use Role;
 use Permission;
 use Response;
 use Input;
+use Auth;
+
 
 class ApiRolesController extends Controller
 {
@@ -69,7 +71,14 @@ class ApiRolesController extends Controller
         // Outros Metodos
         public function getPermissionForRole()
         {
-            $permissions = Permission::all();
+            foreach (Auth::user()->roles as $role) {
+                # code...
+                if ($role->name == 'super-admin') {
+                    $permissions = Permission::all();
+                }else{
+                    $permissions= Permission::where('name', '!=', 'admin')->get();
+                }
+            }
             return $permissions;
         }
     }
