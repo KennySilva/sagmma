@@ -25,6 +25,8 @@ export default{
             pagination: {},
             success: false,
             showRow: '',
+            msgSucess: '',
+            typeAlert: '',
         }
     },
 

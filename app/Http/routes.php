@@ -94,7 +94,7 @@ Route::group(['namespace' => 'ApiControllers'], function()
         Route::group(['middleware' => ['role:admin']], function () {
             // ----------------------------------------Api-Markets----------------------------------
             Route::resource('markets', 'ApiMarketsController');
-            Route::get('allMarkets/{row}', 'ApiMarketsController@index');
+            Route::get('getAllMarkets/{row}', 'ApiMarketsController@index');
 
 
             // ----------------------------------------Api-Typeofemployees------------------------------

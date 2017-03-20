@@ -198,8 +198,9 @@ class ApiUsersController extends Controller
         //
         //         // Supplier::has('products')->where('name', $name)->get();
         //
-        //         // $user = User::has('roles')->where('name', '!=', 'admin')->paginate(10);
-        //         $user = User::with('roles')->whereName(!$role->name)->paginate(10);
+        //         $user = User::has('roles')->where('name', '!=', 'admin')->paginate(10);
+        //         // $user = User::with('roles')->paginate(10);
+        //         // $user = User::with('roles')->whereName('super-admins')->paginate(10);
         //
         //
         //         // $user->each(function($user){
