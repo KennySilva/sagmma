@@ -5,7 +5,7 @@
     <link href="{{ asset('/plugins/datepicker/datepicker3.css') }}" rel="stylesheet" type="text/css" />
     <!------------------------------------------------------------------------------------------------------>
     <style media="screen">
-    
+
     #exTab2 h3 {
         color : white;
         background-color: #428bca;
@@ -83,7 +83,7 @@
     {{-- <script src="{{ asset('/plugins/datepicker/locales/bootstrap-datepicker.pt.js') }}" charset="utf-8"></script> --}}
 
     <script type="text/javascript">
-    $('.datepicker').datepicker();
-
+    webshims.setOptions('forms-ext', {types: 'date'});
+    webshims.polyfill('forms forms-ext');
     </script>
 @endpush

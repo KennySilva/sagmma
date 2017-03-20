@@ -1,9 +1,8 @@
 import Pagination from '../../../Pagination/src/Component.vue'
-// import vSelect from "vue-select"
+import { _ } from 'lodash'
+
 export default{
     name: 'ShowEmployees',
-
-
     data(){
         return {
             showColumn: {
@@ -32,24 +31,215 @@ export default{
 
             },
 
-
             employees  : {},
             markets    : [],
             types      : [],
 
-
             sortColumn : 'name',
             sortInverse: 1,
-            filter     : {
-                term   : ''
+            filter: {
+                term: ''
             },
-            pagination : {},
-            success    : false,
+            columnsFiltered: [],
+            pagination: {},
+            success: false,
+            msgSucess: '',
+            typeAlert: '',
+            showRow: '',
+            all: {},
+            auth: [],
         }
     },
 
 
+    ready () {
+        this.fetchEmployee(this.pagination.current_Page, this.showRow)
+        this.marketEmployee()
+        this.employeeType()
+        // -------------------------------------------------------------------------------------
+
+        var self = this
+        jQuery(self.$els.marketcols).select2({
+            placeholder: "Coluna",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('columnsFiltered', jQuery(this).val());
+        });
+        // -------------------------------------------------------------------------------------
+
+        jQuery(self.$els.typecreate).select2({
+            placeholder: "Tipo",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('newEmployee.typeofemployee_id', jQuery(this).val());
+        });
+
+        jQuery(self.$els.typeedit).select2({
+            placeholder: "Tipo",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('newEmployee.typeofemployee_id', jQuery(this).val());
+        });
+        // -------------------------------------------------------------------------------------
+
+
+
+        jQuery(self.$els.marketcreate).select2({
+            placeholder: "Mercado",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('newEmployee.markets', jQuery(this).val());
+        });
+
+
+        jQuery(self.$els.marketedit).select2({
+            placeholder: "Mercado",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('newEmployee.markets', jQuery(this).val());
+        });
+
+        // -------------------------------------------------------------------------------------
+
+        jQuery(self.$els.statecreate).select2({
+            placeholder: "Ilha",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('newEmployee.state', jQuery(this).val());
+        });
+
+        jQuery(self.$els.stateedit).select2({
+            placeholder: "Ilha",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('newEmployee.state', jQuery(this).val());
+        });
+        // -------------------------------------------------------------------------------------
+
+        jQuery(self.$els.councilcreate).select2({
+            placeholder: "Concelho",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('newEmployee.council', jQuery(this).val());
+        });
+
+        jQuery(self.$els.counciledit).select2({
+            placeholder: "Concelho",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('newEmployee.council', jQuery(this).val());
+        });
+        // -------------------------------------------------------------------------------------
+
+        jQuery(self.$els.parishcreate).select2({
+            placeholder: "Freguesia",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('newEmployee.parish', jQuery(this).val());
+        });
+
+        jQuery(self.$els.parishedit).select2({
+            placeholder: "Freguesia",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('newEmployee.parish', jQuery(this).val());
+        });
+        // -------------------------------------------------------------------------------------
+
+        jQuery(self.$els.echeloncreate).select2({
+            placeholder: "Escalão",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('newEmployee.echelon', jQuery(this).val());
+        });
+
+        jQuery(self.$els.echelonedit).select2({
+            placeholder: "Escalão",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+
+
+        }).on('change', function () {
+            self.$set('newEmployee.echelon', jQuery(this).val());
+        });
+    },
+
+
     methods: {
+        alert: function(msg, typeAlert) {
+            var self = this;
+            this.success = true;
+            this.msgSucess = msg;
+            this.typeAlert = typeAlert;
+
+
+            setTimeout(function() {
+                self.success = false;
+            }, 5000);
+        },
+
         clearField: function(){
             this.newEmployee = {
                 name              : '',
@@ -86,12 +276,9 @@ export default{
                     console.log('chegando aqui');
                     $('#modal-create-employee').modal('hide');
                     console.log(response.data);
-                    this.fetchEmployee(this.pagination.last_Page);
-                    var self = this;
-                    this.success = true;
-                    setTimeout(function() {
-                        self.success = false;
-                    }, 5000);
+                    this.fetchEmployee(this.pagination.last_Page, this.showRow);
+
+                    this.alert('Funcionário Criado com sucesso', 'success');
                 }
             }, (response) => {
 
@@ -100,9 +287,10 @@ export default{
 
         // --------------------------------------------------------------------------------------------
 
-        fetchEmployee: function(page) {
-            this.$http.get('http://localhost:8000/api/v1/employees?page='+page).then((response) => {
+        fetchEmployee: function(page, row) {
+            this.$http.get('http://localhost:8000/api/v1/allEmployees/'+row+'?page='+page).then((response) => {
                 this.$set('employees', response.data.data);
+                this.$set('all', response.data.data);
                 this.$set('pagination', response.data);
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -144,7 +332,8 @@ export default{
                 if (response.status == 200) {
                     $('#modal-edit-employee').modal('hide');
                     // console.log(response.data);
-                    this.fetchEmployee(this.pagination.current_page);
+                    this.fetchEmployee(this.pagination.current_page, this.showRow);
+                    this.alert('Funcionário atualizado com sucesso', 'info');
 
                 }
             }, (response) => {
@@ -160,7 +349,8 @@ export default{
                 $('#modal-delete-employee').modal('hide');
                 if (response.status == 200) {
                     // console.log(response.data);
-                    this.fetchEmployee();
+                    this.fetchEmployee(this.pagination.current_page, this.showRow);
+                    this.alert('Funcionário eliminado com sucesso', 'warning');
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -178,6 +368,14 @@ export default{
         employeeType: function() {
             this.$http.get('http://localhost:8000/api/v1/employeeType').then((response) => {
                 this.$set('types', response.data);
+            }, (response) => {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+        authUser: function() {
+            this.$http.get('http://localhost:8000/api/v1/authUser').then((response) => {
+                this.$set('auth', response.data);
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
             });
@@ -240,23 +438,30 @@ export default{
             // console.log(ev);
         },
 
+        doFilter: function() {
+            var self = this
+            filtered = self.all
+            if (self.filter.term != '' && self.columnsFiltered.length > 0) {
+                filtered = _.filter(self.all, function(market) {
+                    return self.columnsFiltered.some(function(column) {
+                        return market[column].toLowerCase().indexOf(self.filter.term.toLowerCase()) > -1
+                    })
+                })
+            }
+            self.$set('markets', filtered)
+        },
+
         // --------------------------------------------------------------------------------------------
 
         // Outros funções
         navigate (page) {
-            this.fetchEmployee(page);
+            this.fetchEmployee(page, this.showRow);
         },
 
 
     },
 
 
-    ready () {
-        this.fetchEmployee(this.pagination.current_Page)
-        this.marketEmployee()
-        this.employeeType()
-
-    },
 
 
     components: {

@@ -30,7 +30,7 @@ class ApiMarketsController extends Controller
         $market->logo        = $request->logo;
         $market->save();
     }
-
+    
 
     public function show($id)
     {

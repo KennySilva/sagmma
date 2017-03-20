@@ -1,8 +1,8 @@
 var Vue = require('vue');
+Vue.use(require('vue-validator'));
 // var VueQuillEditor = require('vue-quill-editor');
 // Vue.use(VueQuillEditor);
 Vue.use(require('vue-resource'));
-Vue.use(require('vue-validator'));
 // Vue.use(require('vue-form'));
 // Vue.use(require('vue-select'));
 // Vue.use(require('vue-router'));

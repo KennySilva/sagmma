@@ -5,6 +5,10 @@
 </div>
 
 
+<!-- <pre>
+	{{$data.errors | json}}
+</pre> -->
+
 <div class="row">
 	<div class="col-md-12">
 		<div class="form-inline pull-right">
@@ -192,7 +196,7 @@
 				<h4 class="modal-title">Registar Mercado</h4>
 			</div>
 			<div class="modal-body">
-				<validator name="validationew">
+				<validator name="validationmarket">
 					<form action="#" methods="POST">
 						<div class="row">
 							<div class="col-md-12">
@@ -200,7 +204,7 @@
 									<div class="form-group has-feedback">
 										<input type="text" class="form-control" name="name" placeholder="Nome do Mercado" v-model="newMarket.name" v-validate:name="['required']"/>
 										<span class="fa fa-university form-control-feedback"></span>
-										<p style="color:red;" v-if="$validationew.name.required && $validationew.name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
+										<p style="color:red;" v-if="$validationmarket.name.required && $validationmarket.name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
 									</div>
 								</div>
 							</div>
@@ -212,7 +216,7 @@
 									<div class="form-group has-feedback">
 										<input type="text" class="form-control" name="location" placeholder="Localização" v-model="newMarket.location" v-validate:location="['required']"/>
 										<span class="fa fa-thumb-tack form-control-feedback"></span>
-										<p style="color:red;" v-if="$validationew.location.required && $validationew.location.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
+										<p style="color:red;" v-if="$validationmarket.location.required && $validationmarket.location.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
 									</div>
 								</div>
 							</div>
@@ -239,7 +243,7 @@
 					<div class="col-md-12">
 						<button type="button" class="btn btn-outline-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
 
-						<button :disabled = "!$validationew.valid" @click="createMarket" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
+						<button :disabled = "!$validationmarket.valid" @click="createMarket" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
 					</div>
 				</div>
 			</div>

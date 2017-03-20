@@ -87,17 +87,22 @@ export default{
                 this.fetchMarket(1, this.showRow);
 
                 this.alert('Mercado Criado com sucesso', 'success');
+                // di kel forma li cata da pamodi problema de  'always_populate_raw_post_data'
+                console.log(response.data);
 
-                this.$set('errors', '');
+                // this.$set('errors', response.data);
+
 
                 this.submited = true;
             }, (response) => {
-                this.$set('errors', response.data);
+                console.log(response.data);
+
+                // this.$set('errors', response);
             });
         },
 
         // --------------------------------------------------------------------------------------------
-
+        
         fetchMarket: function(page, row) {
             this.$http.get('http://localhost:8000/api/v1/getAllMarkets/'+row+'?page='+page).then((response) => {
                 this.$set('markets', response.data.data)

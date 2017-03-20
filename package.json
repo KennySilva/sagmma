@@ -24,7 +24,9 @@
     "laravel-elixir-vueify": "^2.0.0",
     "moment": "^2.14.1",
     "vue-cli": "^2.2.0",
+    "vue-laravel-validator": "^1.0.4",
     "vue-quill-editor": "^1.1.1",
-    "vue-router": "^0.7.13"
+    "vue-router": "^0.7.13",
+    "vue-validator": "^3.0.0-alpha.2"
   }
 }

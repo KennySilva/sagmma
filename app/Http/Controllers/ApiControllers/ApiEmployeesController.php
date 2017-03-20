@@ -85,7 +85,61 @@ class ApiEmployeesController extends Controller
 
         public function update(Req $request, $id)
         {
-            Employee::findOrFail($id)->update($request::all());
+
+            $name              = Input::get('name');
+            $ic                = Input::get('ic');
+            $age               = Input::get('age');
+            $gender            = Input::get('gender');
+            $email             = Input::get('email');
+            $state             = Input::get('state');
+            $council           = Input::get('council');
+            $parish            = Input::get('parish');
+            $zone              = Input::get('zone');
+            $phone             = Input::get('phone');
+            $echelon           = Input::get('echelon');
+            $service_beginning = Input::get('service_beginning');
+            $typeofemployee_id = Input::get('typeofemployee_id');
+            $photo             = Input::get('photo');
+            $description       = Input::get('description');
+
+            // $name              = $request->name;
+            // $ic                = $request->ic;
+            // $age               = $request->age;
+            // $gender            = $request->gender;
+            // $email             = $request->email;
+            // $state             = $request->state;
+            // $council           = $request->council;
+            // $parish            = $request->parish;
+            // $zone              = $request->zone;
+            // $phone             = $request->phone;
+            // $echelon           = $request->echelon;
+            // $service_beginning = $request->service_beginning;
+            // $typeofemployee_id = $request->typeofemployee_id;
+            // $photo             = $request->photo;
+            // $description       = $request->description;
+
+            $employee = new Employee();
+            $employee->where('id', $id)->update(array(
+                'name'              => $name,
+                'ic'                => $ic,
+                'age'               => $age,
+                'gender'            => $gender,
+                'email'             => $email,
+                'state'             => $state,
+                'council'           => $council,
+                'parish'            => $parish,
+                'zone'              => $zone,
+                'phone'             => $phone,
+                'echelon'           => $echelon,
+                'service_beginning' => $service_beginning,
+                'typeofemployee_id' => $typeofemployee_id,
+                'photo'             => $photo,
+                'description'       => $description
+            ));
+            // $employee->markets()->sync($request->markets);
+
+            // $employee->markets()->sync($markets);
+
             return Response::json($request::all());
         }
 
