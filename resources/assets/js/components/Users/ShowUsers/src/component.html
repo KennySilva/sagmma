@@ -431,10 +431,8 @@
 										<div class="col-md-12">
 											<div class="col-md-6">
 												<div class="form-group has-feedback">
-
 													<select v-else name="state" class="form-control" v-model="newUser.parish" placeholder="Selecina o conceolho" v-el:parishcreate>
 														<option value="" selected>Freguesia</option>
-
 														<option v-if="(newUser.council == 10 && newUser.state == 2) || (newUser.council == 2 && newUser.state == 1) || (newUser.council == 19 && newUser.state == 7)" value="1">Nossa Senhora da Luz</option>
 														<option v-if="(newUser.council == 1 && newUser.state == 1)" value="2">Nossa Senhora da Graça</option>
 														<option v-if="newUser.council == 2 && newUser.state == 1" value="3">São Nicolau Tolentino</option>

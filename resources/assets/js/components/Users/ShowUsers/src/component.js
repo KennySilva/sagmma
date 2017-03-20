@@ -100,18 +100,6 @@ export default{
         });
 
 
-        jQuery(self.$els.stateedit).select2({
-            placeholder: "Seleciona a ilha",
-            allowClear: true,
-            theme: "bootstrap",
-            width: '100%',
-            language: 'pt',
-
-
-        }).on('change', function () {
-            self.$set('newUser.state', jQuery(this).val());
-        });
-
         jQuery(self.$els.typeedit).select2({
             placeholder: "Seleciona o tipo",
             allowClear: true,

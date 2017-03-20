@@ -1,4 +1,3 @@
-import vSelect from 'vue-select'
 import Pagination from '../../../Pagination/src/Component.vue'
 
 

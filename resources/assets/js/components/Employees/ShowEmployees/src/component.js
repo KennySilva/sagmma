@@ -65,8 +65,6 @@ export default{
             theme: "bootstrap",
             width: '100%',
             language: 'pt',
-
-
         }).on('change', function () {
             self.$set('columnsFiltered', jQuery(this).val());
         });

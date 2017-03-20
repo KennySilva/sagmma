@@ -1,15 +1,49 @@
 
-<div class="alert alert-success" transition="success" v-if="success">
-	Tipo de funcionário adicionado com sucesso
+<div  id="alert-message" class="alert alert-{{typeAlert}}" transition="success" v-if="success">
+	<button type="button" class="close" data-dismiss="alert">x</button>
+	<i class="fa fa-thumbs-o-up text-center">&nbsp;&nbsp; {{msgSucess}}</i>
 </div>
 
-
-
 <div class="row">
-	<div class="col-md-4 pull-right">
-		<div class="input-group">
-			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
-			<input v-model="filter.term" type="text" class="form-control" placeholder="Filtrar..." aria-describedby="basic-addon1">
+	<div class="col-md-12">
+		<div class="form-inline pull-right">
+			<div class="input-group">
+				<select data-toggle="tooltip" title="A mostrar linhas na tabela" class="form-control" name="" v-model="showRow" @change="fetchTypeofemployee(1, showRow)">
+					<option class="" value="5">05</option>
+					<option class="" value="10" selected>10</option>
+					<option class="" value="20">20</option>
+					<option class="" value="50">50</option>
+					<option class="" value="100">100</option>
+					<option class="" value="200">200</option>
+				</select>
+			</div>
+			&nbsp;&nbsp;
+			<div class="input-group">
+				<select data-toggle="tooltip" title="Escolhe as colunas a serem filtrados" class="form-control" name="" v-model="columnsFiltered" multiple="multiple" v-el:typeofemployeecols>
+					<option class="" value="name"="">Nome</option>
+					<option class="" value="description">Descrição</option>
+				</select>
+			</div>
+			&nbsp;&nbsp;
+			<div v-if="columnsFiltered.length != 0" class="input-group">
+				<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
+				<input data-toggle="tooltip" title="Escreva o valor a ser procurado na Tabela"
+				v-model="filter.term"
+				@keyup="doFilter"
+				type="text"
+				class="form-control"
+				placeholder="Filtrar dados da tabela"
+				aria-describedby="basic-addon1">
+			</div>
+
+			<div v-else class="input-group">
+				<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
+				<input :disabled="columnsFiltered.length == 0" data-toggle="tooltip" title="Para ativar introduza um valor na Coluna"
+				type="text"
+				class="form-control"
+				placeholder="Filtrar dados da tabela"
+				aria-describedby="basic-addon1">
+			</div>
 		</div>
 	</div>
 </div>
@@ -23,153 +57,158 @@
 <br>
 <div class="row">
 
-<div class="col-md-12">
-	<div class='table-responsive'>
-		<table class='table table-striped table-hover table-condensed'>
-			<thead>
-				<tr>
-					<th>
-						<i :class = "{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
-						<a href="#" @click = "doSort($event, 'name')">Nome</a>
-					</th>
-					<th>
-						<i :class = "{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
-						<a href="#" @click = "doSort($event, 'description')">Descrição</a>
-					</th>
+	<div class="col-md-12">
+		<div class='table-responsive'>
+			<table class='table table-striped table-hover table-condensed'>
+				<thead>
+					<tr>
+						<th>
+							<i :class = "{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+							<a href="#" @click = "doSort($event, 'name')">Nome</a>
+						</th>
+						<th>
+							<i :class = "{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+							<a href="#" @click = "doSort($event, 'description')">Descrição</a>
+						</th>
 
-					<th  class="text-center" colspan="2"><span><i class="fa fa-cogs"></i></span></th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr v-for="typeofemployee in typeofemployees | filterBy filter.term | orderBy sortColumn sortInverse">
-					<td>{{ typeofemployee.name }}</td>
-					<td>{{ typeofemployee.description }}</td>
-					<td align=left>  <a data-toggle="modal" data-target="#modal-edit-typeofemployee" href="#"> <i class="fa fa-pencil text-primary" @click="getThisTypeofemployee(typeofemployee.id)" > </i></a></td>
-					<td align=right><a data-toggle="modal" data-target="#modal-delete-typeofemployee" href="#"><i class="fa fa-trash text-danger" @click="getThisTypeofemployee(typeofemployee.id)"></i></a></td>
-				</tr>
-			</tbody>
-		</table>
-		<div class="col-md-12 pull-left">
-			<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
+						<th  class="text-center" colspan="2"><span><i class="fa fa-cogs"></i></span></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="typeofemployee in typeofemployees | filterBy filter.term | orderBy sortColumn sortInverse">
+						<td>{{ typeofemployee.name }}</td>
+						<td>{{ typeofemployee.description }}</td>
+						<td align=left>  <a data-toggle="modal" data-target="#modal-edit-typeofemployee" href="#"> <i class="fa fa-pencil text-primary" @click="getThisTypeofemployee(typeofemployee.id)" > </i></a></td>
+						<td align=right><a data-toggle="modal" data-target="#modal-delete-typeofemployee" href="#"><i class="fa fa-trash text-danger" @click="getThisTypeofemployee(typeofemployee.id)"></i></a></td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="row">
+				<div class="col-md-6 pull-left">
+					<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
+				</div>
+				<div class="col-md-6 pull-right">
+					<h6 class="text-right text-help"> Mostrar de <span class="badge">{{pagination.from}}</span>  a <span class="badge">{{pagination.to}}</span>  no total de <span class="badge">{{pagination.total}}</span></h6>
+				</div>
+			</div>
 		</div>
-	</div>
 
-	<!--------------------------------------------------------------------------------------------------------->
+		<!--------------------------------------------------------------------------------------------------------->
 
-	<div class="modal fade" id="modal-delete-typeofemployee" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button @click="clearField" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-					<h4 class="modal-title" id="">Eliminar</h4>
+		<div class="modal fade" id="modal-delete-typeofemployee" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button @click="clearField" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="">Eliminar</h4>
+					</div>
+					<div class="modal-body">
+						<h5>Eliminar - <span class="text-uppercase">{{newTypeofemployee.name}}</span></h5>
+					</div>
+					<div class="modal-footer">
+						<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+						<button  @keyup.enter="deleteTypeofemployee(newTypeofemployee.id)" @click="deleteTypeofemployee(newTypeofemployee.id)" type="button" class="btn btn-danger">Eliminar</button>
+					</div>
 				</div>
-				<div class="modal-body">
-					<h5>Eliminar - <span class="text-uppercase">{{newTypeofemployee.name}}</span></h5>
+			</div>
+		</div>
+
+
+		<!--------------------------------------------------------------------------------------------------------->
+		<!-- Modal -->
+		<div id="modal-create-typeofemployee" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Registar</h4>
+					</div>
+					<div class="modal-body">
+						<validator name="validationew">
+							<form action="#" methods="POST">
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<div class="form-group has-feedback">
+												<input type="text" class="form-control" name="name" placeholder="Nome do tipo de funcionário" v-model="newTypeofemployee.name" v-validate:name="['required']"/>
+												<span class="fa fa-users form-control-feedback"></span>
+												<p style="color:red;" v-if="$validationew.name.required && $validationew.name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<hr><!---------------------------------------------------------------------------------------------------------------->
+
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<div class="form-group has-feedback">
+												<textarea name="description" placeholder="Descrição..." class="form-control" rows="5" cols="40" id="description" v-model="newTypeofemployee.description"></textarea>
+											</div>
+										</div>
+									</div>
+								</div>
+							</form>
+						</validator>
+					</div>
+					<div class="modal-footer">
+						<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
+
+						<button :disabled = "!$validationew.valid" @click="createTypeofemployee" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
+					</div>
 				</div>
-				<div class="modal-footer">
-					<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-					<button  @keyup.enter="deleteTypeofemployee(newTypeofemployee.id)" @click="deleteTypeofemployee(newTypeofemployee.id)" type="button" class="btn btn-danger">Eliminar</button>
+			</div>
+		</div>
+
+		<!--------------------------------------------------------------------------------------------------------->
+
+		<!-- Modal -->
+		<div id="modal-edit-typeofemployee" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Editar</h4>
+					</div>
+					<div class="modal-body">
+						<validator name="validation1">
+							<form methods="patch">
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<div class="form-group has-feedback">
+												<input type="text" class="form-control" name="name" v-model="newTypeofemployee.name" v-validate:name="['required']"/>
+												<span class="fa fa-users form-control-feedback"></span>
+												<p style="color:red;" v-if="$validation1.name.required && $validation1.name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<hr><!---------------------------------------------------------------------------------------------------------------->
+
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<div class="form-group has-feedback">
+												<textarea name="description" placeholder="Descrição deste Mescado" class="form-control" rows="5" cols="40" id="description" v-model="newTypeofemployee.description"></textarea>
+											</div>
+										</div>
+									</div>
+								</div>
+							</form>
+						</validator>
+					</div>
+					<div class="modal-footer">
+						<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
+						<button v-on:show="" @click="saveEditedTypeofemployee(newTypeofemployee.id)" type="button" class="btn btn-primary"><i class="fa fa-refresh fa-spin"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-
-
-	<!--------------------------------------------------------------------------------------------------------->
-	<!-- Modal -->
-	<div id="modal-create-typeofemployee" class="modal fade" role="dialog">
-		<div class="modal-dialog">
-
-			<!-- Modal content-->
-			<div class="modal-content">
-				<div class="modal-header">
-					<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">Registar</h4>
-				</div>
-				<div class="modal-body">
-					<validator name="validationew">
-						<form action="#" methods="POST">
-							<div class="row">
-								<div class="col-md-12">
-									<div class="col-md-12">
-										<div class="form-group has-feedback">
-											<input type="text" class="form-control" name="name" placeholder="Nome do tipo de funcionário" v-model="newTypeofemployee.name" v-validate:name="['required']"/>
-											<span class="fa fa-users form-control-feedback"></span>
-											<p style="color:red;" v-if="$validationew.name.required && $validationew.name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<hr><!---------------------------------------------------------------------------------------------------------------->
-
-							<div class="row">
-								<div class="col-md-12">
-									<div class="col-md-12">
-										<div class="form-group has-feedback">
-											<textarea name="description" placeholder="Descrição..." class="form-control" rows="5" cols="40" id="description" v-model="newTypeofemployee.description"></textarea>
-										</div>
-									</div>
-								</div>
-							</div>
-						</form>
-					</validator>
-				</div>
-				<div class="modal-footer">
-					<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
-
-					<button :disabled = "!$validationew.valid" @click="createTypeofemployee" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<!--------------------------------------------------------------------------------------------------------->
-
-	<!-- Modal -->
-	<div id="modal-edit-typeofemployee" class="modal fade" role="dialog">
-		<div class="modal-dialog">
-			<!-- Modal content-->
-			<div class="modal-content">
-				<div class="modal-header">
-					<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">Editar</h4>
-				</div>
-				<div class="modal-body">
-					<validator name="validation1">
-						<form methods="patch">
-							<div class="row">
-								<div class="col-md-12">
-									<div class="col-md-12">
-										<div class="form-group has-feedback">
-											<input type="text" class="form-control" name="name" v-model="newTypeofemployee.name" v-validate:name="['required']"/>
-											<span class="fa fa-users form-control-feedback"></span>
-											<p style="color:red;" v-if="$validation1.name.required && $validation1.name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<hr><!---------------------------------------------------------------------------------------------------------------->
-
-							<div class="row">
-								<div class="col-md-12">
-									<div class="col-md-12">
-										<div class="form-group has-feedback">
-											<textarea name="description" placeholder="Descrição deste Mescado" class="form-control" rows="5" cols="40" id="description" v-model="newTypeofemployee.description"></textarea>
-										</div>
-									</div>
-								</div>
-							</div>
-						</form>
-					</validator>
-				</div>
-				<div class="modal-footer">
-					<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
-					<button v-on:show="" @click="saveEditedTypeofemployee(newTypeofemployee.id)" type="button" class="btn btn-primary"><i class="fa fa-refresh fa-spin"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
 </div>

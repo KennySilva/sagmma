@@ -31,6 +31,7 @@ export default{
             success: false,
             msgSucess: '',
             typeAlert: '',
+            all: {},
         }
     },
 
@@ -216,7 +217,6 @@ export default{
 
         // --------------------------------------------------------------------------------------------
         doFilter: function() {
-
             var self = this
             filtered = self.all
             if (self.filter.term != '' && self.columnsFiltered.length > 0) {

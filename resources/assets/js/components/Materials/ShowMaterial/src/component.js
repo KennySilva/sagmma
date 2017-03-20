@@ -1,4 +1,5 @@
 import Pagination from '../../../Pagination/src/Component.vue'
+import { _ } from 'lodash'
 
 export default{
 
@@ -18,40 +19,72 @@ export default{
             filter: {
                 term: ''
             },
+            columnsFiltered: [],
             pagination: {},
             success: false,
+            msgSucess: '',
+            typeAlert: '',
+            showRow: '',
+            all: {},
+
         }
     },
 
     // ---------------------------------------------------------------------------------
 
     ready () {
-        this.fetchMaterial(1);
+        this.fetchMaterial(this.pagination.current_Page, this.showRow);
+        var self = this
+        jQuery(self.$els.materialcols).select2({
+            placeholder: "Coluna",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('columnsFiltered', jQuery(this).val());
+        });
     },
 
     // ---------------------------------------------------------------------------------
 
     methods: {
+        alert: function(msg, typeAlert) {
+            var self = this;
+            this.success = true;
+            this.msgSucess = msg;
+            this.typeAlert = typeAlert;
+
+
+            setTimeout(function() {
+                self.success = false;
+            }, 5000);
+        },
+
+        clearField: function(){
+            this.newMarket = {
+                id         : '',
+                name       : '',
+                location   : '',
+                description: '',
+                logo       : ''
+            };
+        },
+
         createMaterial: function() {
             var material = this.newMaterial;
 
             //Clear form input
-            this.newMaterial = {
-                id         : '',
-                name       : '',
-                description: '',
-            };
+            this.clearField();
+
             this.$http.post('http://localhost:8000/api/v1/materials/', material).then((response) => {
                 if (response.status == 200) {
                     console.log('chegando aqui');
                     $('#modal-create-material').modal('hide');
                     // console.log(response.data);
-                    this.fetchMaterial();
-                    var self = this;
-                    this.success = true;
-                    setTimeout(function() {
-                        self.success = false;
-                    }, 5000);
+                    this.fetchMaterial(this.pagination.current_Page, this.showRow);
+                    this.alert('Tipo de Funcionário Criado com sucesso', 'success');
+
                 }
             }, (response) => {
 
@@ -60,9 +93,10 @@ export default{
 
         // --------------------------------------------------------------------------------------------
 
-        fetchMaterial: function(page) {
-            this.$http.get('http://localhost:8000/api/v1/materials?page='+page).then((response) => {
+        fetchMaterial: function(page, row) {
+            this.$http.get('http://localhost:8000/api/v1/allMaterials/'+row+'?page='+page).then((response) => {
                 this.$set('materials', response.data.data)
+                this.$set('all', response.data.data)
                 this.$set('pagination', response.data)
             }, (response) => {
                 console.log("Ocorreu um erro na operação")
@@ -87,18 +121,14 @@ export default{
 
         saveEditedMaterial: function(id) {
             var material = this.newMaterial;
-
-            this.newMaterial = {
-                id         : '',
-                name       : '',
-                description: '',
-            };
-
+            this.clearField();
             this.$http.patch('http://localhost:8000/api/v1/materials/'+ id, material).then((response) => {
                 if (response.status == 200) {
                     $('#modal-edit-material').modal('hide');
                     // console.log(response.data);
                     this.fetchMaterial();
+                    this.alert('Tipo de Funcionário atualizado com sucesso', 'info');
+
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -112,7 +142,9 @@ export default{
                 $('#modal-delete-material').modal('hide');
                 if (response.status == 200) {
                     // console.log(response.data);
-                    this.fetchMaterial();
+                    this.fetchMaterial(this.pagination.current_Page, this.showRow);
+                    this.alert('Tipo de Funcionário eliminado com sucesso', 'warning');
+
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -120,6 +152,18 @@ export default{
         },
 
         // --------------------------------------------------------------------------------------------
+        doFilter: function() {
+            var self = this
+            filtered = self.all
+            if (self.filter.term != '' && self.columnsFiltered.length > 0) {
+                filtered = _.filter(self.all, function(material) {
+                    return self.columnsFiltered.some(function(column) {
+                        return material[column].toLowerCase().indexOf(self.filter.term.toLowerCase()) > -1
+                    })
+                })
+            }
+            self.$set('materials', filtered)
+        },
 
         doSort: function(ev, column) {
             var self = this;
@@ -136,7 +180,7 @@ export default{
 
         // Outros funções
         navigate (page) {
-            this.fetchMaterial(page);
+            this.fetchMaterial(page, this.showRow);
         },
 
         clearField: function(){
