@@ -91,12 +91,12 @@ class ApiPromotionsController extends Controller
     public function getTraderForPromotion()
     {
         //
-        // if (Auth::user()->type=='Comerciante') {
-        //     $trader = Auth::user();
-        // }else {
-        //     $trader = Trader::all();
-        // }
-        $trader = Trader::all();
+        if (Auth::user()->type=='trad') {
+            $trader = Auth::user();
+        }else {
+            $trader = Trader::all();
+        }
+        // $trader = Trader::all();
         return $trader;
     }
 

@@ -24,6 +24,7 @@ export default{
 
             },
 
+            articles: {},
             tags        : [],
             categories  : [],
             users       : [],
@@ -40,7 +41,6 @@ export default{
             typeAlert: '',
             showRow: '',
             all: {},
-            articles: {},
         }
     },
 
@@ -101,13 +101,11 @@ export default{
 
         createArticle: function() {
             this.uploadsImages();
-
             var article = this.newArticle;
             // Clear form input
             this.clearField();
             this.$http.post('http://localhost:8000/api/v1/articles/', article).then((response) => {
                 if (response.status == 200) {
-
                     $('#modal-create-article').modal('hide');
                     // this.uploadsImages();
                     this.fetchArticle(1, this.showRow);

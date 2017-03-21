@@ -1,5 +1,5 @@
 import Pagination from '../../../Pagination/src/Component.vue'
-// import vSelect from "vue-select"
+import { _ } from 'lodash'
 export default{
     name: 'ShowPlaces',
 
@@ -27,16 +27,71 @@ export default{
 
             sortColumn : 'name',
             sortInverse: 1,
-            filter     : {
-                term   : ''
+            filter: {
+                term: ''
             },
-            pagination : {},
-            success    : false,
+            columnsFiltered: [],
+            pagination: {},
+            success: false,
+            msgSucess: '',
+            typeAlert: '',
+            showRow: '',
+            all: {},
+
         }
     },
 
 
+    ready () {
+        this.fetchPlace(this.pagination.current_Page, this.showRow)
+        this.placeType()
+        var self = this
+        jQuery(self.$els.placecols).select2({
+            placeholder: "Coluna",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('columnsFiltered', jQuery(this).val());
+        });
+
+        jQuery(self.$els.createplace).select2({
+            placeholder: "Tipo",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('newPlace.typeofplace_id', jQuery(this).val());
+        });
+
+        jQuery(self.$els.editplace).select2({
+            placeholder: "Tipo",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('newPlace.typeofplace_id', jQuery(this).val());
+        });
+    },
+
+
     methods: {
+        alert: function(msg, typeAlert) {
+            var self = this;
+            this.success = true;
+            this.msgSucess = msg;
+            this.typeAlert = typeAlert;
+
+
+            setTimeout(function() {
+                self.success = false;
+            }, 5000);
+        },
+
+
         clearField: function(){
             this.newPlace = {
                 name            : '',
@@ -61,12 +116,9 @@ export default{
                     console.log('chegando aqui');
                     $('#modal-create-place').modal('hide');
                     console.log(response.data);
-                    this.fetchPlace(this.pagination.last_Page);
-                    var self = this;
-                    this.success = true;
-                    setTimeout(function() {
-                        self.success = false;
-                    }, 5000);
+                    this.fetchPlace(this.pagination.current_Page, this.showRow);
+                    this.alert('Espaço Criado com sucesso', 'success');
+
                 }
             }, (response) => {
 
@@ -75,9 +127,10 @@ export default{
 
         // --------------------------------------------------------------------------------------------
 
-        fetchPlace: function(page) {
-            this.$http.get('http://localhost:8000/api/v1/places?page='+page).then((response) => {
+        fetchPlace: function(page, row) {
+            this.$http.get('http://localhost:8000/api/v1/allPlaces/'+row+'?page='+page).then((response) => {
                 this.$set('places', response.data.data);
+                this.$set('all', response.data.data);
                 this.$set('pagination', response.data);
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -110,7 +163,8 @@ export default{
                 if (response.status == 200) {
                     $('#modal-edit-place').modal('hide');
                     // console.log(response.data);
-                    this.fetchPlace(this.pagination.current_page);
+                    this.fetchPlace(this.pagination.current_Page, this.showRow);
+                    this.alert('Estaço atualizado com sucesso', 'info');
 
                 }
             }, (response) => {
@@ -126,7 +180,9 @@ export default{
                 $('#modal-delete-place').modal('hide');
                 if (response.status == 200) {
                     // console.log(response.data);
-                    this.fetchPlace();
+                    this.fetchPlace(this.pagination.current_Page, this.showRow);
+                    this.alert('Estaço eliminado com sucesso', 'warning');
+
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -148,7 +204,7 @@ export default{
                 console.log(response.status);
                 console.log(response.data);
                 if (response.status == 200) {
-                    this.fetchPlace(this.pagination.current_page);
+                    this.fetchPlace(this.pagination.current_Page, this.showRow);
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -156,6 +212,19 @@ export default{
         },
 
         // -------------------------Metodo de suporte---------------------------------------------------
+        doFilter: function() {
+            var self = this
+            filtered = self.all
+            if (self.filter.term != '' && self.columnsFiltered.length > 0) {
+                filtered = _.filter(self.all, function(place) {
+                    return self.columnsFiltered.some(function(column) {
+                        return place[column].toLowerCase().indexOf(self.filter.term.toLowerCase()) > -1
+                    })
+                })
+            }
+            self.$set('places', filtered)
+        },
+
 
         doSort: function(ev, column) {
             var self = this;
@@ -173,18 +242,12 @@ export default{
 
         // Outros funções
         navigate (page) {
-            this.fetchPlace(page);
+            this.fetchPlace(page, this.showRow);
         },
 
 
     },
 
-
-    ready () {
-        this.fetchPlace(this.pagination.current_Page)
-        this.placeType()
-
-    },
 
 
     components: {

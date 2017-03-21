@@ -51,6 +51,8 @@ class ApiPlacesController extends Controller
             //
         }
 
+
+
         public function update(Req $request, $id)
         {
             Place::findOrFail($id)->update($request::all());
@@ -82,4 +84,7 @@ class ApiPlacesController extends Controller
             return response($place, 200);
         }
 
+        // $user = User::has('roles')->where('name', '!=', 'admin')->paginate(10);
+        //         // $user = User::with('roles')->paginate(10);
+        //         // $user = User::with('roles')->whereName('super-admins')->paginate(10);
     }

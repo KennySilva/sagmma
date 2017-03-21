@@ -1,17 +1,50 @@
-<div class="alert alert-success" transition="success" v-if="success">
-	<i class="fa fa-thumbs-up"> Sucesso!!</i>
+
+<div  id="alert-message" class="alert alert-{{typeAlert}}" transition="success" v-if="success">
+	<button type="button" class="close" data-dismiss="alert">x</button>
+	<i class="fa fa-thumbs-o-up text-center">&nbsp;&nbsp; {{msgSucess}}</i>
 </div>
 
 <div class="row">
-	<div class="pull right col-md-8">
-		<label class="checkbox-inline"><input type="checkbox" id="" value="" v-model="showColumn.price">Valor</label>
-		<label class="checkbox-inline"><input type="checkbox" id="" value="" v-model="showColumn.typeofplace_id">Tipo</label>
-	</div>
+	<div class="col-md-12">
+		<div class="form-inline pull-right">
+			<div class="input-group">
+				<select data-toggle="tooltip" title="A mostrar linhas na tabela" class="form-control" name="" v-model="showRow" @change="fetchPlace(1, showRow)">
+					<option class="" value="5">05</option>
+					<option class="" value="10" selected>10</option>
+					<option class="" value="20">20</option>
+					<option class="" value="50">50</option>
+					<option class="" value="100">100</option>
+					<option class="" value="200">200</option>
+				</select>
+			</div>
+			&nbsp;&nbsp;
+			<div class="input-group">
+				<select data-toggle="tooltip" title="Escolhe as colunas a serem filtrados" class="form-control" name="" v-model="columnsFiltered" multiple="multiple" v-el:placecols>
+					<option class="" value="name"="">Nome</option>
+					<option class="" value="description">Estado</option>
+					<option class="" value="price">Valor</option>
+				</select>
+			</div>
+			&nbsp;&nbsp;
+			<div v-if="columnsFiltered.length != 0" class="input-group">
+				<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
+				<input data-toggle="tooltip" title="Escreva o valor a ser procurado na Tabela"
+				v-model="filter.term"
+				@keyup="doFilter"
+				type="text"
+				class="form-control"
+				placeholder="Filtrar dados da tabela"
+				aria-describedby="basic-addon1">
+			</div>
 
-	<div class="col-md-4 pull-left">
-		<div class="input-group">
-			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
-			<input v-model="filter.term" type="text" class="form-control" placeholder="Filtrar..." aria-describedby="basic-addon1">
+			<div v-else class="input-group">
+				<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
+				<input :disabled="columnsFiltered.length == 0" data-toggle="tooltip" title="Para ativar introduza um valor na Coluna"
+				type="text"
+				class="form-control"
+				placeholder="Filtrar dados da tabela"
+				aria-describedby="basic-addon1">
+			</div>
 		</div>
 	</div>
 </div>
@@ -58,7 +91,7 @@
 						<td><a href="#" data-toggle="modal" data-target="#show-place" @click="getThisPlace(place.id)">{{ place.name }}</a></td>
 						<td class="info" v-if="showColumn.price">{{ place.price }} ECV</td>
 						<td>
-							<button type="submit" @click = "placeStatus(place.id)" class='btn btn-xs btn-flat' :class="{ 'btn-info': place.status, 'btn-danger': !place.status }">{{place.status ? 'Ativado' : 'Disativado'}}</button>
+							<button type="submit" @click = "placeStatus(place.id)" class='btn btn-xs btn-flat' :class="{ 'btn-info': place.status, 'btn-danger': !place.status }">{{place.status ? 'Ocupado' : 'Livre'}}</button>
 						</td>
 						<td class="info" v-if="showColumn.typeofplace_id">{{ place.typeofplace.name }}</td>
 
@@ -67,8 +100,13 @@
 					</tr>
 				</tbody>
 			</table>
-			<div class="col-md-12 pull-left">
-				<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
+			<div class="row">
+				<div class="col-md-6 pull-left">
+					<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
+				</div>
+				<div class="col-md-6 pull-right">
+					<h6 class="text-right text-help"> Mostrar de <span class="badge">{{pagination.from}}</span>  a <span class="badge">{{pagination.to}}</span>  no total de <span class="badge">{{pagination.total}}</span></h6>
+				</div>
 			</div>
 		</div>
 
@@ -202,15 +240,14 @@
 								<div class="col-md-12">
 									<div class="col-md-12">
 										<div class="form-group has-feedback">
-											<select class="form-control" v-model="newPlace.typeofplace_id">
-												<option value="" selected>Tipo de Espaço</option>
+											<select class="form-control" v-model="newPlace.typeofplace_id" v-el:createplace>
 												<option v-for="type in types" value="{{type.id}}">{{type.name}}</option>
 											</select>
 										</div>
 									</div>
 								</div>
 							</div>
-
+							<hr>
 
 							<div class="row">
 								<div class="col-md-12">
@@ -306,15 +343,14 @@
 								<div class="col-md-12">
 									<div class="col-md-12">
 										<div class="form-group has-feedback">
-											<select class="form-control" v-model="newPlace.typeofplace_id">
-												<option value="" selected>Tipo de Espaço</option>
+											<select class="form-control" v-model="newPlace.typeofplace_id" v-el:editplace>
 												<option v-for="type in types" value="{{type.id}}">{{type.name}}</option>
 											</select>
 										</div>
 									</div>
 								</div>
 							</div>
-
+							<hr>
 							<div class="row">
 								<div class="col-md-12">
 									<div class="col-md-12">

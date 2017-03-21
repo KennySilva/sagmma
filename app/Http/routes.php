@@ -112,6 +112,7 @@ Route::group(['namespace' => 'ApiControllers'], function()
             // ----------------------------------------Api-Products----------------------------------
             Route::resource('products', 'ApiProductsController');
             Route::get('allProducts/{row}', 'ApiProductsController@index');
+            Route::post('productImageUpload', 'ApiProductsController@uploadImage');
 
             // ----------------------------------------Api-employee----------------------------------
             Route::resource('employees', 'ApiEmployeesController');

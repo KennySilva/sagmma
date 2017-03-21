@@ -1,6 +1,7 @@
 @extends('_backend.master.app')
 @section('style-header')
-    <link rel="stylesheet" href="/bower_components/bootstrap-select/dist/css/bootstrap-select.css">
+    <link rel="stylesheet" href="{{ asset('bower_components/bootstrap-fileinput/css/fileinput.css') }}" media="screen" title="no title" charset="utf-8">
+
 @endsection
 
 @section('htmlheader_title')
@@ -31,3 +32,16 @@
         </div>
     </div>
 @endsection
+@push('scripts')
+    <script src="{{ asset('bower_components/bootstrap-fileinput/js/fileinput.js') }}" charset="utf-8"> </script>
+    <script src="{{ asset('bower_components/bootstrap-fileinput/js/locales/pt.js') }}" charset="utf-8"> </script>
+    <script src="{{ asset('bower_components/bootstrap-fileinput/themes/fa/theme.js') }}" charset="utf-8"> </script>
+    <script>
+    $("#articleimage").fileinput({
+        language: "pt",
+        showUpload: false,
+        allowedFileExtensions: ["jpg", "png", "gif"],
+        theme: "gly",
+    });
+    </script>
+@endpush
