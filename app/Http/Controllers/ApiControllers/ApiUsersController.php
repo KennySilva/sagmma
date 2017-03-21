@@ -14,6 +14,7 @@ use Employee;
 use Response;
 use Input;
 use Auth;
+use DB;
 
 class ApiUsersController extends Controller
 {
@@ -23,26 +24,19 @@ class ApiUsersController extends Controller
         $user->each(function($user){
             $user->roles;
         });
-        return $user;
         // foreach (Auth::user()->roles as $role) {
         //     if ($role->name == 'super-admin') {
         //         $user = User::paginate($row);
         //         $user->each(function($user){
         //             $user->roles;
         //         });
-        //         return $user;
         //     }else{
-        //         // $thisUserRole = $role->where('name', 'admin')->where('name', 'super-admin')
-        //
-        //         $user = User::paginate($row);
-        //         $user->each(function($user){
-        //             // $user->roles;
-        //             $user->roles->where('name', '!=', 'admin');
-        //         });
-        //         return $user;
-        //         // $roles= Role::where('name', '!=', 'admin')->where('name', '!=', 'super-admin')->get();
+        //         $user = User::whereDoesntHave('roles')->orwhere('id','=', Auth::user()->id)->orwhere(function ($query) {$query->whereHas('roles', function($q){
+        //             $q->where('name', '!=', 'Admin')->where('name', '!=', 'articles-manager');
+        //         });})->paginate(20);
         //     }
         // }
+        return $user;
     }
 
     public function create()
@@ -186,29 +180,5 @@ class ApiUsersController extends Controller
         $user = Auth::user();
         $user->roles;
         return $user;
-        // foreach (Auth::user()->roles as $role) {
-        //     if ($role->name == 'super-admin') {
-        //         $user = User::paginate($row);
-        //         $user->each(function($user){
-        //             $user->roles;
-        //         });
-        //         return $user;
-        //     }else{
-        //         // $thisUserRole = $role->where('name', 'admin')->where('name', 'super-admin')
-        //
-        //         // Supplier::has('products')->where('name', $name)->get();
-        //
-        //         $user = User::has('roles')->where('name', '!=', 'admin')->paginate(10);
-        //         // $user = User::with('roles')->paginate(10);
-        //         // $user = User::with('roles')->whereName('super-admins')->paginate(10);
-        //
-        //
-        //         // $user->each(function($user){
-        //         //     $user->roles;
-        //         // });
-        //         return $user;
-        //         // $roles= Role::where('name', '!=', 'admin')->where('name', '!=', 'super-admin')->get();
-        //     }
-        // }
     }
 }
