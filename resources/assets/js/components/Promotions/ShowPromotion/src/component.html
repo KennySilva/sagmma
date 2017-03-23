@@ -1,18 +1,55 @@
-<div class="alert alert-success" transition="success" v-if="success">
-	<i class="fa fa-thumbs-up"> Sucesso!!</i>
+<div  id="alert-message" class="alert alert-{{typeAlert}}" transition="success" v-if="success">
+	<button type="button" class="close" data-dismiss="alert">x</button>
+	<i class="fa fa-thumbs-o-up text-center">&nbsp;&nbsp; {{msgSucess}}</i>
 </div>
-
 <div class="row">
-	<div class="pull right col-md-8">
+	<div class="pull right col-md-4">
 		<label class="checkbox-inline"><input type="checkbox" id="" value="" v-model="showColumn.begnning_date">Início</label>
 		<label class="checkbox-inline"><input type="checkbox" id="" value="" v-model="showColumn.ending_date">Término</label>
 		<label class="checkbox-inline"><input type="checkbox" id="" value="" v-model="showColumn.trader_id">Comerciante</label>
 	</div>
 
-	<div class="col-md-4 pull-left">
-		<div class="input-group">
-			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
-			<input v-model="filter.term" type="text" class="form-control" placeholder="Filtrar..." aria-describedby="basic-addon1">
+	<div class="col-md-8 pull-left">
+		<div class="form-inline pull-right">
+			<div class="input-group">
+				<select data-toggle="tooltip" title="A mostrar linhas na tabela" class="form-control" name="" v-model="showRow" @change="fetchPromotion(1, showRow)">
+					<option class="" value="5">05</option>
+					<option class="" value="10" selected>10</option>
+					<option class="" value="20">20</option>
+					<option class="" value="50">50</option>
+					<option class="" value="100">100</option>
+					<option class="" value="200">200</option>
+				</select>
+			</div>
+			&nbsp;&nbsp;
+			<div class="input-group">
+				<select data-toggle="tooltip" title="Escolhe as colunas a serem filtrados" class="form-control" name="" v-model="columnsFiltered" multiple="multiple" v-el:promotioncols>
+					<option class="" value="name"="">Nome</option>
+					<option class="" value="begnning_date">Inicio</option>
+					<option class="" value="ending_date">Término</option>
+					<option class="" value="trader_id">Comerciante</option>
+				</select>
+			</div>
+			&nbsp;&nbsp;
+			<div v-if="columnsFiltered.length != 0" class="input-group">
+				<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
+				<input data-toggle="tooltip" title="Escreva o valor a ser procurado na Tabela"
+				v-model="filter.term"
+				@keyup="doFilter"
+				type="text"
+				class="form-control"
+				placeholder="Filtrar dados da tabela"
+				aria-describedby="basic-addon1">
+			</div>
+
+			<div v-else class="input-group">
+				<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
+				<input :disabled="columnsFiltered.length == 0" data-toggle="tooltip" title="Para ativar introduza um valor na Coluna"
+				type="text"
+				class="form-control"
+				placeholder="Filtrar dados da tabela"
+				aria-describedby="basic-addon1">
+			</div>
 		</div>
 	</div>
 </div>
@@ -84,15 +121,20 @@
 						<!------------------------------------------------------------------------------------>
 
 
-						<td class="info" v-if="showColumn.service_beginning">{{ promotion.trader.name }}</td>
+						<td class="info" v-if="showColumn.trader_id">{{ promotion.trader.name }}</td>
 
 						<td align=left>  <a data-toggle="modal" data-target="#modal-edit-promotion" href="#"> <i class="fa fa-pencil text-primary" @click="getThisPromotion(promotion.id)" > </i></a></td>
 						<td align=right><a data-toggle="modal" data-target="#modal-delete-promotion" href="#"><i class="fa fa-trash text-danger" @click="getThisPromotion(promotion.id)" ></i></a></td>
 					</tr>
 				</tbody>
 			</table>
-			<div class="col-md-12 pull-left">
-				<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
+			<div class="row">
+				<div class="col-md-6 pull-left">
+					<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
+				</div>
+				<div class="col-md-6 pull-right">
+					<h6 class="text-right text-help"> Mostrar de <span class="badge">{{pagination.from}}</span>  a <span class="badge">{{pagination.to}}</span>  no total de <span class="badge">{{pagination.total}}</span></h6>
+				</div>
 			</div>
 		</div>
 
@@ -240,8 +282,7 @@
 									<div class="col-md-12">
 										<div class="col-md-6">
 											<div class="form-group has-feedback">
-												<select name="trader_id" class="form-control" v-model="newPromotion.trader_id" v-validate:trader_id = "['required']">
-													<option value="" selected>Comerciantes</option>
+												<select name="trader_id" class="form-control" v-model="newPromotion.trader_id" v-el:tradercreate>
 													<option v-for="trader in traders" value="{{trader.id}}">{{trader.name}}</option>
 												</select>
 											</div>
@@ -249,8 +290,7 @@
 
 										<div class="col-md-6">
 											<div class="form-group has-feedback">
-												<select name="product_id" class="form-control" v-model="newPromotion.product_id" v-validate:product_id = "['required']">
-													<option value="" selected>Produtos</option>
+												<select name="product_id" class="form-control" v-model="newPromotion.product_id"v-el:productcreate>
 													<option v-for="product in products" value="{{product.id}}">
 														{{product.name}}
 													</option>
@@ -315,14 +355,17 @@
 									<div class="col-md-12">
 										<div class="col-md-6">
 											<div class="form-group has-feedback">
-												<input type='date' class='form-control' placeholder='' v-model="newPromotion.begnning_date">
+												<input type='date' name="begnning_date" class='form-control' placeholder='' v-model="newPromotion.begnning_date" v-validate:begnning = "['required']">
+												<!-- <span class="fa fa-calendar-check-o form-control-feedback"></span> -->
 												<p class="text-help">Data de início da promoção</p>
 											</div>
 										</div>
 										<div class="col-md-6">
 											<div class="form-group has-feedback">
-												<input type='date' class='form-control' placeholder='' v-model="newPromotion.ending_date">
+												<input type='date' name="ending_date" class='form-control' placeholder='' v-model="newPromotion.ending_date"  v-validate:ending_date = "['required']">
+												<!-- <span class="fa fa-calendar-times-o form-control-feedback"></span> -->
 												<p class="text-help">Término da promoção</p>
+
 											</div>
 										</div>
 									</div>
@@ -334,8 +377,7 @@
 									<div class="col-md-12">
 										<div class="col-md-6">
 											<div class="form-group has-feedback">
-												<select class="form-control" v-model="newPromotion.trader_id">
-													<option value="" selected>Comerciantes</option>
+												<select name="trader_id" class="form-control" v-model="newPromotion.trader_id" v-el:traderedit>
 													<option v-for="trader in traders" value="{{trader.id}}">{{trader.name}}</option>
 												</select>
 											</div>
@@ -343,8 +385,7 @@
 
 										<div class="col-md-6">
 											<div class="form-group has-feedback">
-												<select class="form-control" v-model="newPromotion.product_id">
-													<option value="" selected>Produtos</option>
+												<select name="product_id" class="form-control" v-model="newPromotion.product_id"v-el:productedit>
 													<option v-for="product in products" value="{{product.id}}">
 														{{product.name}}
 													</option>
@@ -369,7 +410,7 @@
 						</validator>
 					</div>
 					<div class="modal-footer">
-						<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Close</button>
+						<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Close</button>
 						<button v-on:show="" @click="saveEditedPromotion(newPromotion.id)" type="button" class="btn btn-primary"><i class="fa fa-refresh fa-spin"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>
 					</div>
 				</div>

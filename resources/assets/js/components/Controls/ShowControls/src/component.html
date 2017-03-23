@@ -1,24 +1,66 @@
-
-<div class="alert alert-success" transition="success" v-if="success">
-	Control adicionado com sucesso
+<div  id="alert-message" class="alert alert-{{typeAlert}}" transition="success" v-if="success">
+	<button type="button" class="close" data-dismiss="alert">x</button>
+	<i class="fa fa-thumbs-o-up text-center">&nbsp;&nbsp; {{msgSucess}}</i>
 </div>
-
-
-
 <div class="row">
-	<div class="col-md-4 pull-right">
-		<div class="input-group">
-			<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
-			<input v-model="filter.term" type="text" class="form-control" placeholder="Filtrar dados da tabela" aria-describedby="basic-addon1">
+	<div class="col-md-12">
+		<div class="form-inline pull-right">
+			<div class="input-group">
+				<select data-toggle="tooltip" title="A mostrar linhas na tabela" class="form-control" name="" v-model="showRow" @change="fetchControl(1, showRow)">
+					<option class="" value="5">05</option>
+					<option class="" value="10" selected>10</option>
+					<option class="" value="20">20</option>
+					<option class="" value="50">50</option>
+					<option class="" value="100">100</option>
+					<option class="" value="200">200</option>
+				</select>
+			</div>
+			&nbsp;&nbsp;
+			<div class="input-group">
+				<select data-toggle="tooltip" title="Escolhe as colunas a serem filtrados" class="form-control" name="" v-model="columnsFiltered" multiple="multiple" v-el:controlcols>
+					<option class="" value="employee_id"="">Funcionário</option>
+					<option class="" value="material_id">Marerial</option>
+					<option class="" value="create_at">Data</option>
+				</select>
+			</div>
+			&nbsp;&nbsp;
+			<div v-if="columnsFiltered.length != 0" class="input-group">
+				<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
+				<input data-toggle="tooltip" title="Escreva o valor a ser procurado na Tabela"
+				v-model="filter.term"
+				@keyup="doFilter"
+				type="text"
+				class="form-control"
+				placeholder="Filtrar dados da tabela"
+				aria-describedby="basic-addon1">
+			</div>
+
+			<div v-else class="input-group">
+				<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
+				<input :disabled="columnsFiltered.length == 0" data-toggle="tooltip" title="Para ativar introduza um valor na Coluna"
+				type="text"
+				class="form-control"
+				placeholder="Filtrar dados da tabela"
+				aria-describedby="basic-addon1">
+			</div>
 		</div>
 	</div>
 </div>
 
 <hr>
-<div class="col-md-12">
-	<button @click="clearField" class="btn btn-secondary pull-right" name="button" data-toggle="modal" data-target="#modal-create-control">Criar Novo</button>
+
+<div class="row">
+	<div v-if = "employees.length > 0 && materials.length > 0" class="col-md-12">
+		<button @click="clearField" class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-control"><i class="fa fa-plus"></i> Novo</button>&nbsp;&nbsp;
+	</div>
+
+	<div v-else class="col-md-12">
+		<button data-toggle="tooltip" title="Tens de criar os funcionários e os material para poder criar este registo" type="button" class="btn btn-danger btn-flat"><i class="fa fa-minus"></i> Novo</button>&nbsp;&nbsp;
+	</div>
+
 </div>
-<br><br>
+
+<br>
 
 <div class="col-md-12">
 	<div class='table-responsive'>
@@ -49,23 +91,29 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr v-for="control in controls | filterBy filter.term | orderBy sortColumn sortInverse">
+				<tr v-for="control in controls | orderBy sortColumn sortInverse">
 					<td v-for="emp in control.employees">{{ emp.name }}</td>
 					<td v-for="mat in control.materials">{{ mat.name }}</td>
 					<!------------------------------------------------------------------------------------------>
 					<td>
-						<button :disabled="control.status" type="submit" @click = "statusControlsChange(control.id)" class='btn btn-xs' :class="{ 'btn-info': control.status, 'btn-danger': !control.status }">{{control.status ? 'Confirmado' : 'Pendente'}}</button>
+						<button v-for="rol in auth.roles" :disabled="rol.name != 'admin'" type="submit" @click = "statusControlsChange(control.id)" class='btn btn-xs' :class="{ 'btn-info': control.status, 'btn-danger': !control.status }">{{control.status ? 'Entregue' : 'Pendente'}}</button>
 					</td>
 					<!------------------------------------------------------------------------------------------>
-					<td>{{ control.created_at }}</td>
+					<td>{{ control.created_at | formatDate }}</td>
 					<td align=left>  <a data-toggle="modal" data-target="#modal-edit-control" href="#"> <i class="fa fa-pencil text-primary" @click="getThisControl(control.id)" > </i></a></td>
 					<td align=right><a data-toggle="modal" data-target="#modal-delete-control" href="#"><i class="fa fa-trash text-danger" @click="getThisControl(control.id)"></i></a></td>
 				</tr>
 			</tbody>
 		</table>
-		<div class="col-md-12 pull-left">
-			<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
+		<div class="row">
+			<div class="col-md-6 pull-left">
+				<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
+			</div>
+			<div class="col-md-6 pull-right">
+				<h6 class="text-right text-help"> Mostrar de <span class="badge">{{pagination.from}}</span>  a <span class="badge">{{pagination.to}}</span>  no total de <span class="badge">{{pagination.total}}</span></h6>
+			</div>
 		</div>
+
 	</div>
 
 	<!--------------------------------------------------------------------------------------------------------->
@@ -107,8 +155,7 @@
 								<div class="col-md-12">
 									<div class="col-md-12">
 										<div class="form-group has-feedback">
-											<select class="form-control" v-model="newControl.employee_id">
-												<option value="" selected>Selecione o funcionario(a)</option>
+											<select class="form-control" v-model="newControl.employee_id" v-el:employeecreate>
 												<option v-for="employee in employees" value="{{employee.id}}">
 													{{employee.name}}
 												</option>
@@ -124,8 +171,7 @@
 								<div class="col-md-12">
 									<div class="col-md-12">
 										<div class="form-group has-feedback">
-											<select class="form-control" v-model="newControl.material_id">
-												<option value="" selected>Selecione o material</option>
+											<select class="form-control" v-model="newControl.material_id" v-el:materialcreate>
 												<option v-for="material in materials" value="{{material.id}}">
 													{{material.name}}
 												</option>
@@ -138,9 +184,9 @@
 					</validator>
 				</div>
 				<div class="modal-footer">
-					<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
+					<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
 
-					<button :disabled = "!$validationew.valid" @click="createControl" class="btn btn-secondary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar Dados Sobre este control</button>
+					<button :disabled = "!$validationew.valid" @click="createControl" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
 				</div>
 			</div>
 		</div>
@@ -155,7 +201,7 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">Editar Este control</h4>
+					<h4 class="modal-title">Editar</h4>
 				</div>
 				<div class="modal-body">
 					<validator name="validationew">
@@ -164,8 +210,7 @@
 								<div class="col-md-12">
 									<div class="col-md-12">
 										<div class="form-group has-feedback">
-											<select class="form-control" v-model="newControl.employee_id">
-												<option value="" selected>Selecione o funcionario(a)</option>
+											<select class="form-control" v-model="newControl.employee_id" v-el:employeeedit>
 												<option v-for="employee in employees" value="{{employee.id}}">
 													{{employee.name}}
 												</option>
@@ -181,8 +226,7 @@
 								<div class="col-md-12">
 									<div class="col-md-12">
 										<div class="form-group has-feedback">
-											<select class="form-control" v-model="newControl.material_id">
-												<option value="" selected>Selecione o material</option>
+											<select class="form-control" v-model="newControl.material_id" v-el:materialedit>
 												<option v-for="material in materials" value="{{material.id}}">
 													{{material.name}}
 												</option>
@@ -195,8 +239,8 @@
 					</validator>
 				</div>
 				<div class="modal-footer">
-					<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Close</button>
-					<button v-on:show="" @click="saveEditedControl(newControl.id)" type="button" class="btn btn-secondary"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp; Salvar as Alterações sobre este control</button>
+					<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Close</button>
+					<button v-on:show="" @click="saveEditedControl(newControl.id)" type="button" class="btn btn-primary"><i class="fa fa-refresh fa-spin"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>
 				</div>
 			</div>
 		</div>

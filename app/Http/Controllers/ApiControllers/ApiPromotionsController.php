@@ -19,6 +19,7 @@ class ApiPromotionsController extends Controller
 {
     public function index($row)
     {
+        // this.updatePromotionStatus();
         $promotion = Promotion::paginate($row);
         $promotion->each(function($promotion){
             $promotion->product;
@@ -114,5 +115,16 @@ class ApiPromotionsController extends Controller
         return response($promotion, 200);
     }
 
-
+    // public function updatePromotionStatus()
+    // {
+    //     $promotions = Promotion::where('status', true)->get();
+    //     foreach ($promotions as $promotion) {
+    //         $date_atual = date('Y-m-d');
+    //         if ($promotion->ending_date < $date_atual) {
+    //             $promotion->status = false;
+    //         }
+    //         $promotion->save();
+    //     }
+    //     return;
+    // }
 }

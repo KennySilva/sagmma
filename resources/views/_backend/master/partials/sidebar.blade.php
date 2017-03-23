@@ -56,7 +56,7 @@
                             <li><a href="{{ url('sagmma/contracts') }}"><i class="fa fa-file-text-o"></i><span>Contratos</span></a></li>
                             {{-- @endpermission --}}
                             {{-- @permission(['manage-resource']) --}}
-                            <li><a href="#"><i class="fa fa-dot-circle-o"></i><span>Controlo dos Materiais</span></a></li>
+                            <li><a href="{{ url('sagmma/controls') }}"><i class="fa fa-dot-circle-o"></i><span>Controlo dos Materiais</span></a></li>
                             <li><a href="{{ url('sagmma/taxations') }}"><i class="fa fa-usd"></i><span>Cobrança de Impostos</span></a></li>
                             {{-- @endpermission --}}
                         </ul>

@@ -1,5 +1,5 @@
 import Pagination from '../../../Pagination/src/Component.vue'
-// import vSelect from "vue-select"
+import { _ } from 'lodash'
 export default{
     name: 'ShowPromotion',
 
@@ -29,16 +29,97 @@ export default{
 
             sortColumn : 'name',
             sortInverse: 1,
-            filter     : {
-                term   : ''
+            filter: {
+                term: ''
             },
-            pagination : {},
-            success    : false,
+            columnsFiltered: [],
+            pagination: {},
+            success: false,
+            msgSucess: '',
+            typeAlert: '',
+            showRow: '',
+            all: {},
+            date_atual: new Date(),
         }
     },
 
 
+    ready () {
+        this.fetchPromotion(this.pagination.current_Page, this.showRow)
+        this.promotionTrader()
+        this.promotionProduct()
+        // this.changePromotionStatus()
+
+
+        self = this
+        jQuery(self.$els.promotioncols).select2({
+            placeholder: "Coluna",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('columnsFiltered', jQuery(this).val());
+        });
+        // ----------------------------------------------------------------
+        jQuery(self.$els.tradercreate).select2({
+            placeholder: "Comerciantes",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('newPromotion.trader_id', jQuery(this).val());
+        });
+        jQuery(self.$els.productcreate).select2({
+            placeholder: "Produtos",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('newPromotion.product_id', jQuery(this).val());
+        });
+        // ----------------------------------------------------------------
+
+        jQuery(self.$els.traderedit).select2({
+            placeholder: "Comerciantes",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('newPromotion.trader_id', jQuery(this).val());
+        });
+        jQuery(self.$els.productedit).select2({
+            placeholder: "Produtos",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('newPromotion.product_id', jQuery(this).val());
+        });
+        // ----------------------------------------------------------------
+
+    },
+
     methods: {
+        // changePromotionStatus: function() {
+        //     this.$http.get('http://localhost:8000/api/v1/changePromotionStatus').then((response) => {
+        //     }, (response) => {
+        //     });
+        // },
+        alert: function(msg, typeAlert) {
+            var self = this;
+            this.success = true;
+            this.msgSucess = msg;
+            this.typeAlert = typeAlert;
+            setTimeout(function() {
+                self.success = false;
+            }, 5000);
+        },
+
         clearField: function(){
             this.newPromotion = {
                 id            : '',
@@ -65,12 +146,9 @@ export default{
                     console.log('chegando aqui');
                     $('#modal-create-promotion').modal('hide');
                     console.log(response.data);
-                    this.fetchPromotion(this.pagination.last_Page);
-                    var self = this;
-                    this.success = true;
-                    setTimeout(function() {
-                        self.success = false;
-                    }, 5000);
+                    this.fetchPromotion(this.pagination.current_Page, this.showRow);
+                    alert('Promoção Criado com sucesso', 'success');
+
                 }
             }, (response) => {
 
@@ -79,9 +157,10 @@ export default{
 
         // --------------------------------------------------------------------------------------------
 
-        fetchPromotion: function(page) {
-            this.$http.get('http://localhost:8000/api/v1/promotions?page='+page).then((response) => {
+        fetchPromotion: function(page, row) {
+            this.$http.get('http://localhost:8000/api/v1/allPromotions/'+row+'?page='+page).then((response) => {
                 this.$set('promotions', response.data.data);
+                this.$set('all', response.data.data)
                 this.$set('pagination', response.data);
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -114,8 +193,8 @@ export default{
                 if (response.status == 200) {
                     $('#modal-edit-promotion').modal('hide');
                     // console.log(response.data);
-                    this.fetchPromotion(this.pagination.current_page);
-
+                    this.fetchPromotion(this.pagination.current_Page, this.showRow);
+                    this.alert('Promoção Atualizado com sucesso', 'info');
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -130,7 +209,8 @@ export default{
                 $('#modal-delete-promotion').modal('hide');
                 if (response.status == 200) {
                     // console.log(response.data);
-                    this.fetchPromotion();
+                    this.fetchPromotion(this.pagination.current_Page, this.showRow);
+                    this.alert('Promoção Eliminado com sucesso', 'success');
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -160,7 +240,7 @@ export default{
                 console.log(response.status);
                 console.log(response.data);
                 if (response.status == 200) {
-                    this.fetchPromotion(this.pagination.current_page);
+                    this.fetchPromotion(this.pagination.current_Page, this.showRow);
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -168,7 +248,23 @@ export default{
         },
 
 
+
+
         // -------------------------Metodo de suporte---------------------------------------------------
+        doFilter: function() {
+            var self = this
+            filtered = self.all
+            if (self.filter.term != '' && self.columnsFiltered.length > 0) {
+                filtered = _.filter(self.all, function(promotion) {
+                    return self.columnsFiltered.some(function(column) {
+                        return promotion[column].toLowerCase().indexOf(self.filter.term.toLowerCase()) > -1
+                    })
+                })
+            }
+            self.$set('promotions', filtered)
+        },
+
+
 
         doSort: function(ev, column) {
             var self = this;
@@ -186,20 +282,11 @@ export default{
 
         // Outros funções
         navigate (page) {
-            this.fetchPromotion(page);
+            this.fetchPromotion(page, this.showRow);
         },
 
 
     },
-
-
-    ready () {
-        this.fetchPromotion(this.pagination.current_Page)
-        this.promotionTrader()
-        this.promotionProduct()
-
-    },
-
 
     components: {
         'Pagination': Pagination,

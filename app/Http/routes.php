@@ -166,6 +166,7 @@ Route::group(['namespace' => 'ApiControllers'], function()
             Route::get('promotionTrader', 'ApiPromotionsController@getTraderForPromotion');
             Route::get('promotionProduct', 'ApiPromotionsController@getProductForPromotion');
             Route::post('promotionStatus', 'ApiPromotionsController@statusPromotionsChange');
+            // Route::get('changePromotionStatus', 'ApiPromotionsController@updatePromotionStatus');
 
         });
         // ###########################################################################################################
@@ -252,6 +253,7 @@ Route::group(['namespace' => 'Sagmma'], function()
 
             // -----------------------------------------promotions-----------------------------------
             Route::resource('promotions', 'PromotionsController');
+
         });
     });
 });
@@ -359,6 +361,7 @@ Route::get('/art', ['middleware' => 'auth', function () {
 Route::get('/news', function () {
     return view('newscaroucel');
 });
+
 
 
 

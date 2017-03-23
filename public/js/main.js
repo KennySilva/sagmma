@@ -37225,6 +37225,8 @@ var _Component = require('../../../Pagination/src/Component.vue');
 
 var _Component2 = _interopRequireDefault(_Component);
 
+var _lodash = require('lodash');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = {
@@ -37249,8 +37251,15 @@ exports.default = {
             filter: {
                 term: ''
             },
+            columnsFiltered: [],
             pagination: {},
-            success: false
+            success: false,
+            msgSucess: '',
+            typeAlert: '',
+            showRow: '',
+            all: {},
+            auth: []
+
         };
     },
 
@@ -37258,15 +37267,75 @@ exports.default = {
     // ---------------------------------------------------------------------------------
 
     ready: function ready() {
-        this.fetchControl(1);
+        this.fetchControl(this.pagination.current_Page, this.showRow);
         this.controlEmployee();
         this.controlMaterial();
+        this.authUser();
+        self = this;
+        jQuery(self.$els.controlcols).select2({
+            placeholder: "Coluna",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt'
+        }).on('change', function () {
+            self.$set('columnsFiltered', jQuery(this).val());
+        });
+        // ----------------------------------------------------------------
+        jQuery(self.$els.employeecreate).select2({
+            placeholder: "Funcionários",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt'
+        }).on('change', function () {
+            self.$set('newControl.employee_id', jQuery(this).val());
+        });
+        jQuery(self.$els.materialcreate).select2({
+            placeholder: "Material",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt'
+        }).on('change', function () {
+            self.$set('newPromotion.material_id', jQuery(this).val());
+        });
+        // ----------------------------------------------------------------
+        jQuery(self.$els.employeeedit).select2({
+            placeholder: "Funcionários",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt'
+        }).on('change', function () {
+            self.$set('newControl.employee_id', jQuery(this).val());
+        });
+        jQuery(self.$els.materialedit).select2({
+            placeholder: "Material",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt'
+        }).on('change', function () {
+            self.$set('newPromotion.material_id', jQuery(this).val());
+        });
+        // ----------------------------------------------------------------
     },
 
 
     // ---------------------------------------------------------------------------------
 
     methods: {
+        alert: function alert(msg, typeAlert) {
+            var self = this;
+            this.success = true;
+            this.msgSucess = msg;
+            this.typeAlert = typeAlert;
+            setTimeout(function () {
+                self.success = false;
+            }, 5000);
+        },
+
         clearField: function clearField() {
             this.newControl = {
                 id: '',
@@ -37286,24 +37355,20 @@ exports.default = {
             this.$http.post('http://localhost:8000/api/v1/controls/', control).then(function (response) {
                 if (response.status == 200) {
                     $('#modal-create-control').modal('hide');
-                    _this.fetchControl();
-                    console.log('correu bem');
-                    var self = _this;
-                    _this.success = true;
-                    setTimeout(function () {
-                        self.success = false;
-                    }, 5000);
+                    _this.fetchControl(_this.pagination.current_Page, _this.showRow);
+                    alert('Registo Criado com sucesso', 'success');
                 }
             }, function (response) {});
         },
 
         // --------------------------------------------------------------------------------------------
 
-        fetchControl: function fetchControl(page) {
+        fetchControl: function fetchControl(page, row) {
             var _this2 = this;
 
-            this.$http.get('http://localhost:8000/api/v1/controls?page=' + page).then(function (response) {
+            this.$http.get('http://localhost:8000/api/v1/allControls/' + row + '?page=' + page).then(function (response) {
                 _this2.$set('controls', response.data.data);
+                _this2.$set('all', response.data.data);
                 _this2.$set('pagination', response.data);
             }, function (response) {
                 console.log("Ocorreu um erro na operação");
@@ -37335,8 +37400,8 @@ exports.default = {
             this.$http.patch('http://localhost:8000/api/v1/controls/' + id, control).then(function (response) {
                 if (response.status == 200) {
                     $('#modal-edit-control').modal('hide');
-                    // console.log(response.data);
-                    _this4.fetchControl();
+                    _this4.fetchControl(_this4.pagination.current_Page, _this4.showRow);
+                    _this4.alert('Registo Atualizado com sucesso', 'info');
                 }
             }, function (response) {
                 console.log("Ocorreu um erro na operação");
@@ -37352,7 +37417,8 @@ exports.default = {
                 $('#modal-delete-control').modal('hide');
                 if (response.status == 200) {
                     // console.log(response.data);
-                    _this5.fetchControl();
+                    _this5.fetchControl(_this5.pagination.current_Page, _this5.showRow);
+                    _this5.alert('Registo eliminado com sucesso', 'warning');
                 }
             }, function (response) {
                 console.log("Ocorreu um erro na operação");
@@ -37392,13 +37458,23 @@ exports.default = {
             }
         },
 
-        statusControlsChange: function statusControlsChange(controlStatus) {
+        authUser: function authUser() {
             var _this8 = this;
+
+            this.$http.get('http://localhost:8000/api/v1/authUser').then(function (response) {
+                _this8.$set('auth', response.data);
+            }, function (response) {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+        statusControlsChange: function statusControlsChange(controlStatus) {
+            var _this9 = this;
 
             var postData = { id: controlStatus };
             this.$http.post('http://localhost:8000/api/v1/controlStatus/', postData).then(function (response) {
                 if (response.status == 200) {
-                    _this8.fetchControl();
+                    _this9.fetchControl(_this9.pagination.current_Page, _this9.showRow);
                 }
             }, function (response) {
                 console.log("Ocorreu um erro na operação");
@@ -37406,10 +37482,22 @@ exports.default = {
         },
 
         // --------------------------------------------------------------------------------------------
+        doFilter: function doFilter() {
+            var self = this;
+            filtered = self.all;
+            if (self.filter.term != '' && self.columnsFiltered.length > 0) {
+                filtered = _lodash._.filter(self.all, function (controlarregisto) {
+                    return self.columnsFiltered.some(function (column) {
+                        return controlarregisto[column].toLowerCase().indexOf(self.filter.term.toLowerCase()) > -1;
+                    });
+                });
+            }
+            self.$set('controls', filtered);
+        },
 
         // Outros funções
         navigate: function navigate(page) {
-            this.fetchControl(page);
+            this.fetchControl(page, this.showRow);
         }
     },
 
@@ -37424,7 +37512,7 @@ exports.default = {
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\r\n<div class=\"alert alert-success\" transition=\"success\" v-if=\"success\">\r\n\tControl adicionado com sucesso\r\n</div>\r\n\r\n\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-4 pull-right\">\r\n\t\t<div class=\"input-group\">\r\n\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t<input v-model=\"filter.term\" type=\"text\" class=\"form-control\" placeholder=\"Filtrar dados da tabela\" aria-describedby=\"basic-addon1\">\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n<div class=\"col-md-12\">\r\n\t<button @click=\"clearField\" class=\"btn btn-secondary pull-right\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-control\">Criar Novo</button>\r\n</div>\r\n<br><br>\r\n\r\n<div class=\"col-md-12\">\r\n\t<div class='table-responsive'>\r\n\t\t<table class='table table-striped table-hover table-condensed'>\r\n\t\t\t<thead>\r\n\t\t\t\t<tr>\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'employee_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'employee_id' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'employee_id')\">Funcionário(a)</a>\r\n\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'material_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'material_id' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'material_id')\">Material</a>\r\n\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'status' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'status' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'status')\">Estado</a>\r\n\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'created_at' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'created_at' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'created_at')\">Data</a>\r\n\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n\t\t\t\t</tr>\r\n\t\t\t</thead>\r\n\t\t\t<tbody>\r\n\t\t\t\t<tr v-for=\"control in controls | filterBy filter.term | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t<td v-for=\"emp in control.employees\">{{ emp.name }}</td>\r\n\t\t\t\t\t<td v-for=\"mat in control.materials\">{{ mat.name }}</td>\r\n\t\t\t\t\t<!------------------------------------------------------------------------------------------>\r\n\t\t\t\t\t<td>\r\n\t\t\t\t\t\t<button :disabled=\"control.status\" type=\"submit\" @click = \"statusControlsChange(control.id)\" class='btn btn-xs' :class=\"{ 'btn-info': control.status, 'btn-danger': !control.status }\">{{control.status ? 'Confirmado' : 'Pendente'}}</button>\r\n\t\t\t\t\t</td>\r\n\t\t\t\t\t<!------------------------------------------------------------------------------------------>\r\n\t\t\t\t\t<td>{{ control.created_at }}</td>\r\n\t\t\t\t\t<td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-control\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisControl(control.id)\" > </i></a></td>\r\n\t\t\t\t\t<td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-control\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisControl(control.id)\"></i></a></td>\r\n\t\t\t\t</tr>\r\n\t\t\t</tbody>\r\n\t\t</table>\r\n\t\t<div class=\"col-md-12 pull-left\">\r\n\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t<div class=\"modal fade\" id=\"modal-delete-control\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t<div class=\"modal-dialog\">\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar Registo</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<h1>Eliminar este registo</h1>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Cancelar</button>\r\n\t\t\t\t\t<button  @keyup.enter=\"deleteControl(newControl.id)\" @click=\"deleteControl(newControl.id)\" type=\"button\" class=\"btn btn-default\">Eliminar  control</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\t<!-- Modal -->\r\n\t<div id=\"modal-create-control\" class=\"modal fade\" role=\"dialog\">\r\n\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t<!-- Modal content-->\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\">Criar Registo</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newControl.employee_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Selecione o funcionario(a)</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"employee in employees\" value=\"{{employee.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t{{employee.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newControl.material_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Selecione o material</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"material in materials\" value=\"{{material.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t{{material.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</form>\r\n\t\t\t\t\t</validator>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createControl\" class=\"btn btn-secondary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar Dados Sobre este control</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t<!-- Modal -->\r\n\t<div id=\"modal-edit-control\" class=\"modal fade\" role=\"dialog\">\r\n\t\t<div class=\"modal-dialog\">\r\n\t\t\t<!-- Modal content-->\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\">Editar Este control</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t<form action=\"#\" methods=\"patch\">\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newControl.employee_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Selecione o funcionario(a)</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"employee in employees\" value=\"{{employee.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t{{employee.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newControl.material_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Selecione o material</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"material in materials\" value=\"{{material.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t{{material.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</form>\r\n\t\t\t\t\t</validator>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedControl(newControl.id)\" type=\"button\" class=\"btn btn-secondary\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp; Salvar as Alterações sobre este control</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div  id=\"alert-message\" class=\"alert alert-{{typeAlert}}\" transition=\"success\" v-if=\"success\">\r\n\t<button type=\"button\" class=\"close\" data-dismiss=\"alert\">x</button>\r\n\t<i class=\"fa fa-thumbs-o-up text-center\">&nbsp;&nbsp; {{msgSucess}}</i>\r\n</div>\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class=\"form-inline pull-right\">\r\n\t\t\t<div class=\"input-group\">\r\n\t\t\t\t<select data-toggle=\"tooltip\" title=\"A mostrar linhas na tabela\" class=\"form-control\" name=\"\" v-model=\"showRow\" @change=\"fetchControl(1, showRow)\">\r\n\t\t\t\t\t<option class=\"\" value=\"5\">05</option>\r\n\t\t\t\t\t<option class=\"\" value=\"10\" selected>10</option>\r\n\t\t\t\t\t<option class=\"\" value=\"20\">20</option>\r\n\t\t\t\t\t<option class=\"\" value=\"50\">50</option>\r\n\t\t\t\t\t<option class=\"\" value=\"100\">100</option>\r\n\t\t\t\t\t<option class=\"\" value=\"200\">200</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t&nbsp;&nbsp;\r\n\t\t\t<div class=\"input-group\">\r\n\t\t\t\t<select data-toggle=\"tooltip\" title=\"Escolhe as colunas a serem filtrados\" class=\"form-control\" name=\"\" v-model=\"columnsFiltered\" multiple=\"multiple\" v-el:controlcols>\r\n\t\t\t\t\t<option class=\"\" value=\"employee_id\"=\"\">Funcionário</option>\r\n\t\t\t\t\t<option class=\"\" value=\"material_id\">Marerial</option>\r\n\t\t\t\t\t<option class=\"\" value=\"create_at\">Data</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t&nbsp;&nbsp;\r\n\t\t\t<div v-if=\"columnsFiltered.length != 0\" class=\"input-group\">\r\n\t\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<input data-toggle=\"tooltip\" title=\"Escreva o valor a ser procurado na Tabela\"\r\n\t\t\t\tv-model=\"filter.term\"\r\n\t\t\t\t@keyup=\"doFilter\"\r\n\t\t\t\ttype=\"text\"\r\n\t\t\t\tclass=\"form-control\"\r\n\t\t\t\tplaceholder=\"Filtrar dados da tabela\"\r\n\t\t\t\taria-describedby=\"basic-addon1\">\r\n\t\t\t</div>\r\n\r\n\t\t\t<div v-else class=\"input-group\">\r\n\t\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<input :disabled=\"columnsFiltered.length == 0\" data-toggle=\"tooltip\" title=\"Para ativar introduza um valor na Coluna\"\r\n\t\t\t\ttype=\"text\"\r\n\t\t\t\tclass=\"form-control\"\r\n\t\t\t\tplaceholder=\"Filtrar dados da tabela\"\r\n\t\t\t\taria-describedby=\"basic-addon1\">\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n\r\n<div class=\"row\">\r\n\t<div v-if = \"employees.length > 0 && materials.length > 0\" class=\"col-md-12\">\r\n\t\t<button @click=\"clearField\" class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-control\"><i class=\"fa fa-plus\"></i> Novo</button>&nbsp;&nbsp;\r\n\t</div>\r\n\r\n\t<div v-else class=\"col-md-12\">\r\n\t\t<button data-toggle=\"tooltip\" title=\"Tens de criar os funcionários e os material para poder criar este registo\" type=\"button\" class=\"btn btn-danger btn-flat\"><i class=\"fa fa-minus\"></i> Novo</button>&nbsp;&nbsp;\r\n\t</div>\r\n\r\n</div>\r\n\r\n<br>\r\n\r\n<div class=\"col-md-12\">\r\n\t<div class='table-responsive'>\r\n\t\t<table class='table table-striped table-hover table-condensed'>\r\n\t\t\t<thead>\r\n\t\t\t\t<tr>\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'employee_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'employee_id' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'employee_id')\">Funcionário(a)</a>\r\n\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'material_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'material_id' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'material_id')\">Material</a>\r\n\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'status' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'status' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'status')\">Estado</a>\r\n\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'created_at' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'created_at' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'created_at')\">Data</a>\r\n\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n\t\t\t\t</tr>\r\n\t\t\t</thead>\r\n\t\t\t<tbody>\r\n\t\t\t\t<tr v-for=\"control in controls | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t<td v-for=\"emp in control.employees\">{{ emp.name }}</td>\r\n\t\t\t\t\t<td v-for=\"mat in control.materials\">{{ mat.name }}</td>\r\n\t\t\t\t\t<!------------------------------------------------------------------------------------------>\r\n\t\t\t\t\t<td>\r\n\t\t\t\t\t\t<button v-for=\"rol in auth.roles\" :disabled=\"rol.name != 'admin'\" type=\"submit\" @click = \"statusControlsChange(control.id)\" class='btn btn-xs' :class=\"{ 'btn-info': control.status, 'btn-danger': !control.status }\">{{control.status ? 'Entregue' : 'Pendente'}}</button>\r\n\t\t\t\t\t</td>\r\n\t\t\t\t\t<!------------------------------------------------------------------------------------------>\r\n\t\t\t\t\t<td>{{ control.created_at | formatDate }}</td>\r\n\t\t\t\t\t<td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-control\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisControl(control.id)\" > </i></a></td>\r\n\t\t\t\t\t<td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-control\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisControl(control.id)\"></i></a></td>\r\n\t\t\t\t</tr>\r\n\t\t\t</tbody>\r\n\t\t</table>\r\n\t\t<div class=\"row\">\r\n\t\t\t<div class=\"col-md-6 pull-left\">\r\n\t\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"col-md-6 pull-right\">\r\n\t\t\t\t<h6 class=\"text-right text-help\"> Mostrar de <span class=\"badge\">{{pagination.from}}</span>  a <span class=\"badge\">{{pagination.to}}</span>  no total de <span class=\"badge\">{{pagination.total}}</span></h6>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t</div>\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t<div class=\"modal fade\" id=\"modal-delete-control\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t<div class=\"modal-dialog\">\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar Registo</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<h1>Eliminar este registo</h1>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Cancelar</button>\r\n\t\t\t\t\t<button  @keyup.enter=\"deleteControl(newControl.id)\" @click=\"deleteControl(newControl.id)\" type=\"button\" class=\"btn btn-default\">Eliminar  control</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\t<!-- Modal -->\r\n\t<div id=\"modal-create-control\" class=\"modal fade\" role=\"dialog\">\r\n\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t<!-- Modal content-->\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\">Criar Registo</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newControl.employee_id\" v-el:employeecreate>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"employee in employees\" value=\"{{employee.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t{{employee.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newControl.material_id\" v-el:materialcreate>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"material in materials\" value=\"{{material.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t{{material.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</form>\r\n\t\t\t\t\t</validator>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createControl\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t<!-- Modal -->\r\n\t<div id=\"modal-edit-control\" class=\"modal fade\" role=\"dialog\">\r\n\t\t<div class=\"modal-dialog\">\r\n\t\t\t<!-- Modal content-->\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\">Editar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t<form action=\"#\" methods=\"patch\">\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newControl.employee_id\" v-el:employeeedit>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"employee in employees\" value=\"{{employee.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t{{employee.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newControl.material_id\" v-el:materialedit>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"material in materials\" value=\"{{material.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t{{material.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</form>\r\n\t\t\t\t\t</validator>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedControl(newControl.id)\" type=\"button\" class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -37439,7 +37527,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update("_v-3c1915ad", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"../../../Pagination/src/Component.vue":91,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],88:[function(require,module,exports){
+},{"../../../Pagination/src/Component.vue":91,"lodash":77,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],88:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1 {\r\n  color: #00a8ed;\r\n}")
 'use strict';
@@ -39380,9 +39468,10 @@ var _Component = require('../../../Pagination/src/Component.vue');
 
 var _Component2 = _interopRequireDefault(_Component);
 
+var _lodash = require('lodash');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// import vSelect from "vue-select"
 exports.default = {
     name: 'ShowPromotion',
 
@@ -39412,13 +39501,92 @@ exports.default = {
             filter: {
                 term: ''
             },
+            columnsFiltered: [],
             pagination: {},
-            success: false
+            success: false,
+            msgSucess: '',
+            typeAlert: '',
+            showRow: '',
+            all: {},
+            date_atual: new Date()
         };
+    },
+    ready: function ready() {
+        this.fetchPromotion(this.pagination.current_Page, this.showRow);
+        this.promotionTrader();
+        this.promotionProduct();
+        // this.changePromotionStatus()
+
+
+        self = this;
+        jQuery(self.$els.promotioncols).select2({
+            placeholder: "Coluna",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt'
+        }).on('change', function () {
+            self.$set('columnsFiltered', jQuery(this).val());
+        });
+        // ----------------------------------------------------------------
+        jQuery(self.$els.tradercreate).select2({
+            placeholder: "Comerciantes",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt'
+        }).on('change', function () {
+            self.$set('newPromotion.trader_id', jQuery(this).val());
+        });
+        jQuery(self.$els.productcreate).select2({
+            placeholder: "Produtos",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt'
+        }).on('change', function () {
+            self.$set('newPromotion.product_id', jQuery(this).val());
+        });
+        // ----------------------------------------------------------------
+
+        jQuery(self.$els.traderedit).select2({
+            placeholder: "Comerciantes",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt'
+        }).on('change', function () {
+            self.$set('newPromotion.trader_id', jQuery(this).val());
+        });
+        jQuery(self.$els.productedit).select2({
+            placeholder: "Produtos",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt'
+        }).on('change', function () {
+            self.$set('newPromotion.product_id', jQuery(this).val());
+        });
+        // ----------------------------------------------------------------
     },
 
 
     methods: {
+        // changePromotionStatus: function() {
+        //     this.$http.get('http://localhost:8000/api/v1/changePromotionStatus').then((response) => {
+        //     }, (response) => {
+        //     });
+        // },
+        alert: function alert(msg, typeAlert) {
+            var self = this;
+            this.success = true;
+            this.msgSucess = msg;
+            this.typeAlert = typeAlert;
+            setTimeout(function () {
+                self.success = false;
+            }, 5000);
+        },
+
         clearField: function clearField() {
             this.newPromotion = {
                 id: '',
@@ -39447,23 +39615,20 @@ exports.default = {
                     console.log('chegando aqui');
                     $('#modal-create-promotion').modal('hide');
                     console.log(response.data);
-                    _this.fetchPromotion(_this.pagination.last_Page);
-                    var self = _this;
-                    _this.success = true;
-                    setTimeout(function () {
-                        self.success = false;
-                    }, 5000);
+                    _this.fetchPromotion(_this.pagination.current_Page, _this.showRow);
+                    alert('Promoção Criado com sucesso', 'success');
                 }
             }, function (response) {});
         },
 
         // --------------------------------------------------------------------------------------------
 
-        fetchPromotion: function fetchPromotion(page) {
+        fetchPromotion: function fetchPromotion(page, row) {
             var _this2 = this;
 
-            this.$http.get('http://localhost:8000/api/v1/promotions?page=' + page).then(function (response) {
+            this.$http.get('http://localhost:8000/api/v1/allPromotions/' + row + '?page=' + page).then(function (response) {
                 _this2.$set('promotions', response.data.data);
+                _this2.$set('all', response.data.data);
                 _this2.$set('pagination', response.data);
             }, function (response) {
                 console.log("Ocorreu um erro na operação");
@@ -39500,7 +39665,8 @@ exports.default = {
                 if (response.status == 200) {
                     $('#modal-edit-promotion').modal('hide');
                     // console.log(response.data);
-                    _this4.fetchPromotion(_this4.pagination.current_page);
+                    _this4.fetchPromotion(_this4.pagination.current_Page, _this4.showRow);
+                    _this4.alert('Promoção Atualizado com sucesso', 'info');
                 }
             }, function (response) {
                 console.log("Ocorreu um erro na operação");
@@ -39517,7 +39683,8 @@ exports.default = {
                 $('#modal-delete-promotion').modal('hide');
                 if (response.status == 200) {
                     // console.log(response.data);
-                    _this5.fetchPromotion();
+                    _this5.fetchPromotion(_this5.pagination.current_Page, _this5.showRow);
+                    _this5.alert('Promoção Eliminado com sucesso', 'success');
                 }
             }, function (response) {
                 console.log("Ocorreu um erro na operação");
@@ -39553,7 +39720,7 @@ exports.default = {
                 console.log(response.status);
                 console.log(response.data);
                 if (response.status == 200) {
-                    _this8.fetchPromotion(_this8.pagination.current_page);
+                    _this8.fetchPromotion(_this8.pagination.current_Page, _this8.showRow);
                 }
             }, function (response) {
                 console.log("Ocorreu um erro na operação");
@@ -39561,6 +39728,18 @@ exports.default = {
         },
 
         // -------------------------Metodo de suporte---------------------------------------------------
+        doFilter: function doFilter() {
+            var self = this;
+            filtered = self.all;
+            if (self.filter.term != '' && self.columnsFiltered.length > 0) {
+                filtered = _lodash._.filter(self.all, function (promotion) {
+                    return self.columnsFiltered.some(function (column) {
+                        return promotion[column].toLowerCase().indexOf(self.filter.term.toLowerCase()) > -1;
+                    });
+                });
+            }
+            self.$set('promotions', filtered);
+        },
 
         doSort: function doSort(ev, column) {
             var self = this;
@@ -39578,23 +39757,16 @@ exports.default = {
 
         // Outros funções
         navigate: function navigate(page) {
-            this.fetchPromotion(page);
+            this.fetchPromotion(page, this.showRow);
         }
     },
-
-    ready: function ready() {
-        this.fetchPromotion(this.pagination.current_Page);
-        this.promotionTrader();
-        this.promotionProduct();
-    },
-
 
     components: {
         'Pagination': _Component2.default
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div class=\"alert alert-success\" transition=\"success\" v-if=\"success\">\r\n\t<i class=\"fa fa-thumbs-up\"> Sucesso!!</i>\r\n</div>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"pull right col-md-8\">\r\n\t\t<label class=\"checkbox-inline\"><input type=\"checkbox\" id=\"\" value=\"\" v-model=\"showColumn.begnning_date\">Início</label>\r\n\t\t<label class=\"checkbox-inline\"><input type=\"checkbox\" id=\"\" value=\"\" v-model=\"showColumn.ending_date\">Término</label>\r\n\t\t<label class=\"checkbox-inline\"><input type=\"checkbox\" id=\"\" value=\"\" v-model=\"showColumn.trader_id\">Comerciante</label>\r\n\t</div>\r\n\r\n\t<div class=\"col-md-4 pull-left\">\r\n\t\t<div class=\"input-group\">\r\n\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t<input v-model=\"filter.term\" type=\"text\" class=\"form-control\" placeholder=\"Filtrar...\" aria-describedby=\"basic-addon1\">\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n\r\n<div class=\"row\">\r\n\t<div v-if = \"traders.length > 0 && products.length > 0\" class=\"col-md-12\">\r\n\t\t<button @click=\"clearField\" class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-promotion\"><i class=\"fa fa-plus\"></i> Novo</button>&nbsp;&nbsp;\r\n\t</div>\r\n\r\n\t<div v-else class=\"col-md-12\">\r\n\t\t<button data-toggle=\"tooltip\" title=\"Não podes criar promoção referenciar comerciante e produtos\" type=\"button\" class=\"btn btn-danger btn-flat\"><i class=\"fa fa-minus\"></i> Novo</button>&nbsp;&nbsp;\r\n\t</div>\r\n\r\n</div>\r\n\r\n<br>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class='table-responsive'>\r\n\t\t\t<table class='table table-striped table-hover table-condensed'>\r\n\t\t\t\t<thead>\r\n\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'name')\">Nome</a>\r\n\t\t\t\t\t\t</th>\r\n\t\t\t\t\t\t<th class=\"info\" v-if=\"showColumn.begnning_date\">\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'begnning_date' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'begnning_date' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'begnning_date')\">Início</a>\r\n\t\t\t\t\t\t</th>\r\n\t\t\t\t\t\t<th class=\"info\" v-if=\"showColumn.ending_date\">\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'ending_date' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'ending_date' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'ending_date')\">Término</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th   class=\"text-center\">\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'state' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'state' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'state')\">Publicação</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\r\n\t\t\t\t\t\t<th class=\"info\" v-if=\"showColumn.trader_id\">\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'trader_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'trader_id' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'trader_id')\">Comerciante</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\r\n\t\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</thead>\r\n\t\t\t\t<tbody>\r\n\t\t\t\t\t<tr v-for=\"promotion in promotions | filterBy filter.term | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t\t<td><a href=\"#\" data-toggle=\"modal\" data-target=\"#show-promotion\" @click=\"getThisPromotion(promotion.id)\">{{ promotion.name }}</a></td>\r\n\t\t\t\t\t\t<td class=\"info\" v-if=\"showColumn.begnning_date\">{{ promotion.begnning_date }}</td>\r\n\t\t\t\t\t\t<td class=\"info\" v-if=\"showColumn.ending_date\">{{ promotion.ending_date }}</td>\r\n\r\n\r\n\t\t\t\t\t\t<!------------------------------------------------------------------------------------>\r\n\t\t\t\t\t\t<td  class=\"text-center\" v-if=\"promotion.status\">\r\n\t\t\t\t\t\t\t<button data-toggle=\"tooltip\" title=\"Despublicar esta promoção\" type=\"submit\" @click = \"promotionStatus(promotion.id)\" class='btn btn-xs btn-flat' :class=\"{ 'btn-success': promotion.status, 'btn-warning': !promotion.status }\"><i class=\"fa fa-check\"></i></button>\r\n\t\t\t\t\t\t</td>\r\n\r\n\t\t\t\t\t\t<td  class=\"text-center\" v-if=\"!promotion.status\">\r\n\t\t\t\t\t\t\t<button data-toggle=\"tooltip\" title=\"Publicar esta promoção\" type=\"submit\" @click = \"promotionStatus(promotion.id)\" class='btn btn-xs btn-flat' :class=\"{ 'btn-success': promotion.status, 'btn-warning': !promotion.status }\"><i class=\"fa fa-times\"></i></button>\r\n\t\t\t\t\t\t</td>\r\n\t\t\t\t\t\t<!------------------------------------------------------------------------------------>\r\n\r\n\r\n\t\t\t\t\t\t<td class=\"info\" v-if=\"showColumn.service_beginning\">{{ promotion.trader.name }}</td>\r\n\r\n\t\t\t\t\t\t<td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-promotion\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisPromotion(promotion.id)\" > </i></a></td>\r\n\t\t\t\t\t\t<td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-promotion\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisPromotion(promotion.id)\" ></i></a></td>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</tbody>\r\n\t\t\t</table>\r\n\t\t\t<div class=\"col-md-12 pull-left\">\r\n\t\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<div id=\"show-promotion\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Detalhes do(a) {{ newPromotion.name }}</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class='table-responsive'>\r\n\t\t\t\t\t\t\t\t\t<table class='table table-striped table-hover'>\r\n\t\t\t\t\t\t\t\t\t\t<thead>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<th class=\"text-center\" colspan=\"2\">INFORMAÇOES DE PROMOÇÃO</th>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t</thead>\r\n\t\t\t\t\t\t\t\t\t\t<tbody>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>ID</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newPromotion.id }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Nome</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newPromotion.name }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Início</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><span class=\"label label-info\"><i>{{ newPromotion.begnning_date }}</i></span></td>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Término</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newPromotion.ending_date }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Publicação</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><span class='label' :class=\"{ 'label-success': newPromotion.status, 'label-warning': !newPromotion.status }\"><i>{{newPromotion.status ? 'Publicado' : 'Aguardando'}}</i></span></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Descrição</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newPromotion.description }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Data da criação</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ promotion.created_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Data de atualização</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ promotion.updated_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t\t\t</tbody>\r\n\t\t\t\t\t\t\t\t\t</table>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-success\" data-dismiss=\"modal\"><i class=\"fa fa-check\"></i></button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<div class=\"modal fade\" id=\"modal-delete-promotion\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newPromotion.name}}</span></h5>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i> Cancelar</button>\r\n\t\t\t\t\t\t<button  @keyup.enter=\"deletePromotion(newPromotion.id)\" @click=\"deletePromotion(newPromotion.id)\" type=\"button\" class=\"btn btn-danger\"><i class=\"fa fa-trash-o\"></i> Eliminar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-create-promotion\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Registar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome\" v-model=\"newPromotion.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-user form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type='date' name=\"begnning_date\" class='form-control' placeholder='' v-model=\"newPromotion.begnning_date\" v-validate:begnning = \"['required']\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<!-- <span class=\"fa fa-calendar-check-o form-control-feedback\"></span> -->\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p class=\"text-help\">Data de início da promoção</p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type='date' name=\"ending_date\" class='form-control' placeholder='' v-model=\"newPromotion.ending_date\"  v-validate:ending_date = \"['required']\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<!-- <span class=\"fa fa-calendar-times-o form-control-feedback\"></span> -->\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p class=\"text-help\">Término da promoção</p>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!------------------------------------------------------------>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select name=\"trader_id\" class=\"form-control\" v-model=\"newPromotion.trader_id\" v-validate:trader_id = \"['required']\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Comerciantes</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"trader in traders\" value=\"{{trader.id}}\">{{trader.name}}</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select name=\"product_id\" class=\"form-control\" v-model=\"newPromotion.product_id\" v-validate:product_id = \"['required']\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Produtos</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"product in products\" value=\"{{product.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{product.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!------------------------------------------------------------>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newPromotion.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createPromotion\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-edit-promotion\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Editar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validation1\">\r\n\t\t\t\t\t\t\t<form methods=\"patch\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome\" v-model=\"newPromotion.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-user form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type='date' class='form-control' placeholder='' v-model=\"newPromotion.begnning_date\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p class=\"text-help\">Data de início da promoção</p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type='date' class='form-control' placeholder='' v-model=\"newPromotion.ending_date\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p class=\"text-help\">Término da promoção</p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!------------------------------------------------------------>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newPromotion.trader_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Comerciantes</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"trader in traders\" value=\"{{trader.id}}\">{{trader.name}}</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newPromotion.product_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Produtos</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"product in products\" value=\"{{product.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{product.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!------------------------------------------------------------>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newPromotion.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedPromotion(newPromotion.id)\" type=\"button\" class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div  id=\"alert-message\" class=\"alert alert-{{typeAlert}}\" transition=\"success\" v-if=\"success\">\r\n\t<button type=\"button\" class=\"close\" data-dismiss=\"alert\">x</button>\r\n\t<i class=\"fa fa-thumbs-o-up text-center\">&nbsp;&nbsp; {{msgSucess}}</i>\r\n</div>\r\n<div class=\"row\">\r\n\t<div class=\"pull right col-md-4\">\r\n\t\t<label class=\"checkbox-inline\"><input type=\"checkbox\" id=\"\" value=\"\" v-model=\"showColumn.begnning_date\">Início</label>\r\n\t\t<label class=\"checkbox-inline\"><input type=\"checkbox\" id=\"\" value=\"\" v-model=\"showColumn.ending_date\">Término</label>\r\n\t\t<label class=\"checkbox-inline\"><input type=\"checkbox\" id=\"\" value=\"\" v-model=\"showColumn.trader_id\">Comerciante</label>\r\n\t</div>\r\n\r\n\t<div class=\"col-md-8 pull-left\">\r\n\t\t<div class=\"form-inline pull-right\">\r\n\t\t\t<div class=\"input-group\">\r\n\t\t\t\t<select data-toggle=\"tooltip\" title=\"A mostrar linhas na tabela\" class=\"form-control\" name=\"\" v-model=\"showRow\" @change=\"fetchPromotion(1, showRow)\">\r\n\t\t\t\t\t<option class=\"\" value=\"5\">05</option>\r\n\t\t\t\t\t<option class=\"\" value=\"10\" selected>10</option>\r\n\t\t\t\t\t<option class=\"\" value=\"20\">20</option>\r\n\t\t\t\t\t<option class=\"\" value=\"50\">50</option>\r\n\t\t\t\t\t<option class=\"\" value=\"100\">100</option>\r\n\t\t\t\t\t<option class=\"\" value=\"200\">200</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t&nbsp;&nbsp;\r\n\t\t\t<div class=\"input-group\">\r\n\t\t\t\t<select data-toggle=\"tooltip\" title=\"Escolhe as colunas a serem filtrados\" class=\"form-control\" name=\"\" v-model=\"columnsFiltered\" multiple=\"multiple\" v-el:promotioncols>\r\n\t\t\t\t\t<option class=\"\" value=\"name\"=\"\">Nome</option>\r\n\t\t\t\t\t<option class=\"\" value=\"begnning_date\">Inicio</option>\r\n\t\t\t\t\t<option class=\"\" value=\"ending_date\">Término</option>\r\n\t\t\t\t\t<option class=\"\" value=\"trader_id\">Comerciante</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t&nbsp;&nbsp;\r\n\t\t\t<div v-if=\"columnsFiltered.length != 0\" class=\"input-group\">\r\n\t\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<input data-toggle=\"tooltip\" title=\"Escreva o valor a ser procurado na Tabela\"\r\n\t\t\t\tv-model=\"filter.term\"\r\n\t\t\t\t@keyup=\"doFilter\"\r\n\t\t\t\ttype=\"text\"\r\n\t\t\t\tclass=\"form-control\"\r\n\t\t\t\tplaceholder=\"Filtrar dados da tabela\"\r\n\t\t\t\taria-describedby=\"basic-addon1\">\r\n\t\t\t</div>\r\n\r\n\t\t\t<div v-else class=\"input-group\">\r\n\t\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<input :disabled=\"columnsFiltered.length == 0\" data-toggle=\"tooltip\" title=\"Para ativar introduza um valor na Coluna\"\r\n\t\t\t\ttype=\"text\"\r\n\t\t\t\tclass=\"form-control\"\r\n\t\t\t\tplaceholder=\"Filtrar dados da tabela\"\r\n\t\t\t\taria-describedby=\"basic-addon1\">\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n\r\n<div class=\"row\">\r\n\t<div v-if = \"traders.length > 0 && products.length > 0\" class=\"col-md-12\">\r\n\t\t<button @click=\"clearField\" class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-promotion\"><i class=\"fa fa-plus\"></i> Novo</button>&nbsp;&nbsp;\r\n\t</div>\r\n\r\n\t<div v-else class=\"col-md-12\">\r\n\t\t<button data-toggle=\"tooltip\" title=\"Não podes criar promoção referenciar comerciante e produtos\" type=\"button\" class=\"btn btn-danger btn-flat\"><i class=\"fa fa-minus\"></i> Novo</button>&nbsp;&nbsp;\r\n\t</div>\r\n\r\n</div>\r\n\r\n<br>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class='table-responsive'>\r\n\t\t\t<table class='table table-striped table-hover table-condensed'>\r\n\t\t\t\t<thead>\r\n\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'name')\">Nome</a>\r\n\t\t\t\t\t\t</th>\r\n\t\t\t\t\t\t<th class=\"info\" v-if=\"showColumn.begnning_date\">\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'begnning_date' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'begnning_date' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'begnning_date')\">Início</a>\r\n\t\t\t\t\t\t</th>\r\n\t\t\t\t\t\t<th class=\"info\" v-if=\"showColumn.ending_date\">\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'ending_date' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'ending_date' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'ending_date')\">Término</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th   class=\"text-center\">\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'state' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'state' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'state')\">Publicação</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\r\n\t\t\t\t\t\t<th class=\"info\" v-if=\"showColumn.trader_id\">\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'trader_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'trader_id' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'trader_id')\">Comerciante</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\r\n\t\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</thead>\r\n\t\t\t\t<tbody>\r\n\t\t\t\t\t<tr v-for=\"promotion in promotions | filterBy filter.term | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t\t<td><a href=\"#\" data-toggle=\"modal\" data-target=\"#show-promotion\" @click=\"getThisPromotion(promotion.id)\">{{ promotion.name }}</a></td>\r\n\t\t\t\t\t\t<td class=\"info\" v-if=\"showColumn.begnning_date\">{{ promotion.begnning_date }}</td>\r\n\t\t\t\t\t\t<td class=\"info\" v-if=\"showColumn.ending_date\">{{ promotion.ending_date }}</td>\r\n\r\n\r\n\t\t\t\t\t\t<!------------------------------------------------------------------------------------>\r\n\t\t\t\t\t\t<td  class=\"text-center\" v-if=\"promotion.status\">\r\n\t\t\t\t\t\t\t<button data-toggle=\"tooltip\" title=\"Despublicar esta promoção\" type=\"submit\" @click = \"promotionStatus(promotion.id)\" class='btn btn-xs btn-flat' :class=\"{ 'btn-success': promotion.status, 'btn-warning': !promotion.status }\"><i class=\"fa fa-check\"></i></button>\r\n\t\t\t\t\t\t</td>\r\n\r\n\t\t\t\t\t\t<td  class=\"text-center\" v-if=\"!promotion.status\">\r\n\t\t\t\t\t\t\t<button data-toggle=\"tooltip\" title=\"Publicar esta promoção\" type=\"submit\" @click = \"promotionStatus(promotion.id)\" class='btn btn-xs btn-flat' :class=\"{ 'btn-success': promotion.status, 'btn-warning': !promotion.status }\"><i class=\"fa fa-times\"></i></button>\r\n\t\t\t\t\t\t</td>\r\n\t\t\t\t\t\t<!------------------------------------------------------------------------------------>\r\n\r\n\r\n\t\t\t\t\t\t<td class=\"info\" v-if=\"showColumn.trader_id\">{{ promotion.trader.name }}</td>\r\n\r\n\t\t\t\t\t\t<td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-promotion\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisPromotion(promotion.id)\" > </i></a></td>\r\n\t\t\t\t\t\t<td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-promotion\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisPromotion(promotion.id)\" ></i></a></td>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</tbody>\r\n\t\t\t</table>\r\n\t\t\t<div class=\"row\">\r\n\t\t\t\t<div class=\"col-md-6 pull-left\">\r\n\t\t\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"col-md-6 pull-right\">\r\n\t\t\t\t\t<h6 class=\"text-right text-help\"> Mostrar de <span class=\"badge\">{{pagination.from}}</span>  a <span class=\"badge\">{{pagination.to}}</span>  no total de <span class=\"badge\">{{pagination.total}}</span></h6>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<div id=\"show-promotion\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Detalhes do(a) {{ newPromotion.name }}</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class='table-responsive'>\r\n\t\t\t\t\t\t\t\t\t<table class='table table-striped table-hover'>\r\n\t\t\t\t\t\t\t\t\t\t<thead>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<th class=\"text-center\" colspan=\"2\">INFORMAÇOES DE PROMOÇÃO</th>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t</thead>\r\n\t\t\t\t\t\t\t\t\t\t<tbody>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>ID</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newPromotion.id }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Nome</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newPromotion.name }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Início</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><span class=\"label label-info\"><i>{{ newPromotion.begnning_date }}</i></span></td>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Término</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newPromotion.ending_date }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Publicação</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><span class='label' :class=\"{ 'label-success': newPromotion.status, 'label-warning': !newPromotion.status }\"><i>{{newPromotion.status ? 'Publicado' : 'Aguardando'}}</i></span></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Descrição</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newPromotion.description }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Data da criação</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ promotion.created_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Data de atualização</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ promotion.updated_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t\t\t</tbody>\r\n\t\t\t\t\t\t\t\t\t</table>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-success\" data-dismiss=\"modal\"><i class=\"fa fa-check\"></i></button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<div class=\"modal fade\" id=\"modal-delete-promotion\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newPromotion.name}}</span></h5>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i> Cancelar</button>\r\n\t\t\t\t\t\t<button  @keyup.enter=\"deletePromotion(newPromotion.id)\" @click=\"deletePromotion(newPromotion.id)\" type=\"button\" class=\"btn btn-danger\"><i class=\"fa fa-trash-o\"></i> Eliminar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-create-promotion\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Registar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome\" v-model=\"newPromotion.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-user form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type='date' name=\"begnning_date\" class='form-control' placeholder='' v-model=\"newPromotion.begnning_date\" v-validate:begnning = \"['required']\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<!-- <span class=\"fa fa-calendar-check-o form-control-feedback\"></span> -->\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p class=\"text-help\">Data de início da promoção</p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type='date' name=\"ending_date\" class='form-control' placeholder='' v-model=\"newPromotion.ending_date\"  v-validate:ending_date = \"['required']\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<!-- <span class=\"fa fa-calendar-times-o form-control-feedback\"></span> -->\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p class=\"text-help\">Término da promoção</p>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!------------------------------------------------------------>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select name=\"trader_id\" class=\"form-control\" v-model=\"newPromotion.trader_id\" v-el:tradercreate>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"trader in traders\" value=\"{{trader.id}}\">{{trader.name}}</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select name=\"product_id\" class=\"form-control\" v-model=\"newPromotion.product_id\"v-el:productcreate>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"product in products\" value=\"{{product.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{product.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!------------------------------------------------------------>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newPromotion.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createPromotion\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-edit-promotion\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Editar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validation1\">\r\n\t\t\t\t\t\t\t<form methods=\"patch\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome\" v-model=\"newPromotion.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-user form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type='date' name=\"begnning_date\" class='form-control' placeholder='' v-model=\"newPromotion.begnning_date\" v-validate:begnning = \"['required']\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<!-- <span class=\"fa fa-calendar-check-o form-control-feedback\"></span> -->\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p class=\"text-help\">Data de início da promoção</p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type='date' name=\"ending_date\" class='form-control' placeholder='' v-model=\"newPromotion.ending_date\"  v-validate:ending_date = \"['required']\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<!-- <span class=\"fa fa-calendar-times-o form-control-feedback\"></span> -->\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p class=\"text-help\">Término da promoção</p>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!------------------------------------------------------------>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select name=\"trader_id\" class=\"form-control\" v-model=\"newPromotion.trader_id\" v-el:traderedit>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"trader in traders\" value=\"{{trader.id}}\">{{trader.name}}</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select name=\"product_id\" class=\"form-control\" v-model=\"newPromotion.product_id\"v-el:productedit>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"product in products\" value=\"{{product.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{product.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!------------------------------------------------------------>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newPromotion.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedPromotion(newPromotion.id)\" type=\"button\" class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -39609,7 +39781,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update("_v-39dff6a8", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"../../../Pagination/src/Component.vue":91,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],96:[function(require,module,exports){
+},{"../../../Pagination/src/Component.vue":91,"lodash":77,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],96:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1 {\r\n  color: #00a8ed;\r\n}")
 'use strict';

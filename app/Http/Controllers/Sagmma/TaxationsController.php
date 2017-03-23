@@ -22,15 +22,9 @@ class TaxationsController extends Controller
         // $data = Taxation::select('employee_place.employee_id', DB::raw('sum(employee_place.income) as aggregate'))->groupBy(DB::raw('employee_place.employee_id'))->get(); //must alias the aggregate column as aggregate
         //
         // $chart = Charts::database($data)->preaggregated(true)->lastByDay(7, false);
-
-
-
-
-
-
         $chart = Charts::database(Taxation::all(), 'pie', 'fusioncharts')->dateColumn('created_at')
         ->elementLabel("Total")
-        ->dimensions(1000, 500)
+        ->dimensions(0, 300)
         ->responsive(false)
         ->groupBy('employee_id');
 
