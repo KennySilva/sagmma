@@ -1,6 +1,5 @@
 @extends('_backend.master.app')
 @section('sagmma-style')
-    <link rel="stylesheet" href="/bower_components/bootstrap-select/dist/css/bootstrap-select.css">
 
 @endsection
 

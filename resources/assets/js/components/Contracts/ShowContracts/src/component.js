@@ -1,7 +1,4 @@
-import vSelect from 'vue-select'
 import Pagination from '../../../Pagination/src/Component.vue'
-
-
 export default{
 
     name: 'show-contract',
@@ -203,7 +200,6 @@ export default{
     // ---------------------------------------------------------------------------------
 
     components: {
-        'Pagination': Pagination,
-        'vSelect': vSelect
+        'Pagination': Pagination
     },
 }

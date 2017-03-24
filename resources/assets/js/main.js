@@ -1,12 +1,6 @@
 var Vue = require('vue');
 Vue.use(require('vue-validator'));
-// var VueQuillEditor = require('vue-quill-editor');
-// Vue.use(VueQuillEditor);
 Vue.use(require('vue-resource'));
-// Vue.use(require('vue-form'));
-// Vue.use(require('vue-select'));
-// Vue.use(require('vue-router'));
-
 
 var moment  = require('moment');
 
@@ -50,7 +44,7 @@ new Vue({
         //------------------------------Control-----------------------------------
         'show-control': require('./components/Controls/ShowControls'),
         //------------------------------Contract-----------------------------------
-        // 'show-contract': require('./components/Contracts/ShowContracts'),
+        'show-contract': require('./components/Contracts/ShowContracts'),
         //------------------------------Taxation-----------------------------------
         'show-taxation': require('./components/Taxations/ShowTaxations'),
         //------------------------------Promotion-----------------------------------
