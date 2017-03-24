@@ -52,7 +52,7 @@ new Vue({
         //------------------------------Contract-----------------------------------
         // 'show-contract': require('./components/Contracts/ShowContracts'),
         //------------------------------Taxation-----------------------------------
-        // 'show-taxation': require('./components/Taxations/ShowTaxations'),
+        'show-taxation': require('./components/Taxations/ShowTaxations'),
         //------------------------------Promotion-----------------------------------
         'show-promotion': require('./components/Promotions/ShowPromotion'),
         // ------------------------------place-----------------------------------

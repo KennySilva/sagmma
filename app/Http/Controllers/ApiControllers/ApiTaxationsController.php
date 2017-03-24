@@ -83,7 +83,8 @@ class ApiTaxationsController extends Controller
     //Metodos de auxilio
     public function getEmployeeForTaxation()
     {
-        $employee = Employee::all();
+        $id = Auth::user()->id;
+        $employee = Employee::where('id', '!=', $id)->get();
         return $employee;
     }
 

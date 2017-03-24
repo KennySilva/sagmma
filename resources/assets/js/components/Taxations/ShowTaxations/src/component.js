@@ -23,11 +23,16 @@ export default{
 
             sortColumn : 'id',
             sortInverse: 1,
-            filter   : {
-                term : ''
+            filter: {
+                term: ''
             },
-            pagination : {},
-            success    : false,
+            columnsFiltered: [],
+            pagination: {},
+            success: false,
+            msgSucess: '',
+            typeAlert: '',
+            showRow: '',
+            all: {},
             report_date: '',
             auth: [],
 
@@ -44,16 +49,76 @@ export default{
     // ---------------------------------------------------------------------------------
 
     ready () {
-        this.fetchTaxation(1);
-        this.taxationEmployee();
-        this.taxationIntPlace();
-        this.taxationExtPlace();
-        this.authUser();
+        this.fetchTaxation(this.pagination.current_Page, this.showRow)
+        this.taxationEmployee()
+        this.taxationIntPlace()
+        this.taxationExtPlace()
+        this.authUser()
+        var self = this
+        jQuery(self.$els.taxationcols).select2({
+            placeholder: "Coluna",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('columnsFiltered', jQuery(this).val());
+        });
+        // ---------------------------------------------------------------------------------------------------
+        jQuery(self.$els.typecreate).select2({
+            placeholder: "Tipo de Cobrança",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('newTaxation.type', jQuery(this).val());
+        });
+
+        jQuery(self.$els.typeedit).select2({
+            placeholder: "Tipo de Cobrança",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('newTaxation.type', jQuery(this).val());
+        });
+        // -------------------------------------------------------------------------------------------------
+        jQuery(self.$els.employeecreate).select2({
+            placeholder: "Funcionários",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('newTaxation.employee_id', jQuery(this).val());
+        });
+
+        jQuery(self.$els.employeedit).select2({
+            placeholder: "Funcionários",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('newTaxation.employee_id', jQuery(this).val());
+        });
     },
 
-    // ---------------------------------------------------------------------------------
+        // -----------------------------------------------------------------------------------------------
 
     methods: {
+        alert: function(msg, typeAlert) {
+            var self = this;
+            this.success = true;
+            this.msgSucess = msg;
+            this.typeAlert = typeAlert;
+            setTimeout(function() {
+                self.success = false;
+            }, 5000);
+        },
+
 
         clearField: function(){
             this.newTaxation = {
@@ -74,13 +139,10 @@ export default{
             this.$http.post('http://localhost:8000/api/v1/taxations/', taxation).then((response) => {
                 if (response.status == 200) {
                     $('#modal-create-taxation').modal('hide');
-                    this.fetchTaxation();
+                    this.fetchTaxation(this.pagination.current_Page, this.showRow);
                     console.log('correu bem');
-                    var self = this;
-                    this.success = true;
-                    setTimeout(function() {
-                        self.success = false;
-                    }, 5000);
+                    this.alert('Registo criado com sucesso', 'success');
+
                 }
             }, (response) => {
 
@@ -89,9 +151,10 @@ export default{
 
         // --------------------------------------------------------------------------------------------
 
-        fetchTaxation: function(page) {
-            this.$http.get('http://localhost:8000/api/v1/taxations?page='+page).then((response) => {
+        fetchTaxation: function(page, row) {
+            this.$http.get('http://localhost:8000/api/v1/allTaxations/'+row+'?page='+page).then((response) => {
                 this.$set('taxations', response.data.data)
+                this.$set('all', response.data.data)
                 this.$set('pagination', response.data)
             }, (response) => {
                 console.log("Ocorreu um erro na operação")
@@ -122,7 +185,9 @@ export default{
                 if (response.status == 200) {
                     $('#modal-edit-taxation').modal('hide');
                     // console.log(response.data);
-                    this.fetchTaxation();
+                    this.fetchTaxation(this.pagination.current_Page, this.showRow);
+                    this.alert('Registo atualizado com sucesso', 'info');
+
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -136,7 +201,9 @@ export default{
                 $('#modal-delete-taxation').modal('hide');
                 if (response.status == 200) {
                     // console.log(response.data);
-                    this.fetchTaxation();
+                    this.fetchTaxation(this.pagination.current_Page, this.showRow);
+                    this.alert('Estaço eliminado com sucesso', 'warning');
+
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -186,6 +253,19 @@ export default{
         },
         // --------------------------------------------------------------------------------------------
 
+        doFilter: function() {
+            var self = this
+            filtered = self.all
+            if (self.filter.term != '' && self.columnsFiltered.length > 0) {
+                filtered = _.filter(self.all, function(taxation) {
+                    return self.columnsFiltered.some(function(column) {
+                        return taxation[column].toLowerCase().indexOf(self.filter.term.toLowerCase()) > -1
+                    })
+                })
+            }
+            self.$set('taxations', filtered)
+        },
+
         doSort: function(ev, column) {
             var self = this;
             ev.preventDefault()
@@ -202,7 +282,7 @@ export default{
 
         // Outros funções
         navigate (page) {
-            this.fetchTaxation(page);
+            this.fetchTaxation(page, this.showRow);
         },
 
 

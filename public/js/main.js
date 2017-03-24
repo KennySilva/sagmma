@@ -36975,9 +36975,9 @@ if (module.hot) {(function () {  module.hot.accept()
     document.head.removeChild(__vueify_style__)
   })
   if (!module.hot.data) {
-    hotAPI.createRecord("_v-0bf39de6", module.exports)
+    hotAPI.createRecord("_v-05cac4ed", module.exports)
   } else {
-    hotAPI.update("_v-0bf39de6", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+    hotAPI.update("_v-05cac4ed", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
 },{"../../../Pagination/src/Component.vue":91,"lodash":77,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],86:[function(require,module,exports){
@@ -37207,9 +37207,9 @@ if (module.hot) {(function () {  module.hot.accept()
     document.head.removeChild(__vueify_style__)
   })
   if (!module.hot.data) {
-    hotAPI.createRecord("_v-63b12ead", module.exports)
+    hotAPI.createRecord("_v-1148d28d", module.exports)
   } else {
-    hotAPI.update("_v-63b12ead", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+    hotAPI.update("_v-1148d28d", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
 },{"../../../Pagination/src/Component.vue":91,"lodash":77,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],87:[function(require,module,exports){
@@ -37522,9 +37522,9 @@ if (module.hot) {(function () {  module.hot.accept()
     document.head.removeChild(__vueify_style__)
   })
   if (!module.hot.data) {
-    hotAPI.createRecord("_v-3c1915ad", module.exports)
+    hotAPI.createRecord("_v-47dda98d", module.exports)
   } else {
-    hotAPI.update("_v-3c1915ad", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+    hotAPI.update("_v-47dda98d", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
 },{"../../../Pagination/src/Component.vue":91,"lodash":77,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],88:[function(require,module,exports){
@@ -38009,9 +38009,9 @@ if (module.hot) {(function () {  module.hot.accept()
     document.head.removeChild(__vueify_style__)
   })
   if (!module.hot.data) {
-    hotAPI.createRecord("_v-4c2f6b65", module.exports)
+    hotAPI.createRecord("_v-791e8745", module.exports)
   } else {
-    hotAPI.update("_v-4c2f6b65", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+    hotAPI.update("_v-791e8745", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
 },{"../../../Pagination/src/Component.vue":91,"lodash":77,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],89:[function(require,module,exports){
@@ -38253,9 +38253,9 @@ if (module.hot) {(function () {  module.hot.accept()
     document.head.removeChild(__vueify_style__)
   })
   if (!module.hot.data) {
-    hotAPI.createRecord("_v-a7f969e8", module.exports)
+    hotAPI.createRecord("_v-f96b79a8", module.exports)
   } else {
-    hotAPI.update("_v-a7f969e8", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+    hotAPI.update("_v-f96b79a8", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
 },{"../../../Pagination/src/Component.vue":91,"lodash":77,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],90:[function(require,module,exports){
@@ -38495,9 +38495,9 @@ if (module.hot) {(function () {  module.hot.accept()
     document.head.removeChild(__vueify_style__)
   })
   if (!module.hot.data) {
-    hotAPI.createRecord("_v-f5eb95bc", module.exports)
+    hotAPI.createRecord("_v-1c4fc57c", module.exports)
   } else {
-    hotAPI.update("_v-f5eb95bc", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+    hotAPI.update("_v-1c4fc57c", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
 },{"../../../Pagination/src/Component.vue":91,"babel-runtime/helpers/defineProperty":5,"lodash":77,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],91:[function(require,module,exports){
@@ -38647,9 +38647,9 @@ if (module.hot) {(function () {  module.hot.accept()
     document.head.removeChild(__vueify_style__)
   })
   if (!module.hot.data) {
-    hotAPI.createRecord("_v-0f74e9a8", module.exports)
+    hotAPI.createRecord("_v-5673fc70", module.exports)
   } else {
-    hotAPI.update("_v-0f74e9a8", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+    hotAPI.update("_v-5673fc70", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
 },{"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],92:[function(require,module,exports){
@@ -38921,9 +38921,9 @@ if (module.hot) {(function () {  module.hot.accept()
     document.head.removeChild(__vueify_style__)
   })
   if (!module.hot.data) {
-    hotAPI.createRecord("_v-91e28edc", module.exports)
+    hotAPI.createRecord("_v-8728de9c", module.exports)
   } else {
-    hotAPI.update("_v-91e28edc", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+    hotAPI.update("_v-8728de9c", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
 },{"../../../Pagination/src/Component.vue":91,"lodash":77,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],93:[function(require,module,exports){
@@ -39205,9 +39205,9 @@ if (module.hot) {(function () {  module.hot.accept()
     document.head.removeChild(__vueify_style__)
   })
   if (!module.hot.data) {
-    hotAPI.createRecord("_v-6b08c0a8", module.exports)
+    hotAPI.createRecord("_v-61ef40c8", module.exports)
   } else {
-    hotAPI.update("_v-6b08c0a8", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+    hotAPI.update("_v-61ef40c8", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
 },{"../../../Pagination/src/Component.vue":91,"lodash":77,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],94:[function(require,module,exports){
@@ -39450,9 +39450,9 @@ if (module.hot) {(function () {  module.hot.accept()
     document.head.removeChild(__vueify_style__)
   })
   if (!module.hot.data) {
-    hotAPI.createRecord("_v-2c902268", module.exports)
+    hotAPI.createRecord("_v-4df99288", module.exports)
   } else {
-    hotAPI.update("_v-2c902268", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+    hotAPI.update("_v-4df99288", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
 },{"../../../Pagination/src/Component.vue":91,"lodash":77,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],95:[function(require,module,exports){
@@ -39776,9 +39776,9 @@ if (module.hot) {(function () {  module.hot.accept()
     document.head.removeChild(__vueify_style__)
   })
   if (!module.hot.data) {
-    hotAPI.createRecord("_v-39dff6a8", module.exports)
+    hotAPI.createRecord("_v-aa575270", module.exports)
   } else {
-    hotAPI.update("_v-39dff6a8", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+    hotAPI.update("_v-aa575270", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
 },{"../../../Pagination/src/Component.vue":91,"lodash":77,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],96:[function(require,module,exports){
@@ -40097,9 +40097,9 @@ if (module.hot) {(function () {  module.hot.accept()
     document.head.removeChild(__vueify_style__)
   })
   if (!module.hot.data) {
-    hotAPI.createRecord("_v-4c3448f5", module.exports)
+    hotAPI.createRecord("_v-5c6d44d5", module.exports)
   } else {
-    hotAPI.update("_v-4c3448f5", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+    hotAPI.update("_v-5c6d44d5", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
 },{"../../../Pagination/src/Component.vue":91,"lodash":77,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],97:[function(require,module,exports){
@@ -40326,12 +40326,348 @@ if (module.hot) {(function () {  module.hot.accept()
     document.head.removeChild(__vueify_style__)
   })
   if (!module.hot.data) {
-    hotAPI.createRecord("_v-6436698d", module.exports)
+    hotAPI.createRecord("_v-5c3cdd6d", module.exports)
   } else {
-    hotAPI.update("_v-6436698d", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+    hotAPI.update("_v-5c3cdd6d", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
 },{"../../../Pagination/src/Component.vue":91,"lodash":77,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],98:[function(require,module,exports){
+var __vueify_insert__ = require("vueify/lib/insert-css")
+var __vueify_style__ = __vueify_insert__.insert("h1 {\r\n  color: #00a8ed;\r\n}")
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _Component = require('../../../Pagination/src/Component.vue');
+
+var _Component2 = _interopRequireDefault(_Component);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = {
+
+    name: 'show-taxation',
+
+    data: function data() {
+        return {
+            newTaxation: {
+                id: '',
+                employee_id: '',
+                place_id: '',
+                income: '',
+                type: '',
+                created_at: ''
+            },
+
+            taxations: {},
+            employees: [],
+            placesInt: [],
+            placesExt: [],
+
+            sortColumn: 'id',
+            sortInverse: 1,
+            filter: {
+                term: ''
+            },
+            columnsFiltered: [],
+            pagination: {},
+            success: false,
+            msgSucess: '',
+            typeAlert: '',
+            showRow: '',
+            all: {},
+            report_date: '',
+            auth: [],
+
+            report: {
+                day: '',
+                month: '',
+                year: ''
+            },
+
+            myDate: new Date()
+        };
+    },
+
+
+    // ---------------------------------------------------------------------------------
+
+    ready: function ready() {
+        this.fetchTaxation(this.pagination.current_Page, this.showRow);
+        this.taxationEmployee();
+        this.taxationIntPlace();
+        this.taxationExtPlace();
+        this.authUser();
+        var self = this;
+        jQuery(self.$els.taxationcols).select2({
+            placeholder: "Coluna",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt'
+        }).on('change', function () {
+            self.$set('columnsFiltered', jQuery(this).val());
+        });
+        // ---------------------------------------------------------------------------------------------------
+        jQuery(self.$els.typecreate).select2({
+            placeholder: "Tipo de Cobrança",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt'
+        }).on('change', function () {
+            self.$set('newTaxation.type', jQuery(this).val());
+        });
+
+        jQuery(self.$els.typeedit).select2({
+            placeholder: "Tipo de Cobrança",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt'
+        }).on('change', function () {
+            self.$set('newTaxation.type', jQuery(this).val());
+        });
+        // -------------------------------------------------------------------------------------------------
+        jQuery(self.$els.employeecreate).select2({
+            placeholder: "Funcionários",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt'
+        }).on('change', function () {
+            self.$set('newTaxation.employee_id', jQuery(this).val());
+        });
+
+        jQuery(self.$els.employeedit).select2({
+            placeholder: "Funcionários",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt'
+        }).on('change', function () {
+            self.$set('newTaxation.employee_id', jQuery(this).val());
+        });
+    },
+
+
+    // -----------------------------------------------------------------------------------------------
+
+    methods: {
+        alert: function alert(msg, typeAlert) {
+            var self = this;
+            this.success = true;
+            this.msgSucess = msg;
+            this.typeAlert = typeAlert;
+            setTimeout(function () {
+                self.success = false;
+            }, 5000);
+        },
+
+        clearField: function clearField() {
+            this.newTaxation = {
+                id: '',
+                employee_id: '',
+                place_id: '',
+                income: '',
+                type: ''
+            };
+        },
+
+        createTaxation: function createTaxation() {
+            var _this = this;
+
+            var taxation = this.newTaxation;
+
+            //Clear form input
+            this.clearField();
+            this.$http.post('http://localhost:8000/api/v1/taxations/', taxation).then(function (response) {
+                if (response.status == 200) {
+                    $('#modal-create-taxation').modal('hide');
+                    _this.fetchTaxation(_this.pagination.current_Page, _this.showRow);
+                    console.log('correu bem');
+                    _this.alert('Registo criado com sucesso', 'success');
+                }
+            }, function (response) {});
+        },
+
+        // --------------------------------------------------------------------------------------------
+
+        fetchTaxation: function fetchTaxation(page, row) {
+            var _this2 = this;
+
+            this.$http.get('http://localhost:8000/api/v1/allTaxations/' + row + '?page=' + page).then(function (response) {
+                _this2.$set('taxations', response.data.data);
+                _this2.$set('all', response.data.data);
+                _this2.$set('pagination', response.data);
+            }, function (response) {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+        // --------------------------------------------------------------------------------------------
+
+        getThisTaxation: function getThisTaxation(id) {
+            var _this3 = this;
+
+            this.$http.get('http://localhost:8000/api/v1/taxations/' + id).then(function (response) {
+                _this3.newTaxation.id = response.data.id;
+                _this3.newTaxation.employee_id = response.data.employee_id;
+                _this3.newTaxation.place_id = response.data.place_id;
+                _this3.newTaxation.income = response.data.income;
+                _this3.newTaxation.type = response.data.type;
+                _this3.newTaxation.created_at = response.data.created_at;
+            }, function (response) {
+                console.log('Error');
+            });
+        },
+
+        // --------------------------------------------------------------------------------------------
+
+        saveEditedTaxation: function saveEditedTaxation(id) {
+            var _this4 = this;
+
+            var taxation = this.newTaxation;
+            this.clearField();
+            this.$http.patch('http://localhost:8000/api/v1/taxations/' + id, taxation).then(function (response) {
+                if (response.status == 200) {
+                    $('#modal-edit-taxation').modal('hide');
+                    // console.log(response.data);
+                    _this4.fetchTaxation(_this4.pagination.current_Page, _this4.showRow);
+                    _this4.alert('Registo atualizado com sucesso', 'info');
+                }
+            }, function (response) {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+        // --------------------------------------------------------------------------------------------
+
+        deleteTaxation: function deleteTaxation(id) {
+            var _this5 = this;
+
+            this.$http.delete('http://localhost:8000/api/v1/taxations/' + id).then(function (response) {
+                $('#modal-delete-taxation').modal('hide');
+                if (response.status == 200) {
+                    // console.log(response.data);
+                    _this5.fetchTaxation(_this5.pagination.current_Page, _this5.showRow);
+                    _this5.alert('Estaço eliminado com sucesso', 'warning');
+                }
+            }, function (response) {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+        // -------------------------Metodo de suporte---------------------------------------------------
+        taxationIntPlace: function taxationIntPlace() {
+            var _this6 = this;
+
+            this.$http.get('http://localhost:8000/api/v1/taxationIntPlace').then(function (response) {
+                _this6.$set('placesInt', response.data);
+                // this.$set('options', response.data.name);
+                // this.options = response.data.items
+            }, function (response) {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+        authUser: function authUser() {
+            var _this7 = this;
+
+            this.$http.get('http://localhost:8000/api/v1/authUser').then(function (response) {
+                _this7.$set('auth', response.data);
+                // this.$set('options', response.data.name);
+                // this.options = response.data.items
+            }, function (response) {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+        taxationExtPlace: function taxationExtPlace() {
+            var _this8 = this;
+
+            this.$http.get('http://localhost:8000/api/v1/taxationExtPlace').then(function (response) {
+                _this8.$set('placesExt', response.data);
+                // this.$set('options', response.data.name);
+                // this.options = response.data.items
+            }, function (response) {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+        //-----------------------------------------------------------------------------------------------
+
+        taxationEmployee: function taxationEmployee() {
+            var _this9 = this;
+
+            this.$http.get('http://localhost:8000/api/v1/taxationEmployee').then(function (response) {
+                _this9.$set('employees', response.data);
+            }, function (response) {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+        // --------------------------------------------------------------------------------------------
+
+        doFilter: function doFilter() {
+            var self = this;
+            filtered = self.all;
+            if (self.filter.term != '' && self.columnsFiltered.length > 0) {
+                filtered = _.filter(self.all, function (taxation) {
+                    return self.columnsFiltered.some(function (column) {
+                        return taxation[column].toLowerCase().indexOf(self.filter.term.toLowerCase()) > -1;
+                    });
+                });
+            }
+            self.$set('taxations', filtered);
+        },
+
+        doSort: function doSort(ev, column) {
+            var self = this;
+            ev.preventDefault();
+            self.sortColumn = column;
+            if (self.sortInverse == 1) {
+                self.sortInverse = -1;
+            } else {
+                self.sortInverse = 1;
+            }
+        },
+
+        // --------------------------------------------------------------------------------------------
+
+        // Outros funções
+        navigate: function navigate(page) {
+            this.fetchTaxation(page, this.showRow);
+        }
+    },
+
+    // ---------------------------------------------------------------------------------
+
+    computed: {},
+
+    // ---------------------------------------------------------------------------------
+
+    components: {
+        'Pagination': _Component2.default
+    }
+};
+if (module.exports.__esModule) module.exports = module.exports.default
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\r\n<div  id=\"alert-message\" class=\"alert alert-{{typeAlert}}\" transition=\"success\" v-if=\"success\">\r\n\t<button type=\"button\" class=\"close\" data-dismiss=\"alert\">x</button>\r\n\t<i class=\"fa fa-thumbs-o-up text-center\">&nbsp;&nbsp; {{msgSucess}}</i>\r\n</div>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class=\"form-inline pull-right\">\r\n\t\t\t<div class=\"input-group\">\r\n\t\t\t\t<select data-toggle=\"tooltip\" title=\"A mostrar linhas na tabela\" class=\"form-control\" name=\"\" v-model=\"showRow\" @change=\"fetchTaxation(1, showRow)\">\r\n\t\t\t\t\t<option class=\"\" value=\"5\">05</option>\r\n\t\t\t\t\t<option class=\"\" value=\"10\" selected>10</option>\r\n\t\t\t\t\t<option class=\"\" value=\"20\">20</option>\r\n\t\t\t\t\t<option class=\"\" value=\"50\">50</option>\r\n\t\t\t\t\t<option class=\"\" value=\"100\">100</option>\r\n\t\t\t\t\t<option class=\"\" value=\"200\">200</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t&nbsp;&nbsp;\r\n\t\t\t<div class=\"input-group\">\r\n\t\t\t\t<select data-toggle=\"tooltip\" title=\"Escolhe as colunas a serem filtrados\" class=\"form-control\" name=\"\" v-model=\"columnsFiltered\" multiple=\"multiple\" v-el:taxationcols>\r\n\t\t\t\t\t<option class=\"\" value=\"name\"=\"\">Funcionários</option>\r\n\t\t\t\t\t<option class=\"\" value=\"description\">Espaços</option>\r\n\t\t\t\t\t<option class=\"\" value=\"price\">Valor</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t&nbsp;&nbsp;\r\n\t\t\t<div v-if=\"columnsFiltered.length != 0\" class=\"input-group\">\r\n\t\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<input data-toggle=\"tooltip\" title=\"Escreva o valor a ser procurado na Tabela\"\r\n\t\t\t\tv-model=\"filter.term\"\r\n\t\t\t\t@keyup=\"doFilter\"\r\n\t\t\t\ttype=\"text\"\r\n\t\t\t\tclass=\"form-control\"\r\n\t\t\t\tplaceholder=\"Filtrar dados da tabela\"\r\n\t\t\t\taria-describedby=\"basic-addon1\">\r\n\t\t\t</div>\r\n\r\n\t\t\t<div v-else class=\"input-group\">\r\n\t\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<input :disabled=\"columnsFiltered.length == 0\" data-toggle=\"tooltip\" title=\"Para ativar introduza um valor na Coluna\"\r\n\t\t\t\ttype=\"text\"\r\n\t\t\t\tclass=\"form-control\"\r\n\t\t\t\tplaceholder=\"Filtrar dados da tabela\"\r\n\t\t\t\taria-describedby=\"basic-addon1\">\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n<hr>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<button @click=\"clearField\" class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-taxation\"><i class=\"fa fa-plus\"></i> Novo</button>&nbsp;&nbsp;\r\n\r\n\t\t<a class=\"btn btn-primary btn-flat btn-outline\" href=\"/export/taxationsPDF\"><i class=\"fa fa-download\"></i> PDF</a>&nbsp;&nbsp;\r\n\r\n\t\t<div class=\"btn-group\">\r\n\t\t\t<button type=\"button\" class=\"btn btn-primary btn-flat btn-outline dropdown-toggle\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\"><i class=\"fa fa-eye\"></i> Ver Relatórios   <span class=\"caret\"></span></button>\r\n\t\t\t<ul class=\"dropdown-menu\">\r\n\t\t\t\t<li><a data-toggle=\"modal\" data-target=\"#modal-report-date\" href=\"#\">Relatório Diário</a></li>\r\n\t\t\t\t<li><a data-toggle=\"modal\" data-target=\"#modal-report-month\" href=\"#\">Relatório Mensal</a></li>\r\n\t\t\t\t<li><a data-toggle=\"modal\" data-target=\"#modal-report-year\" href=\"#\">Relatório Anual</a></li>\r\n\t\t\t</ul>\r\n\t\t</div>\r\n\r\n\r\n\t</div>\r\n\r\n\t<div class=\"modal fade\" id=\"modal-report-date\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t<div class=\"modal-dialog\">\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\" id=\"\"><i class=\"fa fa-calendar fa-2x\"></i></h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<div class=\"form-group\">\r\n\t\t\t\t\t\t<label for=\"\"></label>\r\n\t\t\t\t\t\t<input type=\"date\" class=\"form-control\" id=\"\" placeholder=\"\" v-model=\"report.day\">\r\n\t\t\t\t\t\t<p class=\"help-block\">Introduza data do relatório</p>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\" aria-hidden=\"true\"></i></button>\r\n\t\t\t\t\t<a v-if=\"report.day\" class=\"btn btn-primary\" href=\"/export/dateRoportInformation/{{report.day}}\"><i class=\"fa fa-list\" aria-hidden=\"true\"></i> Enviar</a>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\t<div class=\"modal fade\" id=\"modal-report-month\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t<div class=\"modal-dialog\">\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\" id=\"\"><i class=\"fa fa-calendar fa-2x\"></i></h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t<div class=\"form-group\">\r\n\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"report.month\" v-el:month>\r\n\t\t\t\t\t\t\t\t\t<option value=\"\">Mês</option>\r\n\t\t\t\t\t\t\t\t\t<option value=\"01\">Janeiro</option>\r\n\t\t\t\t\t\t\t\t\t<option value=\"02\">Fevereiro</option>\r\n\t\t\t\t\t\t\t\t\t<option value=\"03\">Março</option>\r\n\t\t\t\t\t\t\t\t\t<option value=\"04\">Abril</option>\r\n\t\t\t\t\t\t\t\t\t<option value=\"05\">Maio</option>\r\n\t\t\t\t\t\t\t\t\t<option value=\"06\">Junho</option>\r\n\t\t\t\t\t\t\t\t\t<option value=\"07\">Julho</option>\r\n\t\t\t\t\t\t\t\t\t<option value=\"08\">Agosto</option>\r\n\t\t\t\t\t\t\t\t\t<option value=\"09\">Setembro</option>\r\n\t\t\t\t\t\t\t\t\t<option value=\"10\">Outubro</option>\r\n\t\t\t\t\t\t\t\t\t<option value=\"11\">Novembro</option>\r\n\t\t\t\t\t\t\t\t\t<option value=\"12\">Desembro</option>\r\n\r\n\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<div v-if=\"report.month\" class=\"col-md-6\">\r\n\t\t\t\t\t\t\t<div class=\"form-group\">\r\n\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"report.year\" v-el:monthyear>\r\n\t\t\t\t\t\t\t\t\t<option value=\"\">Ano</option>\r\n\t\t\t\t\t\t\t\t\t<option value=\"2013\">2013</option>\r\n\t\t\t\t\t\t\t\t\t<option value=\"2014\">2014</option>\r\n\t\t\t\t\t\t\t\t\t<option value=\"2015\">2015</option>\r\n\t\t\t\t\t\t\t\t\t<option value=\"2016\">2016</option>\r\n\t\t\t\t\t\t\t\t\t<option value=\"2017\">2017</option>\r\n\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\" aria-hidden=\"true\"></i></button>\r\n\t\t\t\t\t<a v-if=\"report.year && report.month\" class=\"btn btn-primary\" href=\"/export/monthRoportInformation/{{report.month}}/{{report.year}}\"> <i class=\"fa fa-list\" aria-hidden=\"true\"></i> Enviar</a>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\t<div class=\"modal fade\" id=\"modal-report-year\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t<div class=\"modal-dialog\">\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\" id=\"\"><i class=\"fa fa-calendar fa-2x\"></i></h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t<div class=\"form-group\">\r\n\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"report.year\" v-el:year>\r\n\t\t\t\t\t\t\t\t\t<option value=\"\" selected>Ano</option>\r\n\t\t\t\t\t\t\t\t\t<option value=\"2013\">2013</option>\r\n\t\t\t\t\t\t\t\t\t<option value=\"2014\">2014</option>\r\n\t\t\t\t\t\t\t\t\t<option value=\"2015\">2015</option>\r\n\t\t\t\t\t\t\t\t\t<option value=\"2016\">2016</option>\r\n\t\t\t\t\t\t\t\t\t<option value=\"2017\">2017</option>\r\n\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\" aria-hidden=\"true\"></i></button>\r\n\t\t\t\t\t<a v-if=\"report.year\" class=\"btn btn-primary\" href=\"/export/yearRoportInformation/{{report.year}}\"><i class=\"fa fa-list\" aria-hidden=\"true\"></i> Enviar</a>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<br>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class='table-responsive'>\r\n\t\t\t<table class='table table-striped table-hover table-condensed'>\r\n\t\t\t\t<thead>\r\n\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'employee_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'employee_id' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'employee_id')\">Funcionário</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'place_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'place_id' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'place_id')\">Espaços</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'income' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'income' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'income')\">Valor ($)</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th  class=\"text-center\" colspan=\"3\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</thead>\r\n\t\t\t\t<tbody>\r\n\t\t\t\t\t<tr v-for=\"taxation in taxations | filterBy filter.term | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t\t<td v-if=\"taxation.type == 2\" v-for=\"employee in taxation.employees\">{{ employee.name }}</td>\r\n\t\t\t\t\t\t<td v-if=\"taxation.type == 1\">{{ taxation.author }}</td>\r\n\t\t\t\t\t\t<td v-for=\"place in taxation.places\">{{ place.name }}</td>\r\n\r\n\t\t\t\t\t\t<td>{{ taxation.income }}</td>\r\n\t\t\t\t\t\t<td align=center>  <a data-toggle=\"modal\" data-target=\"#modal-edit-taxation\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisTaxation(taxation.id)\" > </i></a></td>\r\n\t\t\t\t\t\t<!-- <td v-for=\"roles in auth.roles\" align=center>  <a v-if = \"roles.name == 'admin'\" data-toggle=\"modal\" data-target=\"#modal-edit-taxation\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisTaxation(taxation.id)\" > </i></a></td> -->\r\n\t\t\t\t\t\t<td align=center><a data-toggle=\"modal\" data-target=\"#modal-delete-taxation\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisTaxation(taxation.id)\"></i></a></td>\r\n\r\n\t\t\t\t\t\t<td align=center><a href=\"/export/receiptInformation/{{taxation.id}}\"><i class=\"fa fa-print text-info\"></i></a></td>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</tbody>\r\n\t\t\t</table>\r\n\t\t\t<div class=\"row\">\r\n\t\t\t\t<div v-if=\"pagination.total > showRow\" class=\"col-md-6 pull-left\">\r\n\t\t\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"col-md-6 pull-right\">\r\n\t\t\t\t\t<h6 class=\"text-right text-help\"> Mostrar de <span class=\"badge\">{{pagination.from}}</span>  a <span class=\"badge\">{{pagination.to}}</span>  no total de <span class=\"badge\">{{pagination.total}}</span></h6>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<div class=\"modal fade\" id=\"modal-delete-taxation\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\" id=\"\"><i class=\" text-danger fa fa-trash fa-2x\"></i></h4>\r\n\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<h2 class=\"text-center text-info\">Eliminar esta Cobrança</h2>\r\n\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i> Cancelar</button>\r\n\t\t\t\t\t\t<button  @keyup.enter=\"deleteTaxation(newTaxation.id)\" @click=\"deleteTaxation(newTaxation.id)\" type=\"button\" class=\"btn btn-danger\"><i class=\"fa fa-trash-o\"></i> Eliminar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-create-taxation\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Registar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-Registarfeedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select name=\"state\" class=\"form-control\" v-model=\"newTaxation.type\" v-el:typecreate>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"1\">Cobrança interno</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"2\">Cobrança Externo</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"help-block\">Selecione o tipo de espaço</span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<hr>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select :disabled = \"newTaxation.type != 2\" class=\"form-control\" v-model=\"newTaxation.employee_id\" v-el:employeecreate>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"employee in employees\" value=\"{{employee.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{employee.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span v-if=\"newTaxation.type == 2\" class=\"text-help text-warning\">Selecione o cobrador</span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span v-if=\"newTaxation.type == 1\" class=\"text-help text-success\">O cobrador será o responsável pelo Registo</span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<!-------------------------------------------------------------------------->\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select v-if=\"newTaxation.type == 2\" :disabled = \"newTaxation.type == ''\" class=\"form-control\" v-model=\"newTaxation.place_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\">Espaço</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"place in placesExt\" value=\"{{place.id}}\">{{place.name}}</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<!-------------------------------------------------------------------------->\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select v-else :disabled = \"newTaxation.type == ''\" class=\"form-control\" v-model=\"newTaxation.place_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"\">Espaço</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"place in placesInt\" value=\"{{place.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{place.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<!-------------------------------------------------------------------------->\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"help-block\">Qual é o espaço?</span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\t\t\t\t\t\t\t\t<!-- <v-select :value.sync=\"selected\" :options=\"options\"></v-select> -->\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<!-- <input class=\"form-control\" type=\"number\" name=\"income\" value=\"\" placeholder=\"Valor da cobrança\"> -->\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input :disabled = \"newTaxation.type != 2\" type=\"number\" class=\"form-control\" placeholder=\"Valor cobrado\" v-model=\"newTaxation.income\" name=\"email\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<i class=\"fa fa-usd form-control-feedback\"></i>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"text-help text-warning\" v-if=\"newTaxation.type == 2\">Introduza o valor cobrado</span>\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"text-help text-success\" v-if=\"newTaxation.type == 1\">O valor será preenchido automaticamente</span>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div v-if=\"newTaxation.type == 1\" class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t\t<button :disabled = \"newTaxation.place_id == ''\" @click=\"createTaxation\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button>\r\n\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t<div v-else class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t\t<button :disabled = \"newTaxation.income == '' || newTaxation.employee_id == ''\" @click=\"createTaxation\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-edit-taxation\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Editar Este contrato</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t\t<form action=\"#\" methods=\"patch\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-Registarfeedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select name=\"state\" class=\"form-control\" v-model=\"newTaxation.type\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"1\">Cobrança interno</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"2\">Cobrança Externo</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"help-block\">Selecione o tipo de espaço</span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<hr>\r\n\r\n\t\t\t\t\t\t\t\t<!-- <td v-if=\"taxation.type == 2\" v-for=\"employee in taxation.employees\">{{ employee.name }}</td>\r\n\t\t\t\t\t\t\t\t<td v-if=\"taxation.type == 1\">{{ taxation.author }}</td> -->\r\n\r\n\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<!------------------------------------------------------------------------->\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select v-if=\"newTaxation.type == 2\" :disabled = \"newTaxation.type != 2\" class=\"form-control\" v-model=\"newTaxation.employee_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"employee in employees\" value=\"{{employee.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{employee.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<!------------------------------------------------------------------------->\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select v-if=\"newTaxation.type == 1\" :disabled = \"newTaxation.type != 2\" class=\"form-control\" v-model=\"newTaxation.employee_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option value=\"{{newTaxation.employee_id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{newTaxation.author}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span v-if=\"newTaxation.type == 2\" class=\"text-help text-warning\">Selecione o cobrador</span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span v-if=\"newTaxation.type == 1\" class=\"text-help text-success\">O cobrador será o responsável pelo gegisto</span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t\t<!-------------------------------------------------------------------------->\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select v-if=\"newTaxation.type == 2\" :disabled = \"newTaxation.type == ''\" class=\"form-control\" v-model=\"newTaxation.place_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"place in placesExt\" value=\"{{place.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{place.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<!-------------------------------------------------------------------------->\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select v-else :disabled = \"newTaxation.type == ''\" class=\"form-control\" v-model=\"newTaxation.place_id\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"place in placesInt\" value=\"{{place.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{place.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<!-------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"help-block\">Qual é o espaço?</span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\t\t\t\t\t\t\t\t<!-- <v-select :value.sync=\"selected\" :options=\"options\"></v-select> -->\r\n\r\n\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<!-- <input class=\"form-control\" type=\"number\" name=\"income\" value=\"\" placeholder=\"Valor da cobrança\"> -->\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input :disabled = \"newTaxation.type != 2\" type=\"number\" class=\"form-control\" placeholder=\"Valor cobrado\" v-model=\"newTaxation.income\" name=\"email\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<i class=\"fa fa-usd form-control-feedback\"></i>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"text-help text-warning\" v-if=\"newTaxation.type == 2\">Introduza o valor cobrado</span>\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"text-help text-success\" v-if=\"newTaxation.type == 1\">O valor será preenchido automaticamente</span>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div v-if=\"newTaxation.type == 1\" class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t\t<button :disabled = \"newTaxation.place_id == ''\" @click=\"saveEditedTaxation(newTaxation.id)\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp;Actualizar</button>\r\n\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t<div v-else class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t\t<button :disabled = \"newTaxation.income == '' || newTaxation.employee_id == ''\" @click=\"saveEditedTaxation(newTaxation.id)\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp;Actualizar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  module.hot.dispose(function () {
+    __vueify_insert__.cache["h1 {\r\n  color: #00a8ed;\r\n}"] = false
+    document.head.removeChild(__vueify_style__)
+  })
+  if (!module.hot.data) {
+    hotAPI.createRecord("_v-43c58e4d", module.exports)
+  } else {
+    hotAPI.update("_v-43c58e4d", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+  }
+})()}
+},{"../../../Pagination/src/Component.vue":91,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],99:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1 {\n  color: #00a8ed;\n}")
 'use strict';
@@ -40583,12 +40919,12 @@ if (module.hot) {(function () {  module.hot.accept()
     document.head.removeChild(__vueify_style__)
   })
   if (!module.hot.data) {
-    hotAPI.createRecord("_v-1e3ea3b6", module.exports)
+    hotAPI.createRecord("_v-0278ba05", module.exports)
   } else {
-    hotAPI.update("_v-1e3ea3b6", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+    hotAPI.update("_v-0278ba05", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"../../../Pagination/src/Component.vue":91,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],99:[function(require,module,exports){
+},{"../../../Pagination/src/Component.vue":91,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],100:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1 {\r\n  color: #00a8ed;\r\n}")
 'use strict';
@@ -40825,12 +41161,12 @@ if (module.hot) {(function () {  module.hot.accept()
     document.head.removeChild(__vueify_style__)
   })
   if (!module.hot.data) {
-    hotAPI.createRecord("_v-29da8c4d", module.exports)
+    hotAPI.createRecord("_v-c1ff5fa6", module.exports)
   } else {
-    hotAPI.update("_v-29da8c4d", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+    hotAPI.update("_v-c1ff5fa6", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"../../../Pagination/src/Component.vue":91,"babel-runtime/helpers/defineProperty":5,"lodash":77,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],100:[function(require,module,exports){
+},{"../../../Pagination/src/Component.vue":91,"babel-runtime/helpers/defineProperty":5,"lodash":77,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],101:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1 {\n  color: #00a8ed;\n}")
 'use strict';
@@ -41067,12 +41403,12 @@ if (module.hot) {(function () {  module.hot.accept()
     document.head.removeChild(__vueify_style__)
   })
   if (!module.hot.data) {
-    hotAPI.createRecord("_v-d78388f2", module.exports)
+    hotAPI.createRecord("_v-3a7c6767", module.exports)
   } else {
-    hotAPI.update("_v-d78388f2", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+    hotAPI.update("_v-3a7c6767", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"../../../Pagination/src/Component.vue":91,"babel-runtime/helpers/defineProperty":5,"lodash":77,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],101:[function(require,module,exports){
+},{"../../../Pagination/src/Component.vue":91,"babel-runtime/helpers/defineProperty":5,"lodash":77,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],102:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1 {\r\n  color: #00a8ed;\r\n}")
 'use strict';
@@ -41195,12 +41531,12 @@ if (module.hot) {(function () {  module.hot.accept()
     document.head.removeChild(__vueify_style__)
   })
   if (!module.hot.data) {
-    hotAPI.createRecord("_v-17227769", module.exports)
+    hotAPI.createRecord("_v-0e08f789", module.exports)
   } else {
-    hotAPI.update("_v-17227769", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+    hotAPI.update("_v-0e08f789", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"babel-runtime/core-js/object/keys":2,"babel-runtime/helpers/typeof":6,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],102:[function(require,module,exports){
+},{"babel-runtime/core-js/object/keys":2,"babel-runtime/helpers/typeof":6,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],103:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1 {\n  color: #00a8ed;\n}")
 'use strict';
@@ -41732,12 +42068,12 @@ if (module.hot) {(function () {  module.hot.accept()
     document.head.removeChild(__vueify_style__)
   })
   if (!module.hot.data) {
-    hotAPI.createRecord("_v-d312f7aa", module.exports)
+    hotAPI.createRecord("_v-b2a0ffea", module.exports)
   } else {
-    hotAPI.update("_v-d312f7aa", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+    hotAPI.update("_v-b2a0ffea", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"../../../Pagination/src/Component.vue":91,"babel-runtime/core-js/object/keys":2,"lodash":77,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],103:[function(require,module,exports){
+},{"../../../Pagination/src/Component.vue":91,"babel-runtime/core-js/object/keys":2,"lodash":77,"vue":83,"vue-hot-reload-api":80,"vueify/lib/insert-css":84}],104:[function(require,module,exports){
 'use strict';
 
 var Vue = require('vue');
@@ -41794,7 +42130,7 @@ new Vue({
         //------------------------------Contract-----------------------------------
         // 'show-contract': require('./components/Contracts/ShowContracts'),
         //------------------------------Taxation-----------------------------------
-        // 'show-taxation': require('./components/Taxations/ShowTaxations'),
+        'show-taxation': require('./components/Taxations/ShowTaxations'),
         //------------------------------Promotion-----------------------------------
         'show-promotion': require('./components/Promotions/ShowPromotion'),
         // ------------------------------place-----------------------------------
@@ -41812,6 +42148,6 @@ new Vue({
     }
 });
 
-},{"./components/Articles/ShowArticles":85,"./components/Categories/ShowCategories":86,"./components/Controls/ShowControls":87,"./components/Employees/ShowEmployees":88,"./components/Markets/ShowMarket":89,"./components/Materials/ShowMaterial":90,"./components/Permissions/showPermission":92,"./components/Places/ShowPlace":93,"./components/Products/ShowProduct":94,"./components/Promotions/ShowPromotion":95,"./components/Roles/showRoles":96,"./components/Tags/ShowTags":97,"./components/Traders/ShowTraders":98,"./components/Typeofemployee/ShowTypeofemployee":99,"./components/Typeofplace/ShowTypeofplace":100,"./components/Users/CreateUser":101,"./components/Users/ShowUsers":102,"moment":78,"vue":83,"vue-resource":81,"vue-validator":82}]},{},[103]);
+},{"./components/Articles/ShowArticles":85,"./components/Categories/ShowCategories":86,"./components/Controls/ShowControls":87,"./components/Employees/ShowEmployees":88,"./components/Markets/ShowMarket":89,"./components/Materials/ShowMaterial":90,"./components/Permissions/showPermission":92,"./components/Places/ShowPlace":93,"./components/Products/ShowProduct":94,"./components/Promotions/ShowPromotion":95,"./components/Roles/showRoles":96,"./components/Tags/ShowTags":97,"./components/Taxations/ShowTaxations":98,"./components/Traders/ShowTraders":99,"./components/Typeofemployee/ShowTypeofemployee":100,"./components/Typeofplace/ShowTypeofplace":101,"./components/Users/CreateUser":102,"./components/Users/ShowUsers":103,"moment":78,"vue":83,"vue-resource":81,"vue-validator":82}]},{},[104]);
 
 //# sourceMappingURL=main.js.map

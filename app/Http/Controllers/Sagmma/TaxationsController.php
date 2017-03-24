@@ -19,16 +19,23 @@ class TaxationsController extends Controller
 {
     public function index()
     {
-        // $data = Taxation::select('employee_place.employee_id', DB::raw('sum(employee_place.income) as aggregate'))->groupBy(DB::raw('employee_place.employee_id'))->get(); //must alias the aggregate column as aggregate
-        //
-        // $chart = Charts::database($data)->preaggregated(true)->lastByDay(7, false);
-        $chart = Charts::database(Taxation::all(), 'pie', 'fusioncharts')->dateColumn('created_at')
-        ->elementLabel("Total")
-        ->dimensions(0, 300)
-        ->responsive(false)
-        ->groupBy('employee_id');
+        $chart = Charts::database(Taxation::all()->where('type', '1'), 'line', 'highcharts')
+        ->dateColumn('created_at')
+        ->dimensions(0, 400)
+        ->aggregateColumn('income', 'sum')
+        ->groupByMonth('2017', true)
+        ->elementLabel("Total de Cobrança por dia")
+        ->title('Cobranças Internos');
 
-        return view('_backend.taxations.show', ['chart' => $chart]);
+        $chart1 = Charts::database(Taxation::all()->where('type', '2'), 'bar', 'highcharts')
+        ->dateColumn('created_at')
+        ->dimensions(0, 400)
+        ->aggregateColumn('income', 'sum')
+        ->lastByDay(7, true)
+        ->elementLabel("Total de Cobrança por dia")
+        ->title('Cobranças Externos');
+
+        return view('_backend.taxations.show', ['chart' => $chart, 'chart1' => $chart1]);
     }
 
     public function create()
