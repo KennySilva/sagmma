@@ -1,4 +1,6 @@
 import Pagination from '../../../Pagination/src/Component.vue'
+import { _ } from 'lodash'
+
 export default{
 
     name: 'show-contract',
@@ -27,18 +29,75 @@ export default{
             filter: {
                 term: ''
             },
+            columnsFiltered: [],
             pagination: {},
             success: false,
+            msgSucess: '',
+            typeAlert: '',
+            showRow: '',
+            all: {},
+            auth: [],
         }
     },
 
     // ---------------------------------------------------------------------------------
 
     ready () {
-        this.fetchContract(1);
+        this.fetchContract(this.pagination.current_Page, this.showRow);
         this.contractPlace();
         this.contractTrader();
         // this.getTraders();
+        var self = this
+        jQuery(self.$els.contractcols).select2({
+            placeholder: "Coluna",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('columnsFiltered', jQuery(this).val());
+        });
+        // -------------------------------------------------------------------------------
+
+        jQuery(self.$els.placecreate).select2({
+            placeholder: "Espaço",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('newContract.place_id', jQuery(this).val());
+        });
+
+        jQuery(self.$els.placeedit).select2({
+            placeholder: "Espaço",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('newContract.place_id', jQuery(this).val());
+        });
+        // -------------------------------------------------------------------------------
+        jQuery(self.$els.tradercreate).select2({
+            placeholder: "Comerciante",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('newContract.trader_id', jQuery(this).val());
+        });
+        jQuery(self.$els.traderedit).select2({
+            placeholder: "Comerciante",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('newContract.trader_id', jQuery(this).val());
+        });
+        //
     },
 
     // ---------------------------------------------------------------------------------
@@ -49,6 +108,17 @@ export default{
         //     // this.options = this.traders.name;
         //     this.options.push(this.traders.name);
         // },
+
+        alert: function(msg, typeAlert) {
+            var self = this;
+            this.success = true;
+            this.msgSucess = msg;
+            this.typeAlert = typeAlert;
+            setTimeout(function() {
+                self.success = false;
+            }, 5000);
+        },
+
 
         clearField: function(){
             this.newContract = {
@@ -71,30 +141,24 @@ export default{
             this.$http.post('http://localhost:8000/api/v1/contracts/', contract).then((response) => {
                 if (response.status == 200) {
                     $('#modal-create-contract').modal('hide');
-                    this.fetchContract();
+                    this.fetchContract(this.pagination.current_Page, this.showRow);
                     console.log('correu bem');
-                    var self = this;
-                    this.success = true;
-                    setTimeout(function() {
-                        self.success = false;
-                    }, 5000);
+                    this.alert('Registo criado com sucesso', 'success');
                 }
             }, (response) => {
-
             });
         },
 
         // --------------------------------------------------------------------------------------------
-
-        fetchContract: function(page) {
-            this.$http.get('http://localhost:8000/api/v1/contracts?page='+page).then((response) => {
+        fetchContract: function(page, row) {
+            this.$http.get('http://localhost:8000/api/v1/allContracts/'+row+'?page='+page).then((response) => {
                 this.$set('contracts', response.data.data)
+                this.$set('all', response.data.data)
                 this.$set('pagination', response.data)
             }, (response) => {
                 console.log("Ocorreu um erro na operação")
             });
         },
-
         // --------------------------------------------------------------------------------------------
 
         getThisContract: function(id){
@@ -118,7 +182,8 @@ export default{
                 if (response.status == 200) {
                     $('#modal-edit-contract').modal('hide');
                     // console.log(response.data);
-                    this.fetchContract();
+                    this.fetchContract(this.pagination.current_Page, this.showRow);
+                    this.alert('Registo atualizado com sucesso', 'info');
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -132,7 +197,9 @@ export default{
                 $('#modal-delete-contract').modal('hide');
                 if (response.status == 200) {
                     // console.log(response.data);
-                    this.fetchContract();
+                    this.fetchContract(this.pagination.current_Page, this.showRow);
+                    this.alert('Estaço eliminado com sucesso', 'warning');
+
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -158,6 +225,19 @@ export default{
             });
         },
         // --------------------------------------------------------------------------------------------
+
+        doFilter: function() {
+        var self = this
+        filtered = self.all
+        if (self.filter.term != '' && self.columnsFiltered.length > 0) {
+            filtered = _.filter(self.all, function(contract) {
+                return self.columnsFiltered.some(function(column) {
+                    return contract[column].toLowerCase().indexOf(self.filter.term.toLowerCase()) > -1
+                })
+            })
+        }
+        self.$set('contracts', filtered)
+    },
 
         doSort: function(ev, column) {
             var self = this;
@@ -186,7 +266,7 @@ export default{
 
         // Outros funções
         navigate (page) {
-            this.fetchContract(page);
+            this.fetchContract(page, this.showRow);
         },
 
 

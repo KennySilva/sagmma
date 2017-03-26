@@ -19,6 +19,7 @@ class PermissionsController extends Controller
     }
 
 
+
     public function store(Request $request)
     {
         //

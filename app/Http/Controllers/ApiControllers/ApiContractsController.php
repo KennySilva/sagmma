@@ -34,20 +34,13 @@ class ApiContractsController extends Controller
 
     public function store(ContractsRequest $request)
     {
+
         $contract            = new Contract($request->all());
-
-        // $date = date('Y-m-d');
-        // $end = $request->ending_date;
-        // if ($date > $end) {
-        //     $contract->status    = false;
-        // }else {
-        //     $contract->status    = true;
-        // }
-
+        $place = Place::where('id', '=', $request->place_id)->first();
         $contract->place_id    = $request->place_id;
         $contract->trader_id   = $request->trader_id;
         $contract->status      = true;
-        $contract->rate        = $request->rate;
+        $contract->rate        = $place->price;
         $contract->author      = Auth::user()->name;
         $contract->ending_date = $request->ending_date;
         $contract->save();
@@ -82,28 +75,12 @@ class ApiContractsController extends Controller
     //Metodos de auxilio
     public function getPlaceForContract()
     {
-        // $place = Place::where('status', '=', 1)->where('typeofplace_id', '<', 7)->get();
-        $place = Place::all();
+        $place = Place::where('typeofplace_id','<', 7)->where(function ($query) {$query->whereDoesntHave('traders');})->get();
         return $place;
     }
     public function getTraderForContract()
     {
-        $trader = Trader::all();
-
-        // $trader->each(function($trader){
-        //     $trader->places;
-        // });
-        //
-        // foreach ($trader as $tra) {
-        //     $test = $tra->name;
-        // }
-        // return $test;
-
-
-
-        // foreach ($traderWithcontract->trader_id as $trader) {
-        //     $trader = Trader::where('id', '=', $trader)->get();
-        // }
+        $trader = Trader::whereDoesntHave('places')->get();
         return $trader;
     }
 
