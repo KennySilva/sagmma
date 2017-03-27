@@ -3,6 +3,10 @@
 	<i class="fa fa-thumbs-o-up text-center">&nbsp;&nbsp; {{msgSucess}}</i>
 </div>
 
+<pre>
+	{{$data.errors | json}}
+</pre>
+
 <div class="row">
 	<div class="col-md-12">
 		<div class="form-inline pull-right">
@@ -19,8 +23,8 @@
 			&nbsp;&nbsp;
 			<div class="input-group">
 				<select data-toggle="tooltip" title="Escolhe as colunas a serem filtrados" class="form-control" name="" v-model="columnsFiltered" multiple="multiple" v-el:contractcols>
-					<option class="" value="place_id">Espaço</option>
-					<option class="" value="trader_id">Comerciante</option>
+					<option class="" value="av">Espaço</option>
+					<option class="" value="av">Comerciante</option>
 				</select>
 			</div>
 			&nbsp;&nbsp;
@@ -90,7 +94,7 @@
 						<td v-for="trader in contract.traders">{{ trader.name }}</td>
 						<!------------------------------------------------------------------------------------------>
 						<td>
-							<button type="submit" @click = "statusContractsChange(contract.id)" class="btn btn-xs" :class="{ 'btn-info': contract.status, 'btn-danger': !contract.status }">{{contract.status ? 'Ativado' : 'Desativado'}}</button>
+							<button type="submit" @click = "statusContractsChange(contract.id)" class="btn btn-xs" :class="{ 'btn-info': contract.status, 'btn-danger': !contract.status }">{{contract.status ? 'Normalizado' : 'Pendente'}}</button>
 						</td>
 						<!------------------------------------------------------------------------------------------>
 						<td align=center>  <a data-toggle="modal" data-target="#modal-edit-contract" href="#"> <i class="fa fa-pencil text-primary" @click="getThisContract(contract.id)" > </i></a></td>
@@ -147,7 +151,6 @@
 						<h4 class="modal-title">Registar</h4>
 					</div>
 					<div class="modal-body">
-						<validator name="validationew">
 							<form action="#" methods="POST">
 								<div class="row">
 									<div class="col-md-12">
@@ -193,12 +196,11 @@
 									</div>
 								</div>
 							</form>
-						</validator>
 					</div>
 					<div class="modal-footer">
 						<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
 
-						<button :disabled = "!$validationew.valid" @click="createContract" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
+						<button @click="createContract" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
 					</div>
 				</div>
 			</div>
@@ -216,7 +218,7 @@
 						<h4 class="modal-title">Editar Este contrato</h4>
 					</div>
 					<div class="modal-body">
-						<validator name="validationew">
+
 							<form action="#" methods="patch">
 								<div class="row">
 									<div class="col-md-12">
@@ -264,7 +266,6 @@
 									</div>
 								</div>
 							</form>
-						</validator>
 					</div>
 					<div class="modal-footer">
 						<div class="row">

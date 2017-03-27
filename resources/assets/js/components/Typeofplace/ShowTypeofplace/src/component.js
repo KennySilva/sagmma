@@ -26,6 +26,7 @@ export default{
             typeAlert: '',
             showRow: '',
             all: {},
+            errors: [],
 
         }
     },
@@ -75,18 +76,20 @@ export default{
             var typeofplace = this.newTypeofplace;
 
             //Clear form input
-            this.clearField();
 
             this.$http.post('http://localhost:8000/api/v1/typeofplaces/', typeofplace).then((response) => {
                 if (response.status == 200) {
+                    this.clearField();
                     console.log('chegando aqui');
                     $('#modal-create-typeofplace').modal('hide');
-                    // console.log(response.data);
                     this.fetchTypeofplace(this.pagination.current_Page, this.showRow);
                     this.alert('Tipo de Funcionário Criado com sucesso', 'success');
+                    this.$set('errors', '');
 
                 }
             }, (response) => {
+                console.log(response.data.name);
+                this.$set('errors', response.data)
 
             });
         },
@@ -121,17 +124,19 @@ export default{
 
         saveEditedTypeofplace: function(id) {
             var typeofplace = this.newTypeofplace;
-            this.clearField();
             this.$http.patch('http://localhost:8000/api/v1/typeofplaces/'+ id, typeofplace).then((response) => {
                 if (response.status == 200) {
+                    this.clearField();
                     $('#modal-edit-typeofplace').modal('hide');
                     // console.log(response.data);
-                    this.fetchTypeofplace();
+                    this.fetchTypeofplace(this.pagination.current_Page, this.showRow);
                     this.alert('Tipo de Funcionário atualizado com sucesso', 'info');
+                    this.$set('errors', '');
 
                 }
             }, (response) => {
-                console.log("Ocorreu um erro na operação");
+                var self = this
+                self.$set('errors', response.data)
             });
         },
 
@@ -194,7 +199,7 @@ export default{
     },
 
     // ---------------------------------------------------------------------------------
-    
+
     computed: {
     },
 

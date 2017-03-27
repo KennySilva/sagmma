@@ -21,12 +21,12 @@ class Place extends Model
     //Relacionamentos;
     public function taxation()
     {
-        return $this->belongsTo(Taxaton::class, 'place_id', 'id');
+        return $this->belongsTo(Taxaton::class, 'id', 'place_id');
     }
 
     public function contract()
     {
-        return $this->belongsTo(Contract::class, 'place_id', 'id');
+        return $this->belongsTo(Contract::class, 'id', 'place_id');
     }
 
     public function typeofplace()

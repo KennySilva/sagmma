@@ -15,10 +15,17 @@ use Input;
 
 class ApiPlacesController extends Controller
 {
+    public function __construct()
+    {
+        $this->placeStatusChange();
+    }
+
+
     public function index($row)
     {
         $place = Place::paginate($row);
         $place->each(function($place){
+            $place->contract;
             $place->typeofplace;
         });
         return $place;
@@ -71,20 +78,40 @@ class ApiPlacesController extends Controller
             return $typeofplace;
         }
 
-        public function placeStatus(Request $request)
+        // public function placeStatus(Request $request)
+        // {
+        //     $id  = $request->id;
+        //     $place = Place::find($id);
+        //     if ($place->status == true) {
+        //         $place->status = false;
+        //     }else {
+        //         $place->status = true;
+        //     }
+        //     $place->save();
+        //     return response($place, 200);
+        // }
+
+        public function placeStatusChange()
         {
-            $id  = $request->id;
-            $place = Place::find($id);
-            if ($place->status == true) {
-                $place->status = false;
-            }else {
-                $place->status = true;
+            $places = Place::has('traders')->get();
+            foreach ($places as $place) {
+                $place->status = 1;
+                $place->save();
             }
-            $place->save();
-            return response($place, 200);
+
+            $places2 = Place::whereDoesntHave('traders')->get();
+            foreach ($places2 as $place2) {
+                $place2->status = 0;
+                $place2->save();
+            }
+
+
         }
 
-        // $user = User::has('roles')->where('name', '!=', 'admin')->paginate(10);
-        //         // $user = User::with('roles')->paginate(10);
-        //         // $user = User::with('roles')->whereName('super-admins')->paginate(10);
-    }
+
+
+
+    // $user = User::has('roles')->where('name', '!=', 'admin')->paginate(10);
+    //         // $user = User::with('roles')->paginate(10);
+    //         // $user = User::with('roles')->whereName('super-admins')->paginate(10);
+}

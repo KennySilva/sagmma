@@ -4,6 +4,8 @@
 	<i class="fa fa-thumbs-o-up text-center">&nbsp;&nbsp; {{msgSucess}}</i>
 </div>
 
+<pre>{{$data.errors | json}}</pre>
+
 <div class="row">
 	<div class="col-md-12">
 		<div class="form-inline pull-right">
@@ -125,38 +127,37 @@
 						<h4 class="modal-title">Registar</h4>
 					</div>
 					<div class="modal-body">
-						<validator name="validationew">
-							<form action="#" methods="POST">
-								<div class="row">
+						<form action="#" methods="POST">
+							<div class="row">
+								<div class="col-md-12">
 									<div class="col-md-12">
-										<div class="col-md-12">
-											<div class="form-group has-feedback">
-												<input type="text" class="form-control" name="name" placeholder="Nome do  typeofplace" v-model="newTypeofplace.name" v-validate:name="['required']"/>
-												<span class="fa fa-circle form-control-feedback"></span>
-												<p style="color:red;" v-if="$validationew.name.required && $validationew.name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
-											</div>
+										<div class="form-group{{ errors.name ? ' has-error' : '' }} has-feedback">
+											<input type="text" class="form-control" name="name" placeholder="Nome do  typeofplace" v-model="newTypeofplace.name"/>
+											<span class="fa fa-circle form-control-feedback"></span>
+											<p v-if="errors.name" class="text-danger text-help">!! {{errors.name }}</p>
 										</div>
 									</div>
 								</div>
+							</div>
 
-								<hr><!---------------------------------------------------------------------------------------------------------------->
+							<hr><!---------------------------------------------------------------------------------------------------------------->
 
-								<div class="row">
+							<div class="row">
+								<div class="col-md-12">
 									<div class="col-md-12">
-										<div class="col-md-12">
-											<div class="form-group has-feedback">
-												<textarea name="description" placeholder="Descrição deste Mescado" class="form-control" rows="5" cols="40" id="description" v-model="newTypeofplace.description"></textarea>
-											</div>
+										<div class="form-group{{ errors.description ? ' has-error' : '' }} has-feedback">
+											<textarea name="description" placeholder="Descrição deste Mescado" class="form-control" rows="5" cols="40" id="description" v-model="newTypeofplace.description"></textarea>
+											<p v-if="errors.description" class="text-danger text-help">{{errors.description }}</p>
 										</div>
 									</div>
 								</div>
-							</form>
-						</validator>
+							</div>
+						</form>
 					</div>
 					<div class="modal-footer">
 						<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
 
-						<button :disabled = "!$validationew.valid" @click="createTypeofplace" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp; Guardar</button>
+						<button @click="createTypeofplace" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp; Guardar</button>
 					</div>
 				</div>
 			</div>
@@ -179,10 +180,10 @@
 								<div class="row">
 									<div class="col-md-12">
 										<div class="col-md-12">
-											<div class="form-group has-feedback">
-												<input type="text" class="form-control" name="name" v-model="newTypeofplace.name" v-validate:name="['required']"/>
+											<div class="form-group{{ errors.name ? ' has-error' : '' }} has-feedback">
+												<input type="text" class="form-control" name="name" placeholder="Nome do typeofplace" v-model="newTypeofplace.name"/>
 												<span class="fa fa-circle form-control-feedback"></span>
-												<p style="color:red;" v-if="$validation1.name.required && $validation1.name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
+												<p v-if="errors.name" class="text-danger text-help">{{errors.name }}</p>
 											</div>
 										</div>
 									</div>
@@ -193,8 +194,9 @@
 								<div class="row">
 									<div class="col-md-12">
 										<div class="col-md-12">
-											<div class="form-group has-feedback">
+											<div class="form-group{{ errors.description ? ' has-error' : '' }} has-feedback">
 												<textarea name="description" placeholder="Descrição deste Mescado" class="form-control" rows="5" cols="40" id="description" v-model="newTypeofplace.description"></textarea>
+												<p v-if="errors.description" class="text-danger text-help">{{errors.description }}</p>
 											</div>
 										</div>
 									</div>

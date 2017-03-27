@@ -37,6 +37,7 @@ export default{
             showRow: '',
             all: {},
             auth: [],
+            errors: [],
         }
     },
 
@@ -44,8 +45,7 @@ export default{
 
     ready () {
         this.fetchContract(this.pagination.current_Page, this.showRow);
-        this.contractPlace();
-        this.contractTrader();
+
         // this.getTraders();
         var self = this
         jQuery(self.$els.contractcols).select2({
@@ -144,13 +144,17 @@ export default{
                     this.fetchContract(this.pagination.current_Page, this.showRow);
                     console.log('correu bem');
                     this.alert('Registo criado com sucesso', 'success');
+                    this.$set('errors', '')
                 }
             }, (response) => {
+                this.$set('errors', response.data)
             });
         },
 
         // --------------------------------------------------------------------------------------------
         fetchContract: function(page, row) {
+            this.contractPlace();
+            this.contractTrader();
             this.$http.get('http://localhost:8000/api/v1/allContracts/'+row+'?page='+page).then((response) => {
                 this.$set('contracts', response.data.data)
                 this.$set('all', response.data.data)
@@ -227,17 +231,18 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         doFilter: function() {
-        var self = this
-        filtered = self.all
-        if (self.filter.term != '' && self.columnsFiltered.length > 0) {
-            filtered = _.filter(self.all, function(contract) {
-                return self.columnsFiltered.some(function(column) {
-                    return contract[column].toLowerCase().indexOf(self.filter.term.toLowerCase()) > -1
+
+            var self = this
+            filtered = self.all
+            if (self.filter.term != '' && self.columnsFiltered.length > 0) {
+                filtered = _.filter(self.all, function(contract) {
+                    return self.columnsFiltered.some(function(column) {
+                        return contract[column].toLowerCase().indexOf(self.filter.term.toLowerCase()) > -1
+                    })
                 })
-            })
-        }
-        self.$set('contracts', filtered)
-    },
+            }
+            self.$set('contracts', filtered)
+        },
 
         doSort: function(ev, column) {
             var self = this;
@@ -275,6 +280,7 @@ export default{
     // ---------------------------------------------------------------------------------
 
     computed: {
+
     },
 
     // ---------------------------------------------------------------------------------

@@ -1,7 +1,6 @@
 <?php
 
 namespace Sagmma\Http\Controllers\ApiControllers;
-
 use Illuminate\Http\Request;
 
 use Request as Req;
@@ -11,6 +10,8 @@ use Sagmma\Http\Requests\SagmmaRequests\TypeofplacesRequest;
 use Typeofplace;
 use Response;
 use Input;
+use Validator;
+use Illuminate\Validation\Rule;
 
 class ApiTypeofplacesController extends Controller
 {
@@ -24,10 +25,19 @@ class ApiTypeofplacesController extends Controller
 
         public function store(TypeofplacesRequest $request)
         {
+            // -----------------------------------------------------------------------------
             $typeofplace              = new Typeofplace($request->all());
             $typeofplace->name        = $request->name;
             $typeofplace->description = $request->description;
             $typeofplace->save();
+            // -----------------------------------------------------------------------------
+            if($typeofplace)
+            {
+                return Response::json(['status'=>'success', 'message'=>'Save successful'], 200);
+            }
+            return Response::json(['status'=>'error', 'message'=>$request->messages()]);
+            // -----------------------------------------------------------------------------
+
         }
 
 
@@ -42,11 +52,38 @@ class ApiTypeofplacesController extends Controller
             //
         }
 
-        public function update(Req $request, $id)
+        public function update(TypeofplacesRequest $request, $id)
         {
-            Typeofplace::findOrFail($id)->update($request::all());
-            return Response::json($request::all());
 
+
+            // -----------------------------------------------------------------------------
+            $validation = Validator::make(Input::all(),
+            [
+                'name' => 'min:4|max:45|required|string|unique:typeofplaces,name,'.$id,
+                // 'name' =>  ['required', 'max:54', 'min:4', 'unique:typeofplaces,name,'.$id, 'Regex:^\(\d{3}\)-\d{4}-\d{4}$'],
+                // 'name' =>  ['required', 'max:54', 'min:4', 'unique:typeofplaces,name,'.$id, 'Regex: /^\d{4}-\d{4}$/'], keli sta certo
+
+                'description' => 'min:4|max:250|string'
+            ]);
+            // -----------------------------------------------------------------------------
+            if($validation->fails()) {
+                return Response::json(['status'=>'error', 'message'=>$validation->messages()]);
+            } else {
+                $id          = Input::get('id');
+                $name        = Input::get('name');
+                $description = Input::get('description');
+                // ---------------------------------------------------------
+                $typeofplace = new Typeofplace();
+                // ---------------------------------------------------------
+                $typeofplace->where('id', $id)->update(array(
+                    'name'              => $name,
+                    'description'       => $description
+                ));
+                // ---------------------------------------------------------------------------
+                return Response::json(['status'=>'success', 'message'=>'Save successful'], 200);
+                // ---------------------------------------------------------------------------
+            }
+            // -----------------------------------------------------------------------------
         }
 
         public function destroy($id)

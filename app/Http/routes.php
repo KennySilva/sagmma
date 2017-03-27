@@ -157,7 +157,7 @@ Route::group(['namespace' => 'ApiControllers'], function()
             Route::get('allPlaces/{row}', 'ApiPlacesController@index');
 
             Route::get('placeType', 'ApiPlacesController@getTypeForPlace');
-            Route::post('placeStatus', 'ApiPlacesController@placeStatus');
+            Route::get('placeStatus', 'ApiPlacesController@placeStatusChange');
 
             // ----------------------------------------Api-promotions----------------------------------
             Route::resource('promotions', 'ApiPromotionsController');

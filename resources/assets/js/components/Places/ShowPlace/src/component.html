@@ -20,7 +20,7 @@
 			&nbsp;&nbsp;
 			<div class="input-group">
 				<select data-toggle="tooltip" title="Escolhe as colunas a serem filtrados" class="form-control" name="" v-model="columnsFiltered" multiple="multiple" v-el:placecols>
-					<option class="" value="name"="">Nome</option>
+					<option class="" value="name">Nome</option>
 					<option class="" value="description">Estado</option>
 					<option class="" value="price">Valor</option>
 				</select>
@@ -91,12 +91,17 @@
 						<td><a href="#" data-toggle="modal" data-target="#show-place" @click="getThisPlace(place.id)">{{ place.name }}</a></td>
 						<td class="info" v-if="showColumn.price">{{ place.price }} ECV</td>
 						<td>
-							<button type="submit" @click = "placeStatus(place.id)" class='btn btn-xs btn-flat' :class="{ 'btn-info': place.status, 'btn-danger': !place.status }">{{place.status ? 'Ocupado' : 'Livre'}}</button>
+							<span :class="{ 'label-info': place.status, 'label-danger': !place.status }" class="label">{{place.status ? 'Ocupado' : 'Livre'}}</span>
 						</td>
 						<td class="info" v-if="showColumn.typeofplace_id">{{ place.typeofplace.name }}</td>
 
 						<td align=left>  <a data-toggle="modal" data-target="#modal-edit-place" href="#"> <i class="fa fa-pencil text-primary" @click="getThisPlace(place.id)" > </i></a></td>
-						<td align=right><a data-toggle="modal" data-target="#modal-delete-place" href="#"><i class="fa fa-trash text-danger" @click="getThisPlace(place.id)" ></i></a></td>
+						<!---------------------------------------------------------------------------->
+						<td v-if="place.contract == null" align=right><a data-toggle="modal" data-target="#modal-delete-place" href="#"><i class="fa fa-trash text-danger" @click="getThisPlace(place.id)" ></i></a></td>
+
+						<td v-if="place.contract != null" align=right><a data-toggle="modal" data-target="#modal-undeleted-place" href="#"><i class="fa fa-trash text-warning" @click="getThisPlace(place.id)" ></i></a></td>
+						<!---------------------------------------------------------------------------->
+
 					</tr>
 				</tbody>
 			</table>
@@ -205,6 +210,26 @@
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
 					<button  @keyup.enter="deletePlace(newPlace.id)" @click="deletePlace(newPlace.id)" type="button" class="btn btn-danger">Eliminar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="modal-undeleted-place" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="">Eliminar</h4>
+				</div>
+				<div class="modal-body">
+					<h4 class="text-center"><span class="text-uppercase text-success">{{newPlace.name}}</span> não pode ser apagodo enquanto pertence a um comenrciante</h4>
+					<span class="text-help text-center text-danger">Verefique o contrato</span>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-check text-success"></i></button>
+
+					<a class="btn btn-primary" href="contracts">Verificar Contratos</a>
 				</div>
 			</div>
 		</div>

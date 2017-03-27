@@ -196,20 +196,20 @@ export default{
                 console.log("Ocorreu um erro na operação");
             });
         },
-
-        placeStatus: function(placeStatus) {
-            var postData = {id: placeStatus};
-
-            this.$http.post('http://localhost:8000/api/v1/placeStatus/', postData).then((response) => {
-                console.log(response.status);
-                console.log(response.data);
-                if (response.status == 200) {
-                    this.fetchPlace(this.pagination.current_Page, this.showRow);
-                }
-            }, (response) => {
-                console.log("Ocorreu um erro na operação");
-            });
-        },
+        //
+        // placeStatus: function(placeStatus) {
+        //     var postData = {id: placeStatus};
+        //
+        //     this.$http.post('http://localhost:8000/api/v1/placeStatus/', postData).then((response) => {
+        //         console.log(response.status);
+        //         console.log(response.data);
+        //         if (response.status == 200) {
+        //             this.fetchPlace(this.pagination.current_Page, this.showRow);
+        //         }
+        //     }, (response) => {
+        //         console.log("Ocorreu um erro na operação");
+        //     });
+        // },
 
         // -------------------------Metodo de suporte---------------------------------------------------
         doFilter: function() {
