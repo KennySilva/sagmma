@@ -1,5 +1,6 @@
 import Pagination from '../../../Pagination/src/Component.vue'
 import { _ } from 'lodash'
+import myDatepicker from 'vue-datepicker/vue-datepicker-1.vue'
 
 export default{
 
@@ -38,6 +39,46 @@ export default{
             all: {},
             auth: [],
             errors: [],
+            // Vue-Datepicker
+            option: {
+                type: 'day',
+                week: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom'],
+                month: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+                format: 'YYYY-MM-DD',
+                placeholder: 'Data de expiração do Contrato',
+                inputStyle: {
+                    'display': 'inline-block',
+                    'padding': '6px',
+                    'line-height': '20px',
+                    'font-size': '14px',
+                    'border': '1px solid #d2d6de',
+                    'border-radius': '0px',
+                    'color': '#5F5F5F',
+                    'min-width': '100%',
+                    'width': 'auto'
+                },
+                color: {
+                    header: '#228074',
+                    headerText: '#ffffff'
+                },
+                buttons: {
+                    cancel: 'Cancelar',
+                    ok: 'Escolher',
+                },
+                overlayOpacity: 0.5, // 0.5 as default
+                dismissible: true // as true as default
+            },
+
+            limit: [{
+                type: 'weekday',
+                available: [1, 2, 3, 4, 5, 6]
+            },
+            {
+                type: 'fromto',
+                from: '2017-02-01',
+                // to: '2016-02-20'
+            }],
+            
         }
     },
 
@@ -131,7 +172,7 @@ export default{
                 ending_date : '',
             };
         },
-        
+
         createContract: function() {
             var contract = this.newContract;
 
@@ -288,6 +329,7 @@ export default{
     // ---------------------------------------------------------------------------------
 
     components: {
-        'Pagination': Pagination
+        'Pagination': Pagination,
+        'date-picker': myDatepicker
     },
 }

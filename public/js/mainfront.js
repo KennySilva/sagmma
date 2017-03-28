@@ -23188,7 +23188,7 @@ module.exports = plugin;
 },{}],6:[function(require,module,exports){
 (function (process){
 /*!
- * vue-validator v2.1.3
+ * vue-validator v2.1.7
  * (c) 2016 kazuya kawaguchi
  * Released under the MIT License.
  */
@@ -23250,7 +23250,6 @@ babelHelpers.possibleConstructorReturn = function (self, call) {
 };
 
 babelHelpers;
-
 /**
  * Utilties
  */
@@ -23614,13 +23613,14 @@ function Override (Vue) {
 }
 
 var VALIDATE_UPDATE = '__vue-validator-validate-update__';
-var PRIORITY_VALIDATE = 16;
+var PRIORITY_VALIDATE = 4096;
 var PRIORITY_VALIDATE_CLASS = 32;
 var REGEX_FILTER = /[^|]\|[^|]/;
 var REGEX_VALIDATE_DIRECTIVE = /^v-validate(?:$|:(.*)$)/;
 var REGEX_EVENT = /^v-on:|^@/;
 
 var classId = 0; // ID for validation class
+
 
 function ValidateClass (Vue) {
   var vIf = Vue.directive('if');
@@ -23700,7 +23700,6 @@ function ValidateClass (Vue) {
 }
 
 function Validate (Vue) {
-  var vIf = Vue.directive('if');
   var FragmentFactory = Vue.FragmentFactory;
   var parseDirective = Vue.parsers.directive.parseDirective;
   var _Vue$util = Vue.util;
@@ -23731,8 +23730,9 @@ function Validate (Vue) {
    */
 
   Vue.directive('validate', {
+    deep: true,
     terminal: true,
-    priority: vIf.priority + PRIORITY_VALIDATE,
+    priority: PRIORITY_VALIDATE,
     params: ['group', 'field', 'detect-blur', 'detect-change', 'initial', 'classes'],
 
     paramWatchers: {
@@ -23798,21 +23798,17 @@ function Validate (Vue) {
         return;
       }
 
-      if (isPlainObject(value)) {
-        this.handleObject(value);
-      } else if (Array.isArray(value)) {
-        this.handleArray(value);
+      if (isPlainObject(value) || old && isPlainObject(old)) {
+        this.handleObject(value, old, this.params.initial);
+      } else if (Array.isArray(value) || old && Array.isArray(old)) {
+        this.handleArray(value, old, this.params.initial);
       }
 
-      var options = { field: this.field, noopable: this._initialNoopValidation };
+      var options = { field: this.field };
       if (this.frag) {
         options.el = this.frag.node;
       }
       this.validator.validate(options);
-
-      if (this._initialNoopValidation) {
-        this._initialNoopValidation = null;
-      }
     },
     unbind: function unbind() {
       if (this._invalid) {
@@ -23844,8 +23840,6 @@ function Validate (Vue) {
       isPlainObject(params.classes) && this.validation.setValidationClasses(params.classes);
 
       params.group && validator.addGroupValidation(params.group, this.field);
-
-      this._initialNoopValidation = this.isInitialNoopValidation(params.initial);
     },
     listen: function listen() {
       var model = this.model;
@@ -23926,25 +23920,29 @@ function Validate (Vue) {
       replace(this.anchor, this.el);
       this.anchor = null;
     },
-    handleArray: function handleArray(value) {
+    handleArray: function handleArray(value, old, initial) {
       var _this = this;
 
+      old && this.validation.resetValidation();
+
       each(value, function (val) {
-        _this.validation.setValidation(val);
+        _this.validation.setValidation(val, undefined, undefined, initial);
       });
     },
-    handleObject: function handleObject(value) {
+    handleObject: function handleObject(value, old, initial) {
       var _this2 = this;
+
+      old && this.validation.resetValidation();
 
       each(value, function (val, key) {
         if (isPlainObject(val)) {
           if ('rule' in val) {
             var msg = 'message' in val ? val.message : null;
-            var initial = 'initial' in val ? val.initial : null;
-            _this2.validation.setValidation(key, val.rule, msg, initial);
+            var init = 'initial' in val ? val.initial : null;
+            _this2.validation.setValidation(key, val.rule, msg, init || initial);
           }
         } else {
-          _this2.validation.setValidation(key, val);
+          _this2.validation.setValidation(key, val, undefined, initial);
         }
       });
     },
@@ -24039,6 +24037,24 @@ var BaseValidation = function () {
     this._unwatch && this._unwatch();
   };
 
+  BaseValidation.prototype.resetValidation = function resetValidation() {
+    var _this2 = this;
+
+    var keys = Object.keys(this._validators);
+    each(keys, function (key, index) {
+      _this2._validators[key] = null;
+      delete _this2._validators[key];
+    });
+  };
+
+  BaseValidation.prototype.resetValidationNoopable = function resetValidationNoopable() {
+    each(this._validators, function (descriptor, key) {
+      if (descriptor.initial && !descriptor._isNoopable) {
+        descriptor._isNoopable = true;
+      }
+    });
+  };
+
   BaseValidation.prototype.setValidation = function setValidation(name, arg, msg, initial) {
     var validator = this._validators[name];
     if (!validator) {
@@ -24058,10 +24074,10 @@ var BaseValidation = function () {
   };
 
   BaseValidation.prototype.setValidationClasses = function setValidationClasses(classes) {
-    var _this2 = this;
+    var _this3 = this;
 
     each(classes, function (value, key) {
-      _this2._classes[key] = value;
+      _this3._classes[key] = value;
     });
   };
 
@@ -24119,7 +24135,7 @@ var BaseValidation = function () {
   };
 
   BaseValidation.prototype.validate = function validate(cb) {
-    var _this3 = this;
+    var _this4 = this;
 
     var noopable = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
     var el = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
@@ -24131,7 +24147,7 @@ var BaseValidation = function () {
     var valid = true;
 
     this._runValidators(function (descriptor, name, done) {
-      var asset = _this3._resolveValidator(name);
+      var asset = _this4._resolveValidator(name);
       var validator = null;
       var msg = null;
 
@@ -24162,8 +24178,8 @@ var BaseValidation = function () {
       }
 
       if (validator) {
-        var value = _this3._getValue(_this3._el);
-        _this3._invokeValidator(_this3._vm, validator, value, descriptor.arg, function (ret, err) {
+        var value = _this4._getValue(_this4._el);
+        _this4._invokeValidator(_this4._vm, validator, value, descriptor.arg, function (ret, err) {
           if (!ret) {
             valid = false;
             if (err) {
@@ -24172,7 +24188,7 @@ var BaseValidation = function () {
               results[name] = err;
             } else if (msg) {
               var error = { validator: name };
-              error.message = typeof msg === 'function' ? msg.call(_this3._vm, _this3.field, descriptor.arg) : msg;
+              error.message = typeof msg === 'function' ? msg.call(_this4._vm, _this4.field, descriptor.arg) : msg;
               errors.push(error);
               results[name] = error.message;
             } else {
@@ -24189,23 +24205,23 @@ var BaseValidation = function () {
       }
     }, function () {
       // finished
-      _this3._fireEvent(_this3._el, valid ? 'valid' : 'invalid');
+      _this4._fireEvent(_this4._el, valid ? 'valid' : 'invalid');
 
       var props = {
         valid: valid,
         invalid: !valid,
-        touched: _this3.touched,
-        untouched: !_this3.touched,
-        dirty: _this3.dirty,
-        pristine: !_this3.dirty,
-        modified: _this3.modified
+        touched: _this4.touched,
+        untouched: !_this4.touched,
+        dirty: _this4.dirty,
+        pristine: !_this4.dirty,
+        modified: _this4.modified
       };
       if (!empty(errors)) {
         props.errors = errors;
       }
       _.extend(results, props);
 
-      _this3.willUpdateClasses(results, el);
+      _this4.willUpdateClasses(results, el);
 
       cb(results);
     });
@@ -24219,25 +24235,21 @@ var BaseValidation = function () {
   };
 
   BaseValidation.prototype.reset = function reset() {
-    each(this._validators, function (descriptor, key) {
-      if (descriptor.initial && !descriptor._isNoopable) {
-        descriptor._isNoopable = true;
-      }
-    });
+    this.resetValidationNoopable();
     this.resetFlags();
     this._init = this._getValue(this._el);
   };
 
   BaseValidation.prototype.willUpdateClasses = function willUpdateClasses(results) {
-    var _this4 = this;
+    var _this5 = this;
 
     var el = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
 
     if (this._checkClassIds(el)) {
       (function () {
-        var classIds = _this4._getClassIds(el);
-        _this4.vm.$nextTick(function () {
-          _this4.vm.$emit(VALIDATE_UPDATE, classIds, _this4, results);
+        var classIds = _this5._getClassIds(el);
+        _this5.vm.$nextTick(function () {
+          _this5.vm.$emit(VALIDATE_UPDATE, classIds, _this5, results);
         });
       })();
     } else {
@@ -24436,7 +24448,7 @@ var BaseValidation = function () {
   BaseValidation.prototype._invokeValidator = function _invokeValidator(vm, validator, val, arg, cb) {
     var future = validator.call(this, val, arg);
     if (typeof future === 'function') {
-      // function
+      // function 
       future(function () {
         // resolve
         cb(true);
@@ -24595,6 +24607,7 @@ var CheckboxValidation = function (_BaseValidation) {
   };
 
   CheckboxValidation.prototype.reset = function reset() {
+    this.resetValidationNoopable();
     this.resetFlags();
     each(this._inits, function (item, index) {
       item.init = item.el.checked;
@@ -24774,6 +24787,7 @@ var RadioValidation = function (_BaseValidation) {
   };
 
   RadioValidation.prototype.reset = function reset() {
+    this.resetValidationNoopable();
     this.resetFlags();
     each(this._inits, function (item, index) {
       item.init = item.el.checked;
@@ -24933,10 +24947,6 @@ var SelectValidation = function (_BaseValidation) {
     this._unwatch && this._unwatch();
   };
 
-  SelectValidation.prototype.reset = function reset() {
-    this.resetFlags();
-  };
-
   SelectValidation.prototype._getValue = function _getValue(el) {
     var ret = [];
 
@@ -25026,8 +25036,8 @@ var Validator$1 = function () {
     delete vm['$setValidationErrors'];
     vm.$validate = null;
     delete vm['$validate'];
-    vm.$validatorReset = null;
-    delete vm['$validatorReset'];
+    vm.$resetValidation = null;
+    delete vm['$resetValidation'];
     vm._validatorMaps[this.name] = null;
     delete vm._validatorMaps[this.name];
     vm[this.name] = null;
@@ -25096,7 +25106,7 @@ var Validator$1 = function () {
     var validation = this._getValidationFrom(field);
     var validations = this._groupValidations[group];
 
-    validations && ! ~indexOf(validations, validation) && validations.push(validation);
+    validations && !~indexOf(validations, validation) && validations.push(validation);
   };
 
   Validator.prototype.removeGroupValidation = function removeGroupValidation(group, field) {
@@ -25779,7 +25789,7 @@ function plugin(Vue) {
   Validate(Vue);
 }
 
-plugin.version = '2.1.3';
+plugin.version = '2.1.7';
 
 if (typeof window !== 'undefined' && window.Vue) {
   window.Vue.use(plugin);

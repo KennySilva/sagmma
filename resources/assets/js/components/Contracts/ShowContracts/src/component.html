@@ -4,7 +4,7 @@
 </div>
 <!--
 <pre>
-{{$data.errors | json}}
+{{$data.starttime | json}}
 </pre> -->
 
 <div class="row">
@@ -190,7 +190,8 @@
 										</div>
 										<div class="col-md-6">
 											<div class="form-group {{ errors.ending_date ? ' has-error' : '' }} has-feedback">
-												<input v-model="newContract.ending_date" type="date" class="form-control" placeholder="Fim do Contrato">
+												<date-picker :time.sync="newContract.ending_date" :option="option" :limit="limit"></date-picker>
+												<!-- <input v-model="newContract.ending_date" type="date" class="form-control" placeholder="Fim do Contrato"> -->
 												<p v-if="errors.ending_date" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.ending_date }}</p>
 											</div>
 										</div>
