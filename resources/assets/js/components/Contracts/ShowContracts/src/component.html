@@ -2,10 +2,10 @@
 	<button type="button" class="close" data-dismiss="alert">x</button>
 	<i class="fa fa-thumbs-o-up text-center">&nbsp;&nbsp; {{msgSucess}}</i>
 </div>
-
+<!--
 <pre>
-	{{$data.errors | json}}
-</pre>
+{{$data.errors | json}}
+</pre> -->
 
 <div class="row">
 	<div class="col-md-12">
@@ -94,7 +94,9 @@
 						<td v-for="trader in contract.traders">{{ trader.name }}</td>
 						<!------------------------------------------------------------------------------------------>
 						<td>
-							<button type="submit" @click = "statusContractsChange(contract.id)" class="btn btn-xs" :class="{ 'btn-info': contract.status, 'btn-danger': !contract.status }">{{contract.status ? 'Normalizado' : 'Pendente'}}</button>
+							<span :class="{ 'label-info': contract.status, 'label-danger': !contract.status }" class="label">{{contract.status ? 'Normalizado' : 'Pendente'}}</span>
+
+							<!-- <button type="submit" @click = "statusContractsChange(contract.id)" class="btn btn-xs" :class="{ 'btn-info': contract.status, 'btn-danger': !contract.status }">{{contract.status ? 'Normalizado' : 'Pendente'}}</button> -->
 						</td>
 						<!------------------------------------------------------------------------------------------>
 						<td align=center>  <a data-toggle="modal" data-target="#modal-edit-contract" href="#"> <i class="fa fa-pencil text-primary" @click="getThisContract(contract.id)" > </i></a></td>
@@ -151,27 +153,26 @@
 						<h4 class="modal-title">Registar</h4>
 					</div>
 					<div class="modal-body">
-							<form action="#" methods="POST">
-								<div class="row">
-									<div class="col-md-12">
-										<div class="col-md-6">
-											<div class="form-group has-feedback">
-												<select class="form-control selectpicker" v-model="newContract.place_id" v-el:placecreate>
-													<option v-for="place in places" value="{{place.id}}">
-														{{place.name}}
-													</option>
-												</select>
-												<!-- <span class="help-block">Selecione o espaço pretendido</span> -->
-											</div>
+						<form action="#" methods="POST">
+							<div class="row">
+								<div class="col-md-12">
+									<div class="col-md-6">
+										<div class="form-group {{ errors.place_id ? ' has-error' : '' }} has-feedback">
+											<select class="form-control selectpicker" v-model="newContract.place_id" v-el:placecreate>
+												<option v-for="place in places" value="{{place.id}}">
+													{{place.name}}
+												</option>
+											</select>
+											<p v-if="errors.place_id" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.place_id }}</p>											</div>
 										</div>
 										<div class="col-md-6">
-											<div class="form-group has-feedback">
+											<div class="form-group {{ errors.trader_id ? ' has-error' : '' }} has-feedback">
 												<select class="selectpicker form-control" v-model="newContract.trader_id" v-el:tradercreate>
 													<option v-for="trader in traders" value="{{trader.id}}">
 														{{trader.name}}
 													</option>
 												</select>
-												<!-- <span class="help-block">Selecione o comerciante</span> -->
+												<p v-if="errors.trader_id" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.trader_id }}</p>
 											</div>
 										</div>
 									</div>
@@ -184,97 +185,93 @@
 										<div class="col-md-6">
 											<div class="form-group has-feedback">
 												<input  v-model="newContract.rate"  type="number" class="form-control" placeholder="Taxa do contrato" readonly>
-												<span class="help-block">Introduza o valor do contrato</span>
+												<span class="help-block text-success">Este valor será o valor do Espaço</span>
 											</div>
 										</div>
 										<div class="col-md-6">
-											<div class="form-group has-feedback">
+											<div class="form-group {{ errors.ending_date ? ' has-error' : '' }} has-feedback">
 												<input v-model="newContract.ending_date" type="date" class="form-control" placeholder="Fim do Contrato">
-												<span class="help-block">Introduza a data do término do contrato</span>
+												<p v-if="errors.ending_date" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.ending_date }}</p>
 											</div>
 										</div>
 									</div>
 								</div>
 							</form>
-					</div>
-					<div class="modal-footer">
-						<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
+						</div>
+						<div class="modal-footer">
+							<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
 
-						<button @click="createContract" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
+							<button @click="createContract" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
 
-		<!--------------------------------------------------------------------------------------------------------->
+			<!--------------------------------------------------------------------------------------------------------->
 
-		<!-- Modal -->
-		<div id="modal-edit-contract" class="modal fade" role="dialog">
-			<div class="modal-dialog">
-				<!-- Modal content-->
-				<div class="modal-content">
-					<div class="modal-header">
-						<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
-						<h4 class="modal-title">Editar Este contrato</h4>
-					</div>
-					<div class="modal-body">
+			<!-- Modal -->
+			<div id="modal-edit-contract" class="modal fade" role="dialog">
+				<div class="modal-dialog">
+					<!-- Modal content-->
+					<div class="modal-content">
+						<div class="modal-header">
+							<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
+							<h4 class="modal-title">Editar Este contrato</h4>
+						</div>
+						<div class="modal-body">
 
 							<form action="#" methods="patch">
 								<div class="row">
 									<div class="col-md-12">
 										<div class="col-md-6">
-											<div class="form-group has-feedback">
-												<select class="form-control" v-model="newContract.place_id">
-													<option value="" selected>Selecione o Espaço</option>
+											<div class="form-group {{ errors.place_id ? ' has-error' : '' }} has-feedback">
+												<select class="form-control selectpicker" v-model="newContract.place_id" v-el:placeedit>
 													<option v-for="place in places" value="{{place.id}}">
-														{{place.id}}
+														{{place.name}}
 													</option>
 												</select>
-												<!-- <span class="help-block">Selecione o espaço pretendido</span> -->
+												<p v-if="errors.place_id" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.place_id }}</p>											</div>
 											</div>
-										</div>
-										<div class="col-md-6">
-											<div class="form-group has-feedback">
-												<select class="form-control" v-model="newContract.trader_id">
-													<option value="" selected>Selecione o Comerciante</option>
-													<option v-for="trader in traders" value="{{trader.id}}">
-														{{trader.name}}
-													</option>
-												</select>
-												<!-- <span class="help-block">Selecione o comerciante</span> -->
+											<div class="col-md-6">
+												<div class="form-group {{ errors.trader_id ? ' has-error' : '' }} has-feedback">
+													<select class="selectpicker form-control" v-model="newContract.trader_id" v-el:traderedit>
+														<option v-for="trader in traders" value="{{trader.id}}">
+															{{trader.name}}
+														</option>
+													</select>
+													<p v-if="errors.trader_id" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.trader_id }}</p>
+												</div>
 											</div>
 										</div>
 									</div>
-								</div>
 
-								<hr><!---------------------------------------------------------------------------------------->
+									<hr><!---------------------------------------------------------------------------------------->
 
-								<div class="row">
-									<div class="col-md-12">
-										<div class="col-md-6">
-											<div class="form-group has-feedback">
-												<input  v-model="newContract.rate"  type="number" class="form-control" placeholder="Taxa do contrato">
-												<span class="help-block">Introduza o valor do contrato</span>
+									<div class="row">
+										<div class="col-md-12">
+											<div class="col-md-6">
+												<div class="form-group has-feedback">
+													<input  v-model="newContract.rate"  type="number" class="form-control" placeholder="Taxa do contrato" readonly>
+													<span class="help-block">Introduza o valor do contrato</span>
+												</div>
 											</div>
-										</div>
-										<div class="col-md-6">
-											<div class="form-group has-feedback">
-												<input type="date" class="form-control" placeholder="Fim do Contrato">
-												<span class="help-block">Introduza a data do término do contrato</span>
+											<div class="col-md-6">
+												<div class="form-group {{ errors.ending_date ? ' has-error' : '' }} has-feedback">
+													<input v-model="newContract.ending_date" type="date" class="form-control" placeholder="Fim do Contrato">
+													<p v-if="errors.ending_date" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.ending_date }}</p>
+												</div>
 											</div>
 										</div>
 									</div>
-								</div>
-							</form>
-					</div>
-					<div class="modal-footer">
-						<div class="row">
-							<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Close</button>
-							<button v-on:show="" @click="saveEditedContract(newContract.id)" type="button" class="btn btn-primary"><i class="fa fa-refresh fa-spin"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>
+								</form>
+							</div>
+							<div class="modal-footer">
+								<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Close</button>
+
+								<button v-on:show="" @click="saveEditedContract(newContract.id)" type="button" class="btn btn-primary"><i class="fa fa-refresh fa-spin"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-</div>

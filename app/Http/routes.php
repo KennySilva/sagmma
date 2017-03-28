@@ -141,7 +141,7 @@ Route::group(['namespace' => 'ApiControllers'], function()
 
                 Route::get('contractTrader', 'ApiContractsController@getTraderForContract');
                 Route::get('contractPlace', 'ApiContractsController@getPlaceForContract');
-                // Route::post('contractStatus', 'ApiControlsController@statusControlsChange');
+                Route::get('contractStatus', 'ApiContractsController@statusContractsChange');
             });
 
             // ------------------------------------Api-Taxation (place_trader)--------------------

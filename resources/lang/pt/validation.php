@@ -97,6 +97,17 @@ return [
         'g-recaptcha-response' => [
             'required' => 'Xiii Não és Humano...!!',
         ],
+        'place_id' => [
+            'required' => 'A selecão do :attribute é obrigatória',
+        ],
+        'trader_id' => [
+            'required' => 'A selecão do :attribute é obrigatória',
+        ],
+
+        'ending_date' => [
+            'required' => 'A introdução do :attribute é obrigatória',
+            'after'    => 'A :attribute deve ser no minino 1 Ano (Depois de :date).',
+        ],
     ],
 
 
@@ -119,6 +130,11 @@ return [
         'email'    => 'Email',
         'password' => 'Palavra Passe',
         'g-recaptcha-response'    => 'ReCaptcha',
+
+
+        'place_id'    => 'Espaço',
+        'trader_id'    => 'Comerciante',
+        'ending_date'    => 'Data de Expiração',
     ],
 
 ];

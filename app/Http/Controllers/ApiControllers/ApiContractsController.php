@@ -14,6 +14,8 @@ use Trader;
 use Response;
 use Input;
 use Auth;
+use Carbon\Carbon;
+
 
 class ApiContractsController extends Controller
 {
@@ -34,7 +36,6 @@ class ApiContractsController extends Controller
 
     public function store(ContractsRequest $request)
     {
-
         $contract            = new Contract($request->all());
         $place = Place::where('id', '=', $request->place_id)->first();
         $contract->place_id    = $request->place_id;
@@ -44,7 +45,6 @@ class ApiContractsController extends Controller
         $contract->author      = Auth::user()->name;
         $contract->ending_date = $request->ending_date;
         $contract->save();
-
     }
 
 
@@ -59,10 +59,18 @@ class ApiContractsController extends Controller
         //
     }
 
-    public function update(Req $request, $id)
+    public function update(ContractsRequest $request, $id)
     {
-        Contract::findOrFail($id)->update($request::all());
-        return Response::json($request::all());
+        $place_id    = $request->place_id;
+        $trader_id   = $request->trader_id;
+        $ending_date = $request->ending_date;
+
+        $contract = new Contract();
+        $contract->where('id', $id)->update(array(
+            'place_id'    => $place_id,
+            'trader_id'   => $trader_id,
+            'ending_date' => $ending_date
+        ));
 
     }
 
@@ -85,17 +93,32 @@ class ApiContractsController extends Controller
     }
 
 
-    public function statusControlsChange(Request $request)
+    // public function statusControlsChange(Request $request)
+    // {
+    //     $id  = $request->id;
+    //     $contract = Contract::find($id);
+    //     if ($contract->status == true) {
+    //         $contract->status = false;
+    //     }else {
+    //         $contract->status = true;
+    //     }
+    //     $contract->save();
+    //     return response($contract, 200);
+    // }
+
+    public function statusContractsChange()
     {
-        $id  = $request->id;
-        $contract = Contract::find($id);
-        if ($contract->status == true) {
-            $contract->status = false;
-        }else {
-            $contract->status = true;
+        $now = Carbon::now();
+        $contracts = Contract::all();
+        foreach ($contracts as $contract) {
+            if ($contract->ending_date <= $now ) {
+                $contract->status = 0;
+            }else {
+                $contract->status = 1;
+            }
+            $contract->save();
         }
-        $contract->save();
-        return response($contract, 200);
+
     }
 
 

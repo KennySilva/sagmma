@@ -131,15 +131,14 @@ export default{
                 ending_date : '',
             };
         },
-
-
+        
         createContract: function() {
             var contract = this.newContract;
 
             //Clear form input
-            this.clearField();
             this.$http.post('http://localhost:8000/api/v1/contracts/', contract).then((response) => {
                 if (response.status == 200) {
+                    this.clearField();
                     $('#modal-create-contract').modal('hide');
                     this.fetchContract(this.pagination.current_Page, this.showRow);
                     console.log('correu bem');
@@ -181,18 +180,21 @@ export default{
 
         saveEditedContract: function(id) {
             var contract = this.newContract;
-            this.clearField();
             this.$http.patch('http://localhost:8000/api/v1/contracts/'+ id, contract).then((response) => {
                 if (response.status == 200) {
+                    this.clearField();
                     $('#modal-edit-contract').modal('hide');
                     // console.log(response.data);
                     this.fetchContract(this.pagination.current_Page, this.showRow);
                     this.alert('Registo atualizado com sucesso', 'info');
+                    this.$set('errors', '')
                 }
             }, (response) => {
-                console.log("Ocorreu um erro na operação");
+                this.$set('errors', response.data)
             });
         },
+
+
 
         // --------------------------------------------------------------------------------------------
 
