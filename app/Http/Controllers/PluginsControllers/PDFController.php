@@ -26,4 +26,11 @@ class PDFController extends Controller
         $pdf = PDF::loadView('pdf.taxationReport', ['datas' => $datas]);
         return $pdf->download('relatoriocobarnca.pdf');
     }
+
+    public function downloadreciboempdf($id, $code)
+    {
+        $taxation = Taxation::findOrFail($id);
+        $pdf = PDF::loadView('pdf.sendTaxation', ['taxation' => $taxation]);
+        return $pdf->download('relatoriocobarnca.pdf');
+    }
 }

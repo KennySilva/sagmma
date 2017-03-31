@@ -1,13 +1,15 @@
 
-<div class="box box-primary box-solid">
+<div class="box box-primary box-solid collapsed-box">
     <div class="box-header with-border">
         <h3 class="box-title">Calendário de Tarefas</h3>
         <div class="box-tools pull-right">
-            <button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse"><i class="fa fa-minus"></i></button>
+            <button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse"><i class="fa fa-plus"></i></button>
             <button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove"><i class="fa fa-times"></i></button>
         </div><!-- /.box-tools -->
     </div><!-- /.box-header -->
     <div class="box-body">
+        <div class="table-responsive">
+
         <section class="content">
             <div class="row">
                 <div class="col-md-3">
@@ -86,6 +88,7 @@
             </div>
             <!-- /.row -->
         </section>
+    </div><!-- /.box-body -->
     </div><!-- /.box-body -->
 </div><!-- /.box -->
 

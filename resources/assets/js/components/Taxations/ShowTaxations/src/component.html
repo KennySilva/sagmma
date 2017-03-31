@@ -4,6 +4,10 @@
 	<i class="fa fa-thumbs-o-up text-center">&nbsp;&nbsp; {{msgSucess}}</i>
 </div>
 
+<!-- <pre>
+	{{$data.allRow | json}}
+</pre> -->
+
 <div class="row">
 	<div class="col-md-12">
 		<div class="form-inline pull-right">
@@ -184,6 +188,7 @@
 			<table class='table table-striped table-hover table-condensed'>
 				<thead>
 					<tr>
+
 						<th>
 							<i :class = "{'fa-sort-amount-asc': sortColumn == 'employee_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'employee_id' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
 							<a href="#" @click = "doSort($event, 'employee_id')">Funcionário</a>
@@ -199,11 +204,11 @@
 							<a href="#" @click = "doSort($event, 'income')">Valor ($)</a>
 						</th>
 
-						<th  class="text-center" colspan="3"><span><i class="fa fa-cogs"></i></span></th>
+						<th  class="text-center" colspan="4"><span><i class="fa fa-cogs"></i></span></th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr v-for="taxation in taxations | filterBy filter.term | orderBy sortColumn sortInverse">
+					<tr v-for="taxation in taxations | orderBy sortColumn sortInverse">
 						<td v-if="taxation.type == 2" v-for="employee in taxation.employees">{{ employee.name }}</td>
 						<td v-if="taxation.type == 1">{{ taxation.author }}</td>
 						<td v-for="place in taxation.places">{{ place.name }}</td>
@@ -214,6 +219,8 @@
 						<td align=center><a data-toggle="modal" data-target="#modal-delete-taxation" href="#"><i class="fa fa-trash text-danger" @click="getThisTaxation(taxation.id)"></i></a></td>
 
 						<td align=center><a href="/export/receiptInformation/{{taxation.id}}"><i class="fa fa-print text-info"></i></a></td>
+
+						<td align=center><a @click="getThisTaxation(taxation.id)" href="" data-toggle="modal" data-target="#send-email"><i class="fa fa-envelope-o text-success"></i></a></td>
 					</tr>
 				</tbody>
 			</table>
@@ -228,6 +235,32 @@
 		</div>
 
 		<!--------------------------------------------------------------------------------------------------------->
+		<!-- iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii -->
+		<div id="send-email" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-sm">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 class="modal-title" id="myModalLabel">Enviar Registo por email</h4>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+						  <label for="">Email</label>
+						  <input v-model="sendTaxation" type="email" class="form-control" id="" placeholder="Introduza o email">
+						  <p v-show="!myValidation.email || sendTaxation == ''" class="help-block text-danger">Recorda-te de introduzir Email válido</p>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button v-show="myValidation.email && sendTaxation != ''" v-else @click="sendEmailTaxation(newTaxation.id)" type='submit' class='btn btn-sm btn-primary '><i class="fa fa-send"></i></button>
+
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii -->
+
 
 		<div class="modal fade" id="modal-delete-taxation" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
 			<div class="modal-dialog">
@@ -268,12 +301,13 @@
 								<div class="row">
 									<div class="col-md-12">
 										<div class="col-md-12">
-											<div class="form-group has-Registarfeedback">
+											<div class="form-group {{ errors.type ? ' has-error' : '' }} has-feedback">
 												<select name="state" class="form-control" v-model="newTaxation.type" v-el:typecreate>
+													<option value="">Tipo de Cobrança</option>
 													<option value="1">Cobrança interno</option>
 													<option value="2">Cobrança Externo</option>
 												</select>
-												<span class="help-block">Selecione o tipo de espaço</span>
+												<p v-if="errors.type" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.type }}</p>
 											</div>
 										</div>
 									</div>
@@ -283,12 +317,13 @@
 								<div class="row">
 									<div class="col-md-12">
 										<div class="col-md-12">
-											<div class="form-group has-feedback">
+											<div class="form-group {{ errors.employee_id ? ' has-error' : '' }} has-feedback">
 												<select :disabled = "newTaxation.type != 2" class="form-control" v-model="newTaxation.employee_id" v-el:employeecreate>
 													<option v-for="employee in employees" value="{{employee.id}}">
 														{{employee.name}}
 													</option>
 												</select>
+												<p v-if="errors.employee_id" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.employee_id }}</p>
 												<span v-if="newTaxation.type == 2" class="text-help text-warning">Selecione o cobrador</span>
 												<span v-if="newTaxation.type == 1" class="text-help text-success">O cobrador será o responsável pelo Registo</span>
 											</div>
@@ -298,7 +333,7 @@
 								<div class="row">
 									<div class="col-md-12">
 										<div class="col-md-12">
-											<div class="form-group has-feedback">
+											<div class="form-group {{ errors.place_id ? ' has-error' : '' }} has-feedback">
 												<!-------------------------------------------------------------------------->
 												<select v-if="newTaxation.type == 2" :disabled = "newTaxation.type == ''" class="form-control" v-model="newTaxation.place_id">
 													<option value="">Espaço</option>
@@ -311,6 +346,7 @@
 														{{place.name}}
 													</option>
 												</select>
+												<p v-if="errors.place_id" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.place_id }}</p>
 												<!-------------------------------------------------------------------------->
 												<span class="help-block">Qual é o espaço?</span>
 											</div>
@@ -324,10 +360,11 @@
 								<div class="row">
 									<div class="col-md-12">
 										<div class="col-md-12">
-											<div class="form-group has-feedback">
+											<div class="form-group {{ errors.income ? ' has-error' : '' }} has-feedback">
 												<!-- <input class="form-control" type="number" name="income" value="" placeholder="Valor da cobrança"> -->
 												<input :disabled = "newTaxation.type != 2" type="number" class="form-control" placeholder="Valor cobrado" v-model="newTaxation.income" name="email"/>
 												<i class="fa fa-usd form-control-feedback"></i>
+												<p v-if="errors.income" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.income }}</p>
 											</div>
 
 											<span class="text-help text-warning" v-if="newTaxation.type == 2">Introduza o valor cobrado</span>

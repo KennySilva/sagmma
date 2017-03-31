@@ -27,6 +27,7 @@ class ApiPlacesController extends Controller
         $place->each(function($place){
             $place->contract;
             $place->typeofplace;
+            $place->taxation;
         });
         return $place;
     }

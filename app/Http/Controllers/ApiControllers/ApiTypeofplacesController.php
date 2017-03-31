@@ -17,7 +17,11 @@ class ApiTypeofplacesController extends Controller
 {
     public function index($row)
     {
-        return Typeofplace::paginate($row);
+        $typeofplace = Typeofplace::paginate($row);
+        $typeofplace->each(function($typeofplace){
+            $typeofplace->places;
+        });
+        return $typeofplace;
     }
 
     public function create()

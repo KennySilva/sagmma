@@ -14,6 +14,9 @@ use Place;
 use Response;
 use Input;
 use Auth;
+use Mail;
+use PDF;
+
 
 class ApiTaxationsController extends Controller
 {
@@ -68,10 +71,34 @@ class ApiTaxationsController extends Controller
         //
     }
 
-    public function update(Req $request, $id)
+    public function update(TaxationsRequest $request, $id)
     {
-        Taxation::findOrFail($id)->update($request::all());
-        return Response::json($request::all());
+        if ( $request->place_id == '') {
+            $place_id = 1;
+        }else {
+            $place_id = $request->place_id;
+        }
+        $place = Place::where('id', '=', $place_id)->first();
+        if ($request->type == 1) {
+            $employee_id = Auth::user()->id;
+            $income      = $place->price;
+            $place_id    = $request->place_id;
+        }else {
+            $employee_id = $request->employee_id;
+            $income      = $request->income;
+            $place_id    =  $request->place_id;
+        }
+        $type        = $request->type;
+        $author      = Auth::user()->name;
+
+        $taxation = new Taxation();
+        $taxation->where('id', $id)->update(array(
+            'employee_id' => $employee_id,
+            'place_id'    => $place_id,
+            'income'      => $income,
+            'type'        => $type,
+            'author'      => $author
+        ));
 
     }
 
@@ -100,7 +127,22 @@ class ApiTaxationsController extends Controller
     public function getPlaceIntForTaxation()
     {
         $place = Place::where('typeofplace_id', '<', 4)->get();
+        // ->where('status', true)
         return $place;
+    }
+
+    public function sendTaxation($id, $sendTaxation)
+    {
+        $owner = Auth::user()->email;
+        $taxation = Taxation::findOrFail($id);
+        $email = $sendTaxation;
+        $code = str_random(30);
+        //  $data = array('owner'=>$owner, 'taxation'=>$taxation, 'email'=>$email);
+        Mail::send('emails.sendTaxation', ['taxation' => $taxation, 'code'=>$code], function($ms) use ($email, $owner){
+            $ms->subject('Recibo de Cobrança de Imposto');
+            $ms->to($email);
+            $ms->from($owner, 'Your Application');
+        });
     }
 
 }

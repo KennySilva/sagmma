@@ -52,9 +52,14 @@
 <hr>
 
 <div class="row">
-	<div class="col-md-12">
+	<div v-if = "types.length > 0" class="col-md-12">
 		<button @click="clearField" class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-place"><i class="fa fa-plus"></i> Novo</button>&nbsp;&nbsp;
-		<a class="btn btn-primary btn-flat btn-outline" href="/export/printablePlaceInformation"><i class="fa fa-print"></i> Imprimir</a>
+
+		<a  v-if = "places.length > 0" class="btn btn-primary btn-flat btn-outline" href="/export/printablePlaceInformation"><i class="fa fa-print"></i> Imprimir</a>
+	</div>
+
+	<div v-else class="col-md-12">
+		<button data-toggle="tooltip" title="O espaço tem de pertencer uma categoria (Crie um tipo de espaço)" type="button" class="btn btn-danger btn-flat"><i class="fa fa-minus"></i> Novo</button>&nbsp;&nbsp;
 	</div>
 </div>
 
@@ -90,23 +95,23 @@
 					<tr v-for="place in places | filterBy filter.term | orderBy sortColumn sortInverse">
 						<td><a href="#" data-toggle="modal" data-target="#show-place" @click="getThisPlace(place.id)">{{ place.name }}</a></td>
 						<td class="info" v-if="showColumn.price">{{ place.price }} ECV</td>
-						<td>
+						<td v-show="place.typeofplace_id == 1">
 							<span :class="{ 'label-info': place.status, 'label-danger': !place.status }" class="label">{{place.status ? 'Ocupado' : 'Livre'}}</span>
 						</td>
 						<td class="info" v-if="showColumn.typeofplace_id">{{ place.typeofplace.name }}</td>
 
-						<td align=left>  <a data-toggle="modal" data-target="#modal-edit-place" href="#"> <i class="fa fa-pencil text-primary" @click="getThisPlace(place.id)" > </i></a></td>
+						<td align=left>  <a data-toggle="modal" data-target="#modal-edit-place" href="#"> <i class="fa fa-edit text-primary" @click="getThisPlace(place.id)" > </i></a></td>
 						<!---------------------------------------------------------------------------->
-						<td v-if="place.contract == null" align=right><a data-toggle="modal" data-target="#modal-delete-place" href="#"><i class="fa fa-trash text-danger" @click="getThisPlace(place.id)" ></i></a></td>
+						<td v-if="(place.taxation == null) | (place.contract == null)" align=right><a data-toggle="modal" data-target="#modal-delete-place" href="#"><i class="fa fa-trash text-danger" @click="getThisPlace(place.id)" ></i></a></td>
 
-						<td v-if="place.contract != null" align=right><a data-toggle="modal" data-target="#modal-undeleted-place" href="#"><i class="fa fa-trash text-warning" @click="getThisPlace(place.id)" ></i></a></td>
+						<td v-if="(place.taxation != null) | (place.contract != null)" align=right><a data-toggle="modal" data-target="#modal-undeleted-place" href="#"><i class="fa fa-trash text-warning" @click="getThisPlace(place.id)" ></i></a></td>
 						<!---------------------------------------------------------------------------->
 
 					</tr>
 				</tbody>
 			</table>
 			<div class="row">
-				<div class="col-md-6 pull-left">
+				<div v-if="pagination.total > showRow" class="col-md-6 pull-left">
 					<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
 				</div>
 				<div class="col-md-6 pull-right">
@@ -220,16 +225,16 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-					<h4 class="modal-title" id="">Eliminar</h4>
+					<h4 class="modal-title label label-warning" id=""><i class='fa fa-exclamation-circle fa-spin'></i></h4>
 				</div>
 				<div class="modal-body">
-					<h4 class="text-center"><span class="text-uppercase text-success">{{newPlace.name}}</span> não pode ser apagodo enquanto pertence a um comenrciante</h4>
-					<span class="text-help text-center text-danger">Verefique o contrato</span>
+					<h4 class="text-center"><span class="text-uppercase text-danger">{{newPlace.name}}</span>, não pode ser apagodo enquanto pertence a um comenrciante ou é referenciado a um registo de cobrança</h4>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-check text-success"></i></button>
+					<button type="button" class="btn btn-success" data-dismiss="modal"><i class="fa fa-check"></i> Sair</button>
 
 					<a class="btn btn-primary" href="contracts">Verificar Contratos</a>
+					<a class="btn btn-primary" href="taxations">Verificar Cobranças</a>
 				</div>
 			</div>
 		</div>
@@ -248,13 +253,12 @@
 					<h4 class="modal-title">Registar</h4>
 				</div>
 				<div class="modal-body">
-					<validator name="validationew">
 						<form action="#" methods="POST">
 							<div class="row">
 								<div class="col-md-12">
 									<div class="col-md-12">
 										<div class="form-group has-feedback">
-											<input type="text" class="form-control" name="name" placeholder="Nome" v-model="newPlace.name" v-validate:name="['required']"/>
+											<input type="text" class="form-control" name="name" placeholder="Nome" v-model="newPlace.name"/>
 											<span class="fa fa-map-pin form-control-feedback"></span>
 										</div>
 									</div>
@@ -285,7 +289,7 @@
 									<div class="col-md-6">
 										<div class="form-group has-feedback">
 											<input :disabled = "newPlace.typeofplace_id == 7" type="number" class="form-control" name="dimension" placeholder="Dimensão" v-model="newPlace.dimension"/>
-											<span class="form-control-feedback">mm</span>
+											<span class="form-control-feedback">m²</span>
 										</div>
 									</div>
 								</div>
@@ -305,7 +309,6 @@
 							</div>
 
 						</form>
-					</validator>
 				</div>
 				<div class="modal-footer">
 					<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
@@ -331,14 +334,13 @@
 					<h4 class="modal-title">Editar</h4>
 				</div>
 				<div class="modal-body">
-					<validator name="validation1">
 						<form methods="patch">
 
 							<div class="row">
 								<div class="col-md-12">
 									<div class="col-md-12">
 										<div class="form-group has-feedback">
-											<input type="text" class="form-control" name="name" placeholder="Nome" v-model="newPlace.name" v-validate:name="['required']"/>
+											<input type="text" class="form-control" name="name" placeholder="Nome" v-model="newPlace.name"/>
 											<span class="fa fa-user form-control-feedback"></span>
 										</div>
 									</div>
@@ -386,7 +388,6 @@
 								</div>
 							</div>
 						</form>
-					</validator>
 				</div>
 				<div class="modal-footer">
 					<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Close</button>

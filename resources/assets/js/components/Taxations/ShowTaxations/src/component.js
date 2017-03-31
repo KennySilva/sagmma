@@ -1,4 +1,5 @@
 import Pagination from '../../../Pagination/src/Component.vue'
+import { _ } from 'lodash'
 
 
 export default{
@@ -41,6 +42,8 @@ export default{
                 month: '',
                 year : '',
             },
+            sendTaxation: '',
+            errors: [],
 
             myDate: new Date(),
         }
@@ -106,7 +109,7 @@ export default{
         });
     },
 
-        // -----------------------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------
 
     methods: {
         alert: function(msg, typeAlert) {
@@ -128,6 +131,7 @@ export default{
                 income : '',
                 type : '',
             };
+            this.sendTaxation = '';
         },
 
 
@@ -142,10 +146,10 @@ export default{
                     this.fetchTaxation(this.pagination.current_Page, this.showRow);
                     console.log('correu bem');
                     this.alert('Registo criado com sucesso', 'success');
-
+                    this.$set('errors', '')
                 }
             }, (response) => {
-
+                this.$set('errors', response.data)
             });
         },
 
@@ -187,10 +191,10 @@ export default{
                     // console.log(response.data);
                     this.fetchTaxation(this.pagination.current_Page, this.showRow);
                     this.alert('Registo atualizado com sucesso', 'info');
-
+                    this.$set('errors', '')
                 }
             }, (response) => {
-                console.log("Ocorreu um erro na operação");
+                this.$set('errors', response.data)
             });
         },
 
@@ -202,7 +206,21 @@ export default{
                 if (response.status == 200) {
                     // console.log(response.data);
                     this.fetchTaxation(this.pagination.current_Page, this.showRow);
-                    this.alert('Estaço eliminado com sucesso', 'warning');
+                    this.alert('Registo eliminado com sucesso', 'warning');
+
+                }
+            }, (response) => {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+        sendEmailTaxation: function(id) {
+            var sendTaxation = this.sendTaxation;
+            this.$http.get('http://localhost:8000/api/v1/sendTaxation/'+id+'/'+sendTaxation).then((response) => {
+                $('#send-email').modal('hide');
+                if (response.status == 200) {
+                    this.alert('Recibo enviado para '+this.sendTaxation+' com sucesso', 'success');
+                    this.clearField();
 
                 }
             }, (response) => {
@@ -251,8 +269,10 @@ export default{
                 console.log("Ocorreu um erro na operação");
             });
         },
-        // --------------------------------------------------------------------------------------------
 
+
+
+        // --------------------------------------------------------------------------------------------
         doFilter: function() {
             var self = this
             filtered = self.all
@@ -291,7 +311,18 @@ export default{
     // ---------------------------------------------------------------------------------
 
     computed: {
+        myValidation: function() {
+            return {
+                email: /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[ 0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(this.sendTaxation),
+            }
+        },
 
+        isValid: function() {
+            var validation = this.validation;
+            return Object.keys(validation).every(function(key){
+                return validation[key];
+            });
+        },
     },
 
     // ---------------------------------------------------------------------------------

@@ -147,6 +147,9 @@ Route::group(['namespace' => 'ApiControllers'], function()
             // ------------------------------------Api-Taxation (place_trader)--------------------
             Route::resource('taxations', 'ApiTaxationsController');
             Route::get('allTaxations/{row}', 'ApiTaxationsController@index');
+            Route::get('sendTaxation/{id}/{sendTaxation}', 'ApiTaxationsController@sendTaxation');
+
+
 
             Route::get('taxationEmployee', 'ApiTaxationsController@getEmployeeForTaxation');
             Route::get('taxationExtPlace', 'ApiTaxationsController@getPlaceExtForTaxation');
@@ -288,6 +291,7 @@ Route::group(['namespace' => 'PluginsControllers'], function()
             // -----------------------------PDF-Download---------------------------------------------
             Route::resource('/getPDF', 'PDFController@getPDF');
             Route::resource('/taxationsPDF', 'PDFController@TaxationsPDF');
+
             //-------------------------------Impressão-----------------------------------------------
             Route::get('/printableUserInformation', 'PrintController@indexUser');
             Route::get('/printUserPreview', 'PrintController@printUserPreview');
@@ -414,4 +418,10 @@ Route::post('deleteEvents','PluginsControllers\CalendareventsController@delete')
 // ###################################################  Google analytics #############################################
 // ###################################################################################################################
 Route::get('data','PluginsControllers\AnalyticsController@index');
+// ###################################################################################################################
+
+// ###################################################################################################################
+// ###################################################  Links externos #############################################
+// ###################################################################################################################
+Route::get('acesso_ao_recibo/{id}/{code}', 'PluginsControllers\PDFController@downloadreciboempdf');
 // ###################################################################################################################

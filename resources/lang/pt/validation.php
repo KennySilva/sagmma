@@ -108,6 +108,11 @@ return [
             'required' => 'A introdução do :attribute é obrigatória',
             'after'    => 'A :attribute deve ser no minino 1 Ano (Depois de :date).',
         ],
+        'income' => [
+            'max' => 'Certifique este valor, é muito elevado o máximo aceite é 20000',
+            'min' => 'Valor muito pequeno, o minimo aceite é 500$00',
+            'required_if'    => 'Quando a Cobrança é Externo :attribute tem de ser preenchida',
+        ],
     ],
 
 
@@ -135,6 +140,9 @@ return [
         'place_id'    => 'Espaço',
         'trader_id'    => 'Comerciante',
         'ending_date'    => 'Data de Expiração',
+
+        'income'    => 'Taxa Diária',
+        'employee_id'    => 'Funcionário',
     ],
 
 ];

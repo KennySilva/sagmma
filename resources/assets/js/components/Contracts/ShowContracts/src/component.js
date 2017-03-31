@@ -9,8 +9,6 @@ export default{
     data(){
         return {
             selected: null,
-            // options: [],
-
             newContract: {
                 id          : '',
                 place_id    : '',
@@ -78,7 +76,7 @@ export default{
                 from: '2017-02-01',
                 // to: '2016-02-20'
             }],
-            
+
         }
     },
 

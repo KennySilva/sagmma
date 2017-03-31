@@ -21,7 +21,7 @@ class Place extends Model
     //Relacionamentos;
     public function taxation()
     {
-        return $this->belongsTo(Taxaton::class, 'id', 'place_id');
+        return $this->belongsTo(Taxation::class, 'id', 'place_id');
     }
 
     public function contract()

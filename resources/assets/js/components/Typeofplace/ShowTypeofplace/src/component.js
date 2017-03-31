@@ -155,7 +155,7 @@ export default{
                 console.log("Ocorreu um erro na operação");
             });
         },
-
+        
         // --------------------------------------------------------------------------------------------
         doFilter: function() {
             var self = this
