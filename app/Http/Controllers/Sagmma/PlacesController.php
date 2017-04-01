@@ -4,11 +4,15 @@ namespace Sagmma\Http\Controllers\Sagmma;
 use Illuminate\Http\Request;
 use Sagmma\Http\Requests;
 use Sagmma\Http\Controllers\Controller;
+use Charts;
+use Place;
 
 class PlacesController extends Controller
 {
     public function index()
     {
+
+
         return view('_backend.places.show');
     }
 

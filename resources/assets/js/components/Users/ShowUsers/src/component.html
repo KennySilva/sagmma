@@ -21,8 +21,8 @@
 			<div class="input-group">
 				<select data-toggle="tooltip" title="Escolhe as colunas a serem filtrados" class="form-control" name="" v-model="columnsFiltered" multiple="multiple" v-el:usercols>
 					<option class="" value="name">Nome</option>
-					<option class="" value="tel">Telefone</option>
-					<option class="" value="status">Estado</option>
+					<option class="" value="email">Email</option>
+					<option class="" value="username">Nome de Utilizador</option>
 				</select>
 			</div>
 			&nbsp;&nbsp;
@@ -97,10 +97,10 @@
 						<td>{{ user.phone }}</td>
 						<!----------------------------------------------------------------------------------->
 						<td>
-							<button v-for="rol in auth.roles" :disabled="rol.name == 'admin'" type="submit" @click = "estado_utilizador(user.id)" class='btn btn-xs btn-flat' :class="{ 'btn-info': user.status, 'btn-danger': !user.status }">{{user.status ? 'Ativado' : 'Disativado'}}</button>
+							<button type="submit" @click = "estado_utilizador(user.id)" class='btn btn-xs btn-flat' :class="{ 'btn-info': user.status, 'btn-danger': !user.status }">{{user.status ? 'Ativado' : 'Disativado'}}</button>
 						</td>
 						<!----------------------------------------------------------------------------------->
-						<td class="text-center">  <a data-toggle="modal" data-target="#modal-edit-user" href="#"> <i class="fa fa-pencil text-primary" @click="getThisUser(user.id)"> </i></a></td>
+						<td class="text-center">  <a data-toggle="modal" data-target="#modal-edit-user" href="#"> <i class="fa fa-edit text-primary" @click="getThisUser(user.id)"> </i></a></td>
 						<!------------------------------------------------------------------------------->
 
 						<td class="text-center"><a data-toggle="modal" data-target="#modal-delete-user" href="#"><i class="fa fa-trash text-danger" @click="getThisUser(user.id)" ></i></a></td>
@@ -123,7 +123,7 @@
 					</tbody>
 				</table>
 				<div class="row">
-					<div class="col-md-6 pull-left">
+					<div v-if="pagination.total > showRow" class="col-md-6 pull-left">
 						<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
 					</div>
 
@@ -144,7 +144,7 @@
 					<div class="modal-content">
 						<div class="modal-header">
 							<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
-							<h4 class="modal-title">Info do {{ newUser.name }}</h4>
+							<h4 class="modal-title"><i class="fa fa-info-circle"></i> {{ newUser.name }}</h4>
 						</div>
 						<div class="modal-body">
 							<div class="row">
@@ -284,22 +284,21 @@
 							<h4 class="modal-title">Criar Utilizador</h4>
 						</div>
 						<div class="modal-body">
-							<validator name="validationew">
 								<form action="#" methods="POST">
 									<div class="row">
 										<div class="col-md-12">
 											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<input type="text" class="form-control" name="name" placeholder="Nome Completo" v-model="newUser.name" v-validate:name="['required']"/>
+												<div class="form-group {{ errors.name ? ' has-error' : '' }} has-feedback">
+													<input type="text" class="form-control" name="name" placeholder="Nome Completo" v-model="newUser.name"/>
 													<span class="fa fa-user form-control-feedback"></span>
-													<p style="color:red;" v-if="$validationew.name.required && $validationew.name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
+													<p v-if="errors.name" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.name }}</p>
 												</div>
 											</div>
 											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<input type="text" class="form-control" name="username" placeholder="utilizador" v-model="newUser.username" v-validate:username="['required']"/>
+												<div class="form-group {{ errors.username ? ' has-error' : '' }} has-feedback">
+													<input type="text" class="form-control" name="username" placeholder="utilizador" v-model="newUser.username"/>
 													<span class="fa fa-user-circle form-control-feedback"></span>
-													<p style="color:red;" v-if="$validationew.username.required && $validationew.username.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
+													<p v-if="errors.username" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.username }}</p>
 												</div>
 											</div>
 										</div>
@@ -308,18 +307,17 @@
 									<div class="row">
 										<div class="col-md-12">
 											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<input type="email" class="form-control" name="email" placeholder="Email" v-model="newUser.email" v-validate:email="['required']"/>
+												<div class="form-group {{ errors.email ? ' has-error' : '' }} has-feedback">
+													<input type="email" class="form-control" name="email" placeholder="Email" v-model="newUser.email"/>
 													<span class="fa fa-envelope form-control-feedback"></span>
-													<span style="color:red;" v-show="!myValidation.email" v-if="$validationew.email.required && $validationew.email.touched"><span data-toggle="tooltip" title="Este campo é obrigatório">*</span></span>&nbsp;&nbsp;&nbsp;
-													<span style="color:red;" v-if="!myValidation.email && $validationew.email.touched"><span data-toggle="tooltip" title="Recorda-se de introduzir email valido! ex exemplo@exemplo.cv">*</span></span>
+													<p v-if="errors.email" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.email }}</p>
 												</div>
 											</div>
 											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<input type="password" class="form-control" name="password" placeholder="Password" v-model="newUser.password" v-validate:password="['required']"/>
+												<div class="form-group {{ errors.password ? ' has-error' : '' }} has-feedback">
+													<input type="password" class="form-control" name="password" placeholder="Password" v-model="newUser.password"/>
 													<span class="fa fa-lock form-control-feedback"></span>
-													<p style="color:red;" v-if="$validationew.password.required && $validationew.password.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida">*</span></p>
+													<p v-if="errors.password" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.password }}</p>
 												</div>
 											</div>
 										</div>
@@ -328,16 +326,18 @@
 									<div class="row">
 										<div class="col-md-12">
 											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<input v-model="newUser.ic" type='number' class='form-control' placeholder='Número BI'>
+												<div class="form-group {{ errors.ic ? ' has-error' : '' }} has-feedback">
+													<input v-model="newUser.ic" type="number" class='form-control' placeholder="BI">
 													<span class="fa fa-id-card form-control-feedback"></span>
+													<p v-if="errors.ic" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.ic }}</p>
 												</div>
 											</div>
 
 											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<input v-model="newUser.phone" type='number' class='form-control' placeholder='Introduza o Numero'>
+												<div class="form-group {{ errors.phone ? ' has-error' : '' }} has-feedback">
+													<input v-model="newUser.phone"  id="tel" type='number' class='form-control' placeholder='Introduza o Numero'>
 													<span class="fa fa-phone form-control-feedback"></span>
+														<p v-if="errors.phone" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.phone }}</p>
 												</div>
 											</div>
 										</div>
@@ -517,7 +517,7 @@
 						<div class="modal-footer">
 							<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
 
-							<button :disabled = "!$validationew.valid" @click="createUser" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
+							<button @click="createUser" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
 						</div>
 					</div>
 				</div>

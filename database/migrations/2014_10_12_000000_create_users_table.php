@@ -21,7 +21,7 @@ class CreateUsersTable extends Migration
             $table->string('council', 30)->nullable()->default('Santa Catarina');
             $table->string('parish', 30)->nullable()->default('Santa Catarina');
             $table->string('zone', 30)->nullable();
-            $table->string('phone', 8)->nullable();
+            $table->string('phone', 10)->nullable();
             $table->boolean('status')->default(false);
             $table->enum('type', ['member', 'emp', 'trad'])->default('member');
             $table->text('description', 255)->nullable();

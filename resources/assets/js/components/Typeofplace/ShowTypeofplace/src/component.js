@@ -27,6 +27,8 @@ export default{
             showRow: '',
             all: {},
             errors: [],
+            auth: [],
+
 
         }
     },
@@ -35,6 +37,7 @@ export default{
 
     ready () {
         this.fetchTypeofplace(this.pagination.current_Page, this.showRow);
+        this.authUser();
         var self = this
         jQuery(self.$els.typeofplacecols).select2({
             placeholder: "Coluna",
@@ -155,7 +158,17 @@ export default{
                 console.log("Ocorreu um erro na operação");
             });
         },
-        
+
+
+        authUser: function() {
+            this.$http.get('http://localhost:8000/api/v1/authUser').then((response) => {
+                this.$set('auth', response.data);
+                // this.$set('options', response.data.name);
+                // this.options = response.data.items
+            }, (response) => {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
         // --------------------------------------------------------------------------------------------
         doFilter: function() {
             var self = this

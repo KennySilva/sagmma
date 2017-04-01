@@ -40,21 +40,16 @@ class ApiTaxationsController extends Controller
     public function store(TaxationsRequest $request)
     {
         $taxation= new Taxation();
-        if ( $request->place_id == '') {
-            $place_id = 1;
-        }else {
-            $place_id = $request->place_id;
-        }
+        $place_id = $request->place_id;
         $place = Place::where('id', '=', $place_id)->first();
         if ($request->type == 1) {
             $taxation->employee_id = Auth::user()->id;
             $taxation->income      = $place->price;
-            $taxation->place_id    = $request->place_id;
         }else {
             $taxation->employee_id = $request->employee_id;
             $taxation->income      = $request->income;
-            $taxation->place_id    =  $request->place_id;
         }
+        $taxation->place_id    = $place_id;
         $taxation->type        = $request->type;
         $taxation->author      = Auth::user()->name;
         $taxation->save();
@@ -73,21 +68,16 @@ class ApiTaxationsController extends Controller
 
     public function update(TaxationsRequest $request, $id)
     {
-        if ( $request->place_id == '') {
-            $place_id = 1;
-        }else {
-            $place_id = $request->place_id;
-        }
+        $place_id = $request->place_id;
         $place = Place::where('id', '=', $place_id)->first();
         if ($request->type == 1) {
             $employee_id = Auth::user()->id;
             $income      = $place->price;
-            $place_id    = $request->place_id;
         }else {
             $employee_id = $request->employee_id;
             $income      = $request->income;
-            $place_id    =  $request->place_id;
         }
+        $place_id    =  $request->place_id;
         $type        = $request->type;
         $author      = Auth::user()->name;
 
@@ -118,16 +108,14 @@ class ApiTaxationsController extends Controller
     // --------------------------------------------------------------------------------------
     public function getPlaceExtForTaxation()
     {
-        $place = Place::where('typeofplace_id', '>=', 4)->get();
-        // $place = Place::where('typeofplace_id', '>3', 7)->orWhere('typeofplace_id', '=', 6)->orWhere('typeofplace_id', '=', 5)->orWhere('typeofplace_id', '=', 4)->get();
+        $place = Place::where('typeofplace_id', '=', 1)->get();
         return $place;
     }
 
 
     public function getPlaceIntForTaxation()
     {
-        $place = Place::where('typeofplace_id', '<', 4)->get();
-        // ->where('status', true)
+        $place = Place::where('typeofplace_id', '!=', 1)->where('status', 1)->get();
         return $place;
     }
 

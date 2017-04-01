@@ -15,7 +15,7 @@
     <div class="sagmma_container">
         <div class="row">
             <div class="col-md-6">
-                <div class="box box-primary collapsed-box">
+                <div class="box box-primary box-solid collapsed-box">
                     <div class="box-header with-border">
                         <h3 class="box-title">Estatistíca</h3>
                         <div class="box-tools pull-right">
@@ -34,7 +34,7 @@
             </div>
 
             <div class="col-md-6">
-                <div class="box box-primary collapsed-box">
+                <div class="box box-primary box-solid collapsed-box">
                     <div class="box-header with-border">
                         <h3 class="box-title">Estatistíca</h3>
                         <div class="box-tools pull-right">
@@ -56,7 +56,7 @@
 
         <div class="row">
             <div class="col-md-12">
-                <div class="box box-primary">
+                <div class="box box-primary box-solid">
                     <div class="box-header with-border">
                         <h3 class="box-title">Cobrança de Impostos</h3>
                         <div class="box-tools pull-right">

@@ -27,7 +27,7 @@ class TaxationsController extends Controller
         ->elementLabel("Total de Cobrança por dia")
         ->title('Cobranças Internos');
 
-        $chart1 = Charts::database(Taxation::all()->where('type', '2'), 'bar', 'highcharts')
+        $chart1 = Charts::database(Taxation::all()->where('type', '2'), 'line', 'highcharts')
         ->dateColumn('created_at')
         ->dimensions(0, 400)
         ->aggregateColumn('income', 'sum')

@@ -37,7 +37,7 @@ export default{
             typeAlert: '',
             showRow: '',
             all: {},
-
+            errors: [],
         }
     },
 
@@ -68,7 +68,6 @@ export default{
 
         jQuery(self.$els.editplace).select2({
             placeholder: "Tipo",
-            allowClear: true,
             theme: "bootstrap",
             width: '100%',
             language: 'pt',
@@ -118,10 +117,10 @@ export default{
                     console.log(response.data);
                     this.fetchPlace(this.pagination.current_Page, this.showRow);
                     this.alert('Espaço Criado com sucesso', 'success');
-
+                    this.$set('errors', '')
                 }
             }, (response) => {
-
+                this.$set('errors', response.data)
             });
         },
 
@@ -165,10 +164,10 @@ export default{
                     // console.log(response.data);
                     this.fetchPlace(this.pagination.current_Page, this.showRow);
                     this.alert('Estaço atualizado com sucesso', 'info');
-
+                    this.$set('errors', '')
                 }
             }, (response) => {
-                console.log("Ocorreu um erro na operação");
+                this.$set('errors', response.data)
             });
         },
 

@@ -5,7 +5,7 @@
 </div>
 
 <!-- <pre>
-	{{$data.allRow | json}}
+	{{$data.newTaxation.place_id | json}}
 </pre> -->
 
 <div class="row">
@@ -55,6 +55,7 @@
 <hr>
 
 <div class="row">
+	<!-- <div v-if="(placesInt.length > 0 | placesInt.length > 0) && employees.length > 0" class="col-md-12"> -->
 	<div class="col-md-12">
 		<button @click="clearField" class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-taxation"><i class="fa fa-plus"></i> Novo</button>&nbsp;&nbsp;
 
@@ -68,9 +69,11 @@
 				<li><a data-toggle="modal" data-target="#modal-report-year" href="#">Relatório Anual</a></li>
 			</ul>
 		</div>
-
-
 	</div>
+
+	<!-- <div v-else class="col-md-12">
+		<button data-toggle="tooltip" title="Certifique-se de criar comerciante e espaço para poder criar registo de cobrança" type="button" class="btn btn-danger btn-flat"><i class="fa fa-minus"></i> Novo</button>&nbsp;&nbsp;
+	</div> -->
 
 	<div class="modal fade" id="modal-report-date" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
 		<div class="modal-dialog">
@@ -340,7 +343,7 @@
 													<option v-for="place in placesExt" value="{{place.id}}">{{place.name}}</option>
 												</select>
 												<!-------------------------------------------------------------------------->
-												<select v-else :disabled = "newTaxation.type == ''" class="form-control" v-model="newTaxation.place_id">
+												<select v-else :disabled = "newTaxation.type == '' || placesInt.length == 0" class="form-control" v-model="newTaxation.place_id">
 													<option value="">Espaço</option>
 													<option v-for="place in placesInt" value="{{place.id}}">
 														{{place.name}}
@@ -349,6 +352,7 @@
 												<p v-if="errors.place_id" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.place_id }}</p>
 												<!-------------------------------------------------------------------------->
 												<span class="help-block">Qual é o espaço?</span>
+												<span v-if="newTaxation.type == 1 && placesInt.length == 0" class="text-danger">Nenhum contrato com os Espaços</span>
 											</div>
 										</div>
 

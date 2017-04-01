@@ -49,9 +49,11 @@ class ApiUsersController extends Controller
 
     public function store(UsersRequest $request)
     {
+        $name = ucwords($request->name);
+        $username = ucwords($request->username);
         $user              = new User();
-        $user->name        = $request->name;
-        $user->username    = $request->username;
+        $user->name        = $name;
+        $user->username    = $username;
         $user->ic          = $request->ic;
         $user->email       = $request->email;
         $user->password    = bcrypt($request->password);

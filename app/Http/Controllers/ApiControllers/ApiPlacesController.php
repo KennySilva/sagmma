@@ -59,13 +59,22 @@ class ApiPlacesController extends Controller
             //
         }
 
-
-
-        public function update(Req $request, $id)
+        public function update(PlacesRequest $request, $id)
         {
-            Place::findOrFail($id)->update($request::all());
-            return Response::json($request::all());
+            $name           = $request->name;
+            $typeofplace_id = $request->typeofplace_id;
+            $price          = $request->price;
+            $dimension      = $request->dimension;
+            $description    = $request->description;
 
+            $place = new Place();
+            $place->where('id', $id)->update(array(
+                'name'    => $name,
+                'typeofplace_id'   => $typeofplace_id,
+                'price' => $price,
+                'dimension' => $dimension,
+                'description' => $description
+            ));
         }
 
         public function destroy($id)
@@ -105,14 +114,5 @@ class ApiPlacesController extends Controller
                 $place2->status = 0;
                 $place2->save();
             }
-
-
         }
-
-
-
-
-    // $user = User::has('roles')->where('name', '!=', 'admin')->paginate(10);
-    //         // $user = User::with('roles')->paginate(10);
-    //         // $user = User::with('roles')->whereName('super-admins')->paginate(10);
-}
+    }

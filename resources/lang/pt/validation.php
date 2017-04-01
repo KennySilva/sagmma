@@ -113,6 +113,31 @@ return [
             'min' => 'Valor muito pequeno, o minimo aceite é 500$00',
             'required_if'    => 'Quando a Cobrança é Externo :attribute tem de ser preenchida',
         ],
+
+        'price' => [
+            'numeric' => 'Tipo de dados não aceite, certifique introduzir apenas numeros',
+            'min' => 'O Valor minimo aceite é 5000',
+            'required_unless'    => 'Nesta condição a indicação de :attribute é obrigatória',
+        ],
+
+        'dimension' => [
+            'numeric' => 'Tipo de dados não aceite, certifique introduzir apenas numeros',
+            'min' => 'O Valor minimo aceite é 4',
+            'required_unless'    => 'Nesta condição a indicação de :attribute é obrigatória',
+        ],
+        'name' => [
+            'required' => 'Obrigatório',
+            'min' => 'Minimo caractere é :min',
+            'max' => 'Maximo de caractere é :max',
+            'unique'    => 'Este :attribute já existe',
+        ],
+
+        'username' => [
+            'required' => 'Obrigatório',
+            'min' => 'Minimo caractere é :min',
+            'max' => 'Maximo de caractere é :max',
+            'unique'    => 'Este :attribute já existe',
+        ],
     ],
 
 
@@ -133,6 +158,7 @@ return [
         'username'    => 'Nome Utilizador',
         'ic'    => 'BI',
         'email'    => 'Email',
+        'phone'    => 'Tel/Movel',
         'password' => 'Palavra Passe',
         'g-recaptcha-response'    => 'ReCaptcha',
 
@@ -143,6 +169,10 @@ return [
 
         'income'    => 'Taxa Diária',
         'employee_id'    => 'Funcionário',
+
+        'typeofplace_id'    => 'Tipo de Funcionário',
+        'dimension'    => 'Dimensão',
+        'price'    => 'Valor',
     ],
 
 ];

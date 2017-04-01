@@ -54,6 +54,7 @@ export default{
             showRow: '',
             all: {},
             auth: [],
+            errors: [],
         }
     },
 
@@ -254,9 +255,10 @@ export default{
                     console.log(response.data);
                     this.fetchUser(this.pagination.last_Page, this.showRow);
                     this.alert('Utilizador Criado com sucesso', 'success');
+                    this.$set('errors', '')
                 }
             }, (response) => {
-
+                this.$set('errors', response.data)
             });
         },
 
@@ -321,10 +323,10 @@ export default{
                     // console.log(response.data);
                     this.fetchUser(this.pagination.current_page, this.showRow);
                     this.alert('Utilizador atualizado com sucesso', 'info');
-
+                    this.$set('errors', '')
                 }
             }, (response) => {
-                console.log("Ocorreu um erro na operação");
+                this.$set('errors', response.data)
             });
         },
 

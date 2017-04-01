@@ -10,8 +10,8 @@ class CreatePlacesTable extends Migration
     {
         Schema::create('places', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name', 20)->unique();
-            $table->string('dimension', 10);
+            $table->string('name', 50)->unique();
+            $table->int('dimension');
             $table->float('price');
             $table->text('description', 255);
             $table->boolean('status');
@@ -21,7 +21,7 @@ class CreatePlacesTable extends Migration
             $table->foreign('typeofplace_id')->references('id')->on('typeofplaces')->onDelete('cascade');
         });
     }
-    
+
     public function down()
     {
         Schema::drop('places');

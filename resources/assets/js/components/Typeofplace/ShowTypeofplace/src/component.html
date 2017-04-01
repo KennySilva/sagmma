@@ -4,6 +4,8 @@
 	<i class="fa fa-thumbs-o-up text-center">&nbsp;&nbsp; {{msgSucess}}</i>
 </div>
 
+<!-- <pre>{{$data.auth | json}}</pre> -->
+
 <div class="row">
 	<div class="col-md-12">
 		<div class="form-inline pull-right">
@@ -80,11 +82,11 @@
 
 						<td align=right><a data-toggle="modal" data-target="#modal-edit-typeofplace" href="#"><i class="fa fa-edit text-primary" @click="getThisTypeofplace(typeofplace.id)"></i></a></td>
 						<!---------------------------------------------------------------------------->
-						<span v-for="place in typeofplace.places">
-						<td v-if="place == null" align=right><a data-toggle="modal" data-target="#modal-delete-typeofplace" href="#"><i class="fa fa-trash text-danger" @click="getThisTypeofplace(typeofplace.id)" ></i></a></td>
+						<!-- <span v-for="place in typeofplace.places"> -->
+						<td v-for="role in auth.roles" v-if="role.name == 'super-admin'" align=right><a data-toggle="modal" data-target="#modal-delete-typeofplace" href="#"><i class="fa fa-trash text-danger" @click="getThisTypeofplace(typeofplace.id)" ></i></a></td>
 
-						<td v-if="place != null" align=right><a data-toggle="modal" data-target="#modal-undeleted-typeofplace" href="#"><i class="fa fa-trash text-warning" @click="getThisTypeofplace(typeofplace.id)" ></i></a></td>
-						</span>
+						<!-- <td v-if="place != null" align=right><a data-toggle="modal" data-target="#modal-undeleted-typeofplace" href="#"><i class="fa fa-trash text-warning" @click="getThisTypeofplace(typeofplace.id)" ></i></a></td>
+						</span> -->
 						<!---------------------------------------------------------------------------->
 
 					</tr>
