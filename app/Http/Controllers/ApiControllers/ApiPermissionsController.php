@@ -10,12 +10,26 @@ use Sagmma\Http\Requests\PermissionsRequest;
 use Permission;
 use Response;
 use Input;
+use Auth;
 
 class ApiPermissionsController extends Controller
 {
     public function index($row)
     {
-        return Permission::paginate($row);
+        foreach (Auth::user()->roles as $role) {
+            # code...
+            if ($role->name == 'super-admin') {
+                $permissions = Permission::paginate($row);
+            }else{
+                $permissions = Permission::where('name', '!=', 'admin')->where('name', '!=', 'manage-admins')->paginate($row);
+            }
+        }
+        return $permissions;
+
+
+
+
+        // return Permission::paginate($row);
     }
 
     public function create()

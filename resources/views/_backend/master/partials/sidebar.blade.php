@@ -28,7 +28,7 @@
 
             <li><a href="{{ url('/home') }}"><i class='fa fa-home'></i> <span>HOME</span></a></li>
 
-            @role(['superadmin', 'admin', 'dpel'])
+            @role(['super-admin', 'admin', 'dpel'])
             <li class="treeview">
                 <a href="#"><i class=' fa fa-cogs'></i><span>SISTEMA</span> <i class="fa fa-angle-left pull-right"></i></a>
                 <ul class="treeview-menu">
@@ -40,14 +40,14 @@
                 </ul>
             </li>
             @endrole
-
+            
 
 
             <li class="treeview">
                 <a href="#"><i class='fa fa-line-chart'></i> <span>SAGMMA</span> <i class="fa fa-angle-left pull-right"></i></a>
 
                 <ul class="treeview-menu">
-                    @role(['superadmin', 'admin', 'dpel', 'manager', 'aa'])
+                    @role(['super-admin', 'admin', 'dpel', 'manager', 'aa'])
                     <li class="treeview">
                         <a href="#"><i class="fa fa-bar-chart-o"></i><span>Gestão</span><i class="fa fa-angle-left pull-right"></i>
                         </a>
@@ -62,7 +62,7 @@
                         </ul>
                     </li>
                     @endrole
-                    @role(['superadmin', 'admin', 'dpel', 'manager'])
+                    @role(['super-admin', 'admin', 'dpel', 'manager'])
                     <li><a href="{{ url('sagmma/markets') }}"><i class='fa fa-university'></i> <span>Mercados</span></a></li>
                     <li><a href="{{ url('sagmma/employees') }}"><i class='fa fa-address-card'></i> <span>Funcionários</span></a></li>
                     <li><a href="{{ url('sagmma/materials') }}"><i class='fa fa-briefcase'></i> <span>Materiais</span></a></li>
@@ -74,7 +74,7 @@
                         @endrole
 
                         <li class="treeview">
-                            @role(['superadmin', 'admin', 'dpel', 'ga'])
+                            @role(['super-admin', 'admin', 'dpel', 'ga'])
                             <a href="#"><i class='fa fa-desktop'></i> <span>APLICAÇÃO E CONTEÚDO</span> <i class="fa fa-angle-left pull-right"></i></a>
                             <ul class="treeview-menu">
                                 <li><a href="{{ url('web/categories') }}"><i class='fa fa-folder-open'></i> <span>Categorias</span></a></li>

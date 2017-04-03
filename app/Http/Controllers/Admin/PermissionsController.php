@@ -9,8 +9,10 @@ use Sagmma\Http\Controllers\Controller;
 
 class PermissionsController extends Controller
 {
+    
     public function index()
     {
+
         return view('_backend.permissions.show');
     }
 

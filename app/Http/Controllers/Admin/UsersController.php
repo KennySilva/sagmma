@@ -8,28 +8,31 @@ use Sagmma\Http\Requests;
 use Sagmma\Http\Controllers\Controller;
 use User;
 use Auth;
+use Role;
 // use Image;
 use Intervention\Image\ImageManagerStatic as Image;
+use Charts;
 
 class UsersController extends Controller
 {
     public function index()
     {
+        //Charts
+        $chart = Charts::database(User::all(), 'donut', 'fusioncharts')
+        ->title('Tipo de Utilizadores')
+        ->dimensions(0, 300)
+        ->responsive(false)
+        ->groupBy('type', null, ['member' => 'Membros', 'emp' => 'Funcionários', 'trad' => 'Comerciantes', '' => 'Outros']);
+
+        $chart1 = Charts::database(User::all(), 'area', 'highcharts')
+        ->title('Total por Mês')
+        ->elementLabel("Total Criado por mês")
+        ->dimensions(0, 300)
+        ->responsive(false)
+        ->groupByMonth();
+
         $user=User::all();
-
-        // $user->each(function($user)
-        // {
-        //     $user->roles;
-        // });
-        // // dd($user->name);
-        //
-        // foreach ($user as $k) {
-        //     foreach ($k->roles as $ke) {
-        //         dd($ke->name);
-        //     }
-        // }
-
-        return view('_backend.users.show')->with('user', $user);
+        return view('_backend.users.show')->with('user', $user)->with('chart', $chart)->with('chart1', $chart1);
     }
 
     public function create()

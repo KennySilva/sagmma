@@ -206,7 +206,7 @@ Route::group(['namespace' => 'ApiControllers'], function()
 Route::group(['namespace' => 'Admin'], function()
 {
     Route::group(['prefix' => 'user', 'middleware' => ['auth']], function () {
-        Route::group(['middleware' => ['role:admin']], function () { //Papel de Admin, Superadimin, Dpel
+        Route::group(['middleware' => ['role:admin|super-admin|dpel']], function () { //Papel de Admin, Superadimin, Dpel
             Route::resource('users', 'UsersController');
             // ----------------------------------------------------------
             Route::resource('roles', 'RolesController');

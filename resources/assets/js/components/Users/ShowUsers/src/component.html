@@ -96,14 +96,20 @@
 						<td><a href="#" data-toggle="modal" data-target="#show-user" @click="getThisUser(user.id)">{{ user.name }}</a></td>
 						<td>{{ user.phone }}</td>
 						<!----------------------------------------------------------------------------------->
-						<td>
+						<td v-if="user.id != auth.id">
 							<button type="submit" @click = "estado_utilizador(user.id)" class='btn btn-xs btn-flat' :class="{ 'btn-info': user.status, 'btn-danger': !user.status }">{{user.status ? 'Ativado' : 'Disativado'}}</button>
+						</td>
+
+						<td v-else>
+							<span><i class="fa fa-circle text-success"></i> Online</span>
 						</td>
 						<!----------------------------------------------------------------------------------->
 						<td class="text-center">  <a data-toggle="modal" data-target="#modal-edit-user" href="#"> <i class="fa fa-edit text-primary" @click="getThisUser(user.id)"> </i></a></td>
 						<!------------------------------------------------------------------------------->
 
-						<td class="text-center"><a data-toggle="modal" data-target="#modal-delete-user" href="#"><i class="fa fa-trash text-danger" @click="getThisUser(user.id)" ></i></a></td>
+						<td v-if="user.id != auth.id" class="text-center"><a data-toggle="modal" data-target="#modal-delete-user" href="#"><i class="fa fa-trash text-danger" @click="getThisUser(user.id)" ></i></a></td>
+
+						<td v-else class="text-center"><i class="fa fa-check-square text-success"></i></td>
 
 						<!------------------------------------------------------------------------------->
 						<td width=75 class="text-center">
@@ -284,490 +290,491 @@
 							<h4 class="modal-title">Criar Utilizador</h4>
 						</div>
 						<div class="modal-body">
-								<form action="#" methods="POST">
-									<div class="row">
-										<div class="col-md-12">
-											<div class="col-md-6">
-												<div class="form-group {{ errors.name ? ' has-error' : '' }} has-feedback">
-													<input type="text" class="form-control" name="name" placeholder="Nome Completo" v-model="newUser.name"/>
-													<span class="fa fa-user form-control-feedback"></span>
-													<p v-if="errors.name" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.name }}</p>
-												</div>
+							<form action="#" methods="POST">
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-6">
+											<div class="form-group {{ errors.name ? ' has-error' : '' }} has-feedback">
+												<input type="text" class="form-control" name="name" placeholder="Nome Completo" v-model="newUser.name"/>
+												<span class="fa fa-user form-control-feedback"></span>
+												<p v-if="errors.name" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.name }}</p>
 											</div>
-											<div class="col-md-6">
-												<div class="form-group {{ errors.username ? ' has-error' : '' }} has-feedback">
-													<input type="text" class="form-control" name="username" placeholder="utilizador" v-model="newUser.username"/>
-													<span class="fa fa-user-circle form-control-feedback"></span>
-													<p v-if="errors.username" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.username }}</p>
-												</div>
+										</div>
+										<div class="col-md-6">
+											<div class="form-group {{ errors.username ? ' has-error' : '' }} has-feedback">
+												<input type="text" class="form-control" name="username" placeholder="utilizador" v-model="newUser.username"/>
+												<span class="fa fa-user-circle form-control-feedback"></span>
+												<p v-if="errors.username" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.username }}</p>
 											</div>
 										</div>
 									</div>
+								</div>
 
-									<div class="row">
-										<div class="col-md-12">
-											<div class="col-md-6">
-												<div class="form-group {{ errors.email ? ' has-error' : '' }} has-feedback">
-													<input type="email" class="form-control" name="email" placeholder="Email" v-model="newUser.email"/>
-													<span class="fa fa-envelope form-control-feedback"></span>
-													<p v-if="errors.email" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.email }}</p>
-												</div>
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-6">
+											<div class="form-group {{ errors.email ? ' has-error' : '' }} has-feedback">
+												<input type="email" class="form-control" name="email" placeholder="Email" v-model="newUser.email"/>
+												<span class="fa fa-envelope form-control-feedback"></span>
+												<p v-if="errors.email" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.email }}</p>
 											</div>
-											<div class="col-md-6">
-												<div class="form-group {{ errors.password ? ' has-error' : '' }} has-feedback">
-													<input type="password" class="form-control" name="password" placeholder="Password" v-model="newUser.password"/>
-													<span class="fa fa-lock form-control-feedback"></span>
-													<p v-if="errors.password" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.password }}</p>
-												</div>
+										</div>
+										<div class="col-md-6">
+											<div class="form-group {{ errors.password ? ' has-error' : '' }} has-feedback">
+												<input type="password" class="form-control" name="password" placeholder="Password" v-model="newUser.password"/>
+												<span class="fa fa-lock form-control-feedback"></span>
+												<p v-if="errors.password" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.password }}</p>
 											</div>
 										</div>
 									</div>
+								</div>
 
-									<div class="row">
-										<div class="col-md-12">
-											<div class="col-md-6">
-												<div class="form-group {{ errors.ic ? ' has-error' : '' }} has-feedback">
-													<input v-model="newUser.ic" type="number" class='form-control' placeholder="BI">
-													<span class="fa fa-id-card form-control-feedback"></span>
-													<p v-if="errors.ic" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.ic }}</p>
-												</div>
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-6">
+											<div class="form-group {{ errors.ic ? ' has-error' : '' }} has-feedback">
+												<input v-model="newUser.ic" type="number" class='form-control' placeholder="BI">
+												<span class="fa fa-id-card form-control-feedback"></span>
+												<p v-if="errors.ic" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.ic }}</p>
 											</div>
+										</div>
 
-											<div class="col-md-6">
-												<div class="form-group {{ errors.phone ? ' has-error' : '' }} has-feedback">
-													<input v-model="newUser.phone"  id="tel" type='number' class='form-control' placeholder='Introduza o Numero'>
-													<span class="fa fa-phone form-control-feedback"></span>
-														<p v-if="errors.phone" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.phone }}</p>
-												</div>
+										<div class="col-md-6">
+											<div class="form-group {{ errors.phone ? ' has-error' : '' }} has-feedback">
+												<input v-model="newUser.phone"  id="tel" type='number' class='form-control' placeholder='Introduza o Numero'>
+												<span class="fa fa-phone form-control-feedback"></span>
+												<p v-if="errors.phone" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.phone }}</p>
 											</div>
 										</div>
 									</div>
+								</div>
 
-									<hr><!-------------------------------------------------------------------------------------------------------------------->
+								<hr><!-------------------------------------------------------------------------------------------------------------------->
 
-									<div class="row">
-										<div class="col-md-12">
-											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<label class="radio-inline">
-														<input type="radio" id="gender" value="M" name="gender" v-model="newUser.gender"><i class="fa fa-male"></i> Masculino
-													</label>
-													<label class="radio-inline">
-														<input type="radio" id="gender" name="gender" value="F" v-model="newUser.gender"><i class="fa fa-female"></i> Feminino
-													</label>
-												</div>
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<label class="radio-inline">
+													<input type="radio" id="gender" value="M" name="gender" v-model="newUser.gender"><i class="fa fa-male"></i> Masculino
+												</label>
+												<label class="radio-inline">
+													<input type="radio" id="gender" name="gender" value="F" v-model="newUser.gender"><i class="fa fa-female"></i> Feminino
+												</label>
 											</div>
-											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<input type="number" class="form-control" name="age" placeholder="Idade" min="20" max="50" v-model="newUser.age"/>
-													<span class="fa fa-birthday-cake form-control-feedback"></span>
-												</div>
+										</div>
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<input type="number" class="form-control" name="age" placeholder="Idade" min="20" max="50" v-model="newUser.age"/>
+												<span class="fa fa-birthday-cake form-control-feedback"></span>
 											</div>
 										</div>
 									</div>
+								</div>
 
-									<hr>
+								<hr>
 
-									<div class="row">
-										<div class="col-md-12">
-											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<select name="state" class="form-control" v-model="newUser.state" v-el:statecreate>
-														<optgroup label="Sotavento">
-															<option  class="disabled" value="" selected>Ilha</option>
-															<option value="1">Santiago</option>
-															<option value="2">Maio</option>
-															<option value="3">Fogo</option>
-															<option value="4">Brava</option>
-														</optgroup>
-														<optgroup label="Barlavento">
-															<option value="5">Santo Antão</option>
-															<option value="6">São Nicolau</option>
-															<option value="7">São Vicente</option>
-															<option value="8">Sal</option>
-															<option value="9">Boa Vista</option>
-														</optgroup>
-													</select>
-												</div>
-											</div>
-											<!--#################################################################-->
-											<div class="col-md-6">
-												<div class="form-group has-feedback">
-
-													<select v-else name="state" class="form-control" v-model="newUser.council" placeholder="Selecina o conceolho" v-el:councilcreate>
-														<option value="" selected>Concelho</option>
-														<option v-if="newUser.state == 1" value="1">Praia</option>
-														<option v-if="newUser.state == 1" value="2">São Domingos</option>
-														<option v-if="newUser.state == 1" value="3">Santa Catarina</option>
-														<option v-if="newUser.state == 1" value="4">São Salvador do Mundo</option>
-														<option v-if="newUser.state == 1" value="5">Santa Cruz</option>
-														<option v-if="newUser.state == 1" value="6">São Lourenço dos Órgãos</option>
-														<option v-if="newUser.state == 1" value="7">Ribeira Grande de Santiago</option>
-														<option v-if="newUser.state == 1" value="8">São Miguel</option>
-														<option v-if="newUser.state == 1" value="9">Tarafal</option>
-														<option v-if="newUser.state == 2" value="10">Maio</option>
-														<option v-if="newUser.state == 3" value="11">São Filipe</option>
-														<option v-if="newUser.state == 3" value="12">Santa Catarina do Fogo</option>
-														<option v-if="newUser.state == 3" value="13">Mosteiros</option>
-														<option v-if="newUser.state == 5" value="14">Ribeira Grande</option>
-														<option v-if="newUser.state == 5" value="15">Paul</option>
-														<option v-if="newUser.state == 5" value="16">Porto Novo</option>
-														<option v-if="newUser.state == 6" value="17">Ribeira Brava</option>
-														<option v-if="newUser.state == 6" value="18">Tarrafal de São Nicolau</option>
-														<option v-if="newUser.state == 7" value="19">São Vicente</option>
-														<option v-if="newUser.state == 8" value="20">Sal</option>
-														<option v-if="newUser.state == 9" value="21">Boa Vista</option>
-														<option v-if="newUser.state == 4" value="22">Brava</option>
-													</select>
-												</div>
-											</div>
-											<!--#################################################################-->
-
-										</div>
-									</div>
-
-
-									<div class="row">
-										<div class="col-md-12">
-											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<select v-else name="state" class="form-control" v-model="newUser.parish" placeholder="Selecina o conceolho" v-el:parishcreate>
-														<option value="" selected>Freguesia</option>
-														<option v-if="(newUser.council == 10 && newUser.state == 2) || (newUser.council == 2 && newUser.state == 1) || (newUser.council == 19 && newUser.state == 7)" value="1">Nossa Senhora da Luz</option>
-														<option v-if="(newUser.council == 1 && newUser.state == 1)" value="2">Nossa Senhora da Graça</option>
-														<option v-if="newUser.council == 2 && newUser.state == 1" value="3">São Nicolau Tolentino</option>
-														<option v-if="(newUser.council == 3 && newUser.state == 1) || (newUser.council == 12 && newUser.state == 3)" value="4">Santa Catarina</option>
-														<option v-if="newUser.council == 4  && newUser.state == 1" value="5">São Salvador do Mundo</option>
-														<option v-if="newUser.council == 5  && newUser.state == 1" value="6">Santiago Maior</option>
-														<option v-if="(newUser.council == 6  && newUser.state == 1) || (newUser.council == 11  && newUser.state == 3)" value="7">São Lourenço</option>
-														<option v-if="newUser.council == 7 && newUser.state == 1" value="8">Santíssimo Nome de Jesus</option>
-														<option v-if="newUser.council == 14 && newUser.state == 5" value="9">Santo Crucifixo</option>
-														<option v-if="newUser.council == 14 && newUser.state == 5" value="17">Nossa Senhora do Livramento</option>
-														<option v-if="newUser.council == 14 && newUser.state == 5" value="18">São Pedro Apóstolo</option>
-														<option v-if="newUser.council == 8 && newUser.state == 1" value="10">São Miguel Arcanjo</option>
-														<option v-if="newUser.council == 9 && newUser.state == 1" value="11">Santo Amaro Abade</option>
-														<option v-if="newUser.council == 11 && newUser.state == 3" value="12">Nossa Senhora da Conceição</option>
-														<option v-if="newUser.council == 13 && newUser.state == 3" value="13">Nossa Senhora da Ajuda</option>
-														<option v-if="(newUser.council == 16 && newUser.state == 5) || (newUser.council == 21 && newUser.state == 9) || (newUser.council == 7 && newUser.state == 1)" value="14">São João Baptista</option>
-														<option v-if="newUser.council == 22 && newUser.state == 4" value="15">Nossa Senhora do Monte</option>
-														<option v-if="(newUser.council == 17 && newUser.state == 6) || (newUser.council == 14 && newUser.state == 5)" value="16">Nossa Senhora do Rosário</option>
-														<option v-if="newUser.council == 15 && newUser.state == 5" value="19">Santo António das Pombas</option>
-														<option v-if="newUser.council == 16 && newUser.state == 5" value="20">Santo André</option>
-														<option v-if="newUser.council == 17 && newUser.state == 6" value="21">Nossa Senhora da Lapa</option>
-														<option v-if="newUser.council == 18 && newUser.state == 6" value="22">São Francisco</option>
-														<option v-if="newUser.council == 20 && newUser.state == 8" value="23">Nossa Senhora das Dores</option>
-														<option v-if="newUser.council == 21 && newUser.state == 9" value="4">Santa Isabel</option>
-													</select>
-												</div>
-											</div>
-
-											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<input type="text" class="form-control" name="zone" placeholder="Zona" v-model="newUser.zone"/>
-													<span class="fa fa-thumb-tack form-control-feedback"></span>
-												</div>
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<select name="state" class="form-control" v-model="newUser.state" v-el:statecreate>
+													<optgroup label="Sotavento">
+														<option  class="disabled" value="" selected>Ilha</option>
+														<option value="1">Santiago</option>
+														<option value="2">Maio</option>
+														<option value="3">Fogo</option>
+														<option value="4">Brava</option>
+													</optgroup>
+													<optgroup label="Barlavento">
+														<option value="5">Santo Antão</option>
+														<option value="6">São Nicolau</option>
+														<option value="7">São Vicente</option>
+														<option value="8">Sal</option>
+														<option value="9">Boa Vista</option>
+													</optgroup>
+												</select>
 											</div>
 										</div>
-									</div>
+										<!--#################################################################-->
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
 
-									<hr><!---------------------------------------------------------------------------------------------------------------->
-
-
-
-									<div class="row">
-										<div class="col-md-12">
-											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<select name="state" class="form-control" v-model="newUser.type" v-el:typecreate>
-														<option value="member">Membro</option>
-														<option value="emp">Funcionário</option>
-														<option value="trad">Comerciante</option>
-													</select>
-												</div>
+												<select v-else name="state" class="form-control" v-model="newUser.council" placeholder="Selecina o conceolho" v-el:councilcreate>
+													<option value="" selected>Concelho</option>
+													<option v-if="newUser.state == 1" value="1">Praia</option>
+													<option v-if="newUser.state == 1" value="2">São Domingos</option>
+													<option v-if="newUser.state == 1" value="3">Santa Catarina</option>
+													<option v-if="newUser.state == 1" value="4">São Salvador do Mundo</option>
+													<option v-if="newUser.state == 1" value="5">Santa Cruz</option>
+													<option v-if="newUser.state == 1" value="6">São Lourenço dos Órgãos</option>
+													<option v-if="newUser.state == 1" value="7">Ribeira Grande de Santiago</option>
+													<option v-if="newUser.state == 1" value="8">São Miguel</option>
+													<option v-if="newUser.state == 1" value="9">Tarafal</option>
+													<option v-if="newUser.state == 2" value="10">Maio</option>
+													<option v-if="newUser.state == 3" value="11">São Filipe</option>
+													<option v-if="newUser.state == 3" value="12">Santa Catarina do Fogo</option>
+													<option v-if="newUser.state == 3" value="13">Mosteiros</option>
+													<option v-if="newUser.state == 5" value="14">Ribeira Grande</option>
+													<option v-if="newUser.state == 5" value="15">Paul</option>
+													<option v-if="newUser.state == 5" value="16">Porto Novo</option>
+													<option v-if="newUser.state == 6" value="17">Ribeira Brava</option>
+													<option v-if="newUser.state == 6" value="18">Tarrafal de São Nicolau</option>
+													<option v-if="newUser.state == 7" value="19">São Vicente</option>
+													<option v-if="newUser.state == 8" value="20">Sal</option>
+													<option v-if="newUser.state == 9" value="21">Boa Vista</option>
+													<option v-if="newUser.state == 4" value="22">Brava</option>
+												</select>
 											</div>
+										</div>
+										<!--#################################################################-->
 
-											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<select class="form-control" v-model="newUser.roles" multiple="multiple" v-el:rolescreate>
-														<option v-for="role in roles" value="{{role.id}}">
-															{{role.display_name}}
-														</option>
-													</select>
-													<!-- <input type="text" name="" value=""> -->
-												</div>
+									</div>
+								</div>
+
+
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<select v-else name="state" class="form-control" v-model="newUser.parish" placeholder="Selecina o conceolho" v-el:parishcreate>
+													<option value="" selected>Freguesia</option>
+													<option v-if="(newUser.council == 10 && newUser.state == 2) || (newUser.council == 2 && newUser.state == 1) || (newUser.council == 19 && newUser.state == 7)" value="1">Nossa Senhora da Luz</option>
+													<option v-if="(newUser.council == 1 && newUser.state == 1)" value="2">Nossa Senhora da Graça</option>
+													<option v-if="newUser.council == 2 && newUser.state == 1" value="3">São Nicolau Tolentino</option>
+													<option v-if="(newUser.council == 3 && newUser.state == 1) || (newUser.council == 12 && newUser.state == 3)" value="4">Santa Catarina</option>
+													<option v-if="newUser.council == 4  && newUser.state == 1" value="5">São Salvador do Mundo</option>
+													<option v-if="newUser.council == 5  && newUser.state == 1" value="6">Santiago Maior</option>
+													<option v-if="(newUser.council == 6  && newUser.state == 1) || (newUser.council == 11  && newUser.state == 3)" value="7">São Lourenço</option>
+													<option v-if="newUser.council == 7 && newUser.state == 1" value="8">Santíssimo Nome de Jesus</option>
+													<option v-if="newUser.council == 14 && newUser.state == 5" value="9">Santo Crucifixo</option>
+													<option v-if="newUser.council == 14 && newUser.state == 5" value="17">Nossa Senhora do Livramento</option>
+													<option v-if="newUser.council == 14 && newUser.state == 5" value="18">São Pedro Apóstolo</option>
+													<option v-if="newUser.council == 8 && newUser.state == 1" value="10">São Miguel Arcanjo</option>
+													<option v-if="newUser.council == 9 && newUser.state == 1" value="11">Santo Amaro Abade</option>
+													<option v-if="newUser.council == 11 && newUser.state == 3" value="12">Nossa Senhora da Conceição</option>
+													<option v-if="newUser.council == 13 && newUser.state == 3" value="13">Nossa Senhora da Ajuda</option>
+													<option v-if="(newUser.council == 16 && newUser.state == 5) || (newUser.council == 21 && newUser.state == 9) || (newUser.council == 7 && newUser.state == 1)" value="14">São João Baptista</option>
+													<option v-if="newUser.council == 22 && newUser.state == 4" value="15">Nossa Senhora do Monte</option>
+													<option v-if="(newUser.council == 17 && newUser.state == 6) || (newUser.council == 14 && newUser.state == 5)" value="16">Nossa Senhora do Rosário</option>
+													<option v-if="newUser.council == 15 && newUser.state == 5" value="19">Santo António das Pombas</option>
+													<option v-if="newUser.council == 16 && newUser.state == 5" value="20">Santo André</option>
+													<option v-if="newUser.council == 17 && newUser.state == 6" value="21">Nossa Senhora da Lapa</option>
+													<option v-if="newUser.council == 18 && newUser.state == 6" value="22">São Francisco</option>
+													<option v-if="newUser.council == 20 && newUser.state == 8" value="23">Nossa Senhora das Dores</option>
+													<option v-if="newUser.council == 21 && newUser.state == 9" value="4">Santa Isabel</option>
+												</select>
+											</div>
+										</div>
+
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<input type="text" class="form-control" name="zone" placeholder="Zona" v-model="newUser.zone"/>
+												<span class="fa fa-thumb-tack form-control-feedback"></span>
 											</div>
 										</div>
 									</div>
+								</div>
+
+								<hr><!---------------------------------------------------------------------------------------------------------------->
 
 
-									<hr><!---------------------------------------------------------------------------------------------------------------->
 
-									<div class="row">
-										<div class="col-md-12">
-											<div class="col-md-12">
-												<div class="form-group has-feedback">
-													<textarea name="description" placeholder="Descrição do utilizador" class="form-control" rows="5" cols="40" id="description" v-model="newUser.description"></textarea>
-												</div>
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<select name="state" class="form-control" v-model="newUser.type" v-el:typecreate>
+													<option value="member">Membro</option>
+													<option value="emp">Funcionário</option>
+													<option value="trad">Comerciante</option>
+												</select>
+											</div>
+										</div>
+
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<select class="form-control" v-model="newUser.roles" multiple="multiple" v-el:rolescreate>
+													<option v-for="role in roles" value="{{role.id}}">
+														{{role.display_name}}
+													</option>
+												</select>
+												<!-- <input type="text" name="" value=""> -->
 											</div>
 										</div>
 									</div>
-								</form>
-							</validator>
-						</div>
-						<div class="modal-footer">
-							<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
+								</div>
 
-							<button @click="createUser" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
-						</div>
+
+								<hr><!---------------------------------------------------------------------------------------------------------------->
+
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<div class="form-group has-feedback">
+												<textarea name="description" placeholder="Descrição do utilizador" class="form-control" rows="5" cols="40" id="description" v-model="newUser.description"></textarea>
+											</div>
+										</div>
+									</div>
+								</div>
+							</form>
+						</validator>
+					</div>
+					<div class="modal-footer">
+						<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
+
+						<button @click="createUser" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
 					</div>
 				</div>
 			</div>
+		</div>
 
-			<!--------------------------------------------------------------------------------------------------------->
+		<!--------------------------------------------------------------------------------------------------------->
 
-			<!-- Modal -->
-			<div id="modal-edit-user" class="modal fade" role="dialog">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
-							<h4 class="modal-title">Editar Utilizador</h4>
-						</div>
-						<div class="modal-body">
-							<validator name="validation1">
-								<form methods="patch">
-									<div class="row">
-										<div class="col-md-12">
-											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<input type="text" class="form-control" name="name" placeholder="Nome Completo" v-model="newUser.name" v-validate:name="['required']"/>
-													<span class="fa fa-user form-control-feedback"></span>
-													<p style="color:red;" v-if="$validationew.name.required && $validationew.name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
-												</div>
+		<!-- Modal -->
+		<div id="modal-edit-user" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Editar Utilizador</h4>
+					</div>
+					<div class="modal-body">
+							<form methods="patch">
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-6">
+											<div class="form-group {{ errors.name ? ' has-error' : '' }} has-feedback">
+												<input type="text" class="form-control" name="name" placeholder="Nome Completo" v-model="newUser.name"/>
+												<span class="fa fa-user form-control-feedback"></span>
+												<p v-if="errors.name" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.name }}</p>
 											</div>
-											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<input type="text" class="form-control" name="username" placeholder="utilizador" v-model="newUser.username" v-validate:username="['required']"/>
-													<span class="fa fa-user-circle form-control-feedback"></span>
-													<p style="color:red;" v-if="$validationew.username.required && $validationew.username.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
-												</div>
+										</div>
+										<div class="col-md-6">
+											<div class="form-group {{ errors.username ? ' has-error' : '' }} has-feedback">
+												<input type="text" class="form-control" name="username" placeholder="utilizador" v-model="newUser.username"/>
+												<span class="fa fa-user-circle form-control-feedback"></span>
+												<p v-if="errors.username" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.username }}</p>
 											</div>
 										</div>
 									</div>
+								</div>
 
-									<div class="row">
-										<div class="col-md-12">
-											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<input type="email" class="form-control" name="email" placeholder="Email" v-model="newUser.email" v-validate:email="['required']"/>
-													<span class="fa fa-envelope form-control-feedback"></span>
-													<span style="color:red;" v-show="!myValidation.email" v-if="$validationew.email.required && $validationew.email.touched"><span data-toggle="tooltip" title="Este campo é obrigatório">*</span></span>&nbsp;&nbsp;&nbsp;
-													<span style="color:red;" v-if="!myValidation.email && $validationew.email.touched"><span data-toggle="tooltip" title="Recorda-se de introduzir email valido! ex exemplo@exemplo.cv">*</span></span>
-												</div>
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-6">
+											<div class="form-group {{ errors.email ? ' has-error' : '' }} has-feedback">
+												<input type="email" class="form-control" name="email" placeholder="Email" v-model="newUser.email"/>
+												<span class="fa fa-envelope form-control-feedback"></span>
+												<p v-if="errors.email" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.email }}</p>
 											</div>
-											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<input type="password" class="form-control" name="password" placeholder="Password" v-model="newUser.password" v-validate:password="['required']"/>
-													<span class="fa fa-lock form-control-feedback"></span>
-													<p style="color:red;" v-if="$validationew.password.required && $validationew.password.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida">*</span></p>
-												</div>
+										</div>
+										<div class="col-md-6">
+											<div class="form-group {{ errors.password ? ' has-error' : '' }} has-feedback">
+												<input readonly value="Somethig" type="password" class="form-control" name="password" placeholder="Password" v-model="newUser.password"/>
+												<span class="fa fa-lock form-control-feedback"></span>
+												<p v-if="errors.password" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.password }}</p>
 											</div>
 										</div>
 									</div>
+								</div>
 
-									<div class="row">
-										<div class="col-md-12">
-											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<input v-model="newUser.ic" type='number' class='form-control' placeholder='Número BI'>
-													<span class="fa fa-id-card form-control-feedback"></span>
-												</div>
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-6">
+											<div class="form-group {{ errors.ic ? ' has-error' : '' }} has-feedback">
+												<input v-model="newUser.ic" type="number" class='form-control' placeholder="BI">
+												<span class="fa fa-id-card form-control-feedback"></span>
+												<p v-if="errors.ic" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.ic }}</p>
 											</div>
+										</div>
 
-											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<input v-model="newUser.phone" type='number' class='form-control' placeholder='Introduza o Numero'>
-													<span class="fa fa-phone form-control-feedback"></span>
-												</div>
+										<div class="col-md-6">
+											<div class="form-group {{ errors.phone ? ' has-error' : '' }} has-feedback">
+												<input v-model="newUser.phone"  id="tel" type='number' class='form-control' placeholder='Introduza o Numero'>
+												<span class="fa fa-phone form-control-feedback"></span>
+												<p v-if="errors.phone" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.phone }}</p>
 											</div>
 										</div>
 									</div>
+								</div>
 
-									<hr><!-------------------------------------------------------------------------------------------------------------------->
+								<hr><!-------------------------------------------------------------------------------------------------------------------->
 
-									<div class="row">
-										<div class="col-md-12">
-											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<label class="radio-inline">
-														<input type="radio" id="gender" value="M" name="gender" v-model="newUser.gender"> Masculino
-													</label>
-													<label class="radio-inline">
-														<input type="radio" id="gender" name="gender" value="F" v-model="newUser.gender">Feminino
-													</label>
-												</div>
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<label class="radio-inline">
+													<input type="radio" id="gender" value="M" name="gender" v-model="newUser.gender"><i class="fa fa-male"></i> Masculino
+												</label>
+												<label class="radio-inline">
+													<input type="radio" id="gender" name="gender" value="F" v-model="newUser.gender"><i class="fa fa-female"></i> Feminino
+												</label>
 											</div>
-											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<input type="number" class="form-control" name="age" placeholder="Idade" min="20" max="50" v-model="newUser.age"/>
-													<span class="fa fa-birthday-cake form-control-feedback"></span>
-												</div>
+										</div>
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<input type="number" class="form-control" name="age" placeholder="Idade" min="20" max="50" v-model="newUser.age"/>
+												<span class="fa fa-birthday-cake form-control-feedback"></span>
 											</div>
 										</div>
 									</div>
+								</div>
 
-									<hr>
+								<hr>
 
-									<div class="row">
-										<div class="col-md-12">
-											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<select name="state" class="form-control" v-model="newUser.state" v-el:stateedit>
-														<optgroup label="Sotavento">
-															<option  class="disabled" value="" selected>Ilha</option>
-															<option value="1">Santiago</option>
-															<option value="2">Maio</option>
-															<option value="3">Fogo</option>
-															<option value="4">Brava</option>
-														</optgroup>
-														<optgroup label="Barlavento">
-															<option value="5">Santo Antão</option>
-															<option value="6">São Nicolau</option>
-															<option value="7">São Vicente</option>
-															<option value="8">Sal</option>
-															<option value="9">Boa Vista</option>
-														</optgroup>
-													</select>
-												</div>
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<select name="state" class="form-control" v-model="newUser.state" v-el:stateedit>
+													<optgroup label="Sotavento">
+														<option  class="disabled" value="" selected>Ilha</option>
+														<option value="1">Santiago</option>
+														<option value="2">Maio</option>
+														<option value="3">Fogo</option>
+														<option value="4">Brava</option>
+													</optgroup>
+													<optgroup label="Barlavento">
+														<option value="5">Santo Antão</option>
+														<option value="6">São Nicolau</option>
+														<option value="7">São Vicente</option>
+														<option value="8">Sal</option>
+														<option value="9">Boa Vista</option>
+													</optgroup>
+												</select>
 											</div>
-											<!--#################################################################-->
-											<div class="col-md-6">
-												<div class="form-group has-feedback">
+										</div>
+										<!--#################################################################-->
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
 
-													<select v-else name="state" class="form-control" v-model="newUser.council" placeholder="Selecina o conceolho" v-el:counciledit>
-														<option value="" selected>Concelho</option>
-														<option v-if="newUser.state == 1" value="1">Praia</option>
-														<option v-if="newUser.state == 1" value="2">São Domingos</option>
-														<option v-if="newUser.state == 1" value="3">Santa Catarina</option>
-														<option v-if="newUser.state == 1" value="4">São Salvador do Mundo</option>
-														<option v-if="newUser.state == 1" value="5">Santa Cruz</option>
-														<option v-if="newUser.state == 1" value="6">São Lourenço dos Órgãos</option>
-														<option v-if="newUser.state == 1" value="7">Ribeira Grande de Santiago</option>
-														<option v-if="newUser.state == 1" value="8">São Miguel</option>
-														<option v-if="newUser.state == 1" value="9">Tarafal</option>
-														<option v-if="newUser.state == 2" value="10">Maio</option>
-														<option v-if="newUser.state == 3" value="11">São Filipe</option>
-														<option v-if="newUser.state == 3" value="12">Santa Catarina do Fogo</option>
-														<option v-if="newUser.state == 3" value="13">Mosteiros</option>
-														<option v-if="newUser.state == 5" value="14">Ribeira Grande</option>
-														<option v-if="newUser.state == 5" value="15">Paul</option>
-														<option v-if="newUser.state == 5" value="16">Porto Novo</option>
-														<option v-if="newUser.state == 6" value="17">Ribeira Brava</option>
-														<option v-if="newUser.state == 6" value="18">Tarrafal de São Nicolau</option>
-														<option v-if="newUser.state == 7" value="19">São Vicente</option>
-														<option v-if="newUser.state == 8" value="20">Sal</option>
-														<option v-if="newUser.state == 9" value="21">Boa Vista</option>
-														<option v-if="newUser.state == 4" value="22">Brava</option>
-													</select>
-												</div>
+												<select v-else name="state" class="form-control" v-model="newUser.council" placeholder="Selecina o conceolho" v-el:counciledit>
+													<option value="" selected>Concelho</option>
+													<option v-if="newUser.state == 1" value="1">Praia</option>
+													<option v-if="newUser.state == 1" value="2">São Domingos</option>
+													<option v-if="newUser.state == 1" value="3">Santa Catarina</option>
+													<option v-if="newUser.state == 1" value="4">São Salvador do Mundo</option>
+													<option v-if="newUser.state == 1" value="5">Santa Cruz</option>
+													<option v-if="newUser.state == 1" value="6">São Lourenço dos Órgãos</option>
+													<option v-if="newUser.state == 1" value="7">Ribeira Grande de Santiago</option>
+													<option v-if="newUser.state == 1" value="8">São Miguel</option>
+													<option v-if="newUser.state == 1" value="9">Tarafal</option>
+													<option v-if="newUser.state == 2" value="10">Maio</option>
+													<option v-if="newUser.state == 3" value="11">São Filipe</option>
+													<option v-if="newUser.state == 3" value="12">Santa Catarina do Fogo</option>
+													<option v-if="newUser.state == 3" value="13">Mosteiros</option>
+													<option v-if="newUser.state == 5" value="14">Ribeira Grande</option>
+													<option v-if="newUser.state == 5" value="15">Paul</option>
+													<option v-if="newUser.state == 5" value="16">Porto Novo</option>
+													<option v-if="newUser.state == 6" value="17">Ribeira Brava</option>
+													<option v-if="newUser.state == 6" value="18">Tarrafal de São Nicolau</option>
+													<option v-if="newUser.state == 7" value="19">São Vicente</option>
+													<option v-if="newUser.state == 8" value="20">Sal</option>
+													<option v-if="newUser.state == 9" value="21">Boa Vista</option>
+													<option v-if="newUser.state == 4" value="22">Brava</option>
+												</select>
+											</div>
+										</div>
+										<!--#################################################################-->
+
+									</div>
+								</div>
+
+
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<select v-else name="state" class="form-control" v-model="newUser.parish" placeholder="Selecina o conceolho" v-el:parishedit>
+													<option value="" selected>Freguesia</option>
+													<option v-if="(newUser.council == 10 && newUser.state == 2) || (newUser.council == 2 && newUser.state == 1) || (newUser.council == 19 && newUser.state == 7)" value="1">Nossa Senhora da Luz</option>
+													<option v-if="(newUser.council == 1 && newUser.state == 1)" value="2">Nossa Senhora da Graça</option>
+													<option v-if="newUser.council == 2 && newUser.state == 1" value="3">São Nicolau Tolentino</option>
+													<option v-if="(newUser.council == 3 && newUser.state == 1) || (newUser.council == 12 && newUser.state == 3)" value="4">Santa Catarina</option>
+													<option v-if="newUser.council == 4  && newUser.state == 1" value="5">São Salvador do Mundo</option>
+													<option v-if="newUser.council == 5  && newUser.state == 1" value="6">Santiago Maior</option>
+													<option v-if="(newUser.council == 6  && newUser.state == 1) || (newUser.council == 11  && newUser.state == 3)" value="7">São Lourenço</option>
+													<option v-if="newUser.council == 7 && newUser.state == 1" value="8">Santíssimo Nome de Jesus</option>
+													<option v-if="newUser.council == 14 && newUser.state == 5" value="9">Santo Crucifixo</option>
+													<option v-if="newUser.council == 14 && newUser.state == 5" value="17">Nossa Senhora do Livramento</option>
+													<option v-if="newUser.council == 14 && newUser.state == 5" value="18">São Pedro Apóstolo</option>
+													<option v-if="newUser.council == 8 && newUser.state == 1" value="10">São Miguel Arcanjo</option>
+													<option v-if="newUser.council == 9 && newUser.state == 1" value="11">Santo Amaro Abade</option>
+													<option v-if="newUser.council == 11 && newUser.state == 3" value="12">Nossa Senhora da Conceição</option>
+													<option v-if="newUser.council == 13 && newUser.state == 3" value="13">Nossa Senhora da Ajuda</option>
+													<option v-if="(newUser.council == 16 && newUser.state == 5) || (newUser.council == 21 && newUser.state == 9) || (newUser.council == 7 && newUser.state == 1)" value="14">São João Baptista</option>
+													<option v-if="newUser.council == 22 && newUser.state == 4" value="15">Nossa Senhora do Monte</option>
+													<option v-if="(newUser.council == 17 && newUser.state == 6) || (newUser.council == 14 && newUser.state == 5)" value="16">Nossa Senhora do Rosário</option>
+													<option v-if="newUser.council == 15 && newUser.state == 5" value="19">Santo António das Pombas</option>
+													<option v-if="newUser.council == 16 && newUser.state == 5" value="20">Santo André</option>
+													<option v-if="newUser.council == 17 && newUser.state == 6" value="21">Nossa Senhora da Lapa</option>
+													<option v-if="newUser.council == 18 && newUser.state == 6" value="22">São Francisco</option>
+													<option v-if="newUser.council == 20 && newUser.state == 8" value="23">Nossa Senhora das Dores</option>
+													<option v-if="newUser.council == 21 && newUser.state == 9" value="4">Santa Isabel</option>
+												</select>
+											</div>
+										</div>
+
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<input type="text" class="form-control" name="zone" placeholder="Zona" v-model="newUser.zone"/>
+												<span class="fa fa-thumb-tack form-control-feedback"></span>
 											</div>
 										</div>
 									</div>
+								</div>
+
+								<hr><!---------------------------------------------------------------------------------------------------------------->
 
 
-									<div class="row">
-										<div class="col-md-12">
-											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<select v-else name="state" class="form-control" v-model="newUser.parish" placeholder="Selecina o conceolho" v-el:parishedit>
-														<option value="" selected>Freguesia</option>
-														<option v-if="(newUser.council == 10 && newUser.state == 2) || (newUser.council == 2 && newUser.state == 1) || (newUser.council == 19 && newUser.state == 7)" value="1">Nossa Senhora da Luz</option>
-														<option v-if="(newUser.council == 1 && newUser.state == 1)" value="2">Nossa Senhora da Graça</option>
-														<option v-if="newUser.council == 2 && newUser.state == 1" value="3">São Nicolau Tolentino</option>
-														<option v-if="(newUser.council == 3 && newUser.state == 1) || (newUser.council == 12 && newUser.state == 3)" value="4">Santa Catarina</option>
-														<option v-if="newUser.council == 4  && newUser.state == 1" value="5">São Salvador do Mundo</option>
-														<option v-if="newUser.council == 5  && newUser.state == 1" value="6">Santiago Maior</option>
-														<option v-if="(newUser.council == 6  && newUser.state == 1) || (newUser.council == 11  && newUser.state == 3)" value="7">São Lourenço</option>
-														<option v-if="newUser.council == 7 && newUser.state == 1" value="8">Santíssimo Nome de Jesus</option>
-														<option v-if="newUser.council == 14 && newUser.state == 5" value="9">Santo Crucifixo</option>
-														<option v-if="newUser.council == 14 && newUser.state == 5" value="17">Nossa Senhora do Livramento</option>
-														<option v-if="newUser.council == 14 && newUser.state == 5" value="18">São Pedro Apóstolo</option>
-														<option v-if="newUser.council == 8 && newUser.state == 1" value="10">São Miguel Arcanjo</option>
-														<option v-if="newUser.council == 9 && newUser.state == 1" value="11">Santo Amaro Abade</option>
-														<option v-if="newUser.council == 11 && newUser.state == 3" value="12">Nossa Senhora da Conceição</option>
-														<option v-if="newUser.council == 13 && newUser.state == 3" value="13">Nossa Senhora da Ajuda</option>
-														<option v-if="(newUser.council == 16 && newUser.state == 5) || (newUser.council == 21 && newUser.state == 9) || (newUser.council == 7 && newUser.state == 1)" value="14">São João Baptista</option>
-														<option v-if="newUser.council == 22 && newUser.state == 4" value="15">Nossa Senhora do Monte</option>
-														<option v-if="(newUser.council == 17 && newUser.state == 6) || (newUser.council == 14 && newUser.state == 5)" value="16">Nossa Senhora do Rosário</option>
-														<option v-if="newUser.council == 15 && newUser.state == 5" value="19">Santo António das Pombas</option>
-														<option v-if="newUser.council == 16 && newUser.state == 5" value="20">Santo André</option>
-														<option v-if="newUser.council == 17 && newUser.state == 6" value="21">Nossa Senhora da Lapa</option>
-														<option v-if="newUser.council == 18 && newUser.state == 6" value="22">São Francisco</option>
-														<option v-if="newUser.council == 20 && newUser.state == 8" value="23">Nossa Senhora das Dores</option>
-														<option v-if="newUser.council == 21 && newUser.state == 9" value="4">Santa Isabel</option>
-													</select>
-												</div>
+
+								<div class="row">
+									<div class="col-md-12">
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<select name="state" class="form-control" v-model="newUser.type" v-el:typeedit>
+													<option value="member">Membro</option>
+													<option value="emp">Funcionário</option>
+													<option value="trad">Comerciante</option>
+												</select>
 											</div>
+										</div>
 
-											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<input type="text" class="form-control" name="zone" placeholder="Zona" v-model="newUser.zone"/>
-													<span class="fa fa-thumb-tack form-control-feedback"></span>
-												</div>
+										<div class="col-md-6">
+											<div class="form-group has-feedback">
+												<select class="form-control" v-model="newUser.roles" multiple="multiple" v-el:rolesedit>
+													<option v-for="role in roles" value="{{role.id}}">
+														{{role.display_name}}
+													</option>
+												</select>
+												<!-- <input type="text" name="" value=""> -->
 											</div>
 										</div>
 									</div>
-
-									<hr><!---------------------------------------------------------------------------------------------------------------->
-
+								</div>
 
 
-									<div class="row">
+								<hr><!---------------------------------------------------------------------------------------------------------------->
+
+								<div class="row">
+									<div class="col-md-12">
 										<div class="col-md-12">
-											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<select name="state" class="form-control" v-model="newUser.type" v-el:typeedit>
-														<option value="member">Membro</option>
-														<option value="emp">Funcionário</option>
-														<option value="trad">Comerciante</option>
-													</select>
-												</div>
-											</div>
-
-											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<select class="form-control" v-model="newUser.roles" multiple="multiple" v-el:rolesedit>
-														<option v-for="role in roles" value="{{role.id}}">
-															{{role.display_name}}
-														</option>
-													</select>
-													<!-- <input type="text" name="" value=""> -->
-												</div>
+											<div class="form-group has-feedback">
+												<textarea name="description" placeholder="Descrição do utilizador" class="form-control" rows="5" cols="40" id="description" v-model="newUser.description"></textarea>
 											</div>
 										</div>
 									</div>
-
-
-									<hr><!---------------------------------------------------------------------------------------------------------------->
-
-									<div class="row">
-										<div class="col-md-12">
-											<div class="col-md-12">
-												<div class="form-group has-feedback">
-													<textarea name="description" placeholder="Descrição do utilizador" class="form-control" rows="5" cols="40" id="description" v-model="newUser.description"></textarea>
-												</div>
-											</div>
-										</div>
-									</div>
-								</form>
-							</validator>
-						</div>
-						<div class="modal-footer">
-							<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Close</button>
-							<button v-on:show="" @click="saveEditedUser(newUser.id)" type="button" class="btn btn-primary"><i class="fa fa-refresh fa-spin"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>
-						</div>
+								</div>
+							</form>
+					</div>
+					<div class="modal-footer">
+						<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Close</button>
+						<button v-on:show="" @click="saveEditedUser(newUser.id)" type="button" class="btn btn-primary"><i class="fa fa-refresh fa-spin"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
+</div>

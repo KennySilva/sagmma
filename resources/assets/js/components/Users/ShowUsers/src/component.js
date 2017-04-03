@@ -294,6 +294,7 @@ export default{
                 this.newUser.username    = response.data.username;
                 this.newUser.ic          = response.data.ic;
                 this.newUser.email       = response.data.email;
+                this.newUser.password    = 'Your Password Was Setted';
                 this.newUser.gender      = response.data.gender;
                 this.newUser.age         = response.data.age;
                 this.newUser.state       = response.data.state;

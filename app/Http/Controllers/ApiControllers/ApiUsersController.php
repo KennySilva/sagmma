@@ -20,22 +20,21 @@ class ApiUsersController extends Controller
 {
     public function index($row)
     {
-        $user = User::paginate($row);
-        $user->each(function($user){
-            $user->roles;
-        });
-        // foreach (Auth::user()->roles as $role) {
-        //     if ($role->name == 'super-admin') {
-        //         $user = User::paginate($row);
-        //         $user->each(function($user){
-        //             $user->roles;
-        //         });
-        //     }else{
-        //         $user = User::whereDoesntHave('roles')->orwhere('id','=', Auth::user()->id)->orwhere(function ($query) {$query->whereHas('roles', function($q){
-        //             $q->where('name', '!=', 'Admin')->where('name', '!=', 'articles-manager');
-        //         });})->paginate(20);
-        //     }
-        // }
+        foreach (Auth::user()->roles as $role) {
+            if ($role->name == 'super-admin') {
+                $user = User::paginate($row);
+                $user->each(function($user){
+                    $user->roles;
+                });
+            }else{
+                $user = User::whereDoesntHave('roles')->orwhere('id','=', Auth::user()->id)->orwhere(function ($query) {$query->whereHas('roles', function($q){
+                    $q->where('name', '!=', 'Admin')->where('name', '!=', 'super-admin');
+                });})->paginate($row);
+                $user->each(function($user){
+                    $user->roles;
+                });
+            }
+        }
         return $user;
     }
 
@@ -106,12 +105,6 @@ class ApiUsersController extends Controller
             $employee->description       = $request->description;
             $employee->save();
         }
-
-        // if($test)
-        // {
-        //     return Response::json(['status'=>'success', 'message'=>'Save successful'], 200);
-        // }
-        // return Response::json(['status'=>'error', 'message'=>$request->messages()]);
     }
 
 
@@ -127,15 +120,72 @@ class ApiUsersController extends Controller
     }
 
 
-    public function update(Req $request, $id)
+    public function update(UsersRequest $request, $id)
     {
-        // $user= User::findOrFail($id);
-        // $user->fill($request->all());
-        // $user->update($request::all());
-        // $user->save();
-        // return Response::json($request::all());
-        User::findOrFail($id)->update($request::all());
-        return Response::json($request::all());
+        $name = ucwords($request->name);
+        $username = ucwords($request->username);
+        $ic          = $request->ic;
+        $email       = $request->email;
+        $gender      = $request->gender;
+        $age         = $request->age;
+        $state       = $request->state;
+        $council     = $request->council;
+        $parish      = $request->parish;
+        $zone        = $request->zone;
+        $phone        = $request->phone;
+        $type        = $request->type;
+        $description = $request->description;
+
+        $user = new User();
+        $user->where('id', $id)->update(array(
+            'name'        => $name,
+            'username'    => $username,
+            'ic'          => $ic,
+            'email'       => $email,
+            'gender'      => $gender,
+            'age'         => $age,
+            'state'       => $state,
+            'council'     => $council,
+            'parish'      => $parish,
+            'zone'        => $zone,
+            'phone'       => $phone,
+            'type'        => $type,
+            'description' => $description,
+        ));
+
+        $trader = Trader::where('ic', '=', $ic);
+        if ($trader) {
+            $trader->update([
+                'name'        => $name,
+                'ic'          => $ic,
+                'age'         => $age,
+                'gender'      => $gender,
+                'email'       => $email,
+                'state'       => $state,
+                'council'     => $council,
+                'parish'      => $parish,
+                'zone'        => $zone,
+                'phone'       => $phone,
+                'description' => $description
+            ]);
+        }
+
+        $employee = Employee::where('ic', '=', $ic);
+        if ($employee) {
+            $employee->update([
+                'name'        => $name,
+                'ic'          => $ic,
+                'age'         => $age,
+                'gender'      => $gender,
+                'email'       => $email,
+                'state'       => $state,
+                'council'     => $council,
+                'parish'      => $parish,
+                'zone'        => $zone,
+                'phone'       => $phone,
+                'description' => $description
+            ]);
+        }
     }
 
     public function destroy($id)

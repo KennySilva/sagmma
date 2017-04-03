@@ -18,11 +18,28 @@ class ApiRolesController extends Controller
 {
     public function index($row)
     {
-        $role = Role::paginate($row);
-        $role->each(function($role){
-            $role->perms;
-        });
-        return $role;
+        // $role = Role::paginate($row);
+        // $role->each(function($role){
+        //     $role->perms;
+        // });
+        // return $role;
+
+        foreach (Auth::user()->roles as $role) {
+            # code...
+            if ($role->name == 'super-admin') {
+                $roles = Role::paginate($row);
+                $roles->each(function($roles){
+                    $roles->perms;
+                });
+            }else{
+                $roles = Role::where('name', '!=', 'admin')->where('name', '!=', 'super-admin')->paginate($row);
+                $roles->each(function($roles){
+                    $roles->perms;
+                });
+            }
+        }
+        return $roles;
+
     }
 
     public function create()
