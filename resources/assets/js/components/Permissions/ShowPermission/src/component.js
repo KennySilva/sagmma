@@ -27,6 +27,8 @@ export default{
             showRow: '',
             msgSucess: '',
             typeAlert: '',
+            errors: [],
+            auth: [],
         }
     },
 
@@ -34,6 +36,8 @@ export default{
 
     ready () {
         this.fetchPermission(1, this.showRow);
+        this.authUser();
+
         var self = this
         jQuery(self.$els.perms).select2({
             placeholder: "Coluna",
@@ -48,11 +52,6 @@ export default{
         });
 
     },
-
-
-    // watch() {
-    //     this.fetchPermission(1, this.showRow);
-    // },
 
     // ---------------------------------------------------------------------------------
 
@@ -93,10 +92,10 @@ export default{
                     // console.log(response.data);
                     this.fetchPermission(1, this.showRow);
                     this.alert('Permassão Criado com sucesso', 'success');
-
+                    this.$set('errors', '')
                 }
             }, (response) => {
-
+                this.$set('errors', response.data)
             });
         },
 
@@ -152,8 +151,16 @@ export default{
                     // console.log(response.data);
                     this.fetchPermission(1, this.showRow);
                     this.alert('Permissão Atualizado com sucesso', 'info');
-
+                    this.$set('errors', '')
                 }
+            }, (response) => {
+                this.$set('errors', response.data)
+            });
+        },
+
+        authUser: function() {
+            this.$http.get('http://localhost:8000/api/v1/authUser').then((response) => {
+                this.$set('auth', response.data);
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
             });

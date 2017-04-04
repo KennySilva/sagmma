@@ -132,11 +132,24 @@ return [
             'unique'    => 'Este :attribute já existe',
         ],
 
+        'display_name' => [
+            'required' => 'Obrigatório',
+            'min' => 'Minimo caractere é :min',
+            'max' => 'Maximo de caractere é :max',
+            'unique'    => 'Este :attribute já existe',
+        ],
+
         'username' => [
             'required' => 'Obrigatório',
             'min' => 'Minimo caractere é :min',
             'max' => 'Maximo de caractere é :max',
             'unique'    => 'Este :attribute já existe',
+        ],
+
+        'location' => [
+            'required' => 'Obrigatório',
+            'min' => 'Minimo caractere é :min',
+            'max' => 'Maximo de caractere é :max',
         ],
     ],
 
@@ -155,6 +168,7 @@ return [
 
     'attributes'           => [
         'name'    => 'Nome',
+        'display_name'    => 'Rótulo',
         'username'    => 'Nome Utilizador',
         'ic'    => 'BI',
         'email'    => 'Email',
@@ -173,6 +187,7 @@ return [
         'typeofplace_id'    => 'Tipo de Funcionário',
         'dimension'    => 'Dimensão',
         'price'    => 'Valor',
+        'location'    => 'Localização',
     ],
 
 ];

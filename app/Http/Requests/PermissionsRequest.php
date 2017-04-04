@@ -15,7 +15,8 @@ class PermissionsRequest extends Request
     public function rules()
     {
         return [
-            'name'     => 'min:4|max:128|required',
+            'name'     => 'min:6|max:49|alpha_dash|required|unique:permissions,name,'.$this->id,
+            'display_name'     => 'min:6|max:59|required|unique:permissions,name,'.$this->id,
         ];
     }
 }

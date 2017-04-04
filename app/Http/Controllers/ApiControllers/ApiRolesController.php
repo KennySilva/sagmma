@@ -47,9 +47,11 @@ class ApiRolesController extends Controller
 
         public function store(RolesRequest $request)
         {
+            $display_name = ucwords($request->display_name);
+
             $role               = new Role($request->all());
             $role->name         = $request->name;
-            $role->display_name = $request->display_name;
+            $role->display_name = $display_name;
             $role->description  = $request->description;
             $role->save();
 
@@ -69,7 +71,7 @@ class ApiRolesController extends Controller
             //
         }
 
-        public function update(Request $request, $id)
+        public function update(RolesRequest $request, $id)
         {
             $role = Role::find($id);
             $role->fill($request->all());

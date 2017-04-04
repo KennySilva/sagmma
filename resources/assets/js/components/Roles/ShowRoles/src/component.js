@@ -11,27 +11,30 @@ export default{
 
     data(){
         return {
-            newRole: {
+            newRole          : {
                 id           : '',
                 name         : '',
                 display_name : '',
                 description  : '',
-                permissions: [],
+                permissions  : [],
             },
 
-            roles: {},
-            permissions: [],
-            openDetails: [],
-            sortColumn: 'name',
-            sortInverse: 1,
-            filter: {
-                term: ''
+            roles            : {},
+            permissions      : [],
+            openDetails      : [],
+            sortColumn       : 'name',
+            sortInverse      : 1,
+            filter           : {
+                term         : ''
             },
-            pagination: {},
-            success: false,
-            msgSucess: '',
-            typeAlert: '',
-            all: {},
+            pagination       : {},
+            success          : false,
+            msgSucess        : '',
+            typeAlert        : '',
+            all              : {},
+            errors           : [],
+            auth: [],
+
         }
     },
 
@@ -40,6 +43,7 @@ export default{
     ready () {
         this.fetchRole(1, this.showRow);
         this.permissionrole();
+        this.authUser();
         var self = this
         jQuery(self.$els.rolecols).select2({
             placeholder: "Coluna",
@@ -47,11 +51,33 @@ export default{
             theme: "bootstrap",
             width: '100%',
             language: 'pt',
-
-
         }).on('change', function () {
             self.$set('columnsFiltered', jQuery(this).val());
         });
+        // -----------------------------------------------------------------------------------
+        jQuery(self.$els.permscreate).select2({
+            placeholder: "Permissões",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+            tags: true,
+        }).on('change', function () {
+            self.$set('newRole.permissions', jQuery(this).val());
+        });
+
+        jQuery(self.$els.permsedit).select2({
+            placeholder: "Permissões",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('newRole.permissions', jQuery(this).val());
+        });
+        // -----------------------------------------------------------------------------------
+
+
     },
 
     // ---------------------------------------------------------------------------------
@@ -93,9 +119,10 @@ export default{
                     // console.log(response.data);
                     this.fetchRole(1, this.showRow);
                     this.alert('Papel Criado com sucesso', 'success');
+                    this.$set('errors', '')
                 }
             }, (response) => {
-
+                this.$set('errors', response.data)
             });
         },
 
@@ -107,31 +134,6 @@ export default{
                 self.$set('roles', response.data.data)
                 self.$set('all', response.data.data)
                 self.$set('pagination', response.data)
-
-                jQuery(self.$els.perms).select2({
-                    placeholder: "Permissões",
-                    allowClear: true,
-                    theme: "bootstrap",
-                    width: '100%',
-                    language: 'pt',
-                    tags: true,
-                    //  maximumSelectionLength: 2
-                    //  minimumResultsForSearch: Infinity
-
-                }).on('change', function () {
-                    self.$set('newRole.permissions', jQuery(this).val());
-                });
-
-                jQuery(self.$els.editperms).select2({
-                    placeholder: "Permissões",
-                    allowClear: true,
-                    theme: "bootstrap",
-                    width: '100%',
-                    language: 'pt',
-                }).on('change', function () {
-                    self.$set('newRole.permissions', jQuery(this).val());
-                });
-
 
             }, (response) => {
                 console.log("Ocorreu um erro na operação")
@@ -171,10 +173,10 @@ export default{
                     // console.log(response.data);
                     this.fetchRole(1, this.showRow);
                     this.alert('Papel atualizado com sucesso', 'info');
-
+                    this.$set('errors', '')
                 }
             }, (response) => {
-                console.log("Ocorreu um erro na operação");
+                this.$set('errors', response.data)
             });
         },
 
@@ -197,6 +199,14 @@ export default{
         permissionrole: function() {
             this.$http.get('http://localhost:8000/api/v1/permissionrole').then((response) => {
                 this.$set('permissions', response.data);
+            }, (response) => {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+        authUser: function() {
+            this.$http.get('http://localhost:8000/api/v1/authUser').then((response) => {
+                this.$set('auth', response.data);
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
             });

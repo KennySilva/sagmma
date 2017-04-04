@@ -14,9 +14,9 @@ class MarketsRequest extends Request
     public function rules()
     {
         return [
-            'name'        => 'min:4|max:128|required|unique:markets',
-            'location'    => 'min:4|max:128|required|unique:markets',
-            'description' => 'min:4|max:250',
+            'name'        => 'min:4|max:49|required|unique:markets,name,'.$this->id,
+            'location'    => 'min:4|max:49|required',
+            'description' => 'max:250',
         ];
     }
 }

@@ -1,60 +1,6 @@
 @extends('_backend.master.app')
 @section('sagmma-style')
-    <link rel="stylesheet" href="/bower_components/bootstrap-select/dist/css/bootstrap-select.css">
-
     <!-------------------------------------------------------------------------------------------->
-    <style media="screen">
-    .panel.with-nav-tabs .panel-heading{
-        padding: 5px 5px 0 5px;
-    }
-    .panel.with-nav-tabs .nav-tabs{
-        border-bottom: none;
-    }
-    .panel.with-nav-tabs .nav-justified{
-        margin-bottom: -1px;
-    }
-    /********************************************************************/
-    /*** PANEL PRIMARY ***/
-    .with-nav-tabs.panel-primary .nav-tabs > li > a,
-    .with-nav-tabs.panel-primary .nav-tabs > li > a:hover,
-    .with-nav-tabs.panel-primary .nav-tabs > li > a:focus {
-        color: #fff;
-    }
-    .with-nav-tabs.panel-primary .nav-tabs > .open > a,
-    .with-nav-tabs.panel-primary .nav-tabs > .open > a:hover,
-    .with-nav-tabs.panel-primary .nav-tabs > .open > a:focus,
-    .with-nav-tabs.panel-primary .nav-tabs > li > a:hover,
-    .with-nav-tabs.panel-primary .nav-tabs > li > a:focus {
-        color: #fff;
-        background-color: #3C8DBC;
-        border-color: transparent;
-    }
-    .with-nav-tabs.panel-primary .nav-tabs > li.active > a,
-    .with-nav-tabs.panel-primary .nav-tabs > li.active > a:hover,
-    .with-nav-tabs.panel-primary .nav-tabs > li.active > a:focus {
-        color: #3C8DBC;
-        background-color: #fff;
-        border-color: #3C8DBC;
-        border-bottom-color: transparent;
-    }
-    .with-nav-tabs.panel-primary .nav-tabs > li.dropdown .dropdown-menu {
-        background-color: #3C8DBC;
-        border-color: #3C8DBC;
-    }
-    .with-nav-tabs.panel-primary .nav-tabs > li.dropdown .dropdown-menu > li > a {
-        color: #fff;
-    }
-    .with-nav-tabs.panel-primary .nav-tabs > li.dropdown .dropdown-menu > li > a:hover,
-    .with-nav-tabs.panel-primary .nav-tabs > li.dropdown .dropdown-menu > li > a:focus {
-        background-color: #3C8DBC;
-    }
-    .with-nav-tabs.panel-primary .nav-tabs > li.dropdown .dropdown-menu > .active > a,
-    .with-nav-tabs.panel-primary .nav-tabs > li.dropdown .dropdown-menu > .active > a:hover,
-    .with-nav-tabs.panel-primary .nav-tabs > li.dropdown .dropdown-menu > .active > a:focus {
-        background-color: #4a9fe9;
-    }
-
-    </style>
     {!! Charts::assets() !!}
     <!-------------------------------------------------------------------------------------------->
 @endsection
@@ -74,7 +20,7 @@
     <div class="sagmma_container">
         <div class="row">
             <div class="col-md-6">
-                <div class="box box-primary box-solid collapsed-box">
+                <div class="box box-default box-solid collapsed-box">
                     <div class="box-header with-border">
                         <h3 class="box-title">Tipo de Utilizadores</h3>
                         <div class="box-tools pull-right">
@@ -93,7 +39,7 @@
             </div>
 
             <div class="col-md-6">
-                <div class="box box-primary box-solid collapsed-box">
+                <div class="box box-default box-solid collapsed-box">
                     <div class="box-header with-border">
                         <h3 class="box-title">Utilizadores Criados Por Mês</h3>
                         <div class="box-tools pull-right">
@@ -114,7 +60,7 @@
 
         <div class="row">
             <div class="col-md-12">
-                <div class="panel with-nav-tabs panel-primary">
+                <div class="panel with-nav-tabs panel-default">
                     <div class="panel-heading">
                         <ul class="nav nav-tabs">
                             <li class="active"><a href="#tabUser" data-toggle="tab">Utilizadores</a></li>
@@ -145,28 +91,12 @@
 @endsection
 @push('scripts')
 
-    <script src="/bower_components/bootstrap-select/dist/js/bootstrap-select.js" charset="utf-8"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.10/jquery.mask.js"></script>
     <script>
-    // $('#popover').popover({
-    //     html : true,
-    //     title: function() {
-    //         return $("#popover-head").html();
-    //     },
-    //     content: function() {
-    //         return $("#popover-content").html();
-    //     }
-    // });
-
-    $(document).ready(function(){
+    $(document).ready(function($){
         $("#showSearchInput").click(function(){
             $("#searchPage").show();
         });
     });
-
-    $(document).ready(function(){
-        $('#tel').mask('(00) 0000-0000');
-    });
-
     </script>
 @endpush

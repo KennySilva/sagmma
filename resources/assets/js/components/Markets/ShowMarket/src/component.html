@@ -82,7 +82,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr v-for="market in markets | filterBy filter.term | orderBy sortColumn sortInverse">
+			<tr v-for="market in markets | orderBy sortColumn sortInverse">
 				<td><a href="#" data-toggle="modal" data-target="#show-market" @click="getThisMarket(market.id)">{{ market.name }}</a></td>
 				<td>{{ market.location }}</td>
 				<!-- <td>{{ market.description }}</td> -->
@@ -92,7 +92,7 @@
 		</tbody>
 	</table>
 	<div class="row">
-		<div class="col-md-6 pull-left">
+		<div v-if="pagination.total > showRow" class="col-md-6 pull-left">
 			<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
 		</div>
 		<div class="col-md-6 pull-right">
@@ -196,15 +196,15 @@
 				<h4 class="modal-title">Registar Mercado</h4>
 			</div>
 			<div class="modal-body">
-				<validator name="validationmarket">
 					<form action="#" methods="POST">
 						<div class="row">
 							<div class="col-md-12">
 								<div class="col-md-12">
-									<div class="form-group has-feedback">
-										<input type="text" class="form-control" name="name" placeholder="Nome do Mercado" v-model="newMarket.name" v-validate:name="['required']"/>
+									<div class="form-group  {{ errors.name ? ' has-error' : '' }} has-feedback">
+										<input type="text" class="form-control" name="name" placeholder="Nome do Mercado" v-model="newMarket.name"/>
 										<span class="fa fa-university form-control-feedback"></span>
-										<p style="color:red;" v-if="$validationmarket.name.required && $validationmarket.name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
+											<p v-if="errors.name" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.name }}</p>
+
 									</div>
 								</div>
 							</div>
@@ -213,10 +213,10 @@
 						<div class="row">
 							<div class="col-md-12">
 								<div class="col-md-12">
-									<div class="form-group has-feedback">
-										<input type="text" class="form-control" name="location" placeholder="Localização" v-model="newMarket.location" v-validate:location="['required']"/>
+									<div class="form-group  {{ errors.location ? ' has-error' : '' }} has-feedback">
+										<input type="text" class="form-control" name="location" placeholder="Localização" v-model="newMarket.location"/>
 										<span class="fa fa-thumb-tack form-control-feedback"></span>
-										<p style="color:red;" v-if="$validationmarket.location.required && $validationmarket.location.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
+											<p v-if="errors.location" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.location }}</p>
 									</div>
 								</div>
 							</div>
@@ -228,8 +228,9 @@
 						<div class="row">
 							<div class="col-md-12">
 								<div class="col-md-12">
-									<div class="form-group has-feedback">
+									<div class="form-group  {{ errors.description ? ' has-error' : '' }} has-feedback">
 										<textarea name="description" placeholder="Descrição do Mercado" class="form-control" rows="5" cols="40" id="description" v-model="newMarket.description"></textarea>
+											<p v-if="errors.description" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.description }}</p>
 									</div>
 								</div>
 							</div>
@@ -243,7 +244,7 @@
 					<div class="col-md-12">
 						<button type="button" class="btn btn-outline-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
 
-						<button :disabled = "!$validationmarket.valid" @click="createMarket" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
+						<button @click="createMarket" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
 					</div>
 				</div>
 			</div>

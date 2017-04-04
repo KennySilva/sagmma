@@ -56,10 +56,11 @@ class ApiPermissionsController extends Controller
         //
     }
 
-    public function update(Req $request, $id)
+    public function update(PermissionsRequest $request, $id)
     {
-        Permission::findOrFail($id)->update($request::all());
-        return Response::json($request::all());
+        $permission = Permission::find($id);
+        $permission->fill($request->all());
+        $permission->save();
 
     }
 

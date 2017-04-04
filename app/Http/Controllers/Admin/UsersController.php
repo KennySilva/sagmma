@@ -18,7 +18,7 @@ class UsersController extends Controller
     public function index()
     {
         //Charts
-        $chart = Charts::database(User::all(), 'donut', 'fusioncharts')
+        $chart = Charts::database(User::all(), 'donut', 'highcharts')
         ->title('Tipo de Utilizadores')
         ->dimensions(0, 300)
         ->responsive(false)

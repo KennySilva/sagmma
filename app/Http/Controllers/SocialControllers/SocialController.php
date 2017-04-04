@@ -31,6 +31,7 @@ class SocialController extends Controller
                 $new_user->name        = $user->name;
                 $new_user->email       = $user->email;
                 $new_user->status      = false;
+                $new_user->type      = 'member';
                 $new_user->avatar      =  $user->avatar;;
                 $new_user->social      = true;
                 $new_user->save();

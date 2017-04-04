@@ -51,8 +51,8 @@
 
 <hr>
 <div class="row">
-	<div class="col-md-12">
-		<button class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-permission"><i class="fa fa-plus"></i> Novo</button>
+	<div class="col-md-12" v-for="authRole in auth.roles">
+		<button :disabled="authRole.name != 'super-admin'" class="btn btn-flat btn-outline pull-left" :class = "{'btn-info': authRole.name != 'super-admin', 'btn-primary':authRole.name == 'super-admin'}"  name="button" data-toggle="modal" data-target="#modal-create-permission"><i class="fa fa-plus"></i> Novo</button>
 	</div>
 </div>
 <br>
@@ -61,7 +61,7 @@
 
 	<div class="col-md-12">
 		<div class='table-responsive'>
-			<table class='table table-striped table-hover table-condensed'>
+			<table class='table table-striped table-hover table-condensed' v-for="authRole in auth.roles">
 				<thead>
 					<tr>
 						<th>
@@ -79,7 +79,7 @@
 							<a href="#" @click = "doSort($event, 'description')">Descriçãos</a>
 						</th>
 
-						<th  class="text-center" colspan="2"><span><i class="fa fa-cogs"></i></span></th>
+						<th v-if="authRole.name == 'super-admin'"  class="text-center" colspan="2"><span><i class="fa fa-cogs"></i></span></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -87,8 +87,8 @@
 						<td>{{ permission.name }}</td>
 						<td>{{ permission.display_name }}</td>
 						<td>{{ permission.description }}</td>
-						<td align=left>  <a data-toggle="modal" data-target="#modal-edit-permission" href="#"> <i class="fa fa-pencil text-primary" @click="getThisPermission(permission.id)" > </i></a></td>
-						<td align=right><a data-toggle="modal" data-target="#modal-delete-permission" href="#"><i class="fa fa-trash text-danger" @click="getThisPermission(permission.id)"></i></a></td>
+						<td v-if="authRole.name == 'super-admin'" align=left>  <a data-toggle="modal" data-target="#modal-edit-permission" href="#"> <i class="fa fa-pencil text-primary" @click="getThisPermission(permission.id)" > </i></a></td>
+						<td v-if="authRole.name == 'super-admin'" align=right><a data-toggle="modal" data-target="#modal-delete-permission" href="#"><i class="fa fa-trash text-danger" @click="getThisPermission(permission.id)"></i></a></td>
 					</tr>
 				</tbody>
 			</table>
@@ -137,15 +137,14 @@
 						<h4 class="modal-title">Registar permission</h4>
 					</div>
 					<div class="modal-body">
-						<validator name="validationew">
 							<form action="#" methods="POST">
 								<div class="row">
 									<div class="col-md-12">
 										<div class="col-md-12">
-											<div class="form-group has-feedback">
-												<input type="text" class="form-control" name="name" placeholder="Nome da permissão no sistema" v-model="newPermission.name" v-validate:name="['required']"/>
+											<div class="form-group {{ errors.display_name ? ' has-error' : '' }} has-feedback">
+												<input type="text" class="form-control" name="name" placeholder="Nome da permissão no sistema" v-model="newPermission.name"/>
 												<span class="fa fa-hand-stop-o form-control-feedback"></span>
-												<p style="color:red;" v-if="$validationew.name.required && $validationew.name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
+													<p v-if="errors.name" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.name }}</p>
 											</div>
 										</div>
 									</div>
@@ -155,10 +154,10 @@
 								<div class="row">
 									<div class="col-md-12">
 										<div class="col-md-12">
-											<div class="form-group has-feedback">
-												<input type="text" class="form-control" name="display_name" placeholder="Nome da permissão a ser vizualizado" v-model="newPermission.display_name" v-validate:display_name="['required']"/>
+											<div class="form-group {{ errors.display_name ? ' has-error' : '' }} has-feedback">
+												<input type="text" class="form-control" name="display_name" placeholder="Nome da permissão a ser vizualizado" v-model="newPermission.display_name"/>
 												<span class="fa fa-eye form-control-feedback"></span>
-												<p style="color:red;" v-if="$validationew.display_name.required && $validationew.display_name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
+													<p v-if="errors.display_name" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.display_name }}</p>
 											</div>
 										</div>
 									</div>
@@ -176,7 +175,7 @@
 									</div>
 								</div>
 							</form>
-						</validator>
+
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
@@ -199,15 +198,15 @@
 						<h4 class="modal-title">Editar Esta função</h4>
 					</div>
 					<div class="modal-body">
-						<validator name="validation1">
+
 							<form methods="patch">
 								<div class="row">
 									<div class="col-md-12">
 										<div class="col-md-12">
-											<div class="form-group has-feedback">
-												<input type="text" class="form-control" name="name" placeholder="Nome da permissão no sistema" v-model="newPermission.name" v-validate:name="['required']"/>
+											<div class="form-group {{ errors.display_name ? ' has-error' : '' }} has-feedback">
+												<input type="text" class="form-control" name="name" placeholder="Nome da permissão no sistema" v-model="newPermission.name"/>
 												<span class="fa fa-hand-stop-o form-control-feedback"></span>
-												<p style="color:red;" v-if="$validationew.name.required && $validationew.name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
+													<p v-if="errors.name" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.name }}</p>
 											</div>
 										</div>
 									</div>
@@ -217,10 +216,10 @@
 								<div class="row">
 									<div class="col-md-12">
 										<div class="col-md-12">
-											<div class="form-group has-feedback">
-												<input type="text" class="form-control" name="display_name" placeholder="Nome da permissão a ser vizualizado" v-model="newPermission.display_name" v-validate:display_name="['required']"/>
+											<div class="form-group {{ errors.display_name ? ' has-error' : '' }} has-feedback">
+												<input type="text" class="form-control" name="display_name" placeholder="Nome da permissão a ser vizualizado" v-model="newPermission.display_name"/>
 												<span class="fa fa-eye form-control-feedback"></span>
-												<p style="color:red;" v-if="$validationew.display_name.required && $validationew.display_name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
+													<p v-if="errors.display_name" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.display_name }}</p>
 											</div>
 										</div>
 									</div>
@@ -238,7 +237,6 @@
 									</div>
 								</div>
 							</form>
-						</validator>
 					</div>
 					<div class="modal-footer">
 						<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Close</button>
