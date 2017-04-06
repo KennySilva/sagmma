@@ -4,6 +4,7 @@
 	<i class="fa fa-thumbs-o-up text-center">&nbsp;&nbsp; {{msgSucess}}</i>
 </div>
 
+
 <div class="row">
 	<div class="col-md-12">
 		<div class="form-inline pull-right">
@@ -75,11 +76,16 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr v-for="typeofemployee in typeofemployees | filterBy filter.term | orderBy sortColumn sortInverse">
+					<tr v-for="typeofemployee in typeofemployees | orderBy sortColumn sortInverse">
 						<td>{{ typeofemployee.name }}</td>
 						<td>{{ typeofemployee.description }}</td>
 						<td align=left>  <a data-toggle="modal" data-target="#modal-edit-typeofemployee" href="#"> <i class="fa fa-pencil text-primary" @click="getThisTypeofemployee(typeofemployee.id)" > </i></a></td>
-						<td align=right><a data-toggle="modal" data-target="#modal-delete-typeofemployee" href="#"><i class="fa fa-trash text-danger" @click="getThisTypeofemployee(typeofemployee.id)"></i></a></td>
+						<!------------------------------------------------------------------------------------------->
+						<td v-if="typeofemployee.employees == null" align=right><a data-toggle="modal" data-target="#modal-delete-typeofemployee" href="#"><i class="fa fa-trash text-danger" @click="getThisTypeofemployee(typeofemployee.id)"></i></a></td>
+
+						<td v-if="typeofemployee.employees != null" align=right><a data-toggle="modal" data-target="#modal-undeleted-typeofemployee" href="#"><i class="fa fa-ban text-warning" @click="getThisTypeofemployee(typeofemployee.id)" ></i></a></td>
+
+						<!------------------------------------------------------------------------------------------->
 					</tr>
 				</tbody>
 			</table>
@@ -113,6 +119,25 @@
 			</div>
 		</div>
 
+		<div class="modal fade" id="modal-undeleted-typeofemployee" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title label label-warning" id=""><i class='fa fa-exclamation-circle fa-spin'></i></h4>
+					</div>
+					<div class="modal-body">
+						<h4 class="text-center"><span class="text-uppercase text-danger">{{newTypeofemployee.name}}</span>, Não pode ser Apagodo</h4>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-success" data-dismiss="modal"><i class="fa fa-check"></i> Sair</button>
+
+						<a class="btn btn-primary" href="employees">Verificar Funcionários</a>
+					</div>
+				</div>
+			</div>
+		</div>
+
 
 		<!--------------------------------------------------------------------------------------------------------->
 		<!-- Modal -->
@@ -126,38 +151,39 @@
 						<h4 class="modal-title">Registar</h4>
 					</div>
 					<div class="modal-body">
-						<validator name="validationew">
-							<form action="#" methods="POST">
-								<div class="row">
+						<form action="#" methods="POST">
+							<div class="row">
+								<div class="col-md-12">
 									<div class="col-md-12">
-										<div class="col-md-12">
-											<div class="form-group has-feedback">
-												<input type="text" class="form-control" name="name" placeholder="Nome do tipo de funcionário" v-model="newTypeofemployee.name" v-validate:name="['required']"/>
-												<span class="fa fa-users form-control-feedback"></span>
-												<p style="color:red;" v-if="$validationew.name.required && $validationew.name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
-											</div>
+										<div class="form-group {{ errors.name ? ' has-error' : '' }} has-feedback">
+											<input type="text" class="form-control" name="name" placeholder="Nome do Tipo de Funcionário" v-model="newTypeofemployee.name"/>
+											<span class="fa fa-users form-control-feedback"></span>
+											<p v-if="errors.name" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.name }}</p>
 										</div>
 									</div>
 								</div>
+							</div>
 
-								<hr><!---------------------------------------------------------------------------------------------------------------->
+							<hr><!---------------------------------------------------------------------------------------------------------------->
 
-								<div class="row">
+							<div class="row">
+								<div class="col-md-12">
 									<div class="col-md-12">
-										<div class="col-md-12">
-											<div class="form-group has-feedback">
-												<textarea name="description" placeholder="Descrição..." class="form-control" rows="5" cols="40" id="description" v-model="newTypeofemployee.description"></textarea>
-											</div>
+										<div class="form-group {{ errors.description ? ' has-error' : '' }} has-feedback">
+											<textarea name="description" placeholder="Descrição..." class="form-control" rows="5" cols="40" id="description" v-model="newTypeofemployee.description"></textarea>
+
+											<p v-if="errors.description" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.description }}</p>
 										</div>
 									</div>
 								</div>
-							</form>
-						</validator>
+							</div>
+						</form>
+
 					</div>
 					<div class="modal-footer">
 						<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
 
-						<button :disabled = "!$validationew.valid" @click="createTypeofemployee" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
+						<button @click="createTypeofemployee" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
 					</div>
 				</div>
 			</div>
@@ -175,37 +201,37 @@
 						<h4 class="modal-title">Editar</h4>
 					</div>
 					<div class="modal-body">
-						<validator name="validation1">
-							<form methods="patch">
-								<div class="row">
+						<form methods="patch">
+							<div class="row">
+								<div class="col-md-12">
 									<div class="col-md-12">
-										<div class="col-md-12">
-											<div class="form-group has-feedback">
-												<input type="text" class="form-control" name="name" v-model="newTypeofemployee.name" v-validate:name="['required']"/>
-												<span class="fa fa-users form-control-feedback"></span>
-												<p style="color:red;" v-if="$validation1.name.required && $validation1.name.touched"><span data-toggle="tooltip" title="Este campo tem de ser preenchida!">*</span></p>
-											</div>
+										<div class="form-group {{ errors.name ? ' has-error' : '' }} has-feedback">
+											<input type="text" class="form-control" name="name" placeholder="Nome do Tipo de Funcionário" v-model="newTypeofemployee.name"/>
+											<span class="fa fa-users form-control-feedback"></span>
+											<p v-if="errors.name" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.name }}</p>
 										</div>
 									</div>
 								</div>
+							</div>
 
-								<hr><!---------------------------------------------------------------------------------------------------------------->
+							<hr><!---------------------------------------------------------------------------------------------------------------->
 
-								<div class="row">
+							<div class="row">
+								<div class="col-md-12">
 									<div class="col-md-12">
-										<div class="col-md-12">
-											<div class="form-group has-feedback">
-												<textarea name="description" placeholder="Descrição deste Mescado" class="form-control" rows="5" cols="40" id="description" v-model="newTypeofemployee.description"></textarea>
-											</div>
+										<div class="form-group {{ errors.description ? ' has-error' : '' }} has-feedback">
+											<textarea name="description" placeholder="Descrição..." class="form-control" rows="5" cols="40" id="description" v-model="newTypeofemployee.description"></textarea>
+
+											<p v-if="errors.description" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.description }}</p>
 										</div>
 									</div>
 								</div>
-							</form>
-						</validator>
+							</div>
+						</form>
 					</div>
 					<div class="modal-footer">
 						<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
-						<button v-on:show="" @click="saveEditedTypeofemployee(newTypeofemployee.id)" type="button" class="btn btn-primary"><i class="fa fa-refresh fa-spin"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>
+						<button @click="saveEditedTypeofemployee(newTypeofemployee.id)" type="button" class="btn btn-primary"><i class="fa fa-refresh fa-spin"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>
 					</div>
 				</div>
 			</div>

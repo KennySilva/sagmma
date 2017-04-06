@@ -530,5 +530,6 @@ export default{
 
     components: {
         'Pagination': Pagination,
-    }
+    },
+
 }

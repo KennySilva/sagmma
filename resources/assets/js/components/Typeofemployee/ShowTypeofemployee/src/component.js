@@ -26,6 +26,7 @@ export default{
             typeAlert: '',
             showRow: '',
             all: {},
+            errors: [],
 
         }
     },
@@ -75,19 +76,18 @@ export default{
             var typeofemployee = this.newTypeofemployee;
 
             //Clear form input
-            this.clearField();
 
             this.$http.post('http://localhost:8000/api/v1/typeofemployees/', typeofemployee).then((response) => {
                 if (response.status == 200) {
                     console.log('chegando aqui');
                     $('#modal-create-typeofemployee').modal('hide');
-                    // console.log(response.data);
+                    this.clearField();
                     this.fetchTypeofemployee(this.pagination.current_Page, this.showRow);
                     this.alert('Tipo de Funcionário Criado com sucesso', 'success');
-
+                    this.$set('errors', '')
                 }
             }, (response) => {
-
+                this.$set('errors', response.data)
             });
         },
 
@@ -121,17 +121,16 @@ export default{
 
         saveEditedTypeofemployee: function(id) {
             var typeofemployee = this.newTypeofemployee;
-            this.clearField();
             this.$http.patch('http://localhost:8000/api/v1/typeofemployees/'+ id, typeofemployee).then((response) => {
                 if (response.status == 200) {
                     $('#modal-edit-typeofemployee').modal('hide');
-                    // console.log(response.data);
-                    this.fetchTypeofemployee();
+                    this.clearField();
+                    this.fetchTypeofemployee(this.pagination.current_Page, this.showRow);
                     this.alert('Tipo de Funcionário atualizado com sucesso', 'info');
-
+                    this.$set('errors', '')
                 }
             }, (response) => {
-                console.log("Ocorreu um erro na operação");
+                this.$set('errors', response.data)
             });
         },
 

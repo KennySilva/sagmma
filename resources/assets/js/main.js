@@ -1,7 +1,6 @@
 var Vue = require('vue');
 Vue.use(require('vue-validator'));
 Vue.use(require('vue-resource'));
-
 var moment  = require('moment');
 
 Vue.filter('formatDate', function(value, formatString) {

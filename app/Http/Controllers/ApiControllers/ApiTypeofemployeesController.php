@@ -16,7 +16,11 @@ class ApiTypeofemployeesController extends Controller
 {
     public function index($row)
     {
-        return Typeofemployee::paginate($row);
+        $typeofemployee = Typeofemployee::paginate($row);
+        $typeofemployee->each(function($typeofemployee){
+            $typeofemployee->employees;
+        });
+        return $typeofemployee;
     }
 
     public function create()
@@ -36,17 +40,17 @@ class ApiTypeofemployeesController extends Controller
             $typeofemployee = Typeofemployee::findOrFail($id);
             return $typeofemployee;
         }
-
+        
         public function edit($id)
         {
             //
         }
 
-        public function update(Req $request, $id)
+        public function update(TypeofemployeesRequest $request, $id)
         {
-            Typeofemployee::findOrFail($id)->update($request::all());
-            return Response::json($request::all());
-
+            $typeofemployee = Typeofemployee::find($id);
+            $typeofemployee->fill($request->all());
+            $typeofemployee->save();
         }
 
         public function destroy($id)

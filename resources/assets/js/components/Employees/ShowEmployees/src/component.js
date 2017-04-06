@@ -26,8 +26,9 @@ export default{
                 photo             : '',
                 description       : '',
                 markets           : [],
-                get_email         : '',
-                get_password      : '',
+                password          : '',
+                username          : '',
+                get_acount        : '',
 
             },
 
@@ -48,6 +49,7 @@ export default{
             showRow: '',
             all: {},
             auth: [],
+            errors: [],
         }
     },
 
@@ -255,6 +257,9 @@ export default{
                 market_id         : '',
                 typeofemployee_id : '',
                 photo             : '',
+                password       : '',
+                get_acount       : '',
+                username       : '',
                 description       : '',
                 markets           : [],
 
@@ -268,18 +273,18 @@ export default{
             var employee = this.newEmployee;
 
             //Clear form input
-            this.clearField();
             this.$http.post('http://localhost:8000/api/v1/employees/', employee).then((response) => {
                 if (response.status == 200) {
                     console.log('chegando aqui');
                     $('#modal-create-employee').modal('hide');
+                    this.clearField();
                     console.log(response.data);
                     this.fetchEmployee(this.pagination.last_Page, this.showRow);
-
                     this.alert('Funcionário Criado com sucesso', 'success');
+                    this.$set('errors', '')
                 }
             }, (response) => {
-
+                this.$set('errors', response.data)
             });
         },
 
@@ -325,17 +330,16 @@ export default{
 
         saveEditedEmployee: function(id) {
             var employee = this.newEmployee;
-            this.clearField();
             this.$http.patch('http://localhost:8000/api/v1/employees/'+ id, employee).then((response) => {
                 if (response.status == 200) {
                     $('#modal-edit-employee').modal('hide');
-                    // console.log(response.data);
+                    this.clearField();
                     this.fetchEmployee(this.pagination.current_page, this.showRow);
                     this.alert('Funcionário atualizado com sucesso', 'info');
-
+                    this.$set('errors', '')
                 }
             }, (response) => {
-                console.log("Ocorreu um erro na operação");
+                this.$set('errors', response.data)
             });
         },
 

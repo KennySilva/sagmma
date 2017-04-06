@@ -42,11 +42,11 @@ class ApiMaterialsController extends Controller
             //
         }
 
-        public function update(Req $request, $id)
+        public function update(MaterialsRequest $request, $id)
         {
-            Material::findOrFail($id)->update($request::all());
-            return Response::json($request::all());
-
+            $material = Material::find($id);
+            $material->fill($request->all());
+            $material->save();
         }
 
         public function destroy($id)

@@ -63,15 +63,15 @@
                 <div class="panel with-nav-tabs panel-default">
                     <div class="panel-heading">
                         <ul class="nav nav-tabs">
-                            <li class="active"><a href="#tabUser" data-toggle="tab">Utilizadores</a></li>
-                            <li><a href="#tabRole" data-toggle="tab">Papeis</a></li>
-                            <li><a href="#tabPerm" data-toggle="tab">Permissões</a></li>
+                            <li class="active"><a href="#tabUser" data-toggle="tab">UTILIZADORES</a></li>
+                            <li><a href="#tabRole" data-toggle="tab">PAPEIS</a></li>
+                            <li><a href="#tabPerm" data-toggle="tab">PERMISSÕES</a></li>
                         </ul>
                     </div>
                     <div class="panel-body">
                         <div class="tab-content">
+                            {{ csrf_field() }}
                             <div class="tab-pane fade in active" id="tabUser">
-                                {{ csrf_field() }}
                                 <show-users></show-users>
                             </div>
 

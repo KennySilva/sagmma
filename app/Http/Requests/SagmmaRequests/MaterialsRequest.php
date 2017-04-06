@@ -14,7 +14,7 @@ class MaterialsRequest extends Request
     public function rules()
     {
         return [
-            'name'        => 'min:4|max:128|required|unique:materials',
+            'name'        => 'min:4|max:49|required|unique:materials,name,'.$this->id,
             'description' => 'min:4|max:250',
         ];
     }

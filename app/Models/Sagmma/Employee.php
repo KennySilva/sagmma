@@ -23,14 +23,14 @@ class Employee extends Model
         return $this->belongsToMany(Market::class, 'employee_market', 'employee_id', 'market_id')->withPivot('author')->withTimestamps();
     }
 
-    public function tranference()
-    {
-        return $this->belongsTo(Transference::class, 'employee_id', 'id');
-    }
+    // public function tranference()
+    // {
+    //     return $this->belongsTo(Transference::class, 'employee_id', 'id');
+    // }
 
     public function taxation()
     {
-        return $this->belongsTo(Taxation::class, 'employee_id', 'id');
+        return $this->belongsTo(Taxation::class, 'id', 'employee_id');
     }
 
     public function typeofemployees()
@@ -41,7 +41,7 @@ class Employee extends Model
 
     public function controls()
     {
-        return $this->belongsTo(Control::class, 'employee_id', 'id');
+        return $this->belongsTo(Control::class, 'id', 'employee_id');
     }
 
     public function materials()

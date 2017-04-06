@@ -8,8 +8,10 @@ use Request as Req;
 use Sagmma\Http\Requests;
 use Sagmma\Http\Controllers\Controller;
 use Sagmma\Http\Requests\SagmmaRequests\EmployeesRequest;
+use Sagmma\Http\Requests\UsersRequest;
 use Employee;
 use Market;
+use User;
 use Typeofemployee;
 use Response;
 use Input;
@@ -22,6 +24,8 @@ class ApiEmployeesController extends Controller
         $employee->each(function($employee){
             $employee->typeofemployees;
             $employee->markets;
+            $employee->controls;
+            $employee->taxation;
         });
         return $employee;
     }
@@ -29,10 +33,11 @@ class ApiEmployeesController extends Controller
     public function create()
     {}
 
-        public function store(EmployeesRequest $request)
+        public function store(EmployeesRequest $request, UsersRequest $urequest)
         {
+            $name = ucwords($request->name);
             $employee                    = new Employee();
-            $employee->name              = $request->name;
+            $employee->name              = $name;
             $employee->ic                = $request->ic;
             $employee->age               = $request->age;
             $employee->gender            = $request->gender;
@@ -50,24 +55,24 @@ class ApiEmployeesController extends Controller
             $employee->save();
             $employee->markets()->sync($request->markets);
 
-            if ($request->get_password != '') {
+            if ($urequest->password != '') {
                 $user                  = new User();
-                $user->name            = $request->name;
-                $user->username        = "Funcionário3".$request->id;
-                $user->ic              = $request->ic;
-                $user->email           = $request->email;
-                $user->password        = bcrypt($request->get_password);
-                $user->gender          = $request->gender;
-                $user->age             = $request->age;
-                $user->state           = $request->state;
-                $user->council         = $request->council;
-                $user->parish          = $request->parish;
-                $user->zone            = $request->zone;
-                $user->phone           = $request->phone;
+                $user->name            = $urequest->name;
+                $user->username        = $urequest->username;
+                $user->ic              = $urequest->ic;
+                $user->email           = $urequest->email;
+                $user->password        = bcrypt($urequest->get_password);
+                $user->gender          = $urequest->gender;
+                $user->age             = $urequest->age;
+                $user->state           = $urequest->state;
+                $user->council         = $urequest->council;
+                $user->parish          = $urequest->parish;
+                $user->zone            = $urequest->zone;
+                $user->phone           = $urequest->phone;
                 $user->avatar          = 'default.png';
                 $user->status          = false;
                 $user->type            = 'trad';
-                $user->description     = $request->description;
+                $user->description     = $urequest->description;
                 $user->save();
             }
         }

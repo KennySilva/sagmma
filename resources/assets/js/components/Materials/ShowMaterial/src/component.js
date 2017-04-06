@@ -26,6 +26,7 @@ export default{
             typeAlert: '',
             showRow: '',
             all: {},
+            errors: [],
 
         }
     },
@@ -69,25 +70,27 @@ export default{
                 description: '',
                 logo       : ''
             };
+
+
         },
 
         createMaterial: function() {
             var material = this.newMaterial;
 
             //Clear form input
-            this.clearField();
 
             this.$http.post('http://localhost:8000/api/v1/materials/', material).then((response) => {
                 if (response.status == 200) {
                     console.log('chegando aqui');
                     $('#modal-create-material').modal('hide');
+                    this.clearField();
                     // console.log(response.data);
                     this.fetchMaterial(this.pagination.current_Page, this.showRow);
                     this.alert('Tipo de Funcionário Criado com sucesso', 'success');
-
+                    this.$set('errors', '')
                 }
             }, (response) => {
-
+                this.$set('errors', response.data)
             });
         },
 
@@ -121,17 +124,17 @@ export default{
 
         saveEditedMaterial: function(id) {
             var material = this.newMaterial;
-            this.clearField();
             this.$http.patch('http://localhost:8000/api/v1/materials/'+ id, material).then((response) => {
                 if (response.status == 200) {
                     $('#modal-edit-material').modal('hide');
+                    this.clearField();
                     // console.log(response.data);
-                    this.fetchMaterial();
+                    this.fetchMaterial(this.pagination.current_Page, this.showRow);
                     this.alert('Tipo de Funcionário atualizado com sucesso', 'info');
-
+                    this.$set('errors', '')
                 }
             }, (response) => {
-                console.log("Ocorreu um erro na operação");
+                this.$set('errors', response.data)
             });
         },
 

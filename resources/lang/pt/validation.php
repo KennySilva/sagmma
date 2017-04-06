@@ -151,6 +151,12 @@ return [
             'min' => 'Minimo caractere é :min',
             'max' => 'Maximo de caractere é :max',
         ],
+
+        'description' => [
+            'required' => 'Obrigatório',
+            'min' => 'Minimo caractere é :min',
+            'max' => 'Maximo de caractere é :max',
+        ],
     ],
 
 
@@ -188,6 +194,7 @@ return [
         'dimension'    => 'Dimensão',
         'price'    => 'Valor',
         'location'    => 'Localização',
+        'description'    => 'Descrição',
     ],
 
 ];
