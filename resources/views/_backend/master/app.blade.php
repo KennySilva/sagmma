@@ -28,31 +28,36 @@ desired effect
 |---------------------------------------------------------|
 -->
 <body class="sagmma-skin sidebar-mini">
-<div class="wrapper">
+    <div class="wrapper">
 
-    @include('_backend.master.partials.mainheader')
+        @include('_backend.master.partials.mainheader')
 
-    @include('_backend.master.partials.sidebar')
+        @include('_backend.master.partials.sidebar')
 
-    <!-- Content Wrapper. Contains page content -->
-    <div class="content-wrapper">
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
 
-        @include('_backend.master.partials.contentheader')
+            @include('_backend.master.partials.contentheader')
 
-        <!-- Main content -->
-        <section class="content">
-            <!-- Your Page Content Here -->
-            @yield('main-content')
-        </section><!-- /.content -->
-    </div><!-- /.content-wrapper -->
+            <!-- Main content -->
+            <section class="content">
+                <!-- Your Page Content Here -->
+                @yield('main-content')
+            </section><!-- /.content -->
+        </div><!-- /.content-wrapper -->
 
-    @include('_backend.master.partials.controlsidebar')
+        @include('_backend.master.partials.controlsidebar')
 
-    @include('_backend.master.partials.footer')
+        @include('_backend.master.partials.footer')
 
-</div><!-- ./wrapper -->
+    </div><!-- ./wrapper -->
 
-@include('_backend.master.partials.scripts')
-@stack('scripts')
+    @include('_backend.master.partials.scripts')
+    @stack('scripts')
+    <script type="text/javascript">
+    $('.modal').on('hidden.bs.modal', function(){
+        $(this).find('form')[0].reset();
+    });
+    </script>
 </body>
 </html>

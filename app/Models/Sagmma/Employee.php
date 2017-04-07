@@ -10,23 +10,16 @@ class Employee extends Model
 
     protected $guarded = ['id'];
 
+    public function getDates()
+{
+    return [];
+}
 
-
-    //Relacionamentos;
-    // public function market()
-    // {
-    //     return $this->belongsTo(Market::class);
-    // }
     //------------------------------------------------------------
     public function markets()
     {
         return $this->belongsToMany(Market::class, 'employee_market', 'employee_id', 'market_id')->withPivot('author')->withTimestamps();
     }
-
-    // public function tranference()
-    // {
-    //     return $this->belongsTo(Transference::class, 'employee_id', 'id');
-    // }
 
     public function taxation()
     {

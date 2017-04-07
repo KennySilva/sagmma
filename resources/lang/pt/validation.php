@@ -157,6 +157,14 @@ return [
             'min' => 'Minimo caractere é :min',
             'max' => 'Maximo de caractere é :max',
         ],
+        'typeofemployee_id' => [
+            'required' => 'Obrigatório',
+        ],
+
+        'service_beginning' => [
+            'date' => 'Data Inválida',
+        ],
+
     ],
 
 
@@ -195,6 +203,8 @@ return [
         'price'    => 'Valor',
         'location'    => 'Localização',
         'description'    => 'Descrição',
+        'typeofemployee_id'    => 'Tipo de Funcionário',
+        'service_beginning'    => 'Data de Início',
     ],
 
 ];

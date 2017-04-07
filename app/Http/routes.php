@@ -315,9 +315,12 @@ Route::group(['namespace' => 'PluginsControllers'], function()
             // --------------------------------------------------------------------------------------
             Route::get('/printableEmployeeInformation', 'PrintController@indexEmployee');
             Route::get('/printEmployeePreview', 'PrintController@printEmployeePreview');
-            // -----------------------------Exportation----------------------------------------------
-            Route::get('/getImport', 'PluginsControllers\ExcelController@getImport');
-            Route::post('/postImport', 'PluginsControllers\ExcelController@postImport');
+
+            // ---------------------------------------Excel------------------------------------------
+            Route::get('/getEmployeeImport', 'ExcelController@getEmployeeImport');
+            Route::post('/postEmployeeImport', 'ExcelController@postEmployeeImport');
+            Route::get('/getEmployeeExport', 'ExcelController@getEmployeeExport');
+
         });
     });
 });

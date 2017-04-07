@@ -240,6 +240,7 @@ export default{
             }, 5000);
         },
 
+
         clearField: function(){
             this.newEmployee = {
                 name              : '',
@@ -321,6 +322,8 @@ export default{
                 this.newEmployee.typeofemployee_id = response.data.typeofemployee_id;
                 this.newEmployee.description       = response.data.description;
                 this.newEmployee.markets           = response.data.markets;
+                this.newEmployee.password           = 'something';
+                this.newEmployee.username           = 'something';
             }, (response) => {
                 console.log('Error');
             });

@@ -36,6 +36,8 @@ class ApiEmployeesController extends Controller
         public function store(EmployeesRequest $request, UsersRequest $urequest)
         {
             $name = ucwords($request->name);
+            $username          = ucwords($request->username);
+
             $employee                    = new Employee();
             $employee->name              = $name;
             $employee->ic                = $request->ic;
@@ -57,8 +59,8 @@ class ApiEmployeesController extends Controller
 
             if ($urequest->password != '') {
                 $user                  = new User();
-                $user->name            = $urequest->name;
-                $user->username        = $urequest->username;
+                $user->name            = $name;
+                $user->username        = $username;
                 $user->ic              = $urequest->ic;
                 $user->email           = $urequest->email;
                 $user->password        = bcrypt($urequest->get_password);
@@ -71,7 +73,7 @@ class ApiEmployeesController extends Controller
                 $user->phone           = $urequest->phone;
                 $user->avatar          = 'default.png';
                 $user->status          = false;
-                $user->type            = 'trad';
+                $user->type            = 'emp';
                 $user->description     = $urequest->description;
                 $user->save();
             }
@@ -88,43 +90,25 @@ class ApiEmployeesController extends Controller
             //
         }
 
-        public function update(Req $request, $id)
+        public function update(EmployeesRequest $request, $id)
         {
+            $name              = ucwords($request->name);
+            $ic                = $request->ic;
+            $age               = $request->age;
+            $gender            = $request->gender;
+            $email             = $request->email;
+            $state             = $request->state;
+            $council           = $request->council;
+            $parish            = $request->parish;
+            $zone              = $request->zone;
+            $phone             = $request->phone;
+            $echelon           = $request->echelon;
+            $service_beginning = $request->service_beginning;
+            $typeofemployee_id = $request->typeofemployee_id;
+            $description       = $request->description;
 
-            $name              = Input::get('name');
-            $ic                = Input::get('ic');
-            $age               = Input::get('age');
-            $gender            = Input::get('gender');
-            $email             = Input::get('email');
-            $state             = Input::get('state');
-            $council           = Input::get('council');
-            $parish            = Input::get('parish');
-            $zone              = Input::get('zone');
-            $phone             = Input::get('phone');
-            $echelon           = Input::get('echelon');
-            $service_beginning = Input::get('service_beginning');
-            $typeofemployee_id = Input::get('typeofemployee_id');
-            $photo             = Input::get('photo');
-            $description       = Input::get('description');
-
-            // $name              = $request->name;
-            // $ic                = $request->ic;
-            // $age               = $request->age;
-            // $gender            = $request->gender;
-            // $email             = $request->email;
-            // $state             = $request->state;
-            // $council           = $request->council;
-            // $parish            = $request->parish;
-            // $zone              = $request->zone;
-            // $phone             = $request->phone;
-            // $echelon           = $request->echelon;
-            // $service_beginning = $request->service_beginning;
-            // $typeofemployee_id = $request->typeofemployee_id;
-            // $photo             = $request->photo;
-            // $description       = $request->description;
-
-            $employee = new Employee();
-            $employee->where('id', $id)->update(array(
+            $employee = Employee::where('id', '=', $id);
+            $employee->update([
                 'name'              => $name,
                 'ic'                => $ic,
                 'age'               => $age,
@@ -135,18 +119,32 @@ class ApiEmployeesController extends Controller
                 'parish'            => $parish,
                 'zone'              => $zone,
                 'phone'             => $phone,
-                'echelon'           => $echelon,
                 'service_beginning' => $service_beginning,
                 'typeofemployee_id' => $typeofemployee_id,
-                'photo'             => $photo,
-                'description'       => $description
-            ));
-            // $employee->markets()->sync($request->markets);
+                'description'       => $description,
+            ]);
+            $employee->markets()->sync($request->markets);
 
-            // $employee->markets()->sync($markets);
-
-            return Response::json($request::all());
+            $user = User::where('ic', '=', $ic);
+            if ($user) {
+                $user->update(array(
+                    'name'        => $name,
+                    // 'username'    => $username,
+                    'ic'          => $ic,
+                    'email'       => $email,
+                    'gender'      => $gender,
+                    'age'         => $age,
+                    'state'       => $state,
+                    'council'     => $council,
+                    'parish'      => $parish,
+                    'zone'        => $zone,
+                    'phone'       => $phone,
+                    'description' => $description,
+                ));
+            }
         }
+
+
 
         public function destroy($id)
         {
