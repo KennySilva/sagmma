@@ -10,6 +10,7 @@ use Redirect;
 use DB;
 use Excel;
 use Employee;
+use Caffeinated\Flash\Facades\Flash;
 class ExcelController extends Controller
 {
     public function getEmployeeImport()
@@ -25,6 +26,7 @@ class ExcelController extends Controller
                 Employee::firstOrCreate($sheet->toArray());
             });
         });
+        Flash::success('O Ficheiro foi armazenado na Base de Dados com Sucesso');
         return Redirect::back();
     }
 
@@ -38,6 +40,8 @@ class ExcelController extends Controller
             });
 
         })->export('xls');
+        return Redirect::back();
+
     }
 
     // public function deleteAll()

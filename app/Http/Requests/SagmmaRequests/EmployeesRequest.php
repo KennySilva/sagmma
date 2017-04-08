@@ -13,13 +13,13 @@ class EmployeesRequest extends Request
 
     public function rules()
     {
-        $now = Carbon::now()->addYear(1)->toDateString();
+        $date = Carbon::now()->toDateString();
         return [
             'name'              => 'required|max:60|min:4',
             'ic'                => 'required|digits:6|Integer|unique:employees,ic,'.$this->id,
             'email'             => 'email|unique:employees,email,'.$this->id,
             'phone'             => 'digits:7|unique:employees,phone,'.$this->id,
-            'service_beginning' => 'date',
+            'service_beginning' => 'date|before:'.$date,
             'typeofemployee_id' => 'required',
             // 'ending_date' => 'required|after:'.$now,
 

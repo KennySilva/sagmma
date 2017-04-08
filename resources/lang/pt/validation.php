@@ -163,6 +163,15 @@ return [
 
         'service_beginning' => [
             'date' => 'Data Inválida',
+            'before' => 'Introduzir data menor ou igual a :date',
+        ],
+
+        'ic' => [
+            'required' => 'Obrigatório',
+            'min' => 'Minimo caractere é :min',
+            'max' => 'Maximo de caractere é :max',
+            'unique'    => 'Este :attribute já existe',
+            'digits'    => 'Aceita :digits Números',
         ],
 
     ],

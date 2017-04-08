@@ -1,5 +1,7 @@
 import Pagination from '../../../Pagination/src/Component.vue'
 import { _ } from 'lodash'
+import myDatepicker from 'vue-datepicker/vue-datepicker-1.vue'
+
 
 export default{
     name: 'ShowEmployees',
@@ -26,12 +28,9 @@ export default{
                 photo             : '',
                 description       : '',
                 markets           : [],
-                password          : '',
-                username          : '',
-                get_acount        : '',
+                get_acount        : false,
 
             },
-
             employees  : {},
             markets    : [],
             types      : [],
@@ -50,6 +49,51 @@ export default{
             all: {},
             auth: [],
             errors: [],
+
+            deleteMultIten: [],
+            allSelected: false,
+            selected: [],
+
+            // Vue-Datepicker
+            option: {
+                type: 'day',
+                week: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom'],
+                month: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+                format: 'YYYY-MM-DD',
+                placeholder: 'Data de Inicio de Serviço',
+                inputStyle: {
+                    'display': 'inline-block',
+                    'padding': '6px',
+                    'line-height': '20px',
+                    'font-size': '14px',
+                    'border': '1px solid #d2d6de',
+                    'border-radius': '0px',
+                    'color': '#5F5F5F',
+                    'min-width': '100%',
+                    'width': '100%'
+                },
+                color: {
+                    header: '#228074',
+                    headerText: '#ffffff'
+                },
+                buttons: {
+                    cancel: 'Cancelar',
+                    ok: 'Escolher',
+                },
+                overlayOpacity: 0.5, // 0.5 as default
+                dismissible: true // as true as default
+            },
+
+            limit: [{
+                type: 'weekday',
+                available: [1, 2, 3, 4, 5, 6]
+            },
+            {
+                type: 'fromto',
+                from: '2017-02-01',
+                // to: '2016-02-20'
+            }],
+
         }
     },
 
@@ -228,6 +272,15 @@ export default{
 
 
     methods: {
+        selectAll: function() {
+            this.deleteMultIten = [];
+            if (!this.allSelected) {
+                for (employee in this.employees) {
+                    this.deleteMultIten.push(this.employees[employee].id);
+                }
+            }
+        },
+
         alert: function(msg, typeAlert) {
             var self = this;
             this.success = true;
@@ -258,11 +311,11 @@ export default{
                 market_id         : '',
                 typeofemployee_id : '',
                 photo             : '',
-                password       : '',
                 get_acount       : '',
-                username       : '',
                 description       : '',
                 markets           : [],
+                get_acount        : false,
+
 
             };
         },
@@ -322,8 +375,6 @@ export default{
                 this.newEmployee.typeofemployee_id = response.data.typeofemployee_id;
                 this.newEmployee.description       = response.data.description;
                 this.newEmployee.markets           = response.data.markets;
-                this.newEmployee.password           = 'something';
-                this.newEmployee.username           = 'something';
             }, (response) => {
                 console.log('Error');
             });
@@ -361,6 +412,18 @@ export default{
                 console.log("Ocorreu um erro na operação");
             });
         },
+
+        deleteMultEmployee: function() {
+            this.$http.delete('http://localhost:8000/api/v1/deleteMultEmployees/'+ this.deleteMultIten).then((response) => {
+                if (response.status == 200) {
+                    this.fetchEmployee(this.pagination.current_page, this.showRow);
+                    this.alert('Funcionários eliminados com sucesso', 'warning');
+                }
+            }, (response) => {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
 
         // employeeMarket: function() {
         //     this.$http.get('http://localhost:8000/api/v1/employeeMarket').then((response) => {
@@ -471,5 +534,6 @@ export default{
 
     components: {
         'Pagination': Pagination,
+        'date-picker': myDatepicker
     }
 }

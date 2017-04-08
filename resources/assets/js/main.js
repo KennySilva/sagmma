@@ -15,8 +15,9 @@ new Vue({
     el: '.sagmma_container',
 
     data: {
-        newUser: {},
-        updateimage: '',
+        newUser      : {},
+        updateimage  : '',
+        employeeExcel: '',
     },
 
     components: {

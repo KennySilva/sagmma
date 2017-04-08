@@ -15,6 +15,8 @@ use User;
 use Typeofemployee;
 use Response;
 use Input;
+use Validator;
+use Carbon\Carbon;
 
 class ApiEmployeesController extends Controller
 {
@@ -33,10 +35,16 @@ class ApiEmployeesController extends Controller
     public function create()
     {}
 
-        public function store(EmployeesRequest $request, UsersRequest $urequest)
+        public function store(EmployeesRequest $request)
         {
-            $name = ucwords($request->name);
-            $username          = ucwords($request->username);
+            $username = 'Funcionario'.$request->ic;
+            $password = 'SAGMMA'.$request->ic;
+            $name     = ucwords($request->name);
+            if ($request->service_beginning == '') {
+                $service_beginning = Carbon::now();
+            }else {
+                $service_beginning = $request->service_beginning;
+            }
 
             $employee                    = new Employee();
             $employee->name              = $name;
@@ -50,32 +58,45 @@ class ApiEmployeesController extends Controller
             $employee->zone              = $request->zone;
             $employee->phone             = $request->phone;
             $employee->echelon           = $request->echelon;
-            $employee->service_beginning = $request->service_beginning;
+            $employee->service_beginning = $service_beginning;
             $employee->typeofemployee_id = $request->typeofemployee_id;
             $employee->photo             = $request->photo;
             $employee->description       = $request->description;
             $employee->save();
             $employee->markets()->sync($request->markets);
 
-            if ($urequest->password != '') {
-                $user                  = new User();
-                $user->name            = $name;
-                $user->username        = $username;
-                $user->ic              = $urequest->ic;
-                $user->email           = $urequest->email;
-                $user->password        = bcrypt($urequest->get_password);
-                $user->gender          = $urequest->gender;
-                $user->age             = $urequest->age;
-                $user->state           = $urequest->state;
-                $user->council         = $urequest->council;
-                $user->parish          = $urequest->parish;
-                $user->zone            = $urequest->zone;
-                $user->phone           = $urequest->phone;
-                $user->avatar          = 'default.png';
-                $user->status          = false;
-                $user->type            = 'emp';
-                $user->description     = $urequest->description;
-                $user->save();
+            if ($request->get_acount) {
+                // $validation = Validator::make(Input::all(),
+                // [
+                //     'name' => 'min:4|max:45|required|string|unique:users',
+                // ]);
+                // if($validation->fails()) {
+                //     return Response::json(['status'=>'error', 'message'=>$validation->messages()]);
+                // } else {
+                    $user                  = new User();
+                    $user->name            = $name;
+                    $user->username        = $username;
+                    $user->ic              = $request->ic;
+                    $user->email           = $request->email;
+                    $user->password        = bcrypt($password);
+                    $user->gender          = $request->gender;
+                    $user->age             = $request->age;
+                    $user->state           = $request->state;
+                    $user->council         = $request->council;
+                    $user->parish          = $request->parish;
+                    $user->zone            = $request->zone;
+                    $user->phone           = $request->phone;
+                    $user->avatar          = 'default.png';
+                    $user->status          = false;
+                    $user->type            = 'emp';
+                    $user->description     = $request->description;
+                    $user->save();
+                    // ---------------------------------------------------------------------------
+                //     return Response::json(['status'=>'success', 'message'=>'Save successful'], 200);
+                //     // ---------------------------------------------------------------------------
+                // }
+
+
             }
         }
 
@@ -92,6 +113,12 @@ class ApiEmployeesController extends Controller
 
         public function update(EmployeesRequest $request, $id)
         {
+            $service_beginning = $request->service_beginning;
+            if ($request->service_beginning == '') {
+                $service_beginning = Carbon::now();
+            }else {
+                $service_beginning = $request->service_beginning;
+            }
             $name              = ucwords($request->name);
             $ic                = $request->ic;
             $age               = $request->age;
@@ -103,7 +130,6 @@ class ApiEmployeesController extends Controller
             $zone              = $request->zone;
             $phone             = $request->phone;
             $echelon           = $request->echelon;
-            $service_beginning = $request->service_beginning;
             $typeofemployee_id = $request->typeofemployee_id;
             $description       = $request->description;
 
@@ -150,6 +176,15 @@ class ApiEmployeesController extends Controller
         {
             return Employee::destroy($id);
         }
+
+        public function deleteAll($ids)
+        {
+            // Employee::find(explode(',', $ids))->delete();
+            return Employee::whereIn('id', $ids)->delete();
+            // return Employee::destroy($ids);
+
+        }
+
 
         public function getMarketforEmployee()
         {

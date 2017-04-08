@@ -116,6 +116,7 @@ Route::group(['namespace' => 'ApiControllers'], function()
 
             // ----------------------------------------Api-employee----------------------------------
             Route::resource('employees', 'ApiEmployeesController');
+            Route::delete('deleteMultEmployees/{ids}', 'ApiEmployeesController@deleteAll');
             Route::get('marketEmployee', 'ApiEmployeesController@getMarketforEmployee');
             Route::get('allEmployees/{row}', 'ApiEmployeesController@index');
 

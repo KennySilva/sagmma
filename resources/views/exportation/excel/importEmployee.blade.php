@@ -17,11 +17,11 @@
             <input type="hidden" name="_token" value="{{csrf_token()}}">
             <div class="form-group">
                 <label for="employee" class="control-label">Selecionar um Ficheiro CSV para Importar</label>
-                <input type="file" name="employee" value=""  id="excelInput">
+                <input v-model="employeeExcel" type="file" name="employee" value=""  id="excelInput">
             </div>
 
             <div class="form-group">
-                <button type="submit" class="btn btn-primary">
+                <button v-if="!employeeExcel" type="submit" class="btn btn-primary">
                     <i class="fa fa-upload"></i>
                 </button>
 
