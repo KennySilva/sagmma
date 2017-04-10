@@ -1,132 +1,200 @@
 @extends('_backend.master.app')
 @section('sagmma-style')
-    <link rel="stylesheet" href="bower_components/bootstrap-select/dist/css/bootstrap-select.css">
     <link rel="stylesheet" href="/bower_components/fullcalendar/dist/fullcalendar.css">
     <link rel="stylesheet" href="/bower_components/fullcalendar/dist/fullcalendar.print.css" media="print">
 @endsection
-
-
 @section('htmlheader_title')
-    Home
+    Início
 @endsection
-
 @section('contentheader_title')
-    {{-- Sagmma Home --}}
 @endsection
-
-
-
-
-
 @section('main-content')
     <div class="sagmma_container">
         <div class="row">
-            <div class="col-md-4">
-                <div class="info-box">
-                    <!-- Apply any bg-* class to to the icon to color it -->
-                    <span class="info-box-icon bg-blue"><i class="fa fa-users"></i></span>
-                    <div class="info-box-content">
-                        <span class="info-box-text">Utilizadores</span>
-                        <span class="info-box-number">{{$totalUsers}}</span>
-                    </div><!-- /.info-box-content -->
-                </div><!-- /.info-box -->
+            <div class="col-md-3">
+                <a href="#" data-toggle="modal" data-target="#totalUsers ">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-gray"><i class="fa fa-users"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Todos</span>
+                            <span class="info-box-number">{{$users->count()}}</span>
+                        </div>
+                    </div>
+                </a>
             </div>
 
-            <div class="col-md-4">
-                <div class="info-box">
-                    <!-- Apply any bg-* class to to the icon to color it -->
-                    <span class="info-box-icon bg-red"><i class="fa fa-address-card-o"></i></span>
-                    <div class="info-box-content">
-                        <span class="info-box-text">Papeis de Utilizadores</span>
-                        <span class="info-box-number">{{$totalRoles}}</span>
-                    </div><!-- /.info-box-content -->
-                </div><!-- /.info-box -->
+            <div class="col-md-3">
+                <a href="#" data-toggle="modal" data-target="#activeUsers">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-green"><i class="fa fa-check-circle-o"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Ativos</span>
+                            <span class="info-box-number">{{$actives->count()}}</span>
+                        </div>
+                    </div>
+                </a>
             </div>
-            <div class="col-md-4">
-                <div class="info-box">
-                    <!-- Apply any bg-* class to to the icon to color it -->
-                    <span class="info-box-icon bg-gray"><i class="fa fa-sign-in"></i></span>
-                    <div class="info-box-content">
-                        <span class="info-box-text">Permissões</span>
-                        <span class="info-box-number">{{$totalPermissions}}</span>
-                    </div><!-- /.info-box-content -->
-                </div><!-- /.info-box -->
+
+            <div class="col-md-3">
+                <a href="#" data-toggle="modal" data-target="#adminUsers">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-blue"><i class="fa fa-user"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Admin</span>
+                            <span class="info-box-number">{{$admins->count()}}</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="#" data-toggle="modal" data-target="#superAdminUsers">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-red"><i class="fa fa-id-card-o"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Super Admin</span>
+                            <span class="info-box-number">{{$superAdmins->count()}}</span>
+                        </div>
+                    </div>
+                </a>
             </div>
         </div>
+        {{-- ------------------------------------Open Modals----------------------------------------------- --}}
+        <div class="modal fade" id="totalUsers" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id=""><i class="fa fa-users"></i></h4>
+                    </div>
+                    <div class="modal-body">
+                        <ul class="list-group">
+                            @foreach ($users as $user)
+                                <li class="list-group-item">{{$user->name}}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" data-dismiss="modal"><i class="fa fa-check"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{-- ------------------------------------------------------------------------------------------- --}}
+        <div class="modal fade" id="activeUsers" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id=""><i class="fa fa-check-circle-o"></i></h4>
+                    </div>
+                    <div class="modal-body">
+                        <ul class="list-group">
+                            @foreach ($actives as $active)
+                                <li class="list-group-item">{{$active->name}}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" data-dismiss="modal"><i class="fa fa-check"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{-- ------------------------------------------------------------------------------------------- --}}
+
+        <div class="modal fade" id="adminUsers" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id=""><i class="fa fa-user"></i></h4>
+                    </div>
+                    <div class="modal-body">
+                        <ul class="list-group">
+                            @foreach ($admins as $admin)
+                                <li class="list-group-item">{{$admin->name}}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" data-dismiss="modal"><i class="fa fa-check"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{-- ------------------------------------------------------------------------------------------- --}}
+
+        <div class="modal fade" id="superAdminUsers" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id=""><i class="fa fa-id-card-o"></i></h4>
+                    </div>
+                    <div class="modal-body">
+                        <ul class="list-group">
+                            @foreach ($superAdmins as $superAdmin)
+                                <li class="list-group-item">{{$superAdmin->name}}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" data-dismiss="modal"><i class="fa fa-check"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{-- --------------------------------------End Modal--------------------------------------------------- --}}
+
         <div class="row">
             <div class="col-md-12">
                 @include('_backend.master.partials.painelCalendar')
             </div>
         </div>
-        <div class="row ">
+
+        <div class="row">
             <div class="col-md-12">
-                <div class="box box-primary">
-                    <div class="box-header with-border">
-                        <h3 class="box-title">Acção Rápida</h3>
-                        <div class="box-tools pull-right">
-                            <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-                        </div>
-                    </div>
-                    <div class="box-body">
-                        <ul class="nav nav-tabs" id="myTab">
-                            <li class="dropdown">
-                                <a data-toggle="dropdown" class="dropdown-toggle" href="#"><span class="fa fa-file"></span>&nbsp;&nbsp;Contratos <b class="caret"></b></a>
-                                <ul class="dropdown-menu">
-                                    <li><a href="#newContract"><span class="fa fa-plus"></span>&nbsp;&nbsp;Criar Novo</a></li>
-                                    <li><a href="#showContract"><span class="fa fa-eye"></span>&nbsp;&nbsp;Listar Registo Recente</a></li>
-                                </ul>
-                            </li>
-
-                            <li class="dropdown">
-                                <a data-toggle="dropdown" class="dropdown-toggle" href="#"><span class="fa fa-dollar"></span>&nbsp;&nbsp;Cobrança de Imposto <b class="caret"></b></a>
-                                <ul class="dropdown-menu">
-                                    <li><a href="#newCollection"><span class="fa fa-plus"></span>&nbsp;&nbsp;Criar Novo</a></li>
-                                    <li><a href="#showCollection"><span class="fa fa-eye"></span>&nbsp;&nbsp;Listar Registo Recente</a></li>
-                                </ul>
-                            </li>
+                <div class="panel with-nav-tabs panel-default">
+                    <div class="panel-heading">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a href="#tabUser" data-toggle="tab">GERIR UTILIZADORES</a></li>
+                            <li><a href="#tabTax" data-toggle="tab">GERIR COBRANÇA DE IMPOSTOS</a></li>
+                            <li><a href="#tabContr" data-toggle="tab">GERIR CONTRATOS</a></li>
+                            <li><a href="#tabCont" data-toggle="tab">CONTROLO DE MATERIAIS</a></li>
                         </ul>
-
+                    </div>
+                    <div class="panel-body">
                         <div class="tab-content">
-                            <div id="newContract" class="tab-pane fade in active">
-                                <h3>newContract A</h3>
-                                <p>Aliquip placeat salvia cillum iphone. Seitan aliquip quis cardigan american apparel, butcher voluptate nisi qui. Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua, retro synth master cleanse. Mustache cliche tempor, williamsburg carles vegan helvetica. Reprehenderit butcher retro keffiyeh dreamcatcher synth.</p>
+                            {{ csrf_field() }}
+                            <div class="tab-pane fade in active" id="tabUser">
+                                <show-users></show-users>
                             </div>
-                            <div id="showContract" class="tab-pane fade">
-                                <h3>showContract B</h3>
-                                <p>Vestibulum nec erat eu nulla rhoncus fringilla ut non neque. Vivamus nibh urna, ornare id gravida ut, mollis a magna. Aliquam porttitor condimentum nisi, eu viverra ipsum porta ut. Nam hendrerit bibendum turpis, sed molestie mi fermentum id. Aenean volutpat velit sem. Sed consequat ante in rutrum convallis. Nunc facilisis leo at faucibus adipiscing.</p>
+
+                            <div class="tab-pane fade" id="tabTax">
+                                <show-taxation></show-taxation>
                             </div>
-                            <div id="newCollection" class="tab-pane fade">
-                                <h3>newCollection 1</h3>
-                                <p>WInteger convallis, nulla in sollicitudin placerat, ligula enim auctor lectus, in mollis diam dolor at lorem. Sed bibendum nibh sit amet dictum feugiat. Vivamus arcu sem, cursus a feugiat ut, iaculis at erat. Donec vehicula at ligula vitae venenatis. Sed nunc nulla, vehicula non porttitor in, pharetra et dolor. Fusce nec velit velit. Pellentesque consectetur eros.</p>
+
+                            <div class="tab-pane fade" id="tabContr">
+                                <show-contract></show-contract>
                             </div>
-                            <div id="sowCollection" class="tab-pane fade">
-                                <h3>Dropdown 2</h3>
-                                <p>Donec vel placerat quam, ut euismod risus. Sed a mi suscipit, elementum sem a, hendrerit velit. Donec at erat magna. Sed dignissim orci nec eleifend egestas. Donec eget mi consequat massa vestibulum laoreet. Mauris et ultrices nulla, malesuada volutpat ante. Fusce ut orci lorem. Donec molestie libero in tempus imperdiet. Cum sociis natoque penatibus et magnis.</p>
+
+                            <div class="tab-pane fade" id="tabCont">
+                                <show-control></show-control>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
         </div>
+
+
     </div>
 @endsection
-
-
 @push('scripts')
-    <script src="bower_components/bootstrap-select/dist/js/bootstrap-select.js" charset="utf-8"></script>
-    <script src="/plugins/jQueryUI/jquery-ui.js" charset="utf-8"></script>
+    <script src="/bower_components/jquery-ui/jquery-ui.js" charset="utf-8"></script>
     <script src="/bower_components/moment/moment.js" charset="utf-8"></script>
+    {{-- <script src="./node_modules/moment/moment.js" charset="utf-8"></script> --}}
     <script src="/bower_components/fullcalendar/dist/fullcalendar.js" charset="utf-8"></script>
     <script src="/bower_components/fullcalendar/dist/locale/pt.js" charset="utf-8"></script>
     <script src="/js/back/calendarEvents.js" charset="utf-8"></script>
-
-    <script type="text/javascript">
-    $(document).ready(function(){
-        $("#myTab a").click(function(e){
-            e.preventDefault();
-            $(this).tab('show');
-        });
-    });
-    </script>
 @endpush

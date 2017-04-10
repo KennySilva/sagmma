@@ -185,7 +185,7 @@
 												</tr>
 												<tr>
 													<td><b>Sexo</b></td>
-													<td><i>{{ alterGenderValue(newUser.gender) }}</i></td>
+													<td><i>{{ newUser.gender }}</i></td>
 												</tr>
 												<tr>
 													<td><b>BI</b></td>
@@ -208,7 +208,7 @@
 												</tr>
 												<tr>
 													<td><b>Ilha</b></td>
-													<td><i>{{ alterStateValue(newUser.state) }}</i></td>
+													<td><i>{{ newUser.state }}</i></td>
 												</tr>
 												<tr>
 													<td><b>Concelho</b></td>
@@ -224,7 +224,7 @@
 												</tr>
 												<tr>
 													<td><b>Tipo</b></td>
-													<td><span class="label label-primary"><i>{{ alterTypeValue(newUser.type) }}</i></span></td>
+													<td><span class="label label-primary"><i>{{ newUser.type }}</i></span></td>
 
 												</tr>
 												<tr>
@@ -237,11 +237,11 @@
 												</tr>
 												<tr>
 													<td><b>Data da criação</b></td>
-													<td><i>{{ user.created_at | formatDate 'DD/MM/YYYY' }}</i></td>
+													<td><i>{{ newUser.created_at | formatDate 'DD/MM/YYYY' }}</i></td>
 												</tr>
 												<tr>
 													<td><b>Data de atualização</b></td>
-													<td><i>{{ user.updated_at | formatDate 'DD/MM/YYYY' }}</i></td>
+													<td><i>{{ newUser.updated_at | formatDate 'DD/MM/YYYY' }}</i></td>
 												</tr>
 
 											</tbody>
@@ -462,7 +462,7 @@
 													<option v-if="newUser.council == 17 && newUser.state == 6" value="21">Nossa Senhora da Lapa</option>
 													<option v-if="newUser.council == 18 && newUser.state == 6" value="22">São Francisco</option>
 													<option v-if="newUser.council == 20 && newUser.state == 8" value="23">Nossa Senhora das Dores</option>
-													<option v-if="newUser.council == 21 && newUser.state == 9" value="4">Santa Isabel</option>
+													<option v-if="newUser.council == 21 && newUser.state == 9" value="24">Santa Isabel</option>
 												</select>
 											</div>
 										</div>

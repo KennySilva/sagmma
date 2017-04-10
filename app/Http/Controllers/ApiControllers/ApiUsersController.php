@@ -137,7 +137,9 @@ class ApiUsersController extends Controller
         $description = $request->description;
 
         $user = new User();
-        $user->where('id', $id)->update(array(
+
+        $user->where('id', $id)->first();
+        $user->update(array(
             'name'        => $name,
             'username'    => $username,
             'ic'          => $ic,
@@ -152,6 +154,8 @@ class ApiUsersController extends Controller
             'type'        => $type,
             'description' => $description,
         ));
+        $user->roles()->sync($request->roles);
+
 
         $trader = Trader::where('ic', '=', $ic);
         if ($trader) {

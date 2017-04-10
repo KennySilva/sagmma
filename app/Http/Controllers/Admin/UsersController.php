@@ -12,9 +12,17 @@ use Role;
 // use Image;
 use Intervention\Image\ImageManagerStatic as Image;
 use Charts;
+use Carbon\Carbon;
+use Hash;
+use Validator;
+use Caffeinated\Flash\Facades\Flash;
 
 class UsersController extends Controller
 {
+    public function __construct()
+    {
+        Carbon::setlocale('pt');
+    }
     public function index()
     {
         //Charts
@@ -94,5 +102,32 @@ class UsersController extends Controller
             return view('_backend.users.profile')->with('user', $user);
 
         }
+    }
+    public function updatePassword(Request $request)
+    {
+        $rules = [
+            'old_password' => 'required',
+            'new_password' => 'required|min:3|different:old_password|confirmed',
+            'new_password_confirmation' => 'required',
+        ];
+
+
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            Flash::warning('Palavra passe não atualizada, Verifique os dados Introduzidos');
+            return redirect('user/profiles')->withErrors($validator);
+        }else {
+            if (Hash::check($request->old_password, Auth::user()->password)) {
+                $user = new User;
+                $user->where('id', '=', Auth::user()->id)->update(['password' => bcrypt($request->new_password)]);
+
+                Flash::success('Palavra passe atualizada com sucesso');
+                return redirect('user/profiles');
+            }else {
+                Flash::error('Palavra passe Introduzida está incorreta');
+                return redirect('user/profiles');
+            }
+        }
+
     }
 }

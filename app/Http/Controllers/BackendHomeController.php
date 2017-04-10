@@ -9,20 +9,35 @@ use Sagmma\Http\Controllers\Controller;
 use User;
 use Role;
 use Permission;
+use Carbon\Carbon;
 
 class BackendHomeController extends Controller
 {
 
-    public function FunctionName()
+    public function __construct()
     {
-        return 'Estpou indo muitobem com este treta';
+        Carbon::setlocale('pt');
     }
+
     public function index()
     {
-        $totalUsers = User::count();
-        $totalRoles = Role::count();
-        $totalPermissions = Permission::count();
-        return view('_backend.home', compact('totalUsers', 'totalRoles', 'totalPermissions'));
+
+
+        // ----------------------------------------get---------------------------------------------
+        $admins = User::orderBy('name', 'asc')->where(function ($query) {$query->whereHas('roles', function($q){
+            $q->where('name', '=', 'Admin');
+        });})->get();
+
+        $superAdmins = User::orderBy('name', 'asc')->where(function ($query) {$query->whereHas('roles', function($q){
+            $q->where('name', '=', 'super-admin');
+        });})->get();
+
+        $actives = User::orderBy('name', 'asc')->where('status', 1)->get();
+
+        $users = User::orderBy('name', 'asc')->get();
+        // --------------------------------------return--------------------------------------------
+
+        return view('_backend.home', compact('admins', 'superAdmins', 'actives', 'users'));
     }
 
     public function create()

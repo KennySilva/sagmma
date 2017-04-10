@@ -405,58 +405,6 @@ export default{
             return this.users.status;
         },
 
-        // --------------------------------------------------------------------------------------------
-
-        alterGenderValue: function(users) {
-            if (users == 'M') {
-                return 'Masculino';
-            }else if (users == 'F') {
-                return 'Feminino';
-            }else {
-                return 'Não Especificado';
-            }
-
-        },
-
-        // --------------------------------------------------------------------------------------------
-
-        alterTypeValue: function(users) {
-            if (users == 'member') {
-                return 'Membro';
-            }else if (users == 'emp') {
-                return 'Empregado';
-            }else {
-                return 'Comerciante';
-            }
-
-        },
-
-        alterStateValue: function(users) {
-            if (users == 1) {
-                return 'Santiago';
-            }else if (users == 2) {
-                return 'Maio';
-            }else if (users == 3) {
-                return 'Fogo';
-            }else if (users == 4) {
-                return 'Brava';
-            }else if (users == 5) {
-                return 'Santo Antão';
-            }else if (users == 6) {
-                return 'São Niculau';
-            }else if (users == 7) {
-                return 'São Vicente';
-            }else if (users == 8) {
-                return 'Sal';
-            }else if (users == 9) {
-                return 'Boa Vista';
-            }else {
-                return 'Santa Luzia';
-            }
-
-        },
-
-        // --------------------------------------------------------------------------------------------
 
         doFilter: function() {
 

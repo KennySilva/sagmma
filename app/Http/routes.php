@@ -46,6 +46,7 @@ Route::post('password/email', 'Auth\PasswordController@postEmail');
 // Password reset routes...
 Route::get('password/reset/{token}', 'Auth\PasswordController@getReset');
 Route::post('password/reset', 'Auth\PasswordController@postReset');
+Route::post('editPassword', 'Admin\UsersController@updatePassword');
 //-------------------------------------------------------------------------
 
 // ##############################################################################################################################
@@ -75,11 +76,6 @@ Route::group(['namespace' => 'ApiControllers'], function()
             Route::get('allUsers/{row}', 'ApiUsersController@index');
             Route::get('authUser', 'ApiUsersController@authUser');
             Route::get('roleuser', 'ApiUsersController@getRoleForUser');
-
-            Route::get('showThisUser/{id}', function ($id) {
-                return 'User '.$id;
-            });
-
             Route::post('estado_utilizador', 'ApiUsersController@estado_utilizador');
             // -------------------------------------------------------------------------
             Route::resource('roles', 'ApiRolesController');
@@ -212,11 +208,8 @@ Route::group(['namespace' => 'Admin'], function()
             // ----------------------------------------------------------
             Route::resource('roles', 'RolesController');
             Route::resource('permissions', 'PermissionsController');
-            Route::get('showThisUser/{id}', function ($id) {
-                return 'User '.$id;
-            });
         });
-        // Perfil dos usuarios
+        // Perfil dos Utilizador
         Route::get('profiles', 'UsersController@profile');
         Route::post('profiles', 'UsersController@update_profile');
 

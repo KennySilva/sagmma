@@ -17,9 +17,9 @@ class CreateUsersTable extends Migration
             $table->string('password', 60);
             $table->enum('gender', ['M', 'F'])->nullable();
             $table->integer('age');
-            $table->enum('state', ['1', '2', '3', '4', '5','6','7','8','9'])->default('1');
-            $table->string('council', 30)->nullable()->default('Santa Catarina');
-            $table->string('parish', 30)->nullable()->default('Santa Catarina');
+            $table->enum('state', ['1', '2', '3', '4', '5','6','7','8','9'])->default('3');
+            $table->enum('council', ['1', '2', '3', '4', '5','6','7','8','9','10', '11', '12', '13', '14', '15','16','17','18','19', '20', '21', '22'])->default('4');
+            $table->enum('parish', ['1', '2', '3', '4', '5','6','7','8','9','10', '11', '12', '13', '14', '15','16','17','18','19', '20', '21', '22', '23', '24'])->default('1');
             $table->string('zone', 30)->nullable();
             $table->string('phone', 10)->nullable();
             $table->boolean('status')->default(false);

@@ -99,7 +99,7 @@
             @endif
         </div>
         <div class="form-group has-feedback">
-            <input type="password" class="form-control" placeholder="Confirme o password" name="password_confirmation"/>
+            <input type="password" class="form-control" placeholder="Confirme a Palavra Passe" name="password_confirmation"/>
             <span class="glyphicon glyphicon-log-in form-control-feedback"></span>
             @if ($errors->has('password_confirmation'))
                 <span class="help-block">
