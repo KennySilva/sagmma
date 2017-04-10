@@ -7,6 +7,11 @@
 
 
     @include('_frontend.master.partials.alerts')
+    <div class="row">
+        <div class="col-md-6">
+            @include('flash::message')
+        </div>
+    </div>
     <!--------------------------------------------------------------------------------------->
     @include('_frontend.master.partials.indexCarouce')
     <!--------------------------------------------------------------------------------------->

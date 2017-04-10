@@ -43701,7 +43701,11 @@ new Vue({
     el: '.sagmma_container',
 
     data: {
-        newUser: {},
+        profile: {
+            state: '',
+            council: '',
+            parish: ''
+        },
         updateimage: '',
         employeeExcel: ''
     },

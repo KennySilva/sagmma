@@ -42,6 +42,7 @@ class SocialController extends Controller
                 $social->save();
 
             }
+            Flash::success('Registo efectuado com sucesso aguerde a ativação');
             return redirect('/');
         }else {
             return '!!ERRO!!';

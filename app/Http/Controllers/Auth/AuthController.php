@@ -35,6 +35,7 @@ class AuthController extends Controller
             'email'                => 'required|email|Between:3,60|unique:users',
             'password'             => 'required|AlphaNum|Between:4,8|confirmed',
             'g-recaptcha-response' => 'required',
+            'type'             => 'required',
         ]);
     }
     // -------------------------------------------------------------------
@@ -54,9 +55,12 @@ class AuthController extends Controller
             'ic'       => $data['ic'],
             'email'    => $data['email'],
             'password' => bcrypt($data['password']),
+            'type'    => $data['type'],
             'social' => false,
         ]);
     }
+
+    
 
     // public function authenticate()
     // {
