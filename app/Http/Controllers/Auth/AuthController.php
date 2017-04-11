@@ -1,6 +1,7 @@
 <?php
 
 namespace Sagmma\Http\Controllers\Auth;
+use Trader;
 
 // use Auth;
 // use Illuminate\Routing\Controller as controll;
@@ -35,7 +36,7 @@ class AuthController extends Controller
             'email'                => 'required|email|Between:3,60|unique:users',
             'password'             => 'required|AlphaNum|Between:4,8|confirmed',
             'g-recaptcha-response' => 'required',
-            'type'             => 'required',
+            'gender'             => 'required',
         ]);
     }
     // -------------------------------------------------------------------
@@ -55,13 +56,11 @@ class AuthController extends Controller
             'ic'       => $data['ic'],
             'email'    => $data['email'],
             'password' => bcrypt($data['password']),
-            'type'    => $data['type'],
+            'gender'    => $data['gender'],
+            'type'             => 'member',
             'social' => false,
         ]);
     }
-
-    
-
     // public function authenticate()
     // {
     //     if (Auth::attempt(['email' => $email, 'password' => $password, 'status'=>1])) {

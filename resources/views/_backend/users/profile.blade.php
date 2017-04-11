@@ -312,7 +312,7 @@
                             <div class="col-md-6">
                                 <div class="form-group has-feedback">
 
-                                    <select  id="council"  :disabled="!profile.state" v-else name="state" class="form-control" v-model="profile.council" placeholder="Selecina o conceolho">
+                                    <select  id="council"  :disabled="!profile.state" v-else name="council" class="form-control" v-model="profile.council" placeholder="Selecina o conceolho">
                                         <option value="">Concelho</option>
                                         <option class="hide" selected value="">{{$user->council}}</option>
                                         <option v-if="profile.state == 1" value="1">Praia</option>
@@ -349,7 +349,7 @@
                         <div class="col-md-12">
                             <div class="col-md-6">
                                 <div class="form-group has-feedback">
-                                    <select id="parish" :disabled="!profile.state || !profile.council" v-else name="state" class="form-control" v-model="profile.parish" placeholder="Selecina o conceolho">
+                                    <select id="parish" :disabled="!profile.state || !profile.council" v-else name="parish" class="form-control" v-model="profile.parish" placeholder="Selecina o conceolho">
                                         <option class="hide"  value="">{{$user->parish}}</option>
                                         {{-- <option  selected value="">Freguesia</option> --}}
 

@@ -81,20 +81,21 @@
                             </span>
                         @endif
                     </div>
-
+                    <hr>
                     <div class="form-group has-feedback">
-                        <select class="form-control" name="type">
-                            <option selected value="member">Membro</option>
-                            <option disabled value="emp">Funcionário</option>
-                            <option value="trad">Comerciante</option>
-                        </select>
-                        @if ($errors->has('type'))
+                        <label class="radio-inline">
+                            <input type="radio" id="gender" value="M" name="gender">  <i class="fa fa-male"></i>&nbsp;&nbsp;Masculino
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" id="gender" name="gender" value="F">  <i class="fa fa-female"></i>&nbsp;&nbsp;Feminino
+                        </label>
+                        @if ($errors->has('gender'))
                             <span class="help-block">
-                                <p class="help-block text-danger" style="color: #DD4B39;">{{ $errors->first('type') }}</p>
+                                <p class="help-block text-danger" style="color: #DD4B39;">{{ $errors->first('gender') }}</p>
                             </span>
                         @endif
                     </div>
-
+                    
                     {{-- <div class="col-md-6 col-md-offset-1"> --}}
                     {{-- {!! app('captcha')->display([],'pt'); !!}
                     @if ($errors->has('g-recaptcha-response'))

@@ -98,11 +98,46 @@ class UsersController extends Controller
             $user = Auth::user();
             $user->avatar = $filename;
             $user->save();
-
+            Flash::success('Imagem de Perfil Actualizada Com Sucesso');
             return view('_backend.users.profile')->with('user', $user);
 
         }
     }
+
+    public function updateUserPrifile(Request $request)
+    {
+        $rules = [
+            'name' => 'required',
+            'username' => 'required',
+            'email' => 'required',
+        ];
+
+
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            Flash::warning('Informações não atualizadas, Verifique os dados Introduzidos');
+            return redirect('user/profiles')->withErrors($validator);
+        }else {
+            $user = new User;
+            $user->where('id', '=', Auth::user()->id)
+            ->update([
+                'name' => $request->name,
+                'username' => $request->username,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'age' => $request->age,
+                'state' => $request->state,
+                'council' => $request->council,
+                'parish' => $request->parish,
+                'zone' => $request->zone,
+            ]);
+
+            Flash::success('Informações atualizadas com sucesso');
+            return redirect('user/profiles');
+
+        }
+    }
+
     public function updatePassword(Request $request)
     {
         $rules = [

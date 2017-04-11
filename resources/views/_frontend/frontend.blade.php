@@ -6,17 +6,19 @@
     <!----------------------------Alerts----------------------------------------------------------->
 
 
-    @include('_frontend.master.partials.alerts')
-    <div class="row">
-        <div class="col-md-6">
-            @include('flash::message')
-        </div>
-    </div>
+    {{-- @include('_frontend.master.partials.alerts') --}}
+
     <!--------------------------------------------------------------------------------------->
     @include('_frontend.master.partials.indexCarouce')
     <!--------------------------------------------------------------------------------------->
     {{-- <show-promotion-in-front></show-promotion-in-front> --}}
     <!-- Container (About Section) -->
+    <div class="row">
+        <div class="col-md-6">
+            @include('flash::message')
+        </div>
+    </div>
+
     @include('_frontend.master.partials.pages.market_info')
 
     <!-- Container (Services Section) -->
@@ -55,7 +57,7 @@
         $(".alert").fadeTo(500, 0).slideUp(500, function(){
             $(this).remove();
         });
-    }, 4000);
+    }, 6000);
 
     </script>
 
