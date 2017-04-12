@@ -83,7 +83,10 @@ class UsersController extends Controller
 
     public function profile()
     {
-        $user = Auth::user();
+        $user = Auth::user()->load(['roles' => function ($query) {
+            $query->orderBy('display_name', 'asc');
+        }]);
+        
         return view('_backend.users.profile')->with('user', $user);
     }
 

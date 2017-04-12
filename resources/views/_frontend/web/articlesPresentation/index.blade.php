@@ -65,7 +65,7 @@
 <div class="row">
     <div class="col-md-12">
 
-        <section  class="main container">
+        <section  class="main">
             <div class="row">
                 <section  class="posts col-md-9">
                     <div class="miga-de-pan">

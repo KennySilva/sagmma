@@ -167,13 +167,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         return $this->hasMany(Task::class);
     }
 
-
-    // public function roles()
-    // {
-    //     return $this->belongsToMany(Role::class);
-    // }
-    //
-    // //Controlo de Permissoes;
+    //Controlo de Permissoes;
     // public function hasPermission(Permission $permission)
     // {
     //     return $this->hasAnyRoles($permission->roles);
@@ -181,7 +175,6 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     //
     // public function hasAnyRoles($roles)
     // {
-    //
     //     if (is_array($roles) || is_object($roles)) {
     //         foreach ($roles as $role) {
     //             // var_dump($role->name);
@@ -189,18 +182,17 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     //             // return $this->hasAnyRoles($roles);
     //             return $roles->intersect($this->roles)->count();
     //         }
-    //
     //     }
     //     return $this->roles->contains('name', $roles);
     // }
     //
-    //Função para servir o middleware
-    public function Admin()
-    {
-        foreach ($this->roles as $TypeUser) {
-            return $TypeUser->name === 'admin';
-        }
-    }
+    // //Função para servir o middleware
+    // public function Admin()
+    // {
+    //     foreach ($this->roles as $TypeUser) {
+    //         return $TypeUser->name === 'admin';
+    //     }
+    // }
 
 
 }

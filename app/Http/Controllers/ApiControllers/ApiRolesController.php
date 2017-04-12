@@ -93,9 +93,9 @@ class ApiRolesController extends Controller
             foreach (Auth::user()->roles as $role) {
                 # code...
                 if ($role->name == 'super-admin') {
-                    $permissions = Permission::all();
+                    $permissions = Permission::orderBy('display_name', 'asc')->get();
                 }else{
-                    $permissions= Permission::where('name', '!=', 'admin')->where('name', '!=', 'manage-admins')->get();
+                    $permissions= Permission::orderBy('display_name', 'asc')->where('name', '!=', 'admin')->where('name', '!=', 'manage-admins')->get();
                 }
             }
             return $permissions;

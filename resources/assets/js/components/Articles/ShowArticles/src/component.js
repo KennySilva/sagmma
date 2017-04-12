@@ -7,11 +7,6 @@ export default{
 
     data(){
         return {
-            content: '<h2>I am Example</h2>',
-            editorOption: {
-                // something config
-            },
-
             newArticle: {
                 id         : '',
                 title      : '',
@@ -65,9 +60,48 @@ export default{
         });
 
 
+        jQuery(self.$els.categorycreate).select2({
+            placeholder: "Categoria",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('newArticle.category_id', jQuery(this).val());
+        });
+
+        jQuery(self.$els.tagscreate).select2({
+            placeholder: "Marcadores",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('newArticle.tags', jQuery(this).val());
+        });
+        //-----------------------------------------------------------------------------------
+        jQuery(self.$els.categoryedit).select2({
+            placeholder: "Categorias",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('newArticle.category_id', jQuery(this).val());
+        });
+
+        jQuery(self.$els.tagsedit).select2({
+            placeholder: "Marcadores",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('newArticle.tags', jQuery(this).val());
+        });
+
+
     },
-
-
 
     // ---------------------------------------------------------------------------------
 
@@ -78,8 +112,6 @@ export default{
             this.success = true;
             this.msgSucess = msg;
             this.typeAlert = typeAlert;
-
-
             setTimeout(function() {
                 self.success = false;
             }, 5000);
@@ -125,45 +157,6 @@ export default{
                 self.$set('all', response.data.data)
                 self.$set('pagination', response.data)
 
-                jQuery(self.$els.category).select2({
-                    placeholder: "Coluna",
-                    allowClear: true,
-                    theme: "bootstrap",
-                    width: '100%',
-                    language: 'pt',
-                }).on('change', function () {
-                    self.$set('newArticle.category_id', jQuery(this).val());
-                });
-
-                jQuery(self.$els.tags).select2({
-                    placeholder: "Coluna",
-                    allowClear: true,
-                    theme: "bootstrap",
-                    width: '100%',
-                    language: 'pt',
-                }).on('change', function () {
-                    self.$set('newArticle.tags', jQuery(this).val());
-                });
-                //-----------------------------------------------------------------------------------
-                jQuery(self.$els.categoryedit).select2({
-                    placeholder: "Coluna",
-                    allowClear: true,
-                    theme: "bootstrap",
-                    width: '100%',
-                    language: 'pt',
-                }).on('change', function () {
-                    self.$set('newArticle.category_id', jQuery(this).val());
-                });
-
-                jQuery(self.$els.tagsedit).select2({
-                    placeholder: "Coluna",
-                    allowClear: true,
-                    theme: "bootstrap",
-                    width: '100%',
-                    language: 'pt',
-                }).on('change', function () {
-                    self.$set('newArticle.tags', jQuery(this).val());
-                });
 
             }, (response) => {
                 console.log("Ocorreu um erro na operação")
@@ -320,19 +313,6 @@ export default{
 
         },
 
-        onEditorBlur(editor) {
-            console.log('editor blur!', editor)
-        },
-        onEditorFocus(editor) {
-            console.log('editor focus!', editor)
-        },
-        onEditorReady(editor) {
-            console.log('editor ready!', editor)
-        },
-        onEditorChange({ editor, html, text }) {
-            // console.log('editor change!', editor, html, text)
-            this.content = html
-        },
 
         doFilter: function() {
 
@@ -353,18 +333,6 @@ export default{
 
     // ---------------------------------------------------------------------------------
 
-    computed: {
-        editor() {
-            return this.$refs.myTextEditor.quillEditor
-        }
-    },
-
-    // ---------------------------------------------------------------------------------
-    mounted() {
-        // you can use current editor object to do something(editor methods)
-        console.log('this is my editor', this.editor)
-        // this.editor to do something...
-    },
 
 
     components: {

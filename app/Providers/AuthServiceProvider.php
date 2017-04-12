@@ -13,7 +13,7 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         'Sagmma\Model' => 'Sagmma\Policies\ModelPolicy',
     ];
-    
+
     public function boot(GateContract $gate)
     {
         $this->registerPolicies($gate);
@@ -30,7 +30,7 @@ class AuthServiceProvider extends ServiceProvider
         // }
         // $gate->before(function(User $user, $ability)
         // {
-        //     if ($user->hasAnyRoles('adm')) {
+        //     if ($user->hasAnyRoles('super-admin')) {
         //         return true;
         //     }
         // });

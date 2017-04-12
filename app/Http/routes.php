@@ -1,74 +1,46 @@
 <?php
-
-
 // #######################################################################################################################
 // ####################################################  Route Presentation  ##################################################
 // #######################################################################################################################
-
-
-Route::group(['middleware' => []], function () { //Papel de Admin, Superadimin, Dpel
+Route::group(['middleware' => []], function () {
     //-------------------------------------Página Principal------------------------------------------------------
     Route::resource('/', 'FrontController');
     Route::resource('/article', 'Web\NewsController');
-    Route::get('/categories/{name}', [
-        'uses' => 'Web\NewsController@searchCategory',
-        'as'   => 'front.search.category'
-    ]);
-
-    Route::get('/tags/{name}', [
-        'uses' => 'Web\NewsController@searchTag',
-        'as'   => 'front.search.tag'
-    ]);
-
-    Route::get('viewArticle/{slug}', [
-        'uses' => 'Web\NewsController@viewArticle',
-        'as'   => 'front.view.article'
-    ]);
-
+    Route::get('/myProfile', 'FrontController@myProfile');
+    Route::get('/categories/{name}', ['uses' => 'Web\NewsController@searchCategory', 'as'   => 'front.search.category']);
+    Route::get('/tags/{name}', ['uses' => 'Web\NewsController@searchTag', 'as'   => 'front.search.tag']);
+    Route::get('viewArticle/{slug}', ['uses' => 'Web\NewsController@viewArticle','as'   => 'front.view.article']);
 });
-
-
 // #######################################################################################################################
 // ####################################################  Authentication  #################################################
 // #######################################################################################################################
-Route::get('auth/login', 'Auth\AuthController@getLogin');
-Route::post('auth/login', 'Auth\AuthController@postLogin');
-Route::get('auth/logout', 'Auth\AuthController@getLogout');
-
-// Registration routes...
-Route::get('auth/register', 'Auth\AuthController@getRegister');
-Route::post('auth/register', 'Auth\AuthController@postRegister');
-
-// Password reset link request routes...
-Route::get('password/email', 'Auth\PasswordController@getEmail');
-Route::post('password/email', 'Auth\PasswordController@postEmail');
-
-// Password reset routes...
-Route::get('password/reset/{token}', 'Auth\PasswordController@getReset');
-Route::post('password/reset', 'Auth\PasswordController@postReset');
-Route::post('editPassword', 'Admin\UsersController@updatePassword');
-Route::post('editProfile', 'Admin\UsersController@updateUserPrifile');
-//-------------------------------------------------------------------------
-
-// ##############################################################################################################################
+Route::group(['namespace' => 'Auth'], function()
+{
+    Route::get('auth/login', 'AuthController@getLogin');
+    Route::post('auth/login', 'AuthController@postLogin');
+    Route::get('auth/logout', 'AuthController@getLogout');
+    // Registration routes...
+    Route::get('auth/register', 'AuthController@getRegister');
+    Route::post('auth/register', 'AuthController@postRegister');
+    // Password reset link request routes...
+    Route::get('password/email', 'PasswordController@getEmail');
+    Route::post('password/email', 'PasswordController@postEmail');
+    // Password reset routes...
+    Route::get('password/reset/{token}', 'PasswordController@getReset');
+    Route::post('password/reset', 'PasswordController@postReset');
+});
 // ####################################################  Authentication Social  #################################################
-// ##############################################################################################################################
 Route::group(['namespace' => 'SocialControllers'], function()
 {
     Route::get('social/{provider?}', 'SocialController@getSocialAuth');
     Route::get('social/callback/{provider?}', 'SocialController@getSocialAuthCallback');
 });
-// ##############################################################################################################################
-
-
-
 // ###########################################################################################################################
 // #####################################################  API Geral  #########################################################
 // ###########################################################################################################################
 Route::group(['namespace' => 'ApiControllers'], function()
 {
     Route::group(['prefix' => 'api/v1', 'middleware' => ['auth']], function () {
-
         // ###############################################################################################################
         // ################################################  API Sys  ####################################################
         // ###############################################################################################################
@@ -213,6 +185,8 @@ Route::group(['namespace' => 'Admin'], function()
         // Perfil dos Utilizador
         Route::get('profiles', 'UsersController@profile');
         Route::post('profiles', 'UsersController@update_profile');
+        Route::post('editPassword', 'UsersController@updatePassword');
+        Route::post('editProfile', 'UsersController@updateUserPrifile');
 
     });
 });

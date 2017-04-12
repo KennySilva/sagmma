@@ -40,8 +40,8 @@
                                 @permission(['manage_promotions'])
                                 <li><a href="#"><i class="fa fa-sticky-note"></i> MEU NEGÓCIO</a></li>
                                 @endpermission
-                                
-                                <li><a href="#"><i class="fa fa-user-o"></i> PERFIL</a></li>
+
+                                <li><a href="myProfile"><i class="fa fa-user-o"></i> PERFIL</a></li>
                                 <li><a href="{{ url('/auth/logout') }}"><i class="fa fa-sign-out"></i> SAIR</a></li>
                             </ul>
                         </li>

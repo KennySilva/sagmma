@@ -20,7 +20,7 @@ class Kernel extends HttpKernel
         'auth' => \Sagmma\Http\Middleware\Authenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'guest' => \Sagmma\Http\Middleware\RedirectIfAuthenticated::class,
-
+        
         //Dia 17/12   00:08
         'role' => \Zizaco\Entrust\Middleware\EntrustRole::class,
         'permission' => \Zizaco\Entrust\Middleware\EntrustPermission::class,

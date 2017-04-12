@@ -37697,11 +37697,6 @@ exports.default = {
 
     data: function data() {
         return {
-            content: '<h2>I am Example</h2>',
-            editorOption: {
-                // something config
-            },
-
             newArticle: {
                 id: '',
                 title: '',
@@ -37753,6 +37748,46 @@ exports.default = {
         }).on('change', function () {
             self.$set('columnsFiltered', jQuery(this).val());
         });
+
+        jQuery(self.$els.categorycreate).select2({
+            placeholder: "Categoria",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt'
+        }).on('change', function () {
+            self.$set('newArticle.category_id', jQuery(this).val());
+        });
+
+        jQuery(self.$els.tagscreate).select2({
+            placeholder: "Marcadores",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt'
+        }).on('change', function () {
+            self.$set('newArticle.tags', jQuery(this).val());
+        });
+        //-----------------------------------------------------------------------------------
+        jQuery(self.$els.categoryedit).select2({
+            placeholder: "Categorias",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt'
+        }).on('change', function () {
+            self.$set('newArticle.category_id', jQuery(this).val());
+        });
+
+        jQuery(self.$els.tagsedit).select2({
+            placeholder: "Marcadores",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt'
+        }).on('change', function () {
+            self.$set('newArticle.tags', jQuery(this).val());
+        });
     },
 
 
@@ -37765,7 +37800,6 @@ exports.default = {
             this.success = true;
             this.msgSucess = msg;
             this.typeAlert = typeAlert;
-
             setTimeout(function () {
                 self.success = false;
             }, 5000);
@@ -37810,46 +37844,6 @@ exports.default = {
                 self.$set('articles', response.data.data);
                 self.$set('all', response.data.data);
                 self.$set('pagination', response.data);
-
-                jQuery(self.$els.category).select2({
-                    placeholder: "Coluna",
-                    allowClear: true,
-                    theme: "bootstrap",
-                    width: '100%',
-                    language: 'pt'
-                }).on('change', function () {
-                    self.$set('newArticle.category_id', jQuery(this).val());
-                });
-
-                jQuery(self.$els.tags).select2({
-                    placeholder: "Coluna",
-                    allowClear: true,
-                    theme: "bootstrap",
-                    width: '100%',
-                    language: 'pt'
-                }).on('change', function () {
-                    self.$set('newArticle.tags', jQuery(this).val());
-                });
-                //-----------------------------------------------------------------------------------
-                jQuery(self.$els.categoryedit).select2({
-                    placeholder: "Coluna",
-                    allowClear: true,
-                    theme: "bootstrap",
-                    width: '100%',
-                    language: 'pt'
-                }).on('change', function () {
-                    self.$set('newArticle.category_id', jQuery(this).val());
-                });
-
-                jQuery(self.$els.tagsedit).select2({
-                    placeholder: "Coluna",
-                    allowClear: true,
-                    theme: "bootstrap",
-                    width: '100%',
-                    language: 'pt'
-                }).on('change', function () {
-                    self.$set('newArticle.tags', jQuery(this).val());
-                });
             }, function (response) {
                 console.log("Ocorreu um erro na operação");
             });
@@ -38014,25 +38008,6 @@ exports.default = {
             this.$http.post('http://localhost:8000/api/v1/articleImageUpload/', data).then(function (response) {}, function (response) {});
         },
 
-        onEditorBlur: function onEditorBlur(editor) {
-            console.log('editor blur!', editor);
-        },
-        onEditorFocus: function onEditorFocus(editor) {
-            console.log('editor focus!', editor);
-        },
-        onEditorReady: function onEditorReady(editor) {
-            console.log('editor ready!', editor);
-        },
-        onEditorChange: function onEditorChange(_ref) {
-            var editor = _ref.editor;
-            var html = _ref.html;
-            var text = _ref.text;
-
-            // console.log('editor change!', editor, html, text)
-            this.content = html;
-        },
-
-
         doFilter: function doFilter() {
 
             var self = this;
@@ -38050,26 +38025,13 @@ exports.default = {
 
     // ---------------------------------------------------------------------------------
 
-    computed: {
-        editor: function editor() {
-            return this.$refs.myTextEditor.quillEditor;
-        }
-    },
-
-    // ---------------------------------------------------------------------------------
-    mounted: function mounted() {
-        // you can use current editor object to do something(editor methods)
-        console.log('this is my editor', this.editor);
-        // this.editor to do something...
-    },
-
 
     components: {
         'Pagination': _Component2.default
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div  id=\"alert-message\" class=\"alert alert-{{typeAlert}}\" transition=\"success\" v-if=\"success\">\r\n\t<button type=\"button\" class=\"close\" data-dismiss=\"alert\">x</button>\r\n\t<i class=\"fa fa-thumbs-o-up text-center\">&nbsp;&nbsp; {{msgSucess}}</i>\r\n</div>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class=\"form-inline pull-right\">\r\n\t\t\t<div class=\"input-group\">\r\n\t\t\t\t<select data-toggle=\"tooltip\" title=\"A mostrar linhas na tabela\" class=\"form-control\" name=\"\" v-model=\"showRow\" @change=\"fetchArticle(1, showRow)\">\r\n\t\t\t\t\t<option class=\"\" value=\"5\">05</option>\r\n\t\t\t\t\t<option class=\"\" value=\"10\" selected>10</option>\r\n\t\t\t\t\t<option class=\"\" value=\"20\">20</option>\r\n\t\t\t\t\t<option class=\"\" value=\"50\">50</option>\r\n\t\t\t\t\t<option class=\"\" value=\"100\">100</option>\r\n\t\t\t\t\t<option class=\"\" value=\"200\">200</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t&nbsp;&nbsp;\r\n\t\t\t<div class=\"input-group\">\r\n\t\t\t\t<select data-toggle=\"tooltip\" title=\"Escolhe as colunas a serem filtrados\" class=\"form-control\" name=\"\" v-model=\"columnsFiltered\" multiple=\"multiple\" v-el:article>\r\n\t\t\t\t\t<option class=\"\" value=\"title\"=\"\">Titulo</option>\r\n\t\t\t\t\t<option class=\"\" value=\"status\">Publicação</option>\r\n\t\t\t\t\t<option class=\"\" value=\"featured\">Destaque</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t&nbsp;&nbsp;\r\n\t\t\t<div v-if=\"columnsFiltered.length != 0\" class=\"input-group\">\r\n\t\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<input data-toggle=\"tooltip\" title=\"Escreva o valor a ser procurado na Tabela\"\r\n\t\t\t\tv-model=\"filter.term\"\r\n\t\t\t\t@keyup=\"doFilter\"\r\n\t\t\t\ttype=\"text\"\r\n\t\t\t\tclass=\"form-control\"\r\n\t\t\t\tplaceholder=\"Filtrar dados da tabela\"\r\n\t\t\t\taria-describedby=\"basic-addon1\">\r\n\t\t\t</div>\r\n\r\n\t\t\t<div v-else class=\"input-group\">\r\n\t\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<input :disabled=\"columnsFiltered.length == 0\" data-toggle=\"tooltip\" title=\"Para ativar introduza um valor na Coluna\"\r\n\t\t\t\ttype=\"text\"\r\n\t\t\t\tclass=\"form-control\"\r\n\t\t\t\tplaceholder=\"Filtrar dados da tabela\"\r\n\t\t\t\taria-describedby=\"basic-addon1\">\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n\r\n<div class=\"col-md-12\">\r\n\t<button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-article\"><i class=\"fa fa-plus\"></i> Novo</button>\r\n</div>\r\n\r\n\r\n</div>\r\n<br><br>\r\n\r\n<div class=\"col-md-12\">\r\n\t<div class='table-responsive'>\r\n\t\t<table class='table table-striped table-hover table-condensed'>\r\n\t\t\t<thead>\r\n\t\t\t\t<tr>\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'title' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'title' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'title')\">Titulo</a>\r\n\t\t\t\t\t</th>\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'status' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'status' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'status')\">Publicação</a>\r\n\t\t\t\t\t</th>\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'featured' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'featured' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'featured')\">Destaque</a>\r\n\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\">\r\n\t\t\t\t\t\t<span><i class=\"fa fa-cogs\"></i></span>\r\n\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t<th width=75  class=\"text-center\">\r\n\t\t\t\t\t\t<a @click = \"openAllContents\" href=\"#\">\r\n\t\t\t\t\t\t\t<span><i data-toggle=\"tooltip\" data-placement=\"left\" title=\"Ver Conteúdos de todos os Artigos\" class=\"fa\" :class=\"{'fa-plus': openContents.length == 0, 'fa-minus': openContents.length > 0}\"></i></span>\r\n\t\t\t\t\t\t</a>\r\n\t\t\t\t\t</th>\r\n\t\t\t\t</tr>\r\n\t\t\t</thead>\r\n\t\t\t<tbody v-for=\"article in articles | orderBy sortColumn sortInverse\">\r\n\t\t\t\t<tr>\r\n\t\t\t\t\t<td>{{ article.title }}</td>\r\n\r\n\t\t\t\t\t<td>\r\n\t\t\t\t\t\t<button type=\"submit\" @click = \"articleStatus(article.id)\" class='btn btn-xs btn-flat' :class=\"{ 'btn-info': article.status, 'btn-danger': !article.status }\">{{article.status ? 'Publicado' : 'Pendente'}}</button>\r\n\t\t\t\t\t</td>\r\n\r\n\t\t\t\t\t<td>\r\n\t\t\t\t\t\t<button type=\"submit\" @click = \"articleFeatures(article.id)\" class='btn btn-xs btn-flat' :class=\"{ 'btn-info': article.featured, 'btn-danger': !article.featured }\">{{article.featured ? 'Publicado' : 'Pendente'}}</button>\r\n\t\t\t\t\t</td>\r\n\r\n\t\t\t\t\t<td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-article\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisArticle(article.id)\" > </i></a></td>\r\n\t\t\t\t\t<td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-article\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisArticle(article.id)\"></i></a></td>\r\n\r\n\t\t\t\t\t<td width=75 class=\"text-center\">\r\n\t\t\t\t\t\t<a @click = \"doOpenContents($event, article.id)\" v-show=\"article.content != ''\" href=\"#\"><i data-toggle=\"tooltip\" data-placement=\"left\" title=\"Ver este conteúdo\" class=\"fa\" :class=\"{'fa-plus-square': openContents.indexOf(article.id) == -1, 'fa-minus-square': openContents.indexOf(article.id) > -1}\"></i></a>\r\n\t\t\t\t\t\t<i class=\"fa fa-plus-square\" v-show=\"article.content == ''\" style=\"opacity: 0.3\"></i>\r\n\t\t\t\t\t</td>\r\n\t\t\t\t</tr>\r\n\t\t\t\t<tr class=\"\" v-show=\"openContents.indexOf(article.id) > -1 && article.content != ''\">\r\n\t\t\t\t\t<td colspan=\"6\">\r\n\t\t\t\t\t\t{{ article.content }}\r\n\t\t\t\t\t</td>\r\n\t\t\t\t</tr>\r\n\t\t\t</tbody>\r\n\t\t</table>\r\n\r\n\t\t<div class=\"row\">\r\n\t\t\t<div class=\"col-md-6 pull-left\">\r\n\t\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"col-md-6 pull-right\">\r\n\t\t\t\t<h6 class=\"text-right text-help\"> Mostrar de <span class=\"badge\">{{pagination.from}}</span>  a <span class=\"badge\">{{pagination.to}}</span>  no total de <span class=\"badge\">{{pagination.total}}</span></h6>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t</div>\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t<div class=\"modal fade\" id=\"modal-delete-article\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t<div class=\"modal-dialog\">\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newArticle.name}}</span></h5>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Cancelar</button>\r\n\t\t\t\t\t<button  @keyup.enter=\"deleteArticle(newArticle.id)\" @click=\"deleteArticle(newArticle.id)\" type=\"button\" class=\"btn btn-danger\">Eliminar</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\t<!-- Modal -->\r\n\t<div id=\"modal-create-article\" class=\"modal fade\" role=\"dialog\">\r\n\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t<!-- Modal content-->\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\">Registar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"title\" placeholder=\"Titulo\" v-model=\"newArticle.title\" v-validate:title=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t<span class=\"form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.title.required && $validationew.title.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newArticle.category_id\" v-el:category>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"category in categories\" value=\"{{category.id}}\">{{category.name}}</option>\r\n\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newArticle.tags\" v-el:tags multiple=\"multiple\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"tag in tags\" value=\"{{tag.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t{{tag.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"content\" placeholder=\"Conteúdo...\" class=\"form-control textarea-conte\" rows=\"5\" cols=\"40\" id=\"content\" v-model=\"newArticle.content\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t<quill-editor ref=\"myTextEditor\"\r\n\t\t\t\t\t\t\t\t\t\t\tv-model=\"content\"\r\n\t\t\t\t\t\t\t\t\t\t\t:config=\"editorOption\"\r\n\t\t\t\t\t\t\t\t\t\t\t@blur=\"onEditorBlur($event)\"\r\n\t\t\t\t\t\t\t\t\t\t\t@focus=\"onEditorFocus($event)\"\r\n\t\t\t\t\t\t\t\t\t\t\t@ready=\"onEditorReady($event)\">\r\n\t\t\t\t\t\t\t\t\t\t</quill-editor>\r\n\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<!-- <input  class=\"form-control\" type=\"file\" name=\"articleimage\" id=\"articleimage\" v-el:articleimage> -->\r\n\t\t\t\t\t\t\t\t\t\t<input  class=\"form-control\" type=\"file\" name=\"articleimage\" id=\"articleimage\" v-el:articleimage>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t</form>\r\n\t\t\t\t</validator>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createArticle\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n\r\n\r\n<!--------------------------------------------------------------------------------------------------------->\r\n\r\n<!-- Modal -->\r\n<div id=\"modal-edit-article\" class=\"modal fade\" role=\"dialog\">\r\n\t<div class=\"modal-dialog\">\r\n\t\t<!-- Modal content-->\r\n\t\t<div class=\"modal-content\">\r\n\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t<h4 class=\"modal-title\">Editar</h4>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t<validator name=\"validation1\">\r\n\t\t\t\t\t<form methods=\"patch\">\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"title\" placeholder=\"Titulo\" v-model=\"newArticle.title\" v-validate:title=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.title.required && $validationew.title.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newArticle.category_id\" v-el:categoryedit>\r\n\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"category in categories\" value=\"{{category.id}}\">{{category.name}}</option>\r\n\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newArticle.tags\" v-el:tagsedit multiple=\"multiple\">\r\n\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"tag in tags\" value=\"{{tag.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t{{tag.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<textarea name=\"content\" placeholder=\"Conteúdo...\" class=\"form-control textarea-conte\" rows=\"5\" cols=\"40\" id=\"content\" v-model=\"newArticle.content\"></textarea>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<quill-editor ref=\"myTextEditor\"\r\n\t\t\t\t\t\t\t\t\t\tv-model=\"content\"\r\n\t\t\t\t\t\t\t\t\t\t:config=\"editorOption\"\r\n\t\t\t\t\t\t\t\t\t\t@blur=\"onEditorBlur($event)\"\r\n\t\t\t\t\t\t\t\t\t\t@focus=\"onEditorFocus($event)\"\r\n\t\t\t\t\t\t\t\t\t\t@ready=\"onEditorReady($event)\">\r\n\t\t\t\t\t\t\t\t\t</quill-editor>\r\n\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t</form>\r\n\t\t\t\t</validator>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedArticle(newArticle.id)\" type=\"button\" class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n</div>\r\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div  id=\"alert-message\" class=\"alert alert-{{typeAlert}}\" transition=\"success\" v-if=\"success\">\r\n\t<button type=\"button\" class=\"close\" data-dismiss=\"alert\">x</button>\r\n\t<i class=\"fa fa-thumbs-o-up text-center\">&nbsp;&nbsp; {{msgSucess}}</i>\r\n</div>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class=\"form-inline pull-right\">\r\n\t\t\t<div class=\"input-group\">\r\n\t\t\t\t<select data-toggle=\"tooltip\" title=\"A mostrar linhas na tabela\" class=\"form-control\" name=\"\" v-model=\"showRow\" @change=\"fetchArticle(1, showRow)\">\r\n\t\t\t\t\t<option class=\"\" value=\"5\">05</option>\r\n\t\t\t\t\t<option class=\"\" value=\"10\" selected>10</option>\r\n\t\t\t\t\t<option class=\"\" value=\"20\">20</option>\r\n\t\t\t\t\t<option class=\"\" value=\"50\">50</option>\r\n\t\t\t\t\t<option class=\"\" value=\"100\">100</option>\r\n\t\t\t\t\t<option class=\"\" value=\"200\">200</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t&nbsp;&nbsp;\r\n\t\t\t<div class=\"input-group\">\r\n\t\t\t\t<select data-toggle=\"tooltip\" title=\"Escolhe as colunas a serem filtrados\" class=\"form-control\" name=\"\" v-model=\"columnsFiltered\" multiple=\"multiple\" v-el:article>\r\n\t\t\t\t\t<option class=\"\" value=\"title\"=\"\">Titulo</option>\r\n\t\t\t\t\t<option class=\"\" value=\"status\">Publicação</option>\r\n\t\t\t\t\t<option class=\"\" value=\"featured\">Destaque</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t&nbsp;&nbsp;\r\n\t\t\t<div v-if=\"columnsFiltered.length != 0\" class=\"input-group\">\r\n\t\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<input data-toggle=\"tooltip\" title=\"Escreva o valor a ser procurado na Tabela\"\r\n\t\t\t\tv-model=\"filter.term\"\r\n\t\t\t\t@keyup=\"doFilter\"\r\n\t\t\t\ttype=\"text\"\r\n\t\t\t\tclass=\"form-control\"\r\n\t\t\t\tplaceholder=\"Filtrar dados da tabela\"\r\n\t\t\t\taria-describedby=\"basic-addon1\">\r\n\t\t\t</div>\r\n\r\n\t\t\t<div v-else class=\"input-group\">\r\n\t\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<input :disabled=\"columnsFiltered.length == 0\" data-toggle=\"tooltip\" title=\"Para ativar introduza um valor na Coluna\"\r\n\t\t\t\ttype=\"text\"\r\n\t\t\t\tclass=\"form-control\"\r\n\t\t\t\tplaceholder=\"Filtrar dados da tabela\"\r\n\t\t\t\taria-describedby=\"basic-addon1\">\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n\r\n<div class=\"col-md-12\">\r\n\t<button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-article\"><i class=\"fa fa-plus\"></i> Novo</button>\r\n</div>\r\n\r\n\r\n</div>\r\n<br><br>\r\n\r\n<div class=\"col-md-12\">\r\n\t<div class='table-responsive'>\r\n\t\t<table class='table table-striped table-hover table-condensed'>\r\n\t\t\t<thead>\r\n\t\t\t\t<tr>\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'title' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'title' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'title')\">Titulo</a>\r\n\t\t\t\t\t</th>\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'status' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'status' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'status')\">Publicação</a>\r\n\t\t\t\t\t</th>\r\n\t\t\t\t\t<th>\r\n\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'featured' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'featured' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'featured')\">Destaque</a>\r\n\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\">\r\n\t\t\t\t\t\t<span><i class=\"fa fa-cogs\"></i></span>\r\n\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t<th width=75  class=\"text-center\">\r\n\t\t\t\t\t\t<a @click = \"openAllContents\" href=\"#\">\r\n\t\t\t\t\t\t\t<span><i data-toggle=\"tooltip\" data-placement=\"left\" title=\"Ver Conteúdos de todos os Artigos\" class=\"fa\" :class=\"{'fa-plus': openContents.length == 0, 'fa-minus': openContents.length > 0}\"></i></span>\r\n\t\t\t\t\t\t</a>\r\n\t\t\t\t\t</th>\r\n\t\t\t\t</tr>\r\n\t\t\t</thead>\r\n\t\t\t<tbody v-for=\"article in articles | orderBy sortColumn sortInverse\">\r\n\t\t\t\t<tr>\r\n\t\t\t\t\t<td>{{ article.title }}</td>\r\n\r\n\t\t\t\t\t<td>\r\n\t\t\t\t\t\t<button type=\"submit\" @click = \"articleStatus(article.id)\" class='btn btn-xs btn-flat' :class=\"{ 'btn-info': article.status, 'btn-danger': !article.status }\">{{article.status ? 'Publicado' : 'Pendente'}}</button>\r\n\t\t\t\t\t</td>\r\n\r\n\t\t\t\t\t<td>\r\n\t\t\t\t\t\t<button type=\"submit\" @click = \"articleFeatures(article.id)\" class='btn btn-xs btn-flat' :class=\"{ 'btn-info': article.featured, 'btn-danger': !article.featured }\">{{article.featured ? 'Publicado' : 'Pendente'}}</button>\r\n\t\t\t\t\t</td>\r\n\r\n\t\t\t\t\t<td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-article\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisArticle(article.id)\" > </i></a></td>\r\n\t\t\t\t\t<td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-article\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisArticle(article.id)\"></i></a></td>\r\n\r\n\t\t\t\t\t<td width=75 class=\"text-center\">\r\n\t\t\t\t\t\t<a @click = \"doOpenContents($event, article.id)\" v-show=\"article.content != ''\" href=\"#\"><i data-toggle=\"tooltip\" data-placement=\"left\" title=\"Ver este conteúdo\" class=\"fa\" :class=\"{'fa-plus-square': openContents.indexOf(article.id) == -1, 'fa-minus-square': openContents.indexOf(article.id) > -1}\"></i></a>\r\n\t\t\t\t\t\t<i class=\"fa fa-plus-square\" v-show=\"article.content == ''\" style=\"opacity: 0.3\"></i>\r\n\t\t\t\t\t</td>\r\n\t\t\t\t</tr>\r\n\t\t\t\t<tr class=\"\" v-show=\"openContents.indexOf(article.id) > -1 && article.content != ''\">\r\n\t\t\t\t\t<td colspan=\"6\">\r\n\t\t\t\t\t\t{{ article.content }}\r\n\t\t\t\t\t</td>\r\n\t\t\t\t</tr>\r\n\t\t\t</tbody>\r\n\t\t</table>\r\n\r\n\t\t<div class=\"row\">\r\n\t\t\t<div class=\"col-md-6 pull-left\">\r\n\t\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"col-md-6 pull-right\">\r\n\t\t\t\t<h6 class=\"text-right text-help\"> Mostrar de <span class=\"badge\">{{pagination.from}}</span>  a <span class=\"badge\">{{pagination.to}}</span>  no total de <span class=\"badge\">{{pagination.total}}</span></h6>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t</div>\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t<div class=\"modal fade\" id=\"modal-delete-article\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t<div class=\"modal-dialog\">\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newArticle.name}}</span></h5>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Cancelar</button>\r\n\t\t\t\t\t<button  @keyup.enter=\"deleteArticle(newArticle.id)\" @click=\"deleteArticle(newArticle.id)\" type=\"button\" class=\"btn btn-danger\">Eliminar</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\t<!-- Modal -->\r\n\t<div id=\"modal-create-article\" class=\"modal fade\" role=\"dialog\">\r\n\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t<!-- Modal content-->\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\">Registar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"title\" placeholder=\"Titulo\" v-model=\"newArticle.title\"/>\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newArticle.category_id\" v-el:categorycreate>\r\n\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"category in categories\" value=\"{{category.id}}\">{{category.name}}</option>\r\n\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newArticle.tags\" v-el:tagscreate multiple=\"multiple\">\r\n\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"tag in tags\" value=\"{{tag.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t{{tag.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<textarea name=\"content\" placeholder=\"Conteúdo...\" class=\"form-control textarea-conte\" rows=\"5\" cols=\"40\" id=\"content\" v-model=\"newArticle.content\"></textarea>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<!-- <input  class=\"form-control\" type=\"file\" name=\"articleimage\" id=\"articleimage\" v-el:articleimage> -->\r\n\t\t\t\t\t\t\t\t\t\t<input  class=\"form-control\" type=\"file\" name=\"articleimage\" id=\"articleimage\" v-el:articleimage>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</form>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t<button @click=\"createArticle\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n\r\n\r\n\r\n\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t<!-- Modal -->\r\n\t<div id=\"modal-edit-article\" class=\"modal fade\" role=\"dialog\">\r\n\t\t<div class=\"modal-dialog\">\r\n\t\t\t<!-- Modal content-->\r\n\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t<h4 class=\"modal-title\">Editar</h4>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t<form methods=\"patch\">\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"title\" placeholder=\"Titulo\" v-model=\"newArticle.title\"/>\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newArticle.category_id\" v-el:categoryedit>\r\n\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"category in categories\" value=\"{{category.id}}\">{{category.name}}</option>\r\n\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<select class=\"form-control\" v-model=\"newArticle.tags\" v-el:tagsedit multiple=\"multiple\">\r\n\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"tag in tags\" value=\"{{tag.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t{{tag.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t<textarea name=\"content\" placeholder=\"Conteúdo...\" class=\"form-control textarea-conte\" rows=\"5\" cols=\"40\" id=\"content\" v-model=\"newArticle.content\"></textarea>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</form>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t\t<button @click=\"saveEditedArticle(newArticle.id)\" type=\"button\" class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -43709,6 +43671,39 @@ new Vue({
         updateimage: '',
         employeeExcel: ''
     },
+    // 
+    // methods: {
+    //     var self = this;
+    //     jQuery(self.$els.state).select2({
+    //         placeholder: "Ilha",
+    //         allowClear: true,
+    //         theme: "bootstrap",
+    //         width: '100%',
+    //         language: 'pt',
+    //     }).on('change', function () {
+    //         self.$set(profile.state, jQuery(this).val());
+    //     });
+    //
+    //     jQuery(self.$els.council).select2({
+    //         placeholder: "Concelho",
+    //         allowClear: true,
+    //         theme: "bootstrap",
+    //         width: '100%',
+    //         language: 'pt',
+    //     }).on('change', function () {
+    //         self.$set(profile.council, jQuery(this).val());
+    //     });
+    //
+    //     jQuery(self.$els.parish).select2({
+    //         placeholder: "Fraguezia",
+    //         allowClear: true,
+    //         theme: "bootstrap",
+    //         width: '100%',
+    //         language: 'pt',
+    //     }).on('change', function () {
+    //         self.$set(profile.parish, jQuery(this).val());
+    //     });
+    // },
 
     components: {
         //-----------------------------users--------------------------------------

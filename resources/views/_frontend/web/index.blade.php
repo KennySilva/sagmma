@@ -45,7 +45,7 @@
 @section('content')
     <div class="row">
 
-        
+
         <div class="jumbotron">
             <h1>Hello, world!</h1>
             <p>...</p>
@@ -64,7 +64,7 @@
     </div>
     <br>
     <br>
-    <div class="row">
+    <div class="">
         <div class="col-md-12">
 
             {{-- <aside class="col-md-3 hidden-xs hidden-sm">
@@ -94,7 +94,7 @@ Panel content
 
 
 
-<section  class="main container">
+<section  class="container-fluid">
     <div class="row">
         <section  class="posts col-md-9">
             <div class="miga-de-pan">
@@ -109,14 +109,12 @@ Panel content
             @foreach ($articles as $article)
                 <article class="post clearfix">
                     {{-- <a href="{{ route('front.view.article', $article->slug) }}" class="thumb pull-left"> --}}
-
                     @foreach ($article->images as $image)
                         <a href="#" class="thumb pull-left">
 
                             <img class="img-thumbnail img-responsive" src="{{ asset('/uploads/uploadsImages/articles/'.$image->name) }}" alt="" />
                         </a>
                     @endforeach
-
                 </a>
                 <h2 class="post-title">
                     <a href="">{{ $article->title }}</a>
@@ -141,12 +139,6 @@ Panel content
         </section>
         <aside class="col-md-3 hidden-xs hidden-sm">
             @include('_frontend.master.partials.asideNews')
-
-
-
-
-
-
         </aside>
     </div>
 </section>

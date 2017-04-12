@@ -26,6 +26,11 @@ class SocialController extends Controller
             // dd($user);
             if ($this_user = User::select()->where('email', '=', $user->email)->where('status', '=', true)->first()) {
                 Auth::login($this_user);
+                Flash::success('Autenticação bem sucedida');
+                return redirect('/');
+            }elseif ($this_user = User::select()->where('email', '=', $user->email)->where('status', '=', false)->first()) {
+                Flash::warning('Este email está registada numa conta desativada');
+                return redirect('/');
             }else {
                 $new_user              = new User();
                 $new_user->name        = $user->name;

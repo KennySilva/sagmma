@@ -10,9 +10,6 @@
 @endsection
 
 @section('contentheader_title')
-    <div class="col-md-12">
-        Gerir Utilizadores
-    </div>
 @endsection
 
 @section('main-content')

@@ -50,4 +50,10 @@ class FrontController extends Controller
     {
         //
     }
+
+    public function myProfile($value='')
+    {
+        return view('_frontend.web.profile.frontProfile');
+
+    }
 }
