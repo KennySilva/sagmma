@@ -1,43 +1,29 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Acesso negado</title>
-    <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.css">
-    <link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.css" media="screen" title="no title"/>
+@extends('errors.master.app')
+@section('content')
+    <div class="col-md-4 col-md-offset-4">
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                <h1 style="font-family: 'Francois One', sans-serif; color: rgb(77, 123, 226)" class="panel-title text-center">Acesso Restrito</h1>
+            </div>
+            <div class="panel-body">
+                <span class="sr-only">Loading...</span>
+                 <img class="img-responsive center-block" src="{{ asset('img/error/lock-3.png') }}" alt="">
+            </div>
+            <strong class="text-center">
 
-</head>
-<body style="margin-top: 100px;">
-    <div class="container">
-        <div class="col-md-4 col-md-offset-4">
-            <div class="panel panel-danger">
-                <div class="panel-heading">
-                    <h1 class="panel-title text-center">Acesso Restringido <i class="fa fa-lock"></i></h1>
-                </div>
-                <div class="panel-body">
-                    <i class="fa fa-cog fa-spin fa-3x fa-fw"></i>
-                    <span class="sr-only">Loading...</span>
-                     <img class="img-responsive center-block" src="{{ asset('img/error/lock-3.png') }}" alt="">
-                </div>
-                <strong class="text-center">
+                @if(Auth::check())
+                    <h2><i class="fa fa-exclamation-triangle   faa-flash animated faa-slow"></i> Hei {{ Auth::user()->name }}</h2>
+                @else
+                    <h2><i class="fa fa-exclamation-triangle   faa-flash animated faa-slow"></i> Hei Utilizador</h2>
+                @endif
 
-                    @if(Auth::check())
-                        <h3>Hei {{ Auth::user()->name }}</h3>
-                    @else
-                        <h3>Hei Utilizador</h3>
-                    @endif
-
-                    <p>Contacte Administrador para averiguar sua permissão</p>
-                    <p>
-                        <a href="/"><span class="fa fa-arrow-left">   Volatr à página de iníco</span></a>
-                    </p>
-                </strong>
-                <div class="panel-footer text-center">
-                    <h6>SAGMMA</h6>
-                </div>
+                <h3>Contacte Administrador para averiguar suas permissões</h3>
+                <hr>
+                    <a href="/" class="btn btn-primary"><span class="fa fa-home faa-burst animated-hover">   Voltar</span></a>
+            </strong>
+            <div class="panel-footer">
+                <h1 style="font-family: 'Francois One', sans-serif; color: rgb(77, 123, 226)">SAGMMA</h1>
             </div>
         </div>
     </div>
-
-</body>
-</html>
+@endsection

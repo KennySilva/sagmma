@@ -7,6 +7,7 @@
     <!--------------------------------------------------------------------------------------------------------->
     <link href="{{ asset('/css/bootstrap.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('/bower_components/font-awesome/css/font-awesome.css') }}" rel="stylesheet" type="text/css"/>
+    <link href="{{ asset('/bower_components/font-awesome-animation/dist/font-awesome-animation.css') }}" rel="stylesheet" type="text/css"/>
     <link href="{{ asset('/bower_components/Ionicons/css/ionicons.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('/css/AdminLTE.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('/css/_all-skins.css') }}" rel="stylesheet" type="text/css" />

@@ -10,6 +10,7 @@
 @endsection
 @section('main-content')
     <div class="sagmma_container">
+        @role(['super-admin', 'admin', 'dpel'])
         <div class="row">
             <div class="col-md-3">
                 <a href="#" data-toggle="modal" data-target="#totalUsers ">
@@ -58,6 +59,7 @@
                 </a>
             </div>
         </div>
+        @endrole
         {{-- ------------------------------------Open Modals----------------------------------------------- --}}
         <div class="modal fade" id="totalUsers" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
             <div class="modal-dialog">
@@ -101,7 +103,7 @@
             </div>
         </div>
         {{-- ------------------------------------------------------------------------------------------- --}}
-
+        
         <div class="modal fade" id="adminUsers" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -151,32 +153,40 @@
                 @include('_backend.master.partials.painelCalendar')
             </div>
         </div>
-
+        @role(['super-admin', 'admin', 'dpel'])
         <div class="row">
             <div class="col-md-12">
                 <div class="panel with-nav-tabs panel-default">
                     <div class="panel-heading">
                         <ul class="nav nav-tabs">
-                            <li class="active"><a href="#tabUser" data-toggle="tab">GERIR UTILIZADORES</a></li>
-                            <li><a href="#tabTax" data-toggle="tab">GERIR COBRANÇA DE IMPOSTOS</a></li>
+                            @permission(['manage-users', 'manage-admins'])
+                            <li><a href="#tabUser" data-toggle="tab">GERIR UTILIZADORES</a></li>
+                            @endpermission
+                            <li class="active"><a href="#tabTax" data-toggle="tab">GERIR COBRANÇA DE IMPOSTOS</a></li>
+                            @permission(['manage-contracts'])
                             <li><a href="#tabContr" data-toggle="tab">GERIR CONTRATOS</a></li>
+                            @endpermission
                             <li><a href="#tabCont" data-toggle="tab">CONTROLO DE MATERIAIS</a></li>
                         </ul>
                     </div>
                     <div class="panel-body">
                         <div class="tab-content">
                             {{ csrf_field() }}
-                            <div class="tab-pane fade in active" id="tabUser">
+                            @permission(['manage-users', 'manage-admins'])
+                            <div class="tab-pane fade" id="tabUser">
                                 <show-users></show-users>
                             </div>
+                            @endpermission
 
-                            <div class="tab-pane fade" id="tabTax">
+                            <div class="tab-pane fade in active" id="tabTax">
                                 <show-taxation></show-taxation>
                             </div>
 
+                            @permission(['manage-contracts'])
                             <div class="tab-pane fade" id="tabContr">
                                 <show-contract></show-contract>
                             </div>
+                            @endpermission
 
                             <div class="tab-pane fade" id="tabCont">
                                 <show-control></show-control>
@@ -186,7 +196,7 @@
                 </div>
             </div>
         </div>
-
+        @endrole
 
     </div>
 @endsection

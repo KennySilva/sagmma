@@ -12,6 +12,12 @@ Route::group(['middleware' => []], function () {
     Route::get('viewArticle/{slug}', ['uses' => 'Web\NewsController@viewArticle','as'   => 'front.view.article']);
 });
 // #######################################################################################################################
+// ####################################################  Sagmma_Backend  #################################################
+// #######################################################################################################################
+Route::group(['middleware' => ['auth', 'role:super-admin|admin|manager|articles-manager|dpel|administrative-assistant', 'permission:backend-access|']], function () {
+    Route::resource('/home', 'BackendHomeController');
+});
+// #######################################################################################################################
 // ####################################################  Authentication  #################################################
 // #######################################################################################################################
 Route::group(['namespace' => 'Auth'], function()
@@ -40,11 +46,11 @@ Route::group(['namespace' => 'SocialControllers'], function()
 // ###########################################################################################################################
 Route::group(['namespace' => 'ApiControllers'], function()
 {
-    Route::group(['prefix' => 'api/v1', 'middleware' => ['auth']], function () {
+    Route::group(['prefix' => 'api/v1', 'middleware' => ['auth', 'permission:backend-access']], function () {
         // ###############################################################################################################
         // ################################################  API Sys  ####################################################
         // ###############################################################################################################
-        Route::group(['middleware' => ['permission:admin']], function () {
+        Route::group(['middleware' => ['role:super-admin|admin|dpel', 'permission:manage-users']], function () {
             Route::resource('users', 'ApiUsersController');
             Route::get('allUsers/{row}', 'ApiUsersController@index');
             Route::get('authUser', 'ApiUsersController@authUser');
@@ -60,123 +66,102 @@ Route::group(['namespace' => 'ApiControllers'], function()
         // ##################################################################################################################
         // ################################################  API Sagmma  ####################################################
         // ##################################################################################################################
-        Route::group(['middleware' => ['role:admin']], function () {
+        Route::group(['middleware' => ['role:admin|super-admin|dpel|manager|administrative-assistant', 'permission:manage-resources']], function () {
             // ----------------------------------------Api-Markets----------------------------------
             Route::resource('markets', 'ApiMarketsController');
             Route::get('getAllMarkets/{row}', 'ApiMarketsController@index');
-
-
             // ----------------------------------------Api-Typeofemployees------------------------------
             Route::resource('typeofemployees', 'ApiTypeofemployeesController');
             Route::get('allTypeofemployees/{row}', 'ApiTypeofemployeesController@index');
-
             // ----------------------------------------Api-Typeofplaces-------------------------------
             Route::resource('typeofplaces', 'ApiTypeofplacesController');
             Route::get('allTypeofplaces/{row}', 'ApiTypeofplacesController@index');
-
             // ----------------------------------------Api-Materials----------------------------------
             Route::resource('materials', 'ApiMaterialsController');
             Route::get('allMaterials/{row}', 'ApiMaterialsController@index');
-
-            // ----------------------------------------Api-Products----------------------------------
-            Route::resource('products', 'ApiProductsController');
-            Route::get('allProducts/{row}', 'ApiProductsController@index');
-            Route::post('productImageUpload', 'ApiProductsController@uploadImage');
-
             // ----------------------------------------Api-employee----------------------------------
             Route::resource('employees', 'ApiEmployeesController');
             Route::delete('deleteMultEmployees/{ids}', 'ApiEmployeesController@deleteAll');
             Route::get('marketEmployee', 'ApiEmployeesController@getMarketforEmployee');
             Route::get('allEmployees/{row}', 'ApiEmployeesController@index');
-
             // Route::get('employeeMarket', 'ApiEmployeesController@getMarketforEmployee');
             Route::get('employeeType', 'ApiEmployeesController@getTypeforEmployee');
-
             // ----------------------------------------Api-traders----------------------------------
             Route::resource('traders', 'ApiTradersController');
             Route::get('allTraders/{row}', 'ApiTradersController@index');
-
             // ------------------------------------Api-Control (employee_material)--------------------
             Route::resource('controls', 'ApiControlsController');
             Route::get('allControls/{row}', 'ApiControlsController@index');
-
             Route::get('controlEmployee', 'ApiControlsController@getEmployeeForControl');
             Route::get('controlMaterial', 'ApiControlsController@getMaterialForControl');
             Route::post('controlStatus', 'ApiControlsController@statusControlsChange');
-
-            // ------------------------------------Api-Contract (place_trader)--------------------Atores Dpel e Admins
-            Route::group(['middleware' => ['role:admin']], function () {
-                Route::resource('contracts', 'ApiContractsController');
-                Route::get('allContracts/{row}', 'ApiContractsController@index');
-
-                Route::get('contractTrader', 'ApiContractsController@getTraderForContract');
-                Route::get('contractPlace', 'ApiContractsController@getPlaceForContract');
-                Route::get('contractStatus', 'ApiContractsController@statusContractsChange');
-            });
-
             // ------------------------------------Api-Taxation (place_trader)--------------------
             Route::resource('taxations', 'ApiTaxationsController');
             Route::get('allTaxations/{row}', 'ApiTaxationsController@index');
             Route::get('sendTaxation/{id}/{sendTaxation}', 'ApiTaxationsController@sendTaxation');
-
-
-
+            // -----------------------------------------------------------------------------------
             Route::get('taxationEmployee', 'ApiTaxationsController@getEmployeeForTaxation');
             Route::get('taxationExtPlace', 'ApiTaxationsController@getPlaceExtForTaxation');
             Route::get('taxationIntPlace', 'ApiTaxationsController@getPlaceIntForTaxation');
-
             // ----------------------------------------Api-place----------------------------------
             Route::resource('places', 'ApiPlacesController');
             Route::get('allPlaces/{row}', 'ApiPlacesController@index');
 
             Route::get('placeType', 'ApiPlacesController@getTypeForPlace');
             Route::get('placeStatus', 'ApiPlacesController@placeStatusChange');
-
+            // Route::get('changePromotionStatus', 'ApiPromotionsController@updatePromotionStatus');
+            // ------------------------------------Api-Contract (place_trader)--------------------Atores Dpel e Admins
+            Route::group(['middleware' => ['permission:manage-contract']], function () {
+                Route::resource('contracts', 'ApiContractsController');
+                Route::get('allContracts/{row}', 'ApiContractsController@index');
+                // -----------------------------------------------------------------------------------------
+                Route::get('contractTrader', 'ApiContractsController@getTraderForContract');
+                Route::get('contractPlace', 'ApiContractsController@getPlaceForContract');
+                Route::get('contractStatus', 'ApiContractsController@statusContractsChange');
+            });
+        });
+        Route::group(['middleware' => ['role:super-admin|admin|dpel|manager|trader', 'permission:manage-business
+        ']], function () {
             // ----------------------------------------Api-promotions----------------------------------
             Route::resource('promotions', 'ApiPromotionsController');
             Route::get('allPromotions/{row}', 'ApiPromotionsController@index');
-
             Route::get('promotionTrader', 'ApiPromotionsController@getTraderForPromotion');
             Route::get('promotionProduct', 'ApiPromotionsController@getProductForPromotion');
             Route::post('promotionStatus', 'ApiPromotionsController@statusPromotionsChange');
-            // Route::get('changePromotionStatus', 'ApiPromotionsController@updatePromotionStatus');
-
+            // ----------------------------------------Api-Products----------------------------------
+            Route::resource('products', 'ApiProductsController');
+            Route::get('allProducts/{row}', 'ApiProductsController@index');
+            Route::post('productImageUpload', 'ApiProductsController@uploadImage');
         });
         // ###########################################################################################################
         // ##################################################  API Web  ##############################################
         // ###########################################################################################################
-        Route::group(['middleware' => ['role:admin']], function () {
+        Route::group(['middleware' => ['role:super-admin|admin|articles-manager', 'permission:manage-articles']], function () {
             // -----------------------------------Categories--------------------------------------
             Route::resource('categories', 'ApiCategoriesController');
             Route::get('allCategories/{row}', 'ApiCategoriesController@index');
-
-            // Route::get('setPaginate\{entries}', 'ApiCategoriesController@index');
             // --------------------------------------Tags-----------------------------------------
             Route::resource('tags', 'ApiTagsController');
             Route::get('allTags/{row}', 'ApiTagsController@index');
-
             // --------------------------------------Articles-----------------------------------------
             Route::resource('articles', 'ApiArticlesController');
             Route::get('allArticles/{row}', 'ApiArticlesController@index');
-
             Route::post('articleStatus', 'ApiArticlesController@articleStatus');
             Route::post('articleFeatures', 'ApiArticlesController@articleFeatures');
             Route::get('articleTag', 'ApiArticlesController@getTagforArticle');
             Route::get('articleCategory', 'ApiArticlesController@getCategoryForArticle');
             Route::get('articleUser', 'ApiArticlesController@getUserforArticle');
             Route::post('articleImageUpload', 'ApiArticlesController@uploadImage');
-
         });
     });
 });
-
 // ###############################################################################################################
 // ###############################################  Sys  #########################################################
 // ###############################################################################################################
 Route::group(['namespace' => 'Admin'], function()
 {
-    Route::group(['prefix' => 'user', 'middleware' => ['auth']], function () {
-        Route::group(['middleware' => ['role:admin|super-admin|dpel']], function () { //Papel de Admin, Superadimin, Dpel
+    Route::group(['prefix' => 'user', 'middleware' => ['auth', 'permission:backend-access']], function () {
+        Route::group(['middleware' => ['role:super-admin|admin|dpel', 'permission:manage-users']], function () {
             Route::resource('users', 'UsersController');
             // ----------------------------------------------------------
             Route::resource('roles', 'RolesController');
@@ -187,17 +172,15 @@ Route::group(['namespace' => 'Admin'], function()
         Route::post('profiles', 'UsersController@update_profile');
         Route::post('editPassword', 'UsersController@updatePassword');
         Route::post('editProfile', 'UsersController@updateUserPrifile');
-
     });
 });
-
 // ###########################################################################################################
 // ###############################################  Sagmma  ##################################################
 // ###########################################################################################################
 Route::group(['namespace' => 'Sagmma'], function()
 {
-    Route::group(['prefix' => 'sagmma', 'middleware' => 'auth'], function () {
-        Route::group(['middleware' => ['permission:admin']], function () {//Adicionar os restantes papeis
+    Route::group(['prefix' => 'sagmma', 'middleware' => 'auth',  'permission:backend-access'], function () {
+        Route::group(['middleware' => ['role:admin|super-admin|dpel|manager|administrative-assistant', 'permission:manage-resources']], function () {
             // ----------------------------------------Markets----------------------------------
             Route::resource('markets', 'MarketsController');
             // ---------------------------------------Employee----------------------------------
@@ -206,8 +189,6 @@ Route::group(['namespace' => 'Sagmma'], function()
             Route::resource('typeofplaces', 'TypeofplacesController');
             // -----------------------------------------material-----------------------------------
             Route::resource('materials', 'MaterialsController');
-            // -----------------------------------------products-----------------------------------
-            Route::resource('products', 'ProductsController');
             // -----------------------------------------Employees-----------------------------------
             Route::resource('employees', 'EmployeesController');
             // -----------------------------------------Traders-----------------------------------
@@ -216,27 +197,29 @@ Route::group(['namespace' => 'Sagmma'], function()
             Route::resource('controls', 'ControlsController');
             // -----------------------------------------taxations-----------------------------------
             Route::resource('taxations', 'TaxationsController');
-            // -----------------------------------------contracts-----------------------------------
-            Route::group(['middleware' => ['permission:admin']], function () {//Adicionar os restantes papeis
-                Route::resource('contracts', 'ContractsController');
-            });
             // -----------------------------------------Places-----------------------------------
             Route::resource('places', 'PlacesController');
-
+            // -----------------------------------------contracts-----------------------------------
+            Route::group(['middleware' => ['permission:manage-contracts']], function () {//Adicionar os restantes papeis
+                Route::resource('contracts', 'ContractsController');
+            });
+        });
+        Route::group(['middleware' => ['role:super-admin|admin|dpel|manager|trader', 'permission:manage-business
+        ']], function () {
             // -----------------------------------------promotions-----------------------------------
             Route::resource('promotions', 'PromotionsController');
-
+            // -----------------------------------------products-----------------------------------
+            Route::resource('products', 'ProductsController');
         });
     });
 });
-
 // #####################################################################################################################
 // ######################################################  Web  ########################################################
 // #####################################################################################################################
 Route::group(['namespace' => 'Web'], function()
 {
     Route::group(['prefix' => 'web', 'middleware' => 'auth'], function () {
-        Route::group(['middleware' => ['permission:admin']], function () {//Adicionar os restantes papeis
+        Route::group(['middleware' => ['role:super-admin|admin|articles-manager', 'permission:backend-access', 'permission:manage-articles']], function () {
             // ----------------------------------------Categories----------------------------------
             Route::resource('categories', 'CategoriesController');
             // -------------------------------------------Tags-------------------------------------
@@ -245,22 +228,20 @@ Route::group(['namespace' => 'Web'], function()
             Route::resource('articles', 'ArticlesController');
             // --------------------------------------Images-----------------------------------------
             Route::resource('images', 'ImagesController');
-
         });
     });
 });
-
 // #########################################################################################################################
 // ######################################################  Plugins  ########################################################
 // #########################################################################################################################
 Route::group(['namespace' => 'PluginsControllers'], function()
 {
-    Route::group(['prefix' => 'export', 'middleware' => 'auth'], function () {
-        Route::group(['middleware' => ['permission:admin']], function () {
+    Route::group(['prefix' => 'export', 'middleware' => 'auth', 'permission:backend-access'], function () {
+        Route::group(['middleware' => ['role:super-admin|admin|dpel|manager|administrative-assistant', 'permission:manage-resources
+        ']], function () {
             // -----------------------------PDF-Download---------------------------------------------
             Route::resource('/getPDF', 'PDFController@getPDF');
             Route::resource('/taxationsPDF', 'PDFController@TaxationsPDF');
-
             //-------------------------------Impressão-----------------------------------------------
             Route::get('/printableUserInformation', 'PrintController@indexUser');
             Route::get('/printUserPreview', 'PrintController@printUserPreview');
@@ -272,19 +253,15 @@ Route::group(['namespace' => 'PluginsControllers'], function()
             //----------Impressão de Relatório por mês--------------------------------------------
             Route::get('monthRoportInformation/{monh}/{year}', 'PrintController@monthReport');
             Route::get('printMonthReport/{month}/{year}',['as' => 'printThisMonthReport', 'uses' => 'PrintController@printThisMonthReport']);
-            //----------Impressão de Relatório por mês--------------------------------------------
+            //----------Impressão de Relatório por ano--------------------------------------------
             Route::get('yearRoportInformation/{year}', 'PrintController@yearReport');
             Route::get('printYearReport/{year}',['as' => 'printThisYearReport', 'uses' => 'PrintController@printThisYearReport']);
-
+            // ------------------------------------------------------------------------------------
             Route::get('/receiptInformation/{id}', 'PrintController@receiptIndex');
             Route::get('printReceipt/{date}',['as' => 'printReceipt', 'uses' => 'PrintController@printReceipt']);
-
-
-
             // --------------------------------------------------------------------------------------
             Route::get('/printableEmployeeInformation', 'PrintController@indexEmployee');
             Route::get('/printEmployeePreview', 'PrintController@printEmployeePreview');
-
             // ---------------------------------------Excel------------------------------------------
             Route::get('/getEmployeeImport', 'ExcelController@getEmployeeImport');
             Route::post('/postEmployeeImport', 'ExcelController@postEmployeeImport');
@@ -293,72 +270,8 @@ Route::group(['namespace' => 'PluginsControllers'], function()
         });
     });
 });
-
-
-Route::group(['namespace' => 'Web'], function()
-{
-    Route::group(['prefix' => 'front'], function () {
-        //-------------------------------Impressão-----------------------------------------------
-        Route::get('/traderinfo', 'FrontTraderController@index');
-
-    });
-});
-
-
-//Apresentar dados do tipo de espaço para teste
-Route::get('/typetest', 'Test\TypeController@index');
-
-Route::get('/calendar', 'Test\CalendarController@index');
-Route::get('/chart', 'ServicesControllers\ChartsController@TestChart');
-
-
-
 // ###################################################################################################################
-// ###################################################  Testes ######################################################
-// ###################################################################################################################
-Route::group(['middleware' => ['permission:adddmin']], function() {
-    Route::resource('/testrole', 'AdminController');
-});
-
-//Route de homo do backend
-Route::group(['middleware' => ['auth', 'permission:admin|test']], function () {
-    Route::resource('/home', 'BackendHomeController');
-});
-
-Entrust::routeNeedsRole('/home*', 'admin');
-Route::get('/criar', ['middleware' => 'auth', function () {
-    return view('_backend.users.create');
-}]);
-
-Route::get('/art', ['middleware' => 'auth', function () {
-    return view('_frontend.web.index');
-}]);
-
-Route::get('/news', function () {
-    return view('newscaroucel');
-});
-
-
-
-
-
-Route::get('/tester', function () {
-    return view('test');
-});
-
-Route::resource('controlteste', 'ApiControllers\ApiControlsController');
-
-Route::resource('employees', 'ApiControllers\ApiEmployeesController');
-
-
-
-
-
-
-Route::get('testevariavel', 'ApiControllers\ApiArticlesController@test2');
-
-// ###################################################################################################################
-// ###################################################  Contact ######################################################
+// #############################################  Contact teams ######################################################
 // ###################################################################################################################
 Route::group(['namespace' => 'ServicesControllers'], function()
 {
@@ -368,16 +281,6 @@ Route::group(['namespace' => 'ServicesControllers'], function()
     Route::post('/mailAux', array('as' => 'mailToAux', 'uses' => 'MailController@mailToAux'));
 });
 // ###################################################################################################################
-
-
-
-//
-//
-// Route::get('/fullcalendar', function () {
-//     return view('_backend.fullcalendar');
-// });
-
-// ###################################################################################################################
 // ###################################################  Ajax form events #############################################
 // ###################################################################################################################
 Route::get('showEvents{id?}','PluginsControllers\CalendareventsController@index');
@@ -385,15 +288,13 @@ Route::post('saveEvents', array('as' => 'guardaEventos','uses' => 'PluginsContro
 Route::post('updateEvents','PluginsControllers\CalendareventsController@update');
 Route::post('deleteEvents','PluginsControllers\CalendareventsController@delete');
 // ###################################################################################################################
-
-// ###################################################################################################################
 // ###################################################  Google analytics #############################################
 // ###################################################################################################################
 Route::get('data','PluginsControllers\AnalyticsController@index');
 // ###################################################################################################################
-
-// ###################################################################################################################
 // ###################################################  Links externos #############################################
 // ###################################################################################################################
 Route::get('acesso_ao_recibo/{id}/{code}', 'PluginsControllers\PDFController@downloadreciboempdf');
+// ###################################################################################################################
+// ###################################################  Testes ######################################################
 // ###################################################################################################################

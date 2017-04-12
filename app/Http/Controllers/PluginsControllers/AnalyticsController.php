@@ -13,8 +13,7 @@ class AnalyticsController extends Controller
 {
     public function index()
     {
-        phpinfo();
-
+        dd('pendente');        
     }
 
     public function create(){
@@ -26,7 +25,7 @@ class AnalyticsController extends Controller
     }
 
     public function delete(){
-        
+
     }
 
 }
