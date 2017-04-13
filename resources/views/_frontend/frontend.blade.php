@@ -3,22 +3,14 @@
 
 @endsection
 @section('content')
+    <!--------------------------------------------------------------------------------------->
+    @include('_frontend.master.partials.slide')
     <!----------------------------Alerts----------------------------------------------------------->
-
-
-    {{-- @include('_frontend.master.partials.alerts') --}}
-
-    <!--------------------------------------------------------------------------------------->
-    @include('_frontend.master.partials.indexCarouce')
-    <!--------------------------------------------------------------------------------------->
-    {{-- <show-promotion-in-front></show-promotion-in-front> --}}
-    <!-- Container (About Section) -->
     <div class="row">
         <div class="col-md-6">
             @include('flash::message')
         </div>
     </div>
-
     @include('_frontend.master.partials.pages.market_info')
 
     <!-- Container (Services Section) -->
@@ -36,8 +28,6 @@
     <!--------------------------------------------------------------------------------------->
     @include('_frontend.master.partials.mapscript')
     <!--------------------------------------------------------------------------------------->
-
-
 @endsection
 @push('scripts')
     <script>
@@ -58,6 +48,48 @@
             $(this).remove();
         });
     }, 6000);
+
+    $(document).ready(function() {
+        $('.slider').cycle({
+            fx:      'fade, shuffle',
+            sync: true,
+            next: '#next',
+            prev: '#prev',
+            pause: true,
+            speed:    1000,
+            timeout:  5000,
+            pager: $('.pager'),
+            pagerAnchorBuilder: function(index, DOMelement) {
+                return '<a></a>'
+            },
+            activePagerClass: 'sliderActived',
+            fit: 1,
+            containerResize: 0,
+            width: '100%',
+        });
+    });
+
+    $('.box-slider').hover(
+        function(){
+            $('p').fadeIn();
+            $('.prev').fadeIn();
+            $('.next').fadeIn();
+            $('.pager').fadeIn();
+        },
+        function(){
+            $('p').fadeOut();
+            $('.prev').fadeOut();
+            $('.next').fadeOut();
+            $('.pager').fadeOut();
+        }
+    );
+
+    // $(document).ready(function(){
+    //     $("div.box-slider img").hover(
+    //         function(){$(this).siblings("p:first").show();},
+    //         function(){$(this).siblings("p:first").hide();}
+    //     );
+    // });
 
     </script>
 

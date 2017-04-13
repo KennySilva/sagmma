@@ -172,36 +172,28 @@
             </div>
         </div>
         <div class="col-md-3">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">As Minha Funções</h3>
-                </div>
-                <div class="panel-body">
-                    <ul class="list-group">
-                        @foreach (Auth::user()->roles as $role)
-                            <li class="list-group-item list-group-item-success">
-                                {{$role->display_name}}
-                            </li>
-                        @endforeach
-                    </ul>
-                </div>
+            <div class="list-group">
+                <li class="list-group-item active">
+                    Sou Um...
+                </li>
+                @foreach (Auth::user()->roles as $role)
+                    <li class="list-group-item list-group-item-success">
+                        {{$role->display_name}}
+                    </li>
+                @endforeach
             </div>
+
             <hr>
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">As Minha Permissões</h3>
-                </div>
-                <div class="panel-body">
-                    <ul class="list-group">
-                        @foreach (Auth::user()->roles as $role)
-                            @foreach ($role->perms as $permission)
-                                <li class="list-group-item list-group-item-success">
-                                    {{$permission->display_name}}
-                                </li>
-                            @endforeach
-                        @endforeach
-                    </ul>
-                </div>
+
+            <div class="list-group">
+                <li class="list-group-item active">
+                    O que eu faço...
+                </li>
+                @foreach (Auth::user()->roles as $role)
+                    @foreach ($role->perms as $permission)
+                        <li class="list-group-item list-group-item-success">{{$permission->display_name}}</li>
+                    @endforeach
+                @endforeach
             </div>
         </div>
 

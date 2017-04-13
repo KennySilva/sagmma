@@ -9,7 +9,6 @@
 @endsection
 
 @section('contentheader_title')
-    Perfil do Utilizador
 @endsection
 
 @section('main-content')
