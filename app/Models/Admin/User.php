@@ -166,33 +166,4 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     {
         return $this->hasMany(Task::class);
     }
-
-    //Controlo de Permissoes;
-    // public function hasPermission(Permission $permission)
-    // {
-    //     return $this->hasAnyRoles($permission->roles);
-    // }
-    //
-    // public function hasAnyRoles($roles)
-    // {
-    //     if (is_array($roles) || is_object($roles)) {
-    //         foreach ($roles as $role) {
-    //             // var_dump($role->name);
-    //             // return $this->roles->contains('name', $role->name);
-    //             // return $this->hasAnyRoles($roles);
-    //             return $roles->intersect($this->roles)->count();
-    //         }
-    //     }
-    //     return $this->roles->contains('name', $roles);
-    // }
-    //
-    // //Função para servir o middleware
-    // public function Admin()
-    // {
-    //     foreach ($this->roles as $TypeUser) {
-    //         return $TypeUser->name === 'admin';
-    //     }
-    // }
-
-
 }

@@ -23,7 +23,7 @@ new Vue({
         updateimage  : '',
         employeeExcel: '',
     },
-    // 
+    //
     // methods: {
     //     var self = this;
     //     jQuery(self.$els.state).select2({
@@ -56,6 +56,7 @@ new Vue({
     //         self.$set(profile.parish, jQuery(this).val());
     //     });
     // },
+    
 
     components: {
         //-----------------------------users--------------------------------------

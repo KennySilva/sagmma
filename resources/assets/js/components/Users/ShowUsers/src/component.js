@@ -58,10 +58,13 @@ export default{
         }
     },
 
+
     ready () {
         this.fetchUser(this.pagination.current_Page, this.showRow);
         this.roleUser();
         this.authUser();
+
+
         var self = this
         jQuery(self.$els.usercols).select2({
             placeholder: "Coluna",
@@ -76,13 +79,11 @@ export default{
         });
 
         jQuery(self.$els.typecreate).select2({
-            placeholder: "Seleciona o tipo",
+            placeholder: "Tipo",
             allowClear: true,
             theme: "bootstrap",
             width: '100%',
             language: 'pt',
-
-
         }).on('change', function () {
             self.$set('newUser.type', jQuery(this).val());
         });
@@ -94,6 +95,7 @@ export default{
             theme: "bootstrap",
             width: '100%',
             language: 'pt',
+            closeOnSelect: false,
 
 
         }).on('change', function () {
@@ -120,6 +122,7 @@ export default{
             theme: "bootstrap",
             width: '100%',
             language: 'pt',
+            closeOnSelect: false,
 
 
         }).on('change', function () {
@@ -139,7 +142,6 @@ export default{
         });
 
         jQuery(self.$els.stateedit).select2({
-            placeholder: "Ilha",
             allowClear: true,
             theme: "bootstrap",
             width: '100%',
@@ -163,7 +165,6 @@ export default{
         });
 
         jQuery(self.$els.counciledit).select2({
-            placeholder: "Concelho",
             allowClear: true,
             theme: "bootstrap",
             width: '100%',
@@ -187,7 +188,6 @@ export default{
         });
 
         jQuery(self.$els.parishedit).select2({
-            placeholder: "Freguesia",
             allowClear: true,
             theme: "bootstrap",
             width: '100%',
@@ -218,25 +218,26 @@ export default{
 
 
         clearField: function(){
+
             this.newUser = {
-                id          : '',
-                name        : '',
-                username    : '',
-                ic          : '',
-                email       : '',
-                password    : '',
-                gender      : '',
-                age         : '',
-                state       : '',
-                council     : '',
-                parish      : '',
-                zone        : '',
-                phone       : '',
-                status      : '',
-                type        : '',
-                description : '',
-                avatar      : '',
-                roles       : [],
+                id                      : '',
+                name                    : '',
+                username                : '',
+                ic                      : '',
+                email                   : '',
+                password                : '',
+                gender                  : '',
+                age                     : '',
+                state                   : '',
+                council                 : '',
+                parish                  : '',
+                zone                    : '',
+                phone                   : '',
+                status                  : '',
+                type                    : '',
+                description             : '',
+                avatar                  : '',
+                roles                   : [],
             };
         },
 
@@ -253,7 +254,7 @@ export default{
                     console.log('chegando aqui');
                     $('#modal-create-user').modal('hide');
                     console.log(response.data);
-                    this.fetchUser(this.pagination.last_Page, this.showRow);
+                    this.fetchUser(this.pagination.current_Page, this.showRow);
                     this.alert('Utilizador Criado com sucesso', 'success');
                     this.$set('errors', '')
                 }
@@ -277,36 +278,32 @@ export default{
             });
         },
 
-        // --------------------------------------------------------------------------------------------
-        showThisUser: function(id) {
-            this.$http.get('http://localhost:8000/api/v1/showThisUser/' + id).then((response) => {
-                console.log('ritgth');
-            }, (response) => {
-                console.log('Error');
-            });
-        },
-
-
         getThisUser: function(id){
-            this.$http.get('http://localhost:8000/api/v1/users/' + id).then((response) => {
-                this.newUser.id          = response.data.id;
-                this.newUser.name        = response.data.name;
-                this.newUser.username    = response.data.username;
-                this.newUser.ic          = response.data.ic;
-                this.newUser.email       = response.data.email;
-                this.newUser.password    = 'Your Password Was Setted';
-                this.newUser.gender      = response.data.gender;
-                this.newUser.age         = response.data.age;
-                this.newUser.state       = response.data.state;
-                this.newUser.council     = response.data.council;
-                this.newUser.parish      = response.data.parish;
-                this.newUser.zone        = response.data.zone;
-                this.newUser.phone       = response.data.phone;
-                this.newUser.status      = response.data.status;
-                this.newUser.type        = response.data.type;
-                this.newUser.description = response.data.description;
-                this.newUser.avatar = response.data.avatar;
-                this.newUser.roles       = response.data.roles;
+            var self = this;
+            self.newUser.roles = []
+            self.$http.get('http://localhost:8000/api/v1/users/'+id).then((response) => {
+                self.newUser.id          = response.data.id;
+                self.newUser.name        = response.data.name;
+                self.newUser.username    = response.data.username;
+                self.newUser.ic          = response.data.ic;
+                self.newUser.email       = response.data.email;
+                self.newUser.password    = '00000000';
+                self.newUser.gender      = response.data.gender;
+                self.newUser.age         = response.data.age;
+                self.newUser.state       = response.data.state;
+                self.newUser.council     = response.data.council;
+                self.newUser.parish      = response.data.parish;
+                self.newUser.zone        = response.data.zone;
+                self.newUser.phone       = response.data.phone;
+                self.newUser.status      = response.data.status;
+                self.newUser.type        = response.data.type;
+                self.newUser.description = response.data.description;
+                self.newUser.avatar      = response.data.avatar;
+                var roles = response.data.roles;
+                for (var variable in roles) {
+                    self.newUser.roles.push(roles[variable].id)
+                        console.log(roles[variable].id);
+                }
             }, (response) => {
                 console.log('Error');
             });
@@ -317,10 +314,10 @@ export default{
         saveEditedUser: function(id) {
             var user = this.newUser;
             //Clear form input
-            this.clearField();
             this.$http.patch('http://localhost:8000/api/v1/users/'+ id, user).then((response) => {
                 if (response.status == 200) {
                     $('#modal-edit-user').modal('hide');
+                    this.clearField();
                     // console.log(response.data);
                     this.fetchUser(this.pagination.current_page, this.showRow);
                     this.alert('Utilizador atualizado com sucesso', 'info');
@@ -335,20 +332,18 @@ export default{
 
 
         deleteUser: function(id) {
-            var ConfirmBox = confirm("Tens certeza que queres Eliminar este usuario?");
-            if (ConfirmBox) {
+            // var ConfirmBox = confirm("Eliminar?");
+            // if (ConfirmBox) {
                 this.$http.delete('http://localhost:8000/api/v1/users/'+ id).then((response) => {
                     $('#modal-delete-user').modal('hide');
                     if (response.status == 200) {
-                        // console.log(response.data);
-                        this.fetchUser(1, this.showRow);
+                        this.fetchUser(this.pagination.current_page, this.showRow);
                         this.alert('Utilizador eliminado com sucesso', 'warning');
-
                     }
                 }, (response) => {
                     console.log("Ocorreu um erro na operação");
                 });
-            }
+            // }
         },
 
         // -------------------------Metodo de suporte---------------------------------------------------

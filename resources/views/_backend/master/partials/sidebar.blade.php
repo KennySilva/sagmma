@@ -26,7 +26,7 @@
             <li style="color: #000;" class="header"><h4>Navegação</h4></li>
             <li><a href="{{ url('/home') }}"><i class='fa fa-home'></i> <span>HOME</span></a></li>
             @role(['super-admin', 'admin', 'dpel'])
-            @permission(['manage-user', 'manage-admins'])
+            @permission(['manage-users', 'manage-admins'])
             <li class="treeview">
                 <a href="#"><i class=' fa fa-cogs'></i><span>SISTEMA</span> <i class="fa fa-angle-left pull-right"></i></a>
                 <ul class="treeview-menu">

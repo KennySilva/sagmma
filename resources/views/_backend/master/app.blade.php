@@ -33,6 +33,7 @@
             $(this).remove();
         });
     }, 6000);
+    
     </script>
 </body>
 </html>

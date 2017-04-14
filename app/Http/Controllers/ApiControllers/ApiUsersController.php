@@ -69,7 +69,10 @@ class ApiUsersController extends Controller
         $user->avatar      = 'default.png';
         $user->social      = false;
         $user->save();
-        $user->roles()->sync($request->roles);
+        if ($roles) {
+            # code...
+            $user->roles()->sync($request->roles);
+        }
         if ($request->type == 'trad') {
             $trader                  = new Trader();
             $trader->name            = $request->name;
@@ -111,6 +114,11 @@ class ApiUsersController extends Controller
     public function show($id)
     {
         $user = User::findOrFail($id);
+        $user->roles;
+        // foreach ($user->roles as $rol) {
+        //     # code...
+        //     dd($rol->id);
+        // }
         return $user;
     }
 
@@ -124,6 +132,7 @@ class ApiUsersController extends Controller
     {
         $name = ucwords($request->name);
         $username = ucwords($request->username);
+        $idd          = $request->id;
         $ic          = $request->ic;
         $email       = $request->email;
         $gender      = $request->gender;
@@ -132,30 +141,27 @@ class ApiUsersController extends Controller
         $council     = $request->council;
         $parish      = $request->parish;
         $zone        = $request->zone;
-        $phone        = $request->phone;
+        $phone       = $request->phone;
         $type        = $request->type;
         $description = $request->description;
+        $roles = $request->roles;
 
-        $user = new User();
-
-        $user->where('id', $id)->first();
-        $user->update(array(
-            'name'        => $name,
-            'username'    => $username,
-            'ic'          => $ic,
-            'email'       => $email,
-            'gender'      => $gender,
-            'age'         => $age,
-            'state'       => $state,
-            'council'     => $council,
-            'parish'      => $parish,
-            'zone'        => $zone,
-            'phone'       => $phone,
-            'type'        => $type,
-            'description' => $description,
-        ));
-        $user->roles()->sync($request->roles);
-
+        $user = User::findOrFail($id);
+        $user->name        = $name;
+        $user->username    = $username;
+        $user->ic          = $ic;
+        $user->email       = $email;
+        $user->gender      = $gender;
+        $user->age         = $age;
+        $user->state       = $state;
+        $user->council     = $council;
+        $user->parish      = $parish;
+        $user->zone        = $zone;
+        $user->phone       = $phone;
+        $user->type        = $type;
+        $user->description = $description;
+        $user->save();
+        $user->roles()->sync($roles);
 
         $trader = Trader::where('ic', '=', $ic);
         if ($trader) {

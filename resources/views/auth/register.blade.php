@@ -95,7 +95,6 @@
                             </span>
                         @endif
                     </div>
-                    
                     {{-- <div class="col-md-6 col-md-offset-1"> --}}
                     {{-- {!! app('captcha')->display([],'pt'); !!}
                     @if ($errors->has('g-recaptcha-response'))

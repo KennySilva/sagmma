@@ -71,13 +71,13 @@
 
     $('.box-slider').hover(
         function(){
-            $('p').fadeIn();
+            $('.parSlide').fadeIn();
             $('.prev').fadeIn();
             $('.next').fadeIn();
             $('.pager').fadeIn();
         },
         function(){
-            $('p').fadeOut();
+            $('.parSlide').fadeOut();
             $('.prev').fadeOut();
             $('.next').fadeOut();
             $('.pager').fadeOut();

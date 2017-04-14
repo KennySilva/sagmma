@@ -89,7 +89,16 @@
 @push('scripts')
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.10/jquery.mask.js"></script>
+    <script src="{{ asset('/plugins/iCheck/icheck.min.js') }}" type="text/javascript"></script>
     <script>
+    // $(function () {
+    //     $('input').iCheck({
+    //         checkboxClass: 'icheckbox_square-blue',
+    //         radioClass: 'iradio_square-blue',
+    //         increaseArea: '20%' // optional
+    //     });
+    // });
+
     $(document).ready(function($){
         $("#showSearchInput").click(function(){
             $("#searchPage").show();
