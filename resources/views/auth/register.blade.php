@@ -13,15 +13,14 @@
     <body class="register-page">
         <div class="register-box">
             <div class="login-logo">
-                <a href="{{ url('/home') }}">SAGMMA <i class="fa fa-sign-in"></i></a>
+                <a href="{{ url('/') }}"><i class="fa fa-user-plus fa-2x  faa-pulse animated faa-slow"></i></a>
             </div>
-
+            {{--
             <div class="notice notice-info">
-                <strong>Login</strong>    Registe-se e obtenha uma conta.
-            </div>
-
+                <strong><i class="fa fa-user-plus"></i></strong>    Registe-se e obtenha uma conta.
+            </div> --}}
             <div class="register-box-body">
-                <p class="login-box-msg"><h3 class="text-center">Criar Conta</h3></p>
+                <p class="login-box-msg"><h3 class="text-center">Rigistar</h3></p>
                 <form action="{{ url('/auth/register') }}" method="post">
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <div class="form-group has-feedback">
@@ -95,71 +94,56 @@
                             </span>
                         @endif
                     </div>
-                    {{-- <div class="col-md-6 col-md-offset-1"> --}}
-                    {{-- {!! app('captcha')->display([],'pt'); !!}
-                    @if ($errors->has('g-recaptcha-response'))
-                    <span class="help-block">
-                    <p class="help-block text-danger" style="color: #DD4B39;">{{ $errors->first('g-recaptcha-response') }}</p>
-                </span>
-            @endif --}}
 
+                    <div class="col-md-12 pull-left table-responsive">
+                        <div class="g-recaptcha" data-sitekey="6LeuixEUAAAAAEkNQh8jVGirE3kI0hytNvNhM9sn"></div>
+                        @if ($errors->has('g-recaptcha-response'))
+                            <span class="help-block">
+                                <p class="help-block text-danger" style="color: #DD4B39;">{{ $errors->first('g-recaptcha-response') }}</p>
+                            </span>
+                        @endif
+                    </div>
+                    <br>
+                    <br>
+                    <br>
+                    <hr>
+                    <button type="submit" class="btn btn-primary btn-block btn-flat">Registar</button>
+                </form>
+                <br>
+                <div class="social-auth-links text-center">
+                    <p>«Iniciar Sessão com»</p>
+                    <div style="padding: 1px;" class="col-md-12">
 
+                        <div style="padding: 1px;" class="col-md-6">
+                            <a href="{{ url('social/facebook') }}" class="btn btn-block btn-social btn-facebook btn-flat"><i class="fa fa-facebook"></i>Facebook</a>
+                        </div>
 
-            {{-- </div> --}}
+                        <div style="padding: 1px;" class="col-md-6">
+                            <a href="{{ url('social/google') }}" class="btn btn-block btn-social btn-google btn-flat"><i class="fa fa-google-plus"></i>Google+</a>
+                        </div>
 
-
-            {{-- {!! Recaptcha::render() !!} --}}
-
-            <div class="g-recaptcha" data-sitekey="6LeuixEUAAAAAEkNQh8jVGirE3kI0hytNvNhM9sn"></div>
-            @if ($errors->has('g-recaptcha-response'))
-                <span class="help-block">
-                    <p class="help-block text-danger" style="color: #DD4B39;">{{ $errors->first('g-recaptcha-response') }}</p>
-                </span>
-            @endif
-            <br>
-
-            {{-- <div class="col-xs-12"> --}}
-            <button type="submit" class="btn btn-primary btn-block btn-flat">Registar</button>
-            {{-- </div><!-- /.col --> --}}
-        </form>
-        <br>
-        <div class="social-auth-links text-center">
-            <p>- Criar uma conta com -</p>
-            <div style="padding: 1px;" class="col-md-12">
-
-                <div style="padding: 1px;" class="col-md-6">
-                    <a href="{{ url('social/facebook') }}" class="btn btn-block btn-social btn-facebook btn-flat"><i class="fa fa-facebook"></i>Facebook</a>
+                    </div>
                 </div>
+                <br>
+                <hr>
 
-                <div style="padding: 1px;" class="col-md-6">
-                    <a href="{{ url('social/google') }}" class="btn btn-block btn-social btn-google btn-flat"><i class="fa fa-google-plus"></i>Google+</a>
-                </div>
-
+                <a href="{{ url('/auth/login') }}" class="text-center">Minha Conta</a><br>
+                <hr>
+                <a href="{{ url('/') }}" class="text-center"><i class="fa fa-home faa-shake animated"></i></a>
             </div>
-        </div><!-- /.social-auth-links -->
+        </div>
 
+        @include('auth.scripts')
 
-
-
-
-
-        <a href="{{ url('/auth/login') }}" class="text-center">Eu já tenho uma conta quero entrar</a><br>
-        <hr>
-        <a href="{{ url('/') }}" class="text-center">Cancelar</a>
-    </div><!-- /.form-box -->
-</div><!-- /.register-box -->
-
-@include('auth.scripts')
-
-<script>
-$(function () {
-    $('input').iCheck({
-        checkboxClass: 'icheckbox_square-blue',
-        radioClass: 'iradio_square-blue',
-        increaseArea: '20%' // optional
-    });
-});
-</script>
-</body>
+        <script>
+        $(function () {
+            $('input').iCheck({
+                checkboxClass: 'icheckbox_square-blue',
+                radioClass: 'iradio_square-blue',
+                increaseArea: '20%' // optional
+            });
+        });
+        </script>
+    </body>
 
 @endsection

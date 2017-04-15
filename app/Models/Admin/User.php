@@ -64,7 +64,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     {
         if ($value) {
             $states = array(
-                "1" =>'Santatiago',
+                "1" =>'Santiago',
                 "2" =>'Maio',
                 "3" =>'Fogo',
                 "4" =>'Brava',

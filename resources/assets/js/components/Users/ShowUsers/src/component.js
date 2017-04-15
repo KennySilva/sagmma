@@ -46,7 +46,7 @@ export default{
             filter: {
                 term: ''
             },
-            columnsFiltered: [],
+            columnsFiltered: ['name'],
             pagination: {},
             success: false,
             msgSucess: '',
@@ -209,8 +209,6 @@ export default{
             this.success = true;
             this.msgSucess = msg;
             this.typeAlert = typeAlert;
-
-
             setTimeout(function() {
                 self.success = false;
             }, 5000);
@@ -280,8 +278,11 @@ export default{
 
         getThisUser: function(id){
             var self = this;
+
             self.newUser.roles = []
             self.$http.get('http://localhost:8000/api/v1/users/'+id).then((response) => {
+                // var state = {Santiago: '1', Maio: '2', Fogo: '3', Brava: '4', SantoAntão: '5', SãoNiculau: '6', SãoVicente: '7', Sal: '8', Boavista: '9'};
+
                 self.newUser.id          = response.data.id;
                 self.newUser.name        = response.data.name;
                 self.newUser.username    = response.data.username;
@@ -373,12 +374,10 @@ export default{
 
         estado_utilizador: function(userStatus) {
             var postData = {id: userStatus};
-
             this.$http.post('http://localhost:8000/api/v1/estado_utilizador/', postData).then((response) => {
-                console.log(response.status);
-                console.log(response.data);
                 if (response.status == 200) {
                     this.fetchUser(this.pagination.current_page, this.showRow);
+                    this.alert('Estado do Utilizador Atualiazado', 'info');
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");

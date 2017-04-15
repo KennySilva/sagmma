@@ -20,8 +20,8 @@
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">COMERCIANTES</i><span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                        <li><a href="{{ route('auth.login') }}">INFORMAÇÕES</a></li>
-                        <li><a href="#pricing">PROMOÇÕES</a></li>
+                        <li><a href="{{ url('informations') }}">INFORMAÇÕES</a></li>
+                        <li><a href="{{ url('promotions') }}">PROMOÇÕES</a></li>
                     </ul>
                 </li>
                 <li><a href="{{ url('/article') }}" onclick="myFunction()">NOTÍCIA</a></li>
@@ -37,7 +37,7 @@
 
                             @role(['super-admin', 'admin', 'trader'])
                             @permission(['manage-promotions'])
-                            <li><a href="#"><i class="fa fa-shopping-cart"></i> MEU NEGÓCIO</a></li>
+                            <li><a href="{{ url('myBusiness') }}"><i class="fa fa-shopping-cart"></i> MEU NEGÓCIO</a></li>
                             @endpermission
                             @endrole
                             <li><a href="myProfile"><i class="fa fa-user-o"></i> PERFIL</a></li>

@@ -77,9 +77,6 @@ class ApiRolesController extends Controller
             $role->fill($request->all());
             $role->save();
             $role->perms()->sync($request->permissions);
-            //     $role = Role::findOrFail($id)->update($request::all());
-            // return Response::json($request::all());
-
         }
 
         public function destroy($id)

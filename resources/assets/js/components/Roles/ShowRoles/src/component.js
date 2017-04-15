@@ -27,6 +27,8 @@ export default{
             filter           : {
                 term         : ''
             },
+            columnsFiltered: ['name'],
+
             pagination       : {},
             success          : false,
             msgSucess        : '',
@@ -61,7 +63,7 @@ export default{
             theme: "bootstrap",
             width: '100%',
             language: 'pt',
-            tags: true,
+            closeOnSelect: false,
         }).on('change', function () {
             self.$set('newRole.permissions', jQuery(this).val());
         });
@@ -72,6 +74,7 @@ export default{
             theme: "bootstrap",
             width: '100%',
             language: 'pt',
+            closeOnSelect: false,
         }).on('change', function () {
             self.$set('newRole.permissions', jQuery(this).val());
         });
@@ -83,10 +86,14 @@ export default{
     // ---------------------------------------------------------------------------------
 
     methods: {
-
-        resetPermissions: function(ev) {
-            ev.preventDefault()
-            this.newRole.permissions = ""
+        clearField: function(){
+            this.newRole = {
+                id           : '',
+                name         : '',
+                display_name : '',
+                description  : '',
+                permissions  : [],
+            };
         },
 
         alert: function(msg, typeAlert) {
@@ -102,20 +109,13 @@ export default{
         },
 
         createRole: function() {
-            var role = this.newRole;
 
-            //Clear form input
-            this.newRole = {
-                id           : '',
-                name         : '',
-                display_name : '',
-                description  : '',
-                permissions: [],
-            };
+            var role = this.newRole;
             this.$http.post('http://localhost:8000/api/v1/roles/', role).then((response) => {
                 if (response.status == 200) {
                     console.log('chegando aqui');
                     $('#modal-create-role').modal('hide');
+                    this.clearField()
                     // console.log(response.data);
                     this.fetchRole(1, this.showRow);
                     this.alert('Papel Criado com sucesso', 'success');
@@ -143,13 +143,18 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         getThisRole: function(id){
-            this.$http.get('http://localhost:8000/api/v1/roles/' + id).then((response) => {
-                this.newRole.id       = response.data.id;
-                this.newRole.name     = response.data.name;
-                this.newRole.display_name = response.data.display_name;
-                this.newRole.description    = response.data.description;
-                // this.newRole.permissions    = response.data.perms;
-                this.$set('newRole.permissions', response.data.perms)
+            var self = this;
+            this.clearField()
+
+            self.$http.get('http://localhost:8000/api/v1/roles/' + id).then((response) => {
+                self.newRole.id       = response.data.id;
+                self.newRole.name     = response.data.name;
+                self.newRole.display_name = response.data.display_name;
+                self.newRole.description    = response.data.description;
+                var perms = response.data.perms;
+                for (var perm in perms) {
+                    self.newRole.permissions.push(perms[perm].id)
+                }
             }, (response) => {
                 console.log('Error');
             });
@@ -160,17 +165,12 @@ export default{
         saveEditedRole: function(id) {
             var role = this.newRole;
 
-            this.newRole = {
-                id           : '',
-                name         : '',
-                display_name : '',
-                description  : '',
-            };
 
             this.$http.patch('http://localhost:8000/api/v1/roles/'+ id, role).then((response) => {
                 if (response.status == 200) {
                     $('#modal-edit-role').modal('hide');
-                    // console.log(response.data);
+                    this.clearField()
+
                     this.fetchRole(1, this.showRow);
                     this.alert('Papel atualizado com sucesso', 'info');
                     this.$set('errors', '')
@@ -243,14 +243,6 @@ export default{
             this.fetchRole(page, this.showUser);
         },
 
-        clearField: function(){
-            this.newRole = {
-                id           : '',
-                name         : '',
-                display_name : '',
-                description  : '',
-            };
-        },
 
         doOpenDetails: function(ev, id)
         {

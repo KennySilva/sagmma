@@ -6,6 +6,9 @@ Route::group(['middleware' => []], function () {
     //-------------------------------------Página Principal------------------------------------------------------
     Route::resource('/', 'FrontController');
     Route::resource('/article', 'Web\NewsController');
+    Route::resource('/promotions', 'Web\ShowPromotionsController');
+    Route::resource('/informations', 'Web\InformationsController');
+    Route::resource('/myBusiness', 'Web\BusinessController');
     Route::get('/myProfile', 'FrontController@myProfile');
     Route::get('/categories/{name}', ['uses' => 'Web\NewsController@searchCategory', 'as'   => 'front.search.category']);
     Route::get('/tags/{name}', ['uses' => 'Web\NewsController@searchTag', 'as'   => 'front.search.tag']);

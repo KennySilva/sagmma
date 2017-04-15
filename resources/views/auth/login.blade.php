@@ -13,27 +13,14 @@
 @section('content')
     <body class="login-page">
         <div class="login-box">
-            {{-- <div class="info-box">
-            <!-- Apply any bg-* class to to the icon to color it -->
-            <a href="{{ url('/home') }}"><span class="info-box-icon bg-red"><i class="fa fa-lock"></i></span></a>
-            <div class="info-box-content">
-            <span class="info-box-text">Faça o login para iniciares a sessão</span>
-            <span class="info-box-number">Faça o Login no SGMMA</span>
-        </div><!-- /.info-box-content -->
-    </div><!-- /.info-box --> --}}
     <div class="login-logo">
-        <a href="{{ url('/home') }}">SAGMMA <i class="fa fa-unlock"></i></a>
+        <a href="{{ url('/') }}"><i class="fa fa-lock fa-2x faa-ring animated"></i></a>
     </div>
 
-    <div class="notice notice-info">
-        <strong>Login</strong>    Atentique-se para iniciar a sessão.
-    </div>
+    {{-- <div class="notice notice-info">
+        <strong><i class="fa fa-sign-in"></i></strong>    Atentique-se para iniciar a sessão.
+    </div> --}}
 
-
-
-    {{-- <div class="login-logo">
-    <a href="{{ url('/home') }}"><b>SAGMMA</b></a>
-</div><!-- /.login-logo --> --}}
 
 @if (count($errors) > 0)
     <div class="alert alert-warning">
@@ -47,7 +34,7 @@
 
 
 <div class="login-box-body">
-    <p class="login-box-msg"><h3 class="text-center">Faça o Login</h3></p>
+    <p class="login-box-msg"><h3 class="text-center">Autenticar</h3></p>
     <form action="{{ url('/auth/login') }}" method="post">
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
         <div class="form-group has-feedback">
@@ -56,7 +43,7 @@
 
         </div>
         <div class="form-group has-feedback">
-            <input type="password" class="form-control" placeholder="Password" name="password"/>
+            <input type="password" class="form-control" placeholder="Palavra Passe" name="password"/>
             <span class="glyphicon glyphicon-lock form-control-feedback"></span>
 
         </div>
@@ -64,7 +51,7 @@
             <div class="col-xs-8">
                 <div class="checkbox icheck">
                     <label>
-                        <input type="checkbox" name="remember"> Lembrar de Mim
+                        <input type="checkbox" name="remember"> Lembrar
                     </label>
                 </div>
             </div><!-- /.col -->
@@ -75,7 +62,7 @@
     </form>
 
     <div class="social-auth-links text-center">
-        <p>- Se quiseres podes Iniciar Sessão com -</p>
+        <p>«Iniciar Sessão com»</p>
         <div style="padding: 1px;" class="col-md-12">
 
             <div style="padding: 1px;" class="col-md-6">
@@ -88,9 +75,12 @@
 
         </div>
     </div><!-- /.social-auth-links -->
-
-    <a href="{{ url('/password/email') }}">Já esqueci da Palavra Passe</a><br>
-    <a href="{{ url('/auth/register') }}" class="text-center">Quero nova conta</a>
+    <br>
+    <hr>
+    <a href="{{ url('/password/email') }}">Recuperar Palavra Passe</a><br>
+    <a href="{{ url('/auth/register') }}" class="text-center">Registar</a>
+    <hr>
+    <a href="{{ url('/') }}" class="text-center"><i class="fa fa-home faa-shake animated"></i></a>
 
 </div><!-- /.login-box-body -->
 
