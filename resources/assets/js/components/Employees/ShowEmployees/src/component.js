@@ -7,6 +7,12 @@ export default{
     name: 'ShowEmployees',
     data(){
         return {
+
+            relation: {
+                taxation: [],
+                markets: [],
+                controls: [],
+            },
             showColumn: {
                 ic: '',
                 service_beginning: '',
@@ -102,10 +108,11 @@ export default{
         this.fetchEmployee(this.pagination.current_Page, this.showRow)
         this.marketEmployee()
         this.employeeType()
+        // this.employeeRelation()
         // -------------------------------------------------------------------------------------
 
         var self = this
-        jQuery(self.$els.marketcols).select2({
+        jQuery(self.$els.employeescols).select2({
             placeholder: "Coluna",
             allowClear: true,
             theme: "bootstrap",
@@ -145,11 +152,12 @@ export default{
 
         jQuery(self.$els.marketcreate).select2({
             placeholder: "Mercado",
-            allowClear: true,
+            allowClear: false,
             theme: "bootstrap",
             width: '100%',
             language: 'pt',
-
+            closeOnSelect: false,
+            cache: false,
 
         }).on('change', function () {
             self.$set('newEmployee.markets', jQuery(this).val());
@@ -158,10 +166,12 @@ export default{
 
         jQuery(self.$els.marketedit).select2({
             placeholder: "Mercado",
-            allowClear: true,
+            allowClear: false,
             theme: "bootstrap",
             width: '100%',
             language: 'pt',
+            closeOnSelect: false,
+            cache: false,
 
 
         }).on('change', function () {
@@ -315,10 +325,17 @@ export default{
                 description       : '',
                 markets           : [],
                 get_acount        : false,
-
-
             };
         },
+
+        // employeeRelation: function(){
+        //     for (var employee in this.employees) {
+        //         this.relation.taxation.push(employees[employee].taxation.id)
+        //         // this.relation.markets.push(employees[employee].markets)
+        //         // this.relation.controls.push(employees[employee].controls.id)
+        //     }
+        // },
+
 
         // --------------------------------------------------------------------------------------------
 
@@ -332,8 +349,7 @@ export default{
                     console.log('chegando aqui');
                     $('#modal-create-employee').modal('hide');
                     this.clearField();
-                    console.log(response.data);
-                    this.fetchEmployee(this.pagination.last_Page, this.showRow);
+                    this.fetchEmployee(this.pagination.current_page, this.showRow);
                     this.alert('Funcionário Criado com sucesso', 'success');
                     this.$set('errors', '')
                 }
@@ -357,6 +373,7 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         getThisEmployee: function(id){
+            this.clearField()
             this.$http.get('http://localhost:8000/api/v1/employees/' + id).then((response) => {
                 this.newEmployee.id                = response.data.id;
                 this.newEmployee.name              = response.data.name;
@@ -374,7 +391,10 @@ export default{
                 this.newEmployee.market_id         = response.data.market_id;
                 this.newEmployee.typeofemployee_id = response.data.typeofemployee_id;
                 this.newEmployee.description       = response.data.description;
-                this.newEmployee.markets           = response.data.markets;
+                var markets = response.data.markets;
+                for (var market in markets) {
+                    this.newEmployee.markets.push(markets[market].id)
+                }
             }, (response) => {
                 console.log('Error');
             });
@@ -404,7 +424,6 @@ export default{
             this.$http.delete('http://localhost:8000/api/v1/employees/'+ id).then((response) => {
                 $('#modal-delete-employee').modal('hide');
                 if (response.status == 200) {
-                    // console.log(response.data);
                     this.fetchEmployee(this.pagination.current_page, this.showRow);
                     this.alert('Funcionário eliminado com sucesso', 'warning');
                 }
@@ -448,42 +467,6 @@ export default{
                 console.log("Ocorreu um erro na operação");
             });
         },
-
-        alterGenderValue: function(employee) {
-            if (employee == 'M') {
-                return 'Masculino';
-            }else if (employee == 'F') {
-                return 'Feminino';
-            }else {
-                return 'Não Especificado';
-            }
-
-        },
-        alterStateValue: function(employee) {
-            if (employee == 1) {
-                return 'Santiago';
-            }else if (employee == 2) {
-                return 'Maio';
-            }else if (employee == 3) {
-                return 'Fogo';
-            }else if (employee == 4) {
-                return 'Brava';
-            }else if (employee == 5) {
-                return 'Santo Antão';
-            }else if (employee == 6) {
-                return 'São Niculau';
-            }else if (employee == 7) {
-                return 'São Vicente';
-            }else if (employee == 8) {
-                return 'Sal';
-            }else if (employee == 9) {
-                return 'Boa Vista';
-            }else {
-                return 'Santa Luzia';
-            }
-
-        },
-
         // -------------------------Metodo de suporte---------------------------------------------------
         marketEmployee: function() {
             this.$http.get('http://localhost:8000/api/v1/marketEmployee').then((response) => {
@@ -510,13 +493,13 @@ export default{
             var self = this
             filtered = self.all
             if (self.filter.term != '' && self.columnsFiltered.length > 0) {
-                filtered = _.filter(self.all, function(market) {
+                filtered = _.filter(self.all, function(employee) {
                     return self.columnsFiltered.some(function(column) {
-                        return market[column].toLowerCase().indexOf(self.filter.term.toLowerCase()) > -1
+                        return employee[column].toLowerCase().indexOf(self.filter.term.toLowerCase()) > -1
                     })
                 })
             }
-            self.$set('markets', filtered)
+            self.$set('employees', filtered)
         },
 
         // --------------------------------------------------------------------------------------------

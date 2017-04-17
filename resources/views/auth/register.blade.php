@@ -13,7 +13,7 @@
     <body class="register-page">
         <div class="register-box">
             <div class="login-logo">
-                <a href="{{ url('/') }}"><i class="fa fa-user-plus fa-2x  faa-pulse animated faa-slow"></i></a>
+                <a href="{{ url('/') }}"><i class="fa fa-user-plus fa-2x faa-burst animated faa-slow"></i></a>
             </div>
             {{--
             <div class="notice notice-info">

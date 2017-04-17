@@ -73,36 +73,31 @@ class ApiEmployeesController extends Controller
                 // if($validation->fails()) {
                 //     return Response::json(['status'=>'error', 'message'=>$validation->messages()]);
                 // } else {
-                    $user                  = new User();
-                    $user->name            = $name;
-                    $user->username        = $username;
-                    $user->ic              = $request->ic;
-                    $user->email           = $request->email;
-                    $user->password        = bcrypt($password);
-                    $user->gender          = $request->gender;
-                    $user->age             = $request->age;
-                    $user->state           = $request->state;
-                    $user->council         = $request->council;
-                    $user->parish          = $request->parish;
-                    $user->zone            = $request->zone;
-                    $user->phone           = $request->phone;
-                    $user->avatar          = 'default.png';
-                    $user->status          = false;
-                    $user->type            = 'emp';
-                    $user->description     = $request->description;
-                    $user->save();
-                    // ---------------------------------------------------------------------------
-                //     return Response::json(['status'=>'success', 'message'=>'Save successful'], 200);
-                //     // ---------------------------------------------------------------------------
-                // }
-
-
+                $user                  = new User();
+                $user->name            = $name;
+                $user->username        = $username;
+                $user->ic              = $request->ic;
+                $user->email           = $request->email;
+                $user->password        = bcrypt($password);
+                $user->gender          = $request->gender;
+                $user->age             = $request->age;
+                $user->state           = $request->state;
+                $user->council         = $request->council;
+                $user->parish          = $request->parish;
+                $user->zone            = $request->zone;
+                $user->phone           = $request->phone;
+                $user->avatar          = 'default.png';
+                $user->status          = false;
+                $user->type            = 'emp';
+                $user->description     = $request->description;
+                $user->save();
             }
         }
 
         public function show($id)
         {
             $employee = Employee::findOrFail($id);
+            $employee->markets;
             return $employee;
         }
 
@@ -133,29 +128,27 @@ class ApiEmployeesController extends Controller
             $typeofemployee_id = $request->typeofemployee_id;
             $description       = $request->description;
 
-            $employee = Employee::where('id', '=', $id);
-            $employee->update([
-                'name'              => $name,
-                'ic'                => $ic,
-                'age'               => $age,
-                'gender'            => $gender,
-                'email'             => $email,
-                'state'             => $state,
-                'council'           => $council,
-                'parish'            => $parish,
-                'zone'              => $zone,
-                'phone'             => $phone,
-                'service_beginning' => $service_beginning,
-                'typeofemployee_id' => $typeofemployee_id,
-                'description'       => $description,
-            ]);
+            $employee = Employee::findOrFail($id);
+            $employee->name        = $name;
+            $employee->ic          = $ic;
+            $employee->age         = $age;
+            $employee->gender      = $gender;
+            $employee->email       = $email;
+            $employee->state       = $state;
+            $employee->council     = $council;
+            $employee->parish      = $parish;
+            $employee->zone        = $zone;
+            $employee->phone       = $phone;
+            $employee->service_beginning = $service_beginning;
+            $employee->typeofemployee_id = $typeofemployee_id;
+            $employee->description = $description;
+            $employee->save();
             $employee->markets()->sync($request->markets);
 
             $user = User::where('ic', '=', $ic);
             if ($user) {
                 $user->update(array(
                     'name'        => $name,
-                    // 'username'    => $username,
                     'ic'          => $ic,
                     'email'       => $email,
                     'gender'      => $gender,

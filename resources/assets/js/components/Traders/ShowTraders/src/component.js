@@ -23,24 +23,120 @@ export default{
                 phone       : '',
                 photo       : '',
                 description : '',
-                get_email   : '',
-                get_password: '',
+                get_acount        : false,
             },
 
             traders  : {},
 
             sortColumn : 'name',
             sortInverse: 1,
-            filter     : {
-                term   : ''
+            filter           : {
+                term         : ''
             },
-            pagination : {},
-            success    : false,
+            columnsFiltered: ['name'],
+            pagination       : {},
+            success          : false,
+            msgSucess        : '',
+            typeAlert        : '',
+            all              : {},
+            showRow: '',
+            errors           : [],
+            auth: [],
         }
     },
 
 
+    ready () {
+        this.fetchTrader(this.pagination.current_Page, this.showRow)
+
+        var self = this
+        jQuery(self.$els.tradercols).select2({
+            placeholder: "Coluna",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('columnsFiltered', jQuery(this).val());
+        });
+        // -------------------------------------------------------------------------------------
+
+        jQuery(self.$els.statecreate).select2({
+            placeholder: "Ilha",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('newTrader.state', jQuery(this).val());
+        });
+
+        jQuery(self.$els.stateedit).select2({
+            placeholder: "Ilha",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('newTrader.state', jQuery(this).val());
+        });
+        // -------------------------------------------------------------------------------------
+
+        jQuery(self.$els.councilcreate).select2({
+            placeholder: "Concelho",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('newTrader.council', jQuery(this).val());
+        });
+
+        jQuery(self.$els.counciledit).select2({
+            placeholder: "Concelho",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('newTrader.council', jQuery(this).val());
+        });
+        // -------------------------------------------------------------------------------------
+        jQuery(self.$els.parishcreate).select2({
+            placeholder: "Freguesia",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('newTrader.parish', jQuery(this).val());
+        });
+        jQuery(self.$els.parishedit).select2({
+            placeholder: "Freguesia",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('newTrader.parish', jQuery(this).val());
+        });
+        // -------------------------------------------------------------------------------------
+    },
+
+
     methods: {
+        alert: function(msg, typeAlert) {
+            var self = this;
+            this.success = true;
+            this.msgSucess = msg;
+            this.typeAlert = typeAlert;
+
+
+            setTimeout(function() {
+                self.success = false;
+            }, 5000);
+        },
+
         clearField: function(){
             this.newTrader = {
                 id          : '',
@@ -56,18 +152,9 @@ export default{
                 phone       : '',
                 photo       : '',
                 description : '',
-                get_email   : '',
-                get_password: '',
+                get_acount        : false,
             };
         },
-
-        // clearFieldGetEmail: function(){
-        //     return {
-        //         this.newTrader.get_email = '';
-        //         this.newTrader.get_password = '';
-        //     }
-        // },
-
         // --------------------------------------------------------------------------------------------
 
         createTrader: function() {
@@ -80,24 +167,21 @@ export default{
                 if (response.status == 200) {
                     console.log('chegando aqui');
                     $('#modal-create-trader').modal('hide');
-                    console.log(response.data);
-                    this.fetchTrader(this.pagination.last_Page);
-                    var self = this;
-                    this.success = true;
-                    setTimeout(function() {
-                        self.success = false;
-                    }, 5000);
+                    this.fetchTrader(this.pagination.current_page, this.showRow);
+                    this.alert('Comerciante Criado com sucesso', 'success');
+                    this.$set('errors', '')
                 }
             }, (response) => {
-
+                this.$set('errors', response.data)
             });
         },
 
         // --------------------------------------------------------------------------------------------
 
-        fetchTrader: function(page) {
-            this.$http.get('http://localhost:8000/api/v1/traders?page='+page).then((response) => {
+        fetchTrader: function(page, row) {
+            this.$http.get('http://localhost:8000/api/v1/allTraders/'+row+'?page='+page).then((response) => {
                 this.$set('traders', response.data.data);
+                this.$set('all', response.data.data);
                 this.$set('pagination', response.data);
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -134,10 +218,12 @@ export default{
             this.$http.patch('http://localhost:8000/api/v1/traders/'+ id, trader).then((response) => {
                 if (response.status == 200) {
                     $('#modal-edit-trader').modal('hide');
-                    this.fetchTrader(this.pagination.current_page);
+                    this.fetchTrader(this.pagination.current_page, this.showRow);
+                    this.alert('Comerciante atualizado com sucesso', 'info');
+                    this.$set('errors', '')
                 }
             }, (response) => {
-                console.log("Ocorreu um erro na operação");
+                this.$set('errors', response.data)
             });
         },
 
@@ -148,46 +234,12 @@ export default{
             this.$http.delete('http://localhost:8000/api/v1/traders/'+ id).then((response) => {
                 $('#modal-delete-trader').modal('hide');
                 if (response.status == 200) {
-                    this.fetchTrader();
+                    this.fetchTrader(this.pagination.current_page, this.showRow);
+                    this.alert('Comerciante eliminado com sucesso', 'warning');
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
             });
-        },
-
-        alterGenderValue: function(trader) {
-            if (trader == 'M') {
-                return 'Masculino';
-            }else if (trader == 'F') {
-                return 'Feminino';
-            }else {
-                return 'Não Especificado';
-            }
-
-        },
-        alterStateValue: function(trader) {
-            if (trader == 1) {
-                return 'Santiago';
-            }else if (trader == 2) {
-                return 'Maio';
-            }else if (trader == 3) {
-                return 'Fogo';
-            }else if (trader == 4) {
-                return 'Brava';
-            }else if (trader == 5) {
-                return 'Santo Antão';
-            }else if (trader == 6) {
-                return 'São Niculau';
-            }else if (trader == 7) {
-                return 'São Vicente';
-            }else if (trader == 8) {
-                return 'Sal';
-            }else if (trader == 9) {
-                return 'Boa Vista';
-            }else {
-                return 'Santa Luzia';
-            }
-
         },
 
         // -------------------------Metodo de suporte---------------------------------------------------
@@ -203,17 +255,28 @@ export default{
             // console.log(ev);
         },
 
+
+        doFilter: function() {
+            var self = this
+            filtered = self.all
+            if (self.filter.term != '' && self.columnsFiltered.length > 0) {
+                filtered = _.filter(self.all, function(trader) {
+                    return self.columnsFiltered.some(function(column) {
+                        return trader[column].toLowerCase().indexOf(self.filter.term.toLowerCase()) > -1
+                    })
+                })
+            }
+            self.$set('traders', filtered)
+        },
+
         // --------------------------------------------------------------------------------------------
 
         // Outros funções
         navigate (page) {
-            this.fetchTrader(page);
+            this.fetchTrader(page, this.showRow);
         },
     },
 
-    ready () {
-        this.fetchTrader(this.pagination.current_Page)
-    },
 
     components: {
         'Pagination': Pagination,

@@ -310,3 +310,5 @@ Route::get('cycle2', function()
 {
     return view('cycle2');
 });
+
+Route::get('setroles', 'ApiRolesController@superAdminPermissions');

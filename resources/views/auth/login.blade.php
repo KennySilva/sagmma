@@ -14,7 +14,7 @@
     <body class="login-page">
         <div class="login-box">
     <div class="login-logo">
-        <a href="{{ url('/') }}"><i class="fa fa-lock fa-2x faa-ring animated"></i></a>
+        <a href="{{ url('/') }}"><i class="fa fa-lock fa-2x faa-burst animated faa-slow"></i></a>
     </div>
 
     {{-- <div class="notice notice-info">

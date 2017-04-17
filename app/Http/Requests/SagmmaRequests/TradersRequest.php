@@ -14,11 +14,10 @@ class TradersRequest extends Request
     public function rules()
     {
         return [
-
-            'name'  => 'required|max:60|min:4',
-            'ic'    => 'required|digits:6|Integer|unique:traders',
-            'email' => 'unique:traders|email',
-            'phone' => 'digits:7|unique:traders',
+            'name'              => 'required|max:60|min:4',
+            'ic'                => 'required|digits:6|Integer|unique:traders,ic,'.$this->id,
+            'email'             => 'email|unique:traders,email,'.$this->id,
+            'phone'             => 'digits:7|unique:traders,phone,'.$this->id,
         ];
     }
 }

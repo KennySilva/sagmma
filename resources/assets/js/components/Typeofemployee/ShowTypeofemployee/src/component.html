@@ -79,7 +79,7 @@
 					<tr v-for="typeofemployee in typeofemployees | orderBy sortColumn sortInverse">
 						<td>{{ typeofemployee.name }}</td>
 						<td>{{ typeofemployee.description }}</td>
-						<td align=left>  <a data-toggle="modal" data-target="#modal-edit-typeofemployee" href="#"> <i class="fa fa-pencil text-primary" @click="getThisTypeofemployee(typeofemployee.id)" > </i></a></td>
+						<td align=left>  <a data-toggle="modal" data-target="#modal-edit-typeofemployee" href="#"> <i class="fa fa-edit text-primary" @click="getThisTypeofemployee(typeofemployee.id)" > </i></a></td>
 						<!------------------------------------------------------------------------------------------->
 						<td v-if="typeofemployee.employees == null" align=right><a data-toggle="modal" data-target="#modal-delete-typeofemployee" href="#"><i class="fa fa-trash text-danger" @click="getThisTypeofemployee(typeofemployee.id)"></i></a></td>
 

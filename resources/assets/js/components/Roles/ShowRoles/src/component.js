@@ -28,14 +28,15 @@ export default{
                 term         : ''
             },
             columnsFiltered: ['name'],
-
             pagination       : {},
             success          : false,
             msgSucess        : '',
             typeAlert        : '',
             all              : {},
+            showRow: '',
             errors           : [],
             auth: [],
+
 
         }
     },

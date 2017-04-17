@@ -71,6 +71,20 @@ class ApiRolesController extends Controller
             //
         }
 
+        // public function superAdminPermissions()
+        // {
+        //     $permissions = Permission::all();
+        //     // $permissions->all();
+        //     $role = Role::where('name', 'trader')->get();
+        //     // return $role;
+        //     foreach ($permissions as $permission) {
+        //         // return $role->attachPermissions('1');
+        //         // $role->perms()->sync(1);
+        //         dd($permissions);
+        //     }
+        // }
+
+
         public function update(RolesRequest $request, $id)
         {
             $role = Role::find($id);

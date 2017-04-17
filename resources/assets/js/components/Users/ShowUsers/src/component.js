@@ -279,7 +279,7 @@ export default{
         getThisUser: function(id){
             var self = this;
 
-            self.newUser.roles = []
+            this.clearField()
             self.$http.get('http://localhost:8000/api/v1/users/'+id).then((response) => {
                 // var state = {Santiago: '1', Maio: '2', Fogo: '3', Brava: '4', SantoAntão: '5', SãoNiculau: '6', SãoVicente: '7', Sal: '8', Boavista: '9'};
 
@@ -303,7 +303,6 @@ export default{
                 var roles = response.data.roles;
                 for (var variable in roles) {
                     self.newUser.roles.push(roles[variable].id)
-                        console.log(roles[variable].id);
                 }
             }, (response) => {
                 console.log('Error');
@@ -335,15 +334,15 @@ export default{
         deleteUser: function(id) {
             // var ConfirmBox = confirm("Eliminar?");
             // if (ConfirmBox) {
-                this.$http.delete('http://localhost:8000/api/v1/users/'+ id).then((response) => {
-                    $('#modal-delete-user').modal('hide');
-                    if (response.status == 200) {
-                        this.fetchUser(this.pagination.current_page, this.showRow);
-                        this.alert('Utilizador eliminado com sucesso', 'warning');
-                    }
-                }, (response) => {
-                    console.log("Ocorreu um erro na operação");
-                });
+            this.$http.delete('http://localhost:8000/api/v1/users/'+ id).then((response) => {
+                $('#modal-delete-user').modal('hide');
+                if (response.status == 200) {
+                    this.fetchUser(this.pagination.current_page, this.showRow);
+                    this.alert('Utilizador eliminado com sucesso', 'warning');
+                }
+            }, (response) => {
+                console.log("Ocorreu um erro na operação");
+            });
             // }
         },
 
@@ -450,22 +449,22 @@ export default{
 
 
 
-    computed: {
-        myValidation: function() {
-            return {
-                name: !!this.newUser.name.trim(),
-                username: !!this.newUser.username.trim(),
-                email: /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[ 0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(this.newUser.email),
-            }
-        },
-
-        isValid: function() {
-            var validation = this.validation;
-            return Object.keys(validation).every(function(key){
-                return validation[key];
-            });
-        },
-    },
+    // computed: {
+    //     myValidation: function() {
+    //         return {
+    //             name: !!this.newUser.name.trim(),
+    //             username: !!this.newUser.username.trim(),
+    //             email: /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[ 0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(this.newUser.email),
+    //         }
+    //     },
+    //
+    //     isValid: function() {
+    //         var validation = this.validation;
+    //         return Object.keys(validation).every(function(key){
+    //             return validation[key];
+    //         });
+    //     },
+    // },
 
 
 
