@@ -8,12 +8,12 @@
 @endsection
 
 @section('contentheader_title')
-    Materiais
+    Gegir Materiais
 @endsection
 
 @section('main-content')
     <div class="sagmma_container">
-        <div class="col-md-12">
+        {{-- <div class="col-md-12">
             <div class="box box-default">
                 <div class="box-header with-border">
                     <h3 class="box-title">Materiais</h3>
@@ -21,13 +21,13 @@
                         <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
                     </div>
                 </div>
-                <div class="box-body">
+                <div class="box-body"> --}}
                     {{ csrf_field() }}
                     <!------------------------------------------------------------------------------------->
                     <show-material></show-material>
                     <!------------------------------------------------------------------------------------->
-                </div>
+                {{-- </div>
             </div>
-        </div>
+        </div> --}}
     </div>
 @endsection

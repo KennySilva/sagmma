@@ -23,8 +23,8 @@
 			&nbsp;&nbsp;
 			<div class="input-group">
 				<select data-toggle="tooltip" title="Escolhe as colunas a serem filtrados" class="form-control" name="" v-model="columnsFiltered" multiple="multiple" v-el:contractcols>
-					<option class="" value="av">Espaço</option>
-					<option class="" value="av">Comerciante</option>
+					<option class="" value="rate">Espaço</option>
+					<option class="" value="comerciante">Comerciante</option>
 				</select>
 			</div>
 			&nbsp;&nbsp;
@@ -85,7 +85,7 @@
 						</th>
 
 
-						<th  class="text-center" colspan="3"><span><i class="fa fa-cogs"></i></span></th>
+						<th  class="text-center" colspan="4"><span><i class="fa fa-cogs"></i></span></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -99,10 +99,14 @@
 							<!-- <button type="submit" @click = "statusContractsChange(contract.id)" class="btn btn-xs" :class="{ 'btn-info': contract.status, 'btn-danger': !contract.status }">{{contract.status ? 'Normalizado' : 'Pendente'}}</button> -->
 						</td>
 						<!------------------------------------------------------------------------------------------>
-						<td align=center>  <a data-toggle="modal" data-target="#modal-edit-contract" href="#"> <i class="fa fa-pencil text-primary" @click="getThisContract(contract.id)" > </i></a></td>
+						<td align=center><a data-toggle="modal" data-target="#modal-view-contract" href="#"><i class="fa fa-eye text-success" @click="getThisContract(contract.id)"></i></a></td>
+
+						<td align=center>  <a data-toggle="modal" data-target="#modal-edit-contract" href="#"> <i class="fa fa-edit text-primary" @click="getThisContract(contract.id)" > </i></a></td>
+
 						<td align=center><a data-toggle="modal" data-target="#modal-delete-contract" href="#"><i class="fa fa-trash text-danger" @click="getThisContract(contract.id)"></i></a></td>
 
 						<td align=center><a href="#"><i class="fa fa-print text-info" @click="getThisContract(contract.id)"></i></a></td>
+
 					</tr>
 				</tbody>
 			</table>
@@ -119,23 +123,84 @@
 		</div>
 
 		<!--------------------------------------------------------------------------------------------------------->
-
-		<div class="modal fade" id="modal-delete-contract" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+		<div class="modal fade" id="modal-view-contract" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
-						<button @click="clearField" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-						<h4 class="modal-title" id="">Eliminar contrato</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id=""><i class="fa fa-eye faa-flash animated faa-slow text-success"></i></h4>
 					</div>
 					<div class="modal-body">
-						<h1>Eliminar este contrato</h1>
+						<div class="row">
+							<div class="col-md-12">
+								<div class='table-responsive'>
+									<table class='table table-hover'>
+										<thead>
+											<tr>
+												<th class ="text-center" colspan ="2">INFORMAÇOES DO CONTRATO</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td><b>Comerciante</b></td>
+												<td v-for="trad in newContract.traders"><i>{{ trad.name }}</i></td>
+											</tr>
+											<tr>
+												<td><b>Espaço</b></td>
+												<td v-for="place in newContract.places"><i>{{ place.name }}</i></td>
+											</tr>
+											<tr>
+												<td><b>Valor</b></td>
+												<td><span class="label label-info"><i>{{  newContract.rate }} ECV</i></span></td>
+
+											</tr>
+
+											<tr>
+												<td><b>Estado</b></td>
+												<td><span class="label" :class="{ 'label-info': newContract.status, 'label-danger': !newContract.status }"><i>{{newContract.status ? 'Normalizado' : 'Pendende'}}</i></span></td>
+											</tr>
+
+											<tr>
+												<td><b>Criado em:</b></td>
+												<td><i>{{ newContract.created_at | formatDate 'DD/MM/YYYY' }}</i></td>
+											</tr>
+
+											<tr>
+												<td><b>Data de Expiração:</b></td>
+												<td><i>{{ newContract.ending_date | formatDate 'DD/MM/YYYY' }}</i></td>
+											</tr>
+
+											<tr>
+												<td><b>Responsável:</b></td>
+												<td><i>{{ newContract.author }}</i></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
 					</div>
 					<div class="modal-footer">
-						<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-						<button  @keyup.enter="deleteContract(newContract.id)" @click="deleteContract(newContract.id)" type="button" class="btn btn-danger">Eliminar</button>
+						<button type="button" class="btn btn-success" data-dismiss="modal"><i class="fa fa-check"></i></button>
 					</div>
+				</div>
+			</div>
+		</div>
 
-
+		<div class="modal fade" id="modal-delete-contract" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+			<div class="modal-dialog modal-sm">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h5 class="modal-title" id=""><i class="text-danger fa fa-exclamation-triangle faa-flash animated faa-slow"></i></h5>
+					</div>
+					<div class="modal-body">
+						<h5 class="text-center">Eliminar Contrato?</h5>
+					</div>
+					<div class="modal-footer">
+						<button @click="clearField" type="button" class="btn btn-secondary btn-xs" data-dismiss="modal"><i class="fa fa-times"></i></button>
+						<button  @keyup.enter="deleteContract(newContract.id)" @click="deleteContract(newContract.id)" type="button" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></button>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -150,7 +215,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
-						<h4 class="modal-title">Registar</h4>
+						<h4 class="modal-title"><i class="fa fa-file-text faa-burst animated faa-slow"></i></h4>
 					</div>
 					<div class="modal-body">
 						<form action="#" methods="POST">
@@ -217,7 +282,7 @@
 					<div class="modal-content">
 						<div class="modal-header">
 							<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
-							<h4 class="modal-title">Editar Este contrato</h4>
+							<h4 class="modal-title"><i class="fa fa-edit faa-burst animated faa-slow"></i></h4>
 						</div>
 						<div class="modal-body">
 
@@ -226,7 +291,7 @@
 									<div class="col-md-12">
 										<div class="col-md-6">
 											<div class="form-group {{ errors.place_id ? ' has-error' : '' }} has-feedback">
-												<select class="form-control selectpicker" v-model="newContract.place_id" v-el:placeedit>
+												<select disabled class="form-control selectpicker" v-model="newContract.place_id" v-el:placeedit>
 													<option v-for="place in places" value="{{place.id}}">
 														{{place.name}}
 													</option>
@@ -235,7 +300,7 @@
 											</div>
 											<div class="col-md-6">
 												<div class="form-group {{ errors.trader_id ? ' has-error' : '' }} has-feedback">
-													<select class="selectpicker form-control" v-model="newContract.trader_id" v-el:traderedit>
+													<select disabled class="selectpicker form-control" v-model="newContract.trader_id" v-el:traderedit>
 														<option v-for="trader in traders" value="{{trader.id}}">
 															{{trader.name}}
 														</option>

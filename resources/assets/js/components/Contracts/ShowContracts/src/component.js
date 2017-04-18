@@ -17,6 +17,9 @@ export default{
                 rate        : '',
                 author      : '',
                 ending_date : '',
+                places: [],
+                traders: [],
+
             },
 
             contracts : {},
@@ -210,6 +213,10 @@ export default{
                 this.newContract.trader_id = response.data.trader_id;
                 this.newContract.status    = response.data.status;
                 this.newContract.rate      = response.data.rate;
+                this.newContract.author      = response.data.author;
+                this.newContract.ending_date = response.data.ending_date;
+                this.newContract.traders      = response.data.traders;
+                this.newContract.places      = response.data.places;
             }, (response) => {
                 console.log('Error');
             });
@@ -272,7 +279,6 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         doFilter: function() {
-
             var self = this
             filtered = self.all
             if (self.filter.term != '' && self.columnsFiltered.length > 0) {

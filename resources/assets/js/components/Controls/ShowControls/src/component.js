@@ -30,8 +30,11 @@ export default{
             typeAlert: '',
             showRow: '',
             all: {},
-            auth: [],
+            auth: {},
+            moreColumn: {
+                author: false,
 
+            },
         }
     },
 
@@ -69,7 +72,7 @@ export default{
             width: '100%',
             language: 'pt',
         }).on('change', function () {
-            self.$set('newPromotion.material_id', jQuery(this).val());
+            self.$set('newControl.material_id', jQuery(this).val());
         });
         // ----------------------------------------------------------------
         jQuery(self.$els.employeeedit).select2({
@@ -88,7 +91,7 @@ export default{
             width: '100%',
             language: 'pt',
         }).on('change', function () {
-            self.$set('newPromotion.material_id', jQuery(this).val());
+            self.$set('newControl.material_id', jQuery(this).val());
         });
         // ----------------------------------------------------------------
     },
@@ -226,6 +229,16 @@ export default{
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
             });
+        },
+
+        checkPermition: function() {
+            this.permition = [];
+            var roles = this.auth.roles;
+            for (var rol in roles) {
+                if (roles[rol].name == 'admin' || roles[rol].name == 'super-admin' || roles[rol].name == 'manager' || roles[rol].name == 'dpel') {
+                    return true;
+                }
+            }
         },
 
 

@@ -15,20 +15,24 @@ use Input;
 
 class ApiPlacesController extends Controller
 {
-    public function __construct()
-    {
-        $this->placeStatusChange();
-    }
-
+    // public function __construct()
+    // {
+    //     $this->placeStatusChange();
+    // }
+    //
 
     public function index($row)
     {
+        $this->placeStatusChange();
+
         $place = Place::paginate($row);
         $place->each(function($place){
             $place->contract;
             $place->typeofplace;
             $place->taxation;
         });
+
+
         return $place;
     }
 
@@ -37,12 +41,20 @@ class ApiPlacesController extends Controller
 
         public function store(PlacesRequest $request)
         {
+            if ($request->typeofplace_id == 1) {
+                $price    = 0;
+                $dimension= 0;
+            }else {
+                $price    = $request->price;
+                $dimension= $request->dimension;
+            }
+            $name= ucwords($request->name);
             $place                 = new Place($request->all());
-            $place->name           = $request->name;
-            $place->dimension      = $request->dimension;
-            $place->price          = $request->price;
+            $place->name           = $name;
             $place->description    = $request->description;
             $place->status         = $request->status;
+            $place->price          = $price;
+            $place->dimension      = $dimension;
             $place->typeofplace_id = $request->typeofplace_id;
             $place->save();
         }
@@ -51,6 +63,8 @@ class ApiPlacesController extends Controller
         public function show($id)
         {
             $place = Place::findOrFail($id);
+            $place->traders;
+            $place->typeofplace;
             return $place;
         }
 
@@ -87,19 +101,6 @@ class ApiPlacesController extends Controller
             $typeofplace = Typeofplace::all();
             return $typeofplace;
         }
-
-        // public function placeStatus(Request $request)
-        // {
-        //     $id  = $request->id;
-        //     $place = Place::find($id);
-        //     if ($place->status == true) {
-        //         $place->status = false;
-        //     }else {
-        //         $place->status = true;
-        //     }
-        //     $place->save();
-        //     return response($place, 200);
-        // }
 
         public function placeStatusChange()
         {

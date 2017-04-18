@@ -22,7 +22,7 @@ class Trader extends Model
 
     public function contract()
     {
-        return $this->belongsTo(Contract::class, 'trader_id', 'id');
+        return $this->belongsTo(Contract::class, 'id', 'trader_id');
     }
 
 }

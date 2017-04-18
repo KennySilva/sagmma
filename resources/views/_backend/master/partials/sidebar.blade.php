@@ -38,7 +38,7 @@
             @endpermission
             @endrole
             {{-- ------------------------------------------------------------------------------------------------- --}}
-            @role(['super-admin', 'admin', 'dpel', 'manager', 'administrative-assistant', 'manager'])
+            @role(['super-admin', 'admin', 'dpel', 'administrative-assistant', 'manager'])
             @permission(['backend-access'])
             <li class="treeview">
                 <a href="#"><i class='fa fa-line-chart'></i> <span>SAGMMA</span> <i class="fa fa-angle-left pull-right"></i></a>
@@ -55,7 +55,7 @@
                             <li><a href="{{ url('sagmma/taxations') }}"><i class="fa fa-usd"></i><span>Cobrança de Impostos</span></a></li>
                         </ul>
                     </li>
-
+                    @permission(['manage-resources'])
                     <li><a href="{{ url('sagmma/markets') }}"><i class='fa fa-university'></i> <span>Mercados</span></a></li>
                     <li><a href="{{ url('sagmma/employees') }}"><i class='fa fa-address-card'></i> <span>Funcionários</span></a></li>
                     <li><a href="{{ url('sagmma/materials') }}"><i class='fa fa-briefcase'></i> <span>Materiais</span></a></li>
@@ -64,6 +64,7 @@
                             <li><a href="{{ url('sagmma/promotions') }}"><i class='fa fa-shopping-bag'></i> <span>Promoções</a></li>
                             </ul>
                         </li>
+                        @endpermission
                         @endpermission
                         @endrole
 

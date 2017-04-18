@@ -18,6 +18,7 @@ export default{
             },
 
             markets: {},
+            all: {},
             sortColumn: 'name',
             sortInverse: 1,
             filter: {
@@ -28,7 +29,7 @@ export default{
             pagination: {},
             success: false,
             showRow: '',
-            columnsFiltered: [],
+            columnsFiltered: ['name'],
             msgSucess: '',
             typeAlert: '',
             errors: [],
@@ -38,7 +39,7 @@ export default{
     // ---------------------------------------------------------------------------------
 
     ready () {
-        this.fetchMarket(1, this.showRow);
+        this.fetchMarket(this.pagination.current_Page, this.showRow);
         var self = this
         jQuery(self.$els.colmarket).select2({
             placeholder: "Coluna",
@@ -82,14 +83,14 @@ export default{
             var market = this.newMarket;
 
             //Clear form input
-            this.clearField();
             this.$http.post('http://localhost:8000/api/v1/markets/', market).then((response) => {
                 $('#modal-create-market').modal('hide');
-                this.fetchMarket(1, this.showRow);
+                this.clearField();
+                this.fetchMarket(this.pagination.current_Page, this.showRow);
 
                 this.alert('Mercado Criado com sucesso', 'success');
                 this.$set('errors', '')
-                
+
         }, (response) => {
             this.$set('errors', response.data)
         });
@@ -126,12 +127,11 @@ export default{
     saveEditedMarket: function(id) {
         var market = this.newMarket;
 
-        this.clearField();
         this.$http.patch('http://localhost:8000/api/v1/markets/'+ id, market).then((response) => {
             if (response.status == 200) {
                 $('#modal-edit-market').modal('hide');
-                // console.log(response.data);
-                this.fetchMarket(1, this.showRow);
+                this.clearField();
+                this.fetchMarket(this.pagination.current_Page, this.showRow);
                 this.alert('Mercado atualizado com sucesso', 'info');
                 this.$set('errors', '')
             }
@@ -146,10 +146,8 @@ export default{
         this.$http.delete('http://localhost:8000/api/v1/markets/'+ id).then((response) => {
             $('#modal-delete-market').modal('hide');
             if (response.status == 200) {
-
-                this.fetchMarket(1, this.showRow);
-                this.alert('Mercado eliminado com sucesso', 'danger');
-
+                this.fetchMarket(this.pagination.current_Page, this.showRow);
+                this.alert('Mercado eliminado com sucesso', 'warning');
             }
         }, (response) => {
             console.log("Ocorreu um erro na operação");

@@ -50,13 +50,15 @@ Route::group(['namespace' => 'SocialControllers'], function()
 Route::group(['namespace' => 'ApiControllers'], function()
 {
     Route::group(['prefix' => 'api/v1', 'middleware' => ['auth', 'permission:backend-access']], function () {
+        // ---------------------------------Utilizador autenticado------------------------------
+        Route::get('authUser', 'ApiUsersController@authUser');
+        // -------------------------------------------------------------------------------------
         // ###############################################################################################################
         // ################################################  API Sys  ####################################################
         // ###############################################################################################################
         Route::group(['middleware' => ['role:super-admin|admin|dpel', 'permission:manage-users']], function () {
             Route::resource('users', 'ApiUsersController');
             Route::get('allUsers/{row}', 'ApiUsersController@index');
-            Route::get('authUser', 'ApiUsersController@authUser');
             Route::get('roleuser', 'ApiUsersController@getRoleForUser');
             Route::post('estado_utilizador', 'ApiUsersController@estado_utilizador');
             // -------------------------------------------------------------------------
@@ -69,52 +71,54 @@ Route::group(['namespace' => 'ApiControllers'], function()
         // ##################################################################################################################
         // ################################################  API Sagmma  ####################################################
         // ##################################################################################################################
-        Route::group(['middleware' => ['role:admin|super-admin|dpel|manager|administrative-assistant', 'permission:manage-resources']], function () {
-            // ----------------------------------------Api-Markets----------------------------------
-            Route::resource('markets', 'ApiMarketsController');
-            Route::get('getAllMarkets/{row}', 'ApiMarketsController@index');
-            // ----------------------------------------Api-Typeofemployees------------------------------
-            Route::resource('typeofemployees', 'ApiTypeofemployeesController');
-            Route::get('allTypeofemployees/{row}', 'ApiTypeofemployeesController@index');
-            // ----------------------------------------Api-Typeofplaces-------------------------------
-            Route::resource('typeofplaces', 'ApiTypeofplacesController');
-            Route::get('allTypeofplaces/{row}', 'ApiTypeofplacesController@index');
-            // ----------------------------------------Api-Materials----------------------------------
-            Route::resource('materials', 'ApiMaterialsController');
-            Route::get('allMaterials/{row}', 'ApiMaterialsController@index');
-            // ----------------------------------------Api-employee----------------------------------
-            Route::resource('employees', 'ApiEmployeesController');
-            Route::delete('deleteMultEmployees/{ids}', 'ApiEmployeesController@deleteAll');
-            Route::get('marketEmployee', 'ApiEmployeesController@getMarketforEmployee');
-            Route::get('allEmployees/{row}', 'ApiEmployeesController@index');
-            // Route::get('employeeMarket', 'ApiEmployeesController@getMarketforEmployee');
-            Route::get('employeeType', 'ApiEmployeesController@getTypeforEmployee');
-            // ----------------------------------------Api-traders----------------------------------
-            Route::resource('traders', 'ApiTradersController');
-            Route::get('allTraders/{row}', 'ApiTradersController@index');
+        Route::group(['middleware' => ['role:admin|super-admin|dpel|manager|administrative-assistant']], function () {
+            Route::group(['middleware' => ['permission:manage-resources']], function () {
+                // ----------------------------------------Api-Markets----------------------------------
+                Route::resource('markets', 'ApiMarketsController');
+                Route::get('getAllMarkets/{row}', 'ApiMarketsController@index');
+                // ----------------------------------------Api-Typeofemployees------------------------------
+                Route::resource('typeofemployees', 'ApiTypeofemployeesController');
+                Route::get('allTypeofemployees/{row}', 'ApiTypeofemployeesController@index');
+                // ----------------------------------------Api-Typeofplaces-------------------------------
+                Route::resource('typeofplaces', 'ApiTypeofplacesController');
+                Route::get('allTypeofplaces/{row}', 'ApiTypeofplacesController@index');
+                // ----------------------------------------Api-Materials----------------------------------
+                Route::resource('materials', 'ApiMaterialsController');
+                Route::get('allMaterials/{row}', 'ApiMaterialsController@index');
+                // ----------------------------------------Api-employee----------------------------------
+                Route::resource('employees', 'ApiEmployeesController');
+                Route::delete('deleteMultEmployees/{ids}', 'ApiEmployeesController@deleteAll');
+                Route::get('marketEmployee', 'ApiEmployeesController@getMarketforEmployee');
+                Route::get('allEmployees/{row}', 'ApiEmployeesController@index');
+                // Route::get('employeeMarket', 'ApiEmployeesController@getMarketforEmployee');
+                Route::get('employeeType', 'ApiEmployeesController@getTypeforEmployee');
+                // ----------------------------------------Api-traders----------------------------------
+                Route::resource('traders', 'ApiTradersController');
+                Route::get('allTraders/{row}', 'ApiTradersController@index');
+            });
             // ------------------------------------Api-Control (employee_material)--------------------
             Route::resource('controls', 'ApiControlsController');
             Route::get('allControls/{row}', 'ApiControlsController@index');
             Route::get('controlEmployee', 'ApiControlsController@getEmployeeForControl');
             Route::get('controlMaterial', 'ApiControlsController@getMaterialForControl');
             Route::post('controlStatus', 'ApiControlsController@statusControlsChange');
-            // ------------------------------------Api-Taxation (place_trader)--------------------
-            Route::resource('taxations', 'ApiTaxationsController');
-            Route::get('allTaxations/{row}', 'ApiTaxationsController@index');
-            Route::get('sendTaxation/{id}/{sendTaxation}', 'ApiTaxationsController@sendTaxation');
-            // -----------------------------------------------------------------------------------
-            Route::get('taxationEmployee', 'ApiTaxationsController@getEmployeeForTaxation');
-            Route::get('taxationExtPlace', 'ApiTaxationsController@getPlaceExtForTaxation');
-            Route::get('taxationIntPlace', 'ApiTaxationsController@getPlaceIntForTaxation');
             // ----------------------------------------Api-place----------------------------------
             Route::resource('places', 'ApiPlacesController');
             Route::get('allPlaces/{row}', 'ApiPlacesController@index');
 
             Route::get('placeType', 'ApiPlacesController@getTypeForPlace');
             Route::get('placeStatus', 'ApiPlacesController@placeStatusChange');
+            Route::resource('taxations', 'ApiTaxationsController');
+            Route::get('allTaxations/{row}', 'ApiTaxationsController@index');
+            Route::get('sendTaxation/{id}/{sendTaxation}', 'ApiTaxationsController@sendTaxation');
+            // -----------------------------------------------------------------------------------
+            // ------------------------------------Api-Taxation (place_trader)--------------------
+            Route::get('taxationEmployee', 'ApiTaxationsController@getEmployeeForTaxation');
+            Route::get('taxationExtPlace', 'ApiTaxationsController@getPlaceExtForTaxation');
+            Route::get('taxationIntPlace', 'ApiTaxationsController@getPlaceIntForTaxation');
             // Route::get('changePromotionStatus', 'ApiPromotionsController@updatePromotionStatus');
             // ------------------------------------Api-Contract (place_trader)--------------------Atores Dpel e Admins
-            Route::group(['middleware' => ['permission:manage-contract']], function () {
+            Route::group(['middleware' => ['permission:manage-contracts']], function () {
                 Route::resource('contracts', 'ApiContractsController');
                 Route::get('allContracts/{row}', 'ApiContractsController@index');
                 // -----------------------------------------------------------------------------------------
@@ -183,32 +187,33 @@ Route::group(['namespace' => 'Admin'], function()
 Route::group(['namespace' => 'Sagmma'], function()
 {
     Route::group(['prefix' => 'sagmma', 'middleware' => 'auth',  'permission:backend-access'], function () {
-        Route::group(['middleware' => ['role:admin|super-admin|dpel|manager|administrative-assistant', 'permission:manage-resources']], function () {
-            // ----------------------------------------Markets----------------------------------
-            Route::resource('markets', 'MarketsController');
-            // ---------------------------------------Employee----------------------------------
-            Route::resource('typeofemployees', 'TypeofemployeesController');
-            // -----------------------------------------palce-----------------------------------
-            Route::resource('typeofplaces', 'TypeofplacesController');
-            // -----------------------------------------material-----------------------------------
-            Route::resource('materials', 'MaterialsController');
-            // -----------------------------------------Employees-----------------------------------
-            Route::resource('employees', 'EmployeesController');
-            // -----------------------------------------Traders-----------------------------------
-            Route::resource('traders', 'TradersController');
-            // -----------------------------------------controls-----------------------------------
+        Route::group(['middleware' => ['role:admin|super-admin|dpel|manager|administrative-assistant']], function () {
+            Route::group(['middleware' => ['permission:manage-resources']], function () {
+                // ----------------------------------------Markets----------------------------------
+                Route::resource('markets', 'MarketsController');
+                // ---------------------------------------Employee----------------------------------
+                Route::resource('typeofemployees', 'TypeofemployeesController');
+                // -----------------------------------------palce-----------------------------------
+                Route::resource('typeofplaces', 'TypeofplacesController');
+                // -----------------------------------------material-----------------------------------
+                Route::resource('materials', 'MaterialsController');
+                // -----------------------------------------Employees-----------------------------------
+                Route::resource('employees', 'EmployeesController');
+                // -----------------------------------------Traders-----------------------------------
+                Route::resource('traders', 'TradersController');
+                // -----------------------------------------controls-----------------------------------
+                // -----------------------------------------Places-----------------------------------
+                Route::resource('places', 'PlacesController');
+            });
             Route::resource('controls', 'ControlsController');
             // -----------------------------------------taxations-----------------------------------
             Route::resource('taxations', 'TaxationsController');
-            // -----------------------------------------Places-----------------------------------
-            Route::resource('places', 'PlacesController');
             // -----------------------------------------contracts-----------------------------------
-            Route::group(['middleware' => ['permission:manage-contracts']], function () {//Adicionar os restantes papeis
+            Route::group(['middleware' => ['permission:manage-contracts']], function () {
                 Route::resource('contracts', 'ContractsController');
             });
         });
-        Route::group(['middleware' => ['role:super-admin|admin|dpel|manager|trader', 'permission:manage-business
-        ']], function () {
+        Route::group(['middleware' => ['role:super-admin|admin|dpel|manager|trader', 'permission:manage-business|manage-resources']], function () {
             // -----------------------------------------promotions-----------------------------------
             Route::resource('promotions', 'PromotionsController');
             // -----------------------------------------products-----------------------------------

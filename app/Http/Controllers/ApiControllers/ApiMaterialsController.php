@@ -16,7 +16,11 @@ class ApiMaterialsController extends Controller
 {
     public function index($row)
     {
-        return Material::paginate($row);
+        $material = Material::paginate($row);
+        $material->each(function($material){
+            $material->employees;
+        });
+        return $material;
     }
 
     public function create()

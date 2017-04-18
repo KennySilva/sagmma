@@ -19,6 +19,10 @@ class ApiTradersController extends Controller
     public function index($row)
     {
         $trader = Trader::paginate($row);
+        $trader->each(function($trader){
+            $trader->contract;
+            $trader->promotion;
+        });
         return $trader;
     }
 

@@ -103,7 +103,7 @@
             </div>
         </div>
         {{-- ------------------------------------------------------------------------------------------- --}}
-        
+
         <div class="modal fade" id="adminUsers" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -153,7 +153,7 @@
                 @include('_backend.master.partials.painelCalendar')
             </div>
         </div>
-        @role(['super-admin', 'admin', 'dpel'])
+        @role(['super-admin', 'admin', 'dpel', 'administrative-assistant'])
         <div class="row">
             <div class="col-md-12">
                 <div class="panel with-nav-tabs panel-default">

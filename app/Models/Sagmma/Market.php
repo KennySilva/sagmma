@@ -19,8 +19,4 @@ class Market extends Model
     {
         return $this->belongsToMany(Employee::class, 'employee_market', 'market_id', 'employee_id')->withPivot('author')->withTimestamps();
     }
-    public function tranference()
-    {
-        return $this->belongsTo(Transference::class, 'market_id', 'id');
-    }
 }

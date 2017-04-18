@@ -19,7 +19,7 @@ export default{
             filter: {
                 term: ''
             },
-            columnsFiltered: [],
+            columnsFiltered: ['name'],
             pagination: {},
             success: false,
             msgSucess: '',
@@ -86,7 +86,7 @@ export default{
                     this.clearField();
                     // console.log(response.data);
                     this.fetchMaterial(this.pagination.current_Page, this.showRow);
-                    this.alert('Tipo de Funcionário Criado com sucesso', 'success');
+                    this.alert('Material Criado com sucesso', 'success');
                     this.$set('errors', '')
                 }
             }, (response) => {
@@ -130,7 +130,7 @@ export default{
                     this.clearField();
                     // console.log(response.data);
                     this.fetchMaterial(this.pagination.current_Page, this.showRow);
-                    this.alert('Tipo de Funcionário atualizado com sucesso', 'info');
+                    this.alert('Material atualizado com sucesso', 'info');
                     this.$set('errors', '')
                 }
             }, (response) => {
@@ -146,7 +146,7 @@ export default{
                 if (response.status == 200) {
                     // console.log(response.data);
                     this.fetchMaterial(this.pagination.current_Page, this.showRow);
-                    this.alert('Tipo de Funcionário eliminado com sucesso', 'warning');
+                    this.alert('Material eliminado com sucesso', 'warning');
 
                 }
             }, (response) => {

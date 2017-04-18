@@ -51,6 +51,8 @@ class ApiContractsController extends Controller
     public function show($id)
     {
         $contract = Contract::findOrFail($id);
+        $contract->places;
+        $contract->traders;
         return $contract;
     }
 
@@ -71,7 +73,6 @@ class ApiContractsController extends Controller
             'trader_id'   => $trader_id,
             'ending_date' => $ending_date
         ));
-
     }
 
     public function destroy($id)
@@ -79,32 +80,24 @@ class ApiContractsController extends Controller
         return Contract::destroy($id);
     }
 
-
     //Metodos de auxilio
     public function getPlaceForContract()
     {
-        $place = Place::where('typeofplace_id','<', 7)->where(function ($query) {$query->whereDoesntHave('traders');})->get();
+        /*
+        A lógica de criação de contrato, pois, sabe-se que um espaço que já possui um comerciante
+        não pode ser atribuido ao outro comerciante e um comerciante com um espaço não pode ob_deflatehandlerum outro espaço, por isso a lógica que se egue representa perfeitamente esta realidade
+        */
+        $place = Place::whereDoesntHave('traders')->whereHas('typeofplace', function ($type)
+        {
+            $type->orderBy('name', 'asc')->where('name', '!=', 'Outros');
+        })->get();
         return $place;
     }
     public function getTraderForContract()
     {
-        $trader = Trader::whereDoesntHave('places')->get();
+        $trader = Trader::orderBy('name', 'asc')->whereDoesntHave('places')->get();
         return $trader;
     }
-
-
-    // public function statusControlsChange(Request $request)
-    // {
-    //     $id  = $request->id;
-    //     $contract = Contract::find($id);
-    //     if ($contract->status == true) {
-    //         $contract->status = false;
-    //     }else {
-    //         $contract->status = true;
-    //     }
-    //     $contract->save();
-    //     return response($contract, 200);
-    // }
 
     public function statusContractsChange()
     {
@@ -118,8 +111,5 @@ class ApiContractsController extends Controller
             }
             $contract->save();
         }
-
     }
-
-
 }

@@ -15,7 +15,11 @@ class ApiMarketsController extends Controller
 {
     public function index($row)
     {
-        return Market::paginate($row);
+        $markets = Market::paginate($row);
+        $markets->each(function($markets){
+            $markets->employees;
+        });
+        return $markets;
     }
 
     public function create()
@@ -30,7 +34,7 @@ class ApiMarketsController extends Controller
         $market->logo        = $request->logo;
         $market->save();
     }
-    
+
 
     public function show($id)
     {
@@ -43,11 +47,14 @@ class ApiMarketsController extends Controller
         //
     }
 
-    public function update(Req $request, $id)
+    public function update(MarketsRequest $request, $id)
     {
-        Market::findOrFail($id)->update($request::all());
-        return Response::json($request::all());
 
+        $market              = Market::findOrFail($id);
+        $market->name        = $request->name;
+        $market->location    = $request->location;
+        $market->description = $request->description;
+        $market->save();
     }
 
     public function destroy($id)

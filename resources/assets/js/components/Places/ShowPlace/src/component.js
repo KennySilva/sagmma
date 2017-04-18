@@ -18,8 +18,9 @@ export default{
                 status          : '',
                 typeofplace_id : '',
                 description     : '',
+                traders: [],
+                type: [],
             },
-
 
             places  : {},
             types      : [],
@@ -31,13 +32,14 @@ export default{
                 term: ''
             },
             columnsFiltered: [],
-            pagination: {},
-            success: false,
-            msgSucess: '',
-            typeAlert: '',
-            showRow: '',
-            all: {},
-            errors: [],
+            pagination     : {},
+            success        : false,
+            msgSucess      : '',
+            typeAlert      : '',
+            showRow        : '',
+            all            : {},
+            // auth           : [],
+            errors         : [],
         }
     },
 
@@ -45,6 +47,8 @@ export default{
     ready () {
         this.fetchPlace(this.pagination.current_Page, this.showRow)
         this.placeType()
+        // this.authUser();
+
         var self = this
         jQuery(self.$els.placecols).select2({
             placeholder: "Coluna",
@@ -99,6 +103,9 @@ export default{
                 status          : '',
                 typeofplace_id : '',
                 description     : '',
+                traders: [],
+                type: [],
+
             };
         },
 
@@ -147,7 +154,8 @@ export default{
                 this.newPlace.status         = response.data.status;
                 this.newPlace.typeofplace_id = response.data.typeofplace_id;
                 this.newPlace.description    = response.data.description;
-                // this.newPlace.typename       = response.data.typeofplace.name;
+                this.newPlace.traders    = response.data.traders;
+                this.newPlace.type       = response.data.typeofplace;
             }, (response) => {
                 console.log('Error');
             });
@@ -196,19 +204,15 @@ export default{
             });
         },
         //
-        // placeStatus: function(placeStatus) {
-        //     var postData = {id: placeStatus};
         //
-        //     this.$http.post('http://localhost:8000/api/v1/placeStatus/', postData).then((response) => {
-        //         console.log(response.status);
-        //         console.log(response.data);
-        //         if (response.status == 200) {
-        //             this.fetchPlace(this.pagination.current_Page, this.showRow);
-        //         }
+        // authUser: function() {
+        //     this.$http.get('http://localhost:8000/api/v1/authUser').then((response) => {
+        //         this.$set('auth', response.data);
         //     }, (response) => {
         //         console.log("Ocorreu um erro na operação");
         //     });
         // },
+
 
         // -------------------------Metodo de suporte---------------------------------------------------
         doFilter: function() {
