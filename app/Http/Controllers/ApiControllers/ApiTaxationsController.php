@@ -20,16 +20,20 @@ use PDF;
 
 class ApiTaxationsController extends Controller
 {
-    public function index($row)
+    public function index($row, $type)
     {
-        $taxation = Taxation::paginate($row);
-
+        if ($type == 1) {
+            $taxation = Taxation::where('type', '=', 1)->paginate($row);
+        }elseif ($type == 2) {
+            $taxation = Taxation::where('type', '=', 2)->paginate($row);
+        }else {
+            $taxation = Taxation::paginate($row);
+        }
         $taxation->each(function($taxation){
             $taxation->employees;
-            $taxation->places;
+            $taxation->places->load('traders');
         });
         return $taxation;
-
     }
 
     public function create()
@@ -39,11 +43,12 @@ class ApiTaxationsController extends Controller
 
     public function store(TaxationsRequest $request)
     {
+        $employee = Employee::where('ic', '=', Auth::user()->ic);
         $taxation= new Taxation();
         $place_id = $request->place_id;
         $place = Place::where('id', '=', $place_id)->first();
         if ($request->type == 1) {
-            $taxation->employee_id = Auth::user()->id;
+            $taxation->employee_id = $employee->id;
             $taxation->income      = $place->price;
         }else {
             $taxation->employee_id = $request->employee_id;
@@ -100,22 +105,29 @@ class ApiTaxationsController extends Controller
     //Metodos de auxilio
     public function getEmployeeForTaxation()
     {
-        $id = Auth::user()->id;
-        $employee = Employee::where('id', '!=', $id)->get();
-        return $employee;
+        $employees = Employee::wherehas('typeofemployees', function($type)
+        {
+            $type->where('name', '=', 'Ajudantes dos Serviços Gerais')->orWhere('name', '=', 'Cobradores')->orWhere('name', '=', 'Vigilantes');
+        })->get();
+        return $employees;
     }
 
     // --------------------------------------------------------------------------------------
     public function getPlaceExtForTaxation()
     {
-        $place = Place::where('typeofplace_id', '=', 1)->get();
+        $place = Place::whereDoesntHave('traders')->whereHas('typeofplace', function ($type)
+        {
+            $type->orderBy('name', 'asc')->where('name', '=', 'Outros');
+        })->get();
         return $place;
     }
 
-
     public function getPlaceIntForTaxation()
     {
-        $place = Place::where('typeofplace_id', '!=', 1)->where('status', 1)->get();
+        $place = Place::has('traders')->whereHas('typeofplace', function ($type)
+        {
+            $type->orderBy('name', 'asc')->where('name', '!=', 'Outros');
+        })->get();
         return $place;
     }
 

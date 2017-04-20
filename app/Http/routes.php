@@ -109,7 +109,7 @@ Route::group(['namespace' => 'ApiControllers'], function()
             Route::get('placeType', 'ApiPlacesController@getTypeForPlace');
             Route::get('placeStatus', 'ApiPlacesController@placeStatusChange');
             Route::resource('taxations', 'ApiTaxationsController');
-            Route::get('allTaxations/{row}', 'ApiTaxationsController@index');
+            Route::get('allTaxations/{row}/{type}', 'ApiTaxationsController@index');
             Route::get('sendTaxation/{id}/{sendTaxation}', 'ApiTaxationsController@sendTaxation');
             // -----------------------------------------------------------------------------------
             // ------------------------------------Api-Taxation (place_trader)--------------------
@@ -245,8 +245,7 @@ Route::group(['namespace' => 'Web'], function()
 Route::group(['namespace' => 'PluginsControllers'], function()
 {
     Route::group(['prefix' => 'export', 'middleware' => 'auth', 'permission:backend-access'], function () {
-        Route::group(['middleware' => ['role:super-admin|admin|dpel|manager|administrative-assistant', 'permission:manage-resources
-        ']], function () {
+        Route::group(['middleware' => ['role:super-admin|admin|dpel|manager|administrative-assistant']], function () {
             // -----------------------------PDF-Download---------------------------------------------
             Route::resource('/getPDF', 'PDFController@getPDF');
             Route::resource('/taxationsPDF', 'PDFController@TaxationsPDF');

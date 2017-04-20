@@ -15,7 +15,7 @@
     <div class="sagmma_container">
         <div class="row">
             <div class="col-md-6">
-                <div class="box box-primary box-solid collapsed-box">
+                <div class="box box-default box-solid collapsed-box">
                     <div class="box-header with-border">
                         <h3 class="box-title">Estatistíca</h3>
                         <div class="box-tools pull-right">
@@ -34,7 +34,7 @@
             </div>
 
             <div class="col-md-6">
-                <div class="box box-primary box-solid collapsed-box">
+                <div class="box box-default box-solid collapsed-box">
                     <div class="box-header with-border">
                         <h3 class="box-title">Estatistíca</h3>
                         <div class="box-tools pull-right">
@@ -53,48 +53,29 @@
             </div>
         </div>
 
-
         <div class="row">
             <div class="col-md-12">
-                <div class="box box-primary box-solid">
-                    <div class="box-header with-border">
-                        <h3 class="box-title">Cobrança de Impostos</h3>
-                        <div class="box-tools pull-right">
-                            <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-                        </div>
+                <div class="panel with-nav-tabs panel-default">
+                    <div class="panel-heading">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a href="#tabTax" data-toggle="tab">Cobrança</a></li>
+                            <li><a href="#tabEmp" data-toggle="tab">FUNCIONÁRIOS</a></li>
+                            <li><a href="#tabPla" data-toggle="tab">ESPAÇOS</a></li>
+                        </ul>
                     </div>
-                    <div class="box-body">
-                        <div id="exTab2" class="">
-                            <ul class="nav nav-tabs">
-                                <li class="active">
-                                    <a  href="#1" data-toggle="tab">Cobranças de Imposto</a>
-                                </li>
-                                <li><a href="#2" data-toggle="tab">Funcionários</a>
-                                </li>
-                                <li><a href="#3" data-toggle="tab">Espaços</a>
-                                </li>
-                            </ul>
+                    <div class="panel-body">
+                        <div class="tab-content">
+                            {{ csrf_field() }}
+                            <div class="tab-pane fade in active" id="tabTax">
+                                <show-taxation></show-taxation>
+                            </div>
 
-                            <div class="tab-content ">
-                                <div class="tab-pane active" id="1">
-                                    <br>
-                                    {{ csrf_field() }}
-                                    <!------------------------------------------------------------------------------------->
-                                    <show-taxation></show-taxation>
-                                    <!------------------------------------------------------------------------------------->
-                                </div>
-                                <div class="tab-pane" id="2">
-                                    <br>
-                                    <!------------------------------------------------------------------------------------->
-                                    <show-employee></show-employee>
-                                    <!------------------------------------------------------------------------------------->
-                                </div>
-                                <div class="tab-pane" id="3">
-                                    <br>
-                                    <!------------------------------------------------------------------------------------->
-                                    <show-place></show-place>
-                                    <!------------------------------------------------------------------------------------->
-                                </div>
+                            <div class="tab-pane fade" id="tabEmp">
+                                <show-employee></show-employee>
+                            </div>
+
+                            <div class="tab-pane fade" id="tabPla">
+                                <show-place></show-place>
                             </div>
                         </div>
                     </div>
@@ -105,7 +86,9 @@
 @endsection
 @push('scripts')
     <script>
-
+    $(document).ready(function(){
+        $('[data-toggle="popover"]').popover();
+    });
     </script>
 
 @endpush

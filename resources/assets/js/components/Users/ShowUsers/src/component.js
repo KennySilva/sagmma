@@ -244,13 +244,11 @@ export default{
         createUser: function() {
             //User input
             var user = this.newUser;
-
-            //Clear form input
-            this.clearField();
             this.$http.post('http://localhost:8000/api/v1/users/', user).then((response) => {
                 if (response.status == 200) {
                     console.log('chegando aqui');
                     $('#modal-create-user').modal('hide');
+                    this.clearField();
                     console.log(response.data);
                     this.fetchUser(this.pagination.current_Page, this.showRow);
                     this.alert('Utilizador Criado com sucesso', 'success');

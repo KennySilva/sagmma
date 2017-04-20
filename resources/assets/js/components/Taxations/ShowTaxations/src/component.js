@@ -33,6 +33,7 @@ export default{
             msgSucess: '',
             typeAlert: '',
             showRow: '',
+            typeData: '',
             all: {},
             report_date: '',
             auth: [],
@@ -52,7 +53,8 @@ export default{
     // ---------------------------------------------------------------------------------
 
     ready () {
-        this.fetchTaxation(this.pagination.current_Page, this.showRow)
+
+        this.fetchTaxation(this.pagination.current_Page, this.showRow, this.typeData)
         this.taxationEmployee()
         this.taxationIntPlace()
         this.taxationExtPlace()
@@ -87,6 +89,27 @@ export default{
         }).on('change', function () {
             self.$set('newTaxation.type', jQuery(this).val());
         });
+        // ---------------------------------------------------------------------------------------------------
+
+        jQuery(self.$els.placecreate).select2({
+            placeholder: "Espaços",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('newTaxation.place_id', jQuery(this).val());
+        });
+
+        jQuery(self.$els.placeedit).select2({
+            placeholder: "Espaços",
+            allowClear: true,
+            theme: "bootstrap",
+            width: '100%',
+            language: 'pt',
+        }).on('change', function () {
+            self.$set('newTaxation.place_id', jQuery(this).val());
+        });
         // -------------------------------------------------------------------------------------------------
         jQuery(self.$els.employeecreate).select2({
             placeholder: "Funcionários",
@@ -98,7 +121,7 @@ export default{
             self.$set('newTaxation.employee_id', jQuery(this).val());
         });
 
-        jQuery(self.$els.employeedit).select2({
+        jQuery(self.$els.employeeedit).select2({
             placeholder: "Funcionários",
             allowClear: true,
             theme: "bootstrap",
@@ -122,7 +145,6 @@ export default{
             }, 5000);
         },
 
-
         clearField: function(){
             this.newTaxation = {
                 id          : '',
@@ -143,7 +165,7 @@ export default{
             this.$http.post('http://localhost:8000/api/v1/taxations/', taxation).then((response) => {
                 if (response.status == 200) {
                     $('#modal-create-taxation').modal('hide');
-                    this.fetchTaxation(this.pagination.current_Page, this.showRow);
+                    this.fetchTaxation(this.pagination.current_Page, this.showRow, this.typeData);
                     console.log('correu bem');
                     this.alert('Registo criado com sucesso', 'success');
                     this.$set('errors', '')
@@ -155,8 +177,8 @@ export default{
 
         // --------------------------------------------------------------------------------------------
 
-        fetchTaxation: function(page, row) {
-            this.$http.get('http://localhost:8000/api/v1/allTaxations/'+row+'?page='+page).then((response) => {
+        fetchTaxation: function(page, row, type) {
+            this.$http.get('http://localhost:8000/api/v1/allTaxations/'+row+'/'+type+'?page='+page).then((response) => {
                 this.$set('taxations', response.data.data)
                 this.$set('all', response.data.data)
                 this.$set('pagination', response.data)
@@ -189,7 +211,7 @@ export default{
                 if (response.status == 200) {
                     $('#modal-edit-taxation').modal('hide');
                     // console.log(response.data);
-                    this.fetchTaxation(this.pagination.current_Page, this.showRow);
+                    this.fetchTaxation(this.pagination.current_Page, this.showRow, this.typeData);
                     this.alert('Registo atualizado com sucesso', 'info');
                     this.$set('errors', '')
                 }
@@ -205,7 +227,7 @@ export default{
                 $('#modal-delete-taxation').modal('hide');
                 if (response.status == 200) {
                     // console.log(response.data);
-                    this.fetchTaxation(this.pagination.current_Page, this.showRow);
+                    this.fetchTaxation(this.pagination.current_Page, this.showRow, this.typeData);
                     this.alert('Registo eliminado com sucesso', 'warning');
 
                 }
@@ -242,8 +264,6 @@ export default{
         authUser: function() {
             this.$http.get('http://localhost:8000/api/v1/authUser').then((response) => {
                 this.$set('auth', response.data);
-                // this.$set('options', response.data.name);
-                // this.options = response.data.items
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
             });
@@ -302,7 +322,7 @@ export default{
 
         // Outros funções
         navigate (page) {
-            this.fetchTaxation(page, this.showRow);
+            this.fetchTaxation(page, this.showRow, this.typeData);
         },
 
 
@@ -310,20 +330,7 @@ export default{
 
     // ---------------------------------------------------------------------------------
 
-    computed: {
-        myValidation: function() {
-            return {
-                email: /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[ 0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(this.sendTaxation),
-            }
-        },
 
-        isValid: function() {
-            var validation = this.validation;
-            return Object.keys(validation).every(function(key){
-                return validation[key];
-            });
-        },
-    },
 
     // ---------------------------------------------------------------------------------
 

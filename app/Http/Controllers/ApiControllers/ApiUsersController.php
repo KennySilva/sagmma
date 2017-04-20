@@ -50,6 +50,7 @@ class ApiUsersController extends Controller
     {
         $name = ucwords($request->name);
         $username = ucwords($request->username);
+        $roles = $request->roles;
         $user              = new User();
         $user->name        = $name;
         $user->username    = $username;
@@ -70,7 +71,6 @@ class ApiUsersController extends Controller
         $user->social      = false;
         $user->save();
         if ($roles) {
-            # code...
             $user->roles()->sync($request->roles);
         }
         if ($request->type == 'trad') {
