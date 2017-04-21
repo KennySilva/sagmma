@@ -8,7 +8,7 @@
 @endsection
 
 @section('contentheader_title')
-    Cobrança de Impostos
+    
 @endsection
 
 @section('main-content')
@@ -58,7 +58,7 @@
                 <div class="panel with-nav-tabs panel-default">
                     <div class="panel-heading">
                         <ul class="nav nav-tabs">
-                            <li class="active"><a href="#tabTax" data-toggle="tab">Cobrança</a></li>
+                            <li class="active"><a href="#tabTax" data-toggle="tab">COBRANÇA</a></li>
                             <li><a href="#tabEmp" data-toggle="tab">FUNCIONÁRIOS</a></li>
                             <li><a href="#tabPla" data-toggle="tab">ESPAÇOS</a></li>
                         </ul>

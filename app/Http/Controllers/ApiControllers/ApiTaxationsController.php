@@ -63,7 +63,10 @@ class ApiTaxationsController extends Controller
     public function show($id)
     {
         $taxation = Taxation::findOrFail($id);
+        $taxation->employees;
+        $taxation->places->load('traders');
         return $taxation;
+
     }
 
     public function edit($id)

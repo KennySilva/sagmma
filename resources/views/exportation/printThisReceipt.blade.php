@@ -26,7 +26,7 @@
                 </p>
                 <br>
                 <hr>
-                <p>Assomada {{date('y-m-d'))}}</p>
+                <p>Assomada {{date('y-m-d')}}</p>
             </div>
             <hr>
             <br>

@@ -1,6 +1,9 @@
 import Pagination from '../../../Pagination/src/Component.vue'
 import { _ } from 'lodash'
 
+import myDatepicker from 'vue-datepicker/vue-datepicker-1.vue'
+
+
 
 export default{
 
@@ -14,6 +17,9 @@ export default{
                 place_id    : '',
                 income      : '',
                 type        : '',
+                author        : '',
+                employees  : [],
+                places  : [],
                 created_at  : '',
             },
 
@@ -22,7 +28,7 @@ export default{
             placesInt    : [],
             placesExt    : [],
 
-            sortColumn : 'id',
+            sortColumn : 'employee_id',
             sortInverse: 1,
             filter: {
                 term: ''
@@ -47,6 +53,47 @@ export default{
             errors: [],
 
             myDate: new Date(),
+
+            // Vue-Datepicker
+            option: {
+                type: 'day',
+                week: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom'],
+                month: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+                format: 'YYYY-MM-DD',
+                placeholder: 'Data',
+                inputStyle: {
+                    'display': 'inline',
+                    'padding': '6px',
+                    'line-height': '20px',
+                    'font-size': '14px',
+                    'border': '1px solid #d2d6de',
+                    'box-shadow': '0 1px 3px 0 rgba(0, 0, 0, 0.2)',
+                    'border-radius': '0px',
+                    'color': '#5F5F5F',
+                    'min-width': '100%',
+                    'width': 'auto'
+                },
+                color: {
+                    header: '#228074',
+                    headerText: '#ffffff'
+                },
+                buttons: {
+                    cancel: 'Cancelar',
+                    ok: 'OK',
+                },
+                overlayOpacity: 0.5, // 0.5 as default
+                dismissible: true // as true as default
+            },
+
+            limit: [{
+                type: 'weekday',
+                available: [1, 2, 3, 4, 5, 6]
+            },
+            {
+                type: 'fromto',
+                from: '2017-02-01',
+                // to: this.myDate,
+            }],
         }
     },
 
@@ -152,6 +199,9 @@ export default{
                 place_id : '',
                 income : '',
                 type : '',
+                author : '',
+                employees : [],
+                places : [],
             };
             this.sendTaxation = '';
         },
@@ -190,13 +240,27 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         getThisTaxation: function(id){
+            var self = this;
+            this.clearField()
+
             this.$http.get('http://localhost:8000/api/v1/taxations/' + id).then((response) => {
                 this.newTaxation.id          = response.data.id;
                 this.newTaxation.employee_id = response.data.employee_id;
                 this.newTaxation.place_id    = response.data.place_id;
                 this.newTaxation.income      = response.data.income;
                 this.newTaxation.type        = response.data.type;
-                this.newTaxation.created_at        = response.data.created_at;
+                this.newTaxation.author        = response.data.author;
+                var employees        = response.data.employees;
+                var places        = response.data.places;
+
+                for (var emp in employees) {
+                    self.newTaxation.employees.push(employees[emp])
+                }
+
+                for (var place in places) {
+                    self.newTaxation.places.push(places[place])
+                }
+
             }, (response) => {
                 console.log('Error');
             });
@@ -336,5 +400,7 @@ export default{
 
     components: {
         'Pagination': Pagination,
+        'date-picker': myDatepicker
+
     },
 }

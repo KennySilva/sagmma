@@ -80,12 +80,12 @@
 							<a href="#" @click = "doSort($event, 'status')">Estado</a>
 						</th>
 
-						<th  class="text-center" colspan="2"><span><i class="fa fa-cogs"></i></span></th>
+						<th  class="text-center" colspan="3"><i class="fa fa-cogs"></i> <span class="text-primary">Operações</span></th>
 
 
 						<th width=75  class="text-center">
 							<a @click = "openAllDetails" href="#">
-								<span><i data-toggle="tooltip" data-placement="left" title="Ver Todos os papeis" class="fa"  :class="{'fa-lock': openDetails.length == 0, 'fa-unlock': openDetails.length > 0}"></i></span>
+								<span><i data-toggle="tooltip" data-placement="left" title="Ver Todos os papeis" class="fa"  :class="{'fa-plus-square-o': openDetails.length == 0, 'fa-minus-square-o': openDetails.length > 0}"></i> Função</span>
 							</a>
 						</th>
 
@@ -93,8 +93,9 @@
 				</thead>
 				<tbody  v-for="user in users | orderBy sortColumn sortInverse">
 					<tr>
-						<td><a href="#" data-toggle="modal" data-target="#show-user" @click="getThisUser(user.id)">{{ user.name }}</a></td>
-						<td>{{ user.phone }}</td>
+						<td>{{ user.name }}</td>
+						<td v-if="user.phone">{{ user.phone }}</td>
+						<td v-else>__ __ __</td>
 						<!----------------------------------------------------------------------------------->
 						<td v-if="user.id != auth.id">
 							<button type="submit" @click = "estado_utilizador(user.id)" class='btn btn-xs btn-flat' :class="{ 'btn-info': user.status, 'btn-danger': !user.status }">{{user.status ? 'Ativado' : 'Disativado'}}</button>
@@ -103,18 +104,22 @@
 						<td v-else>
 							<span><i class="fa fa-circle text-success"></i> Online</span>
 						</td>
+
+						<td><a class="btn btn-default btn-xs" href="#" data-toggle="modal" data-target="#show-user" @click="getThisUser(user.id)"><i class="fa fa-search-plus text-success"></i></a></td>
+
+
 						<!----------------------------------------------------------------------------------->
-						<td class="text-center">  <a data-toggle="modal" data-target="#modal-edit-user" href="#"> <i class="fa fa-edit text-primary" @click="getThisUser(user.id)"> </i></a></td>
+						<td class="text-center">  <a class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-edit-user" href="#"> <i class="fa fa-edit text-primary" @click="getThisUser(user.id)"> </i></a></td>
 						<!------------------------------------------------------------------------------->
 
-						<td v-if="user.id != auth.id" class="text-center"><a data-toggle="modal" data-target="#modal-delete-user" href="#"><i class="fa fa-trash text-danger" @click="getThisUser(user.id)" ></i></a></td>
+						<td v-if="user.id != auth.id" class="text-center"><a class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-delete-user" href="#"><i class="fa fa-trash text-danger" @click="getThisUser(user.id)" ></i></a></td>
 
 						<td v-else class="text-center"><i class="fa fa-check-square text-success"></i></td>
 
 						<!------------------------------------------------------------------------------->
 						<td width=75 class="text-center">
-							<a @click = "doOpenDetails($event, user.id)" v-show="user.roles != ''" href="#"><i data-toggle="tooltip" data-placement="left" title="Ver Papeis de utilizador" class="fa" :class="{'fa-plus-square': openDetails.indexOf(user.id) == -1, 'fa-minus-square': openDetails.indexOf(user.id) > -1}"></i></a>
-							<i class="fa fa-plus-square" v-show="user.roles == ''" style="opacity: 0.3"></i>
+							<a class="btn btn-default btn-xs" @click = "doOpenDetails($event, user.id)" v-show="user.roles != ''" href="#"><i data-toggle="tooltip" data-placement="left" title="Ver Papeis de utilizador" class="fa text-primary" :class="{'fa-plus-square': openDetails.indexOf(user.id) == -1, 'fa-minus-square': openDetails.indexOf(user.id) > -1}"></i></a>
+						    <i class="fa fa-plus-square" v-show="user.roles == ''" style="opacity: 0.3"></i>
 						</td>
 
 						<!------------------------------------------------------------------------------->

@@ -12,22 +12,25 @@
 
 @section('main-content')
     <div class="row">
-        <div class="info-box">
-            <span class="info-box-icon bg-blue"><i class="fa fa-print"></i></span>
-            <div class="info-box-content">
-                <span class="info-box-text">Relarório</span>
-                <span class="info-box-number">Imprimir Recibo de @foreach ($taxation->employees as $emp)
-                    {{$emp->name}}
-                @endforeach</span>
+        <div class="col-md-6">
+            <div class="info-box">
+                <span class="info-box-icon bg-blue"><i class="fa fa-file-text-o"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Recibo</span>
+                    <span class="info-box-number">Recibo de @foreach ($taxation->employees as $emp)
+                        {{$emp->name}}
+                    @endforeach</span>
+                </div>
             </div>
         </div>
     </div>
     <hr>
+    <hr>
     <div class="row">
-        <div class="col-md-6 col-md-offset-4">
-            <a class="btnPrint btn btn-success btn-lg btn-flat" href="{{ route('printReceipt', $id) }}"><i class="fa fa-circle-o-notch fa-lg fa-spin"></i>  <b>Imprimir Agora</b></a>
+        <div class="col-md-6">
+            <a class="btn btn-link" href="{{URL::to('sagmma/taxations')}}"><i class="fa fa-angle-double-left faa-passing-reverse animated"></i> Voltar</a>
 
-            <a class="btn btn-default btn-lg btn-flat" href="{{URL::to('sagmma/taxations')}}"><i class="fa fa-undo fa-lg fa-spin"></i>  <b>Voltar</b></a>
+            <a class="btnPrint btn btn-link" href="{{ route('printReceipt', $id) }}"><i class="fa fa-print faa-pulse animated"></i> Imprimir Recibo</a>
         </div>
     </div>
 
