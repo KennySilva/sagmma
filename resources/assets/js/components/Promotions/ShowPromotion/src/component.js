@@ -1,5 +1,7 @@
 import Pagination from '../../../Pagination/src/Component.vue'
 import { _ } from 'lodash'
+import myDatepicker from 'vue-datepicker/vue-datepicker-1.vue'
+
 export default{
     name: 'ShowPromotion',
 
@@ -19,6 +21,8 @@ export default{
                 product_id    : '',
                 status        : '',
                 description   : '',
+                trader:  '',
+                product:  '',
             },
 
 
@@ -39,7 +43,47 @@ export default{
             typeAlert: '',
             showRow: '',
             all: {},
+            auth: [],
             date_atual: new Date(),
+
+            // Vue-Datepicker
+            option: {
+                type: 'day',
+                week: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom'],
+                month: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+                format: 'YYYY-MM-DD',
+                placeholder: 'Data',
+                inputStyle: {
+                    'display': 'inline-block',
+                    'padding': '6px',
+                    'line-height': '20px',
+                    'font-size': '14px',
+                    'border': '1px solid #d2d6de',
+                    'border-radius': '0px',
+                    'color': '#5F5F5F',
+
+                },
+                color: {
+                    header: '#228074',
+                    headerText: '#ffffff'
+                },
+                buttons: {
+                    cancel: 'Cancelar',
+                    ok: 'Escolher',
+                },
+                overlayOpacity: 0.5, // 0.5 as default
+                dismissible: true // as true as default
+            },
+
+            limit: [{
+                type: 'weekday',
+                available: [1, 2, 3, 4, 5, 6]
+            },
+            {
+                type: 'fromto',
+                from: '2017-02-01',
+                // to: '2016-02-20'
+            }],
         }
     },
 
@@ -48,7 +92,9 @@ export default{
         this.fetchPromotion(this.pagination.current_Page, this.showRow)
         this.promotionTrader()
         this.promotionProduct()
+        this.authUser()
         // this.changePromotionStatus()
+
 
 
         self = this
@@ -130,6 +176,8 @@ export default{
                 product_id    : '',
                 status        : '',
                 description   : '',
+                trader   : '',
+                product   : '',
             };
         },
 
@@ -140,11 +188,12 @@ export default{
             var promotion = this.newPromotion;
 
             //Clear form input
-            this.clearField();
             this.$http.post('http://localhost:8000/api/v1/promotions/', promotion).then((response) => {
                 if (response.status == 200) {
                     console.log('chegando aqui');
                     $('#modal-create-promotion').modal('hide');
+                    this.clearField();
+
                     console.log(response.data);
                     this.fetchPromotion(this.pagination.current_Page, this.showRow);
                     alert('Promoção Criado com sucesso', 'success');
@@ -170,6 +219,8 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         getThisPromotion: function(id){
+            this.clearField();
+
             this.$http.get('http://localhost:8000/api/v1/promotions/' + id).then((response) => {
                 this.newPromotion.id            = response.data.id;
                 this.newPromotion.name          = response.data.name;
@@ -179,6 +230,12 @@ export default{
                 this.newPromotion.product_id    = response.data.product_id;
                 this.newPromotion.status        = response.data.status;
                 this.newPromotion.description   = response.data.description;
+                this.newPromotion.product = response.data.product.name;
+                this.newPromotion.trader = response.data.trader.name;
+                // var trader = response.data.trader;
+                // for (var trad in trader) {
+                //     this.newUser.trader.push(trader[trad])
+                // }
             }, (response) => {
                 console.log('Error');
             });
@@ -188,10 +245,11 @@ export default{
 
         saveEditedPromotion: function(id) {
             var promotion = this.newPromotion;
-            this.clearField();
             this.$http.patch('http://localhost:8000/api/v1/promotions/'+ id, promotion).then((response) => {
                 if (response.status == 200) {
                     $('#modal-edit-promotion').modal('hide');
+                    this.clearField();
+
                     // console.log(response.data);
                     this.fetchPromotion(this.pagination.current_Page, this.showRow);
                     this.alert('Promoção Atualizado com sucesso', 'info');
@@ -248,6 +306,24 @@ export default{
         },
 
 
+        authUser: function() {
+            this.$http.get('http://localhost:8000/api/v1/authUser').then((response) => {
+                this.$set('auth', response.data);
+            }, (response) => {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+        checkPermition: function() {
+            var roles = this.auth.roles;
+            for (var rol in roles) {
+                if (roles[rol].name == 'admin' || roles[rol].name == 'super-admin' || roles[rol].name == 'manager' || roles[rol].name == 'dpel') {
+                    return true;
+                }
+            }
+        },
+
+
 
 
         // -------------------------Metodo de suporte---------------------------------------------------
@@ -290,5 +366,7 @@ export default{
 
     components: {
         'Pagination': Pagination,
+        'date-picker': myDatepicker
+
     }
 }

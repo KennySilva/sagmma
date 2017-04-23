@@ -19,9 +19,9 @@ new Vue({
 
     components: {
         //------------------------------Product-----------------------------------
-        'show-product-in-front': require('./components/Products/ShowProduct'),
+        'show-product': require('./components/Products/ShowProduct'),
         //------------------------------Promotion-----------------------------------
-        'show-promotion-in-front': require('./components/Promotions/ShowPromotion'),
+        'show-promotion': require('./components/Promotions/ShowPromotion')
         // ------------------------------place-----------------------------------
     }
 });

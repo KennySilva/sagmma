@@ -6,13 +6,28 @@ use Illuminate\Http\Request;
 
 use Sagmma\Http\Requests;
 use Sagmma\Http\Controllers\Controller;
-use Article;
+use Product;
+use Promotion;
+use Auth;
 
 
-class ShowPromotionsController extends Controller
+class BusinessController extends Controller
 {
     public function index()
     {
+        // $lastProducts = Product::orderBy('created_at', 'desc')->take(2)->get();
+        // $products = Product::all();
+        //
+        // foreach ($products as $product) {
+        //     $prod_id[] = $product->id;
+        // }
+        // // dd($prod_id);
+        //
+        // $promotions = Promotion::wherehas('product', function($query)
+        // {
+        //     $query->where('user_id', '=', Auth::user()->id);
+        // })->where('product_id', 'in', $prod_id)->get();
+        // return $promotions;
         return view('_frontend.web.showPromotions.business');
     }
 

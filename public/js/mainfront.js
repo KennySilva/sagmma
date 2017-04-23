@@ -1,4 +1,643 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+module.exports = { "default": require("core-js/library/fn/get-iterator"), __esModule: true };
+},{"core-js/library/fn/get-iterator":3}],2:[function(require,module,exports){
+module.exports = { "default": require("core-js/library/fn/json/stringify"), __esModule: true };
+},{"core-js/library/fn/json/stringify":4}],3:[function(require,module,exports){
+require('../modules/web.dom.iterable');
+require('../modules/es6.string.iterator');
+module.exports = require('../modules/core.get-iterator');
+},{"../modules/core.get-iterator":52,"../modules/es6.string.iterator":54,"../modules/web.dom.iterable":55}],4:[function(require,module,exports){
+var core  = require('../../modules/_core')
+  , $JSON = core.JSON || (core.JSON = {stringify: JSON.stringify});
+module.exports = function stringify(it){ // eslint-disable-line no-unused-vars
+  return $JSON.stringify.apply($JSON, arguments);
+};
+},{"../../modules/_core":11}],5:[function(require,module,exports){
+module.exports = function(it){
+  if(typeof it != 'function')throw TypeError(it + ' is not a function!');
+  return it;
+};
+},{}],6:[function(require,module,exports){
+module.exports = function(){ /* empty */ };
+},{}],7:[function(require,module,exports){
+var isObject = require('./_is-object');
+module.exports = function(it){
+  if(!isObject(it))throw TypeError(it + ' is not an object!');
+  return it;
+};
+},{"./_is-object":25}],8:[function(require,module,exports){
+// false -> Array#indexOf
+// true  -> Array#includes
+var toIObject = require('./_to-iobject')
+  , toLength  = require('./_to-length')
+  , toIndex   = require('./_to-index');
+module.exports = function(IS_INCLUDES){
+  return function($this, el, fromIndex){
+    var O      = toIObject($this)
+      , length = toLength(O.length)
+      , index  = toIndex(fromIndex, length)
+      , value;
+    // Array#includes uses SameValueZero equality algorithm
+    if(IS_INCLUDES && el != el)while(length > index){
+      value = O[index++];
+      if(value != value)return true;
+    // Array#toIndex ignores holes, Array#includes - not
+    } else for(;length > index; index++)if(IS_INCLUDES || index in O){
+      if(O[index] === el)return IS_INCLUDES || index || 0;
+    } return !IS_INCLUDES && -1;
+  };
+};
+},{"./_to-index":43,"./_to-iobject":45,"./_to-length":46}],9:[function(require,module,exports){
+// getting tag from 19.1.3.6 Object.prototype.toString()
+var cof = require('./_cof')
+  , TAG = require('./_wks')('toStringTag')
+  // ES3 wrong here
+  , ARG = cof(function(){ return arguments; }()) == 'Arguments';
+
+// fallback for IE11 Script Access Denied error
+var tryGet = function(it, key){
+  try {
+    return it[key];
+  } catch(e){ /* empty */ }
+};
+
+module.exports = function(it){
+  var O, T, B;
+  return it === undefined ? 'Undefined' : it === null ? 'Null'
+    // @@toStringTag case
+    : typeof (T = tryGet(O = Object(it), TAG)) == 'string' ? T
+    // builtinTag case
+    : ARG ? cof(O)
+    // ES3 arguments fallback
+    : (B = cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
+};
+},{"./_cof":10,"./_wks":50}],10:[function(require,module,exports){
+var toString = {}.toString;
+
+module.exports = function(it){
+  return toString.call(it).slice(8, -1);
+};
+},{}],11:[function(require,module,exports){
+var core = module.exports = {version: '2.4.0'};
+if(typeof __e == 'number')__e = core; // eslint-disable-line no-undef
+},{}],12:[function(require,module,exports){
+// optional / simple context binding
+var aFunction = require('./_a-function');
+module.exports = function(fn, that, length){
+  aFunction(fn);
+  if(that === undefined)return fn;
+  switch(length){
+    case 1: return function(a){
+      return fn.call(that, a);
+    };
+    case 2: return function(a, b){
+      return fn.call(that, a, b);
+    };
+    case 3: return function(a, b, c){
+      return fn.call(that, a, b, c);
+    };
+  }
+  return function(/* ...args */){
+    return fn.apply(that, arguments);
+  };
+};
+},{"./_a-function":5}],13:[function(require,module,exports){
+// 7.2.1 RequireObjectCoercible(argument)
+module.exports = function(it){
+  if(it == undefined)throw TypeError("Can't call method on  " + it);
+  return it;
+};
+},{}],14:[function(require,module,exports){
+// Thank's IE8 for his funny defineProperty
+module.exports = !require('./_fails')(function(){
+  return Object.defineProperty({}, 'a', {get: function(){ return 7; }}).a != 7;
+});
+},{"./_fails":18}],15:[function(require,module,exports){
+var isObject = require('./_is-object')
+  , document = require('./_global').document
+  // in old IE typeof document.createElement is 'object'
+  , is = isObject(document) && isObject(document.createElement);
+module.exports = function(it){
+  return is ? document.createElement(it) : {};
+};
+},{"./_global":19,"./_is-object":25}],16:[function(require,module,exports){
+// IE 8- don't enum bug keys
+module.exports = (
+  'constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf'
+).split(',');
+},{}],17:[function(require,module,exports){
+var global    = require('./_global')
+  , core      = require('./_core')
+  , ctx       = require('./_ctx')
+  , hide      = require('./_hide')
+  , PROTOTYPE = 'prototype';
+
+var $export = function(type, name, source){
+  var IS_FORCED = type & $export.F
+    , IS_GLOBAL = type & $export.G
+    , IS_STATIC = type & $export.S
+    , IS_PROTO  = type & $export.P
+    , IS_BIND   = type & $export.B
+    , IS_WRAP   = type & $export.W
+    , exports   = IS_GLOBAL ? core : core[name] || (core[name] = {})
+    , expProto  = exports[PROTOTYPE]
+    , target    = IS_GLOBAL ? global : IS_STATIC ? global[name] : (global[name] || {})[PROTOTYPE]
+    , key, own, out;
+  if(IS_GLOBAL)source = name;
+  for(key in source){
+    // contains in native
+    own = !IS_FORCED && target && target[key] !== undefined;
+    if(own && key in exports)continue;
+    // export native or passed
+    out = own ? target[key] : source[key];
+    // prevent global pollution for namespaces
+    exports[key] = IS_GLOBAL && typeof target[key] != 'function' ? source[key]
+    // bind timers to global for call from export context
+    : IS_BIND && own ? ctx(out, global)
+    // wrap global constructors for prevent change them in library
+    : IS_WRAP && target[key] == out ? (function(C){
+      var F = function(a, b, c){
+        if(this instanceof C){
+          switch(arguments.length){
+            case 0: return new C;
+            case 1: return new C(a);
+            case 2: return new C(a, b);
+          } return new C(a, b, c);
+        } return C.apply(this, arguments);
+      };
+      F[PROTOTYPE] = C[PROTOTYPE];
+      return F;
+    // make static versions for prototype methods
+    })(out) : IS_PROTO && typeof out == 'function' ? ctx(Function.call, out) : out;
+    // export proto methods to core.%CONSTRUCTOR%.methods.%NAME%
+    if(IS_PROTO){
+      (exports.virtual || (exports.virtual = {}))[key] = out;
+      // export proto methods to core.%CONSTRUCTOR%.prototype.%NAME%
+      if(type & $export.R && expProto && !expProto[key])hide(expProto, key, out);
+    }
+  }
+};
+// type bitmap
+$export.F = 1;   // forced
+$export.G = 2;   // global
+$export.S = 4;   // static
+$export.P = 8;   // proto
+$export.B = 16;  // bind
+$export.W = 32;  // wrap
+$export.U = 64;  // safe
+$export.R = 128; // real proto method for `library` 
+module.exports = $export;
+},{"./_core":11,"./_ctx":12,"./_global":19,"./_hide":21}],18:[function(require,module,exports){
+module.exports = function(exec){
+  try {
+    return !!exec();
+  } catch(e){
+    return true;
+  }
+};
+},{}],19:[function(require,module,exports){
+// https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
+var global = module.exports = typeof window != 'undefined' && window.Math == Math
+  ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
+if(typeof __g == 'number')__g = global; // eslint-disable-line no-undef
+},{}],20:[function(require,module,exports){
+var hasOwnProperty = {}.hasOwnProperty;
+module.exports = function(it, key){
+  return hasOwnProperty.call(it, key);
+};
+},{}],21:[function(require,module,exports){
+var dP         = require('./_object-dp')
+  , createDesc = require('./_property-desc');
+module.exports = require('./_descriptors') ? function(object, key, value){
+  return dP.f(object, key, createDesc(1, value));
+} : function(object, key, value){
+  object[key] = value;
+  return object;
+};
+},{"./_descriptors":14,"./_object-dp":32,"./_property-desc":37}],22:[function(require,module,exports){
+module.exports = require('./_global').document && document.documentElement;
+},{"./_global":19}],23:[function(require,module,exports){
+module.exports = !require('./_descriptors') && !require('./_fails')(function(){
+  return Object.defineProperty(require('./_dom-create')('div'), 'a', {get: function(){ return 7; }}).a != 7;
+});
+},{"./_descriptors":14,"./_dom-create":15,"./_fails":18}],24:[function(require,module,exports){
+// fallback for non-array-like ES3 and non-enumerable old V8 strings
+var cof = require('./_cof');
+module.exports = Object('z').propertyIsEnumerable(0) ? Object : function(it){
+  return cof(it) == 'String' ? it.split('') : Object(it);
+};
+},{"./_cof":10}],25:[function(require,module,exports){
+module.exports = function(it){
+  return typeof it === 'object' ? it !== null : typeof it === 'function';
+};
+},{}],26:[function(require,module,exports){
+'use strict';
+var create         = require('./_object-create')
+  , descriptor     = require('./_property-desc')
+  , setToStringTag = require('./_set-to-string-tag')
+  , IteratorPrototype = {};
+
+// 25.1.2.1.1 %IteratorPrototype%[@@iterator]()
+require('./_hide')(IteratorPrototype, require('./_wks')('iterator'), function(){ return this; });
+
+module.exports = function(Constructor, NAME, next){
+  Constructor.prototype = create(IteratorPrototype, {next: descriptor(1, next)});
+  setToStringTag(Constructor, NAME + ' Iterator');
+};
+},{"./_hide":21,"./_object-create":31,"./_property-desc":37,"./_set-to-string-tag":39,"./_wks":50}],27:[function(require,module,exports){
+'use strict';
+var LIBRARY        = require('./_library')
+  , $export        = require('./_export')
+  , redefine       = require('./_redefine')
+  , hide           = require('./_hide')
+  , has            = require('./_has')
+  , Iterators      = require('./_iterators')
+  , $iterCreate    = require('./_iter-create')
+  , setToStringTag = require('./_set-to-string-tag')
+  , getPrototypeOf = require('./_object-gpo')
+  , ITERATOR       = require('./_wks')('iterator')
+  , BUGGY          = !([].keys && 'next' in [].keys()) // Safari has buggy iterators w/o `next`
+  , FF_ITERATOR    = '@@iterator'
+  , KEYS           = 'keys'
+  , VALUES         = 'values';
+
+var returnThis = function(){ return this; };
+
+module.exports = function(Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCED){
+  $iterCreate(Constructor, NAME, next);
+  var getMethod = function(kind){
+    if(!BUGGY && kind in proto)return proto[kind];
+    switch(kind){
+      case KEYS: return function keys(){ return new Constructor(this, kind); };
+      case VALUES: return function values(){ return new Constructor(this, kind); };
+    } return function entries(){ return new Constructor(this, kind); };
+  };
+  var TAG        = NAME + ' Iterator'
+    , DEF_VALUES = DEFAULT == VALUES
+    , VALUES_BUG = false
+    , proto      = Base.prototype
+    , $native    = proto[ITERATOR] || proto[FF_ITERATOR] || DEFAULT && proto[DEFAULT]
+    , $default   = $native || getMethod(DEFAULT)
+    , $entries   = DEFAULT ? !DEF_VALUES ? $default : getMethod('entries') : undefined
+    , $anyNative = NAME == 'Array' ? proto.entries || $native : $native
+    , methods, key, IteratorPrototype;
+  // Fix native
+  if($anyNative){
+    IteratorPrototype = getPrototypeOf($anyNative.call(new Base));
+    if(IteratorPrototype !== Object.prototype){
+      // Set @@toStringTag to native iterators
+      setToStringTag(IteratorPrototype, TAG, true);
+      // fix for some old engines
+      if(!LIBRARY && !has(IteratorPrototype, ITERATOR))hide(IteratorPrototype, ITERATOR, returnThis);
+    }
+  }
+  // fix Array#{values, @@iterator}.name in V8 / FF
+  if(DEF_VALUES && $native && $native.name !== VALUES){
+    VALUES_BUG = true;
+    $default = function values(){ return $native.call(this); };
+  }
+  // Define iterator
+  if((!LIBRARY || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])){
+    hide(proto, ITERATOR, $default);
+  }
+  // Plug for library
+  Iterators[NAME] = $default;
+  Iterators[TAG]  = returnThis;
+  if(DEFAULT){
+    methods = {
+      values:  DEF_VALUES ? $default : getMethod(VALUES),
+      keys:    IS_SET     ? $default : getMethod(KEYS),
+      entries: $entries
+    };
+    if(FORCED)for(key in methods){
+      if(!(key in proto))redefine(proto, key, methods[key]);
+    } else $export($export.P + $export.F * (BUGGY || VALUES_BUG), NAME, methods);
+  }
+  return methods;
+};
+},{"./_export":17,"./_has":20,"./_hide":21,"./_iter-create":26,"./_iterators":29,"./_library":30,"./_object-gpo":34,"./_redefine":38,"./_set-to-string-tag":39,"./_wks":50}],28:[function(require,module,exports){
+module.exports = function(done, value){
+  return {value: value, done: !!done};
+};
+},{}],29:[function(require,module,exports){
+module.exports = {};
+},{}],30:[function(require,module,exports){
+module.exports = true;
+},{}],31:[function(require,module,exports){
+// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
+var anObject    = require('./_an-object')
+  , dPs         = require('./_object-dps')
+  , enumBugKeys = require('./_enum-bug-keys')
+  , IE_PROTO    = require('./_shared-key')('IE_PROTO')
+  , Empty       = function(){ /* empty */ }
+  , PROTOTYPE   = 'prototype';
+
+// Create object with fake `null` prototype: use iframe Object with cleared prototype
+var createDict = function(){
+  // Thrash, waste and sodomy: IE GC bug
+  var iframe = require('./_dom-create')('iframe')
+    , i      = enumBugKeys.length
+    , lt     = '<'
+    , gt     = '>'
+    , iframeDocument;
+  iframe.style.display = 'none';
+  require('./_html').appendChild(iframe);
+  iframe.src = 'javascript:'; // eslint-disable-line no-script-url
+  // createDict = iframe.contentWindow.Object;
+  // html.removeChild(iframe);
+  iframeDocument = iframe.contentWindow.document;
+  iframeDocument.open();
+  iframeDocument.write(lt + 'script' + gt + 'document.F=Object' + lt + '/script' + gt);
+  iframeDocument.close();
+  createDict = iframeDocument.F;
+  while(i--)delete createDict[PROTOTYPE][enumBugKeys[i]];
+  return createDict();
+};
+
+module.exports = Object.create || function create(O, Properties){
+  var result;
+  if(O !== null){
+    Empty[PROTOTYPE] = anObject(O);
+    result = new Empty;
+    Empty[PROTOTYPE] = null;
+    // add "__proto__" for Object.getPrototypeOf polyfill
+    result[IE_PROTO] = O;
+  } else result = createDict();
+  return Properties === undefined ? result : dPs(result, Properties);
+};
+
+},{"./_an-object":7,"./_dom-create":15,"./_enum-bug-keys":16,"./_html":22,"./_object-dps":33,"./_shared-key":40}],32:[function(require,module,exports){
+var anObject       = require('./_an-object')
+  , IE8_DOM_DEFINE = require('./_ie8-dom-define')
+  , toPrimitive    = require('./_to-primitive')
+  , dP             = Object.defineProperty;
+
+exports.f = require('./_descriptors') ? Object.defineProperty : function defineProperty(O, P, Attributes){
+  anObject(O);
+  P = toPrimitive(P, true);
+  anObject(Attributes);
+  if(IE8_DOM_DEFINE)try {
+    return dP(O, P, Attributes);
+  } catch(e){ /* empty */ }
+  if('get' in Attributes || 'set' in Attributes)throw TypeError('Accessors not supported!');
+  if('value' in Attributes)O[P] = Attributes.value;
+  return O;
+};
+},{"./_an-object":7,"./_descriptors":14,"./_ie8-dom-define":23,"./_to-primitive":48}],33:[function(require,module,exports){
+var dP       = require('./_object-dp')
+  , anObject = require('./_an-object')
+  , getKeys  = require('./_object-keys');
+
+module.exports = require('./_descriptors') ? Object.defineProperties : function defineProperties(O, Properties){
+  anObject(O);
+  var keys   = getKeys(Properties)
+    , length = keys.length
+    , i = 0
+    , P;
+  while(length > i)dP.f(O, P = keys[i++], Properties[P]);
+  return O;
+};
+},{"./_an-object":7,"./_descriptors":14,"./_object-dp":32,"./_object-keys":36}],34:[function(require,module,exports){
+// 19.1.2.9 / 15.2.3.2 Object.getPrototypeOf(O)
+var has         = require('./_has')
+  , toObject    = require('./_to-object')
+  , IE_PROTO    = require('./_shared-key')('IE_PROTO')
+  , ObjectProto = Object.prototype;
+
+module.exports = Object.getPrototypeOf || function(O){
+  O = toObject(O);
+  if(has(O, IE_PROTO))return O[IE_PROTO];
+  if(typeof O.constructor == 'function' && O instanceof O.constructor){
+    return O.constructor.prototype;
+  } return O instanceof Object ? ObjectProto : null;
+};
+},{"./_has":20,"./_shared-key":40,"./_to-object":47}],35:[function(require,module,exports){
+var has          = require('./_has')
+  , toIObject    = require('./_to-iobject')
+  , arrayIndexOf = require('./_array-includes')(false)
+  , IE_PROTO     = require('./_shared-key')('IE_PROTO');
+
+module.exports = function(object, names){
+  var O      = toIObject(object)
+    , i      = 0
+    , result = []
+    , key;
+  for(key in O)if(key != IE_PROTO)has(O, key) && result.push(key);
+  // Don't enum bug & hidden keys
+  while(names.length > i)if(has(O, key = names[i++])){
+    ~arrayIndexOf(result, key) || result.push(key);
+  }
+  return result;
+};
+},{"./_array-includes":8,"./_has":20,"./_shared-key":40,"./_to-iobject":45}],36:[function(require,module,exports){
+// 19.1.2.14 / 15.2.3.14 Object.keys(O)
+var $keys       = require('./_object-keys-internal')
+  , enumBugKeys = require('./_enum-bug-keys');
+
+module.exports = Object.keys || function keys(O){
+  return $keys(O, enumBugKeys);
+};
+},{"./_enum-bug-keys":16,"./_object-keys-internal":35}],37:[function(require,module,exports){
+module.exports = function(bitmap, value){
+  return {
+    enumerable  : !(bitmap & 1),
+    configurable: !(bitmap & 2),
+    writable    : !(bitmap & 4),
+    value       : value
+  };
+};
+},{}],38:[function(require,module,exports){
+module.exports = require('./_hide');
+},{"./_hide":21}],39:[function(require,module,exports){
+var def = require('./_object-dp').f
+  , has = require('./_has')
+  , TAG = require('./_wks')('toStringTag');
+
+module.exports = function(it, tag, stat){
+  if(it && !has(it = stat ? it : it.prototype, TAG))def(it, TAG, {configurable: true, value: tag});
+};
+},{"./_has":20,"./_object-dp":32,"./_wks":50}],40:[function(require,module,exports){
+var shared = require('./_shared')('keys')
+  , uid    = require('./_uid');
+module.exports = function(key){
+  return shared[key] || (shared[key] = uid(key));
+};
+},{"./_shared":41,"./_uid":49}],41:[function(require,module,exports){
+var global = require('./_global')
+  , SHARED = '__core-js_shared__'
+  , store  = global[SHARED] || (global[SHARED] = {});
+module.exports = function(key){
+  return store[key] || (store[key] = {});
+};
+},{"./_global":19}],42:[function(require,module,exports){
+var toInteger = require('./_to-integer')
+  , defined   = require('./_defined');
+// true  -> String#at
+// false -> String#codePointAt
+module.exports = function(TO_STRING){
+  return function(that, pos){
+    var s = String(defined(that))
+      , i = toInteger(pos)
+      , l = s.length
+      , a, b;
+    if(i < 0 || i >= l)return TO_STRING ? '' : undefined;
+    a = s.charCodeAt(i);
+    return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff
+      ? TO_STRING ? s.charAt(i) : a
+      : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
+  };
+};
+},{"./_defined":13,"./_to-integer":44}],43:[function(require,module,exports){
+var toInteger = require('./_to-integer')
+  , max       = Math.max
+  , min       = Math.min;
+module.exports = function(index, length){
+  index = toInteger(index);
+  return index < 0 ? max(index + length, 0) : min(index, length);
+};
+},{"./_to-integer":44}],44:[function(require,module,exports){
+// 7.1.4 ToInteger
+var ceil  = Math.ceil
+  , floor = Math.floor;
+module.exports = function(it){
+  return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
+};
+},{}],45:[function(require,module,exports){
+// to indexed object, toObject with fallback for non-array-like ES3 strings
+var IObject = require('./_iobject')
+  , defined = require('./_defined');
+module.exports = function(it){
+  return IObject(defined(it));
+};
+},{"./_defined":13,"./_iobject":24}],46:[function(require,module,exports){
+// 7.1.15 ToLength
+var toInteger = require('./_to-integer')
+  , min       = Math.min;
+module.exports = function(it){
+  return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0; // pow(2, 53) - 1 == 9007199254740991
+};
+},{"./_to-integer":44}],47:[function(require,module,exports){
+// 7.1.13 ToObject(argument)
+var defined = require('./_defined');
+module.exports = function(it){
+  return Object(defined(it));
+};
+},{"./_defined":13}],48:[function(require,module,exports){
+// 7.1.1 ToPrimitive(input [, PreferredType])
+var isObject = require('./_is-object');
+// instead of the ES6 spec version, we didn't implement @@toPrimitive case
+// and the second argument - flag - preferred type is a string
+module.exports = function(it, S){
+  if(!isObject(it))return it;
+  var fn, val;
+  if(S && typeof (fn = it.toString) == 'function' && !isObject(val = fn.call(it)))return val;
+  if(typeof (fn = it.valueOf) == 'function' && !isObject(val = fn.call(it)))return val;
+  if(!S && typeof (fn = it.toString) == 'function' && !isObject(val = fn.call(it)))return val;
+  throw TypeError("Can't convert object to primitive value");
+};
+},{"./_is-object":25}],49:[function(require,module,exports){
+var id = 0
+  , px = Math.random();
+module.exports = function(key){
+  return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
+};
+},{}],50:[function(require,module,exports){
+var store      = require('./_shared')('wks')
+  , uid        = require('./_uid')
+  , Symbol     = require('./_global').Symbol
+  , USE_SYMBOL = typeof Symbol == 'function';
+
+var $exports = module.exports = function(name){
+  return store[name] || (store[name] =
+    USE_SYMBOL && Symbol[name] || (USE_SYMBOL ? Symbol : uid)('Symbol.' + name));
+};
+
+$exports.store = store;
+},{"./_global":19,"./_shared":41,"./_uid":49}],51:[function(require,module,exports){
+var classof   = require('./_classof')
+  , ITERATOR  = require('./_wks')('iterator')
+  , Iterators = require('./_iterators');
+module.exports = require('./_core').getIteratorMethod = function(it){
+  if(it != undefined)return it[ITERATOR]
+    || it['@@iterator']
+    || Iterators[classof(it)];
+};
+},{"./_classof":9,"./_core":11,"./_iterators":29,"./_wks":50}],52:[function(require,module,exports){
+var anObject = require('./_an-object')
+  , get      = require('./core.get-iterator-method');
+module.exports = require('./_core').getIterator = function(it){
+  var iterFn = get(it);
+  if(typeof iterFn != 'function')throw TypeError(it + ' is not iterable!');
+  return anObject(iterFn.call(it));
+};
+},{"./_an-object":7,"./_core":11,"./core.get-iterator-method":51}],53:[function(require,module,exports){
+'use strict';
+var addToUnscopables = require('./_add-to-unscopables')
+  , step             = require('./_iter-step')
+  , Iterators        = require('./_iterators')
+  , toIObject        = require('./_to-iobject');
+
+// 22.1.3.4 Array.prototype.entries()
+// 22.1.3.13 Array.prototype.keys()
+// 22.1.3.29 Array.prototype.values()
+// 22.1.3.30 Array.prototype[@@iterator]()
+module.exports = require('./_iter-define')(Array, 'Array', function(iterated, kind){
+  this._t = toIObject(iterated); // target
+  this._i = 0;                   // next index
+  this._k = kind;                // kind
+// 22.1.5.2.1 %ArrayIteratorPrototype%.next()
+}, function(){
+  var O     = this._t
+    , kind  = this._k
+    , index = this._i++;
+  if(!O || index >= O.length){
+    this._t = undefined;
+    return step(1);
+  }
+  if(kind == 'keys'  )return step(0, index);
+  if(kind == 'values')return step(0, O[index]);
+  return step(0, [index, O[index]]);
+}, 'values');
+
+// argumentsList[@@iterator] is %ArrayProto_values% (9.4.4.6, 9.4.4.7)
+Iterators.Arguments = Iterators.Array;
+
+addToUnscopables('keys');
+addToUnscopables('values');
+addToUnscopables('entries');
+},{"./_add-to-unscopables":6,"./_iter-define":27,"./_iter-step":28,"./_iterators":29,"./_to-iobject":45}],54:[function(require,module,exports){
+'use strict';
+var $at  = require('./_string-at')(true);
+
+// 21.1.3.27 String.prototype[@@iterator]()
+require('./_iter-define')(String, 'String', function(iterated){
+  this._t = String(iterated); // target
+  this._i = 0;                // next index
+// 21.1.5.2.1 %StringIteratorPrototype%.next()
+}, function(){
+  var O     = this._t
+    , index = this._i
+    , point;
+  if(index >= O.length)return {value: undefined, done: true};
+  point = $at(O, index);
+  this._i += point.length;
+  return {value: point, done: false};
+});
+},{"./_iter-define":27,"./_string-at":42}],55:[function(require,module,exports){
+require('./es6.array.iterator');
+var global        = require('./_global')
+  , hide          = require('./_hide')
+  , Iterators     = require('./_iterators')
+  , TO_STRING_TAG = require('./_wks')('toStringTag');
+
+for(var collections = ['NodeList', 'DOMTokenList', 'MediaList', 'StyleSheetList', 'CSSRuleList'], i = 0; i < 5; i++){
+  var NAME       = collections[i]
+    , Collection = global[NAME]
+    , proto      = Collection && Collection.prototype;
+  if(proto && !proto[TO_STRING_TAG])hide(proto, TO_STRING_TAG, NAME);
+  Iterators[NAME] = Iterators.Array;
+}
+},{"./_global":19,"./_hide":21,"./_iterators":29,"./_wks":50,"./es6.array.iterator":53}],56:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -17086,7 +17725,7 @@
 }.call(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],2:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 //! moment.js
 //! version : 2.17.1
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
@@ -21389,7 +22028,7 @@ return hooks;
 
 })));
 
-},{}],3:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -21571,7 +22210,494 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],4:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
+var __vueify_insert__ = require("vueify/lib/insert-css")
+var __vueify_style__ = __vueify_insert__.insert("\n.datepicker-overlay[_v-4143a864] {\n  position: fixed;\n  width: 100%;\n  height: 100%;\n  z-index: 998;\n  top: 0;\n  left: 0;\n  overflow: hidden;\n  -webkit-animation: fadein 0.5s;\n  /* Safari, Chrome and Opera > 12.1 */\n  -moz-animation: fadein 0.5s;\n  /* Firefox < 16 */\n  -ms-animation: fadein 0.5s;\n  /* Internet Explorer */\n  -o-animation: fadein 0.5s;\n  /* Opera < 12.1 */\n  animation: fadein 0.5s;\n}\n\n@keyframes fadein {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n\n\n/* Firefox < 16 */\n\n@-moz-keyframes fadein {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n\n\n/* Safari, Chrome and Opera > 12.1 */\n\n@-webkit-keyframes fadein {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n\n\n/* Internet Explorer */\n\n@-ms-keyframes fadein {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n\n\n/* Opera < 12.1 */\n\n@-o-keyframes fadein {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n\n.cov-date-body[_v-4143a864] {\n  display: inline-block;\n  background: #3F51B5;\n  overflow: hidden;\n  position: relative;\n  font-size: 16px;\n  font-family: 'Roboto';\n  font-weight: 400;\n  position: fixed;\n  display: block;\n  width: 400px;\n  max-width: 100%;\n  z-index: 999;\n  top: 50%;\n  left: 50%;\n  -webkit-transform: translate(-50%, -50%);\n  -ms-transform: translate(-50%, -50%);\n  transform: translate(-50%, -50%);\n  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2);\n}\n\n.cov-picker-box[_v-4143a864] {\n  background: #fff;\n  width: 100%;\n  display: inline-block;\n  padding: 25px;\n  box-sizing: border-box !important;\n  -moz-box-sizing: border-box !important;\n  -webkit-box-sizing: border-box !important;\n  -ms-box-sizing: border-box !important;\n  width: 400px;\n  max-width: 100%;\n  height: 280px;\n  text-align: start!important;\n}\n\n.cov-picker-box td[_v-4143a864] {\n  height: 34px;\n  width: 34px;\n  padding: 0;\n  line-height: 34px;\n  color: #000;\n  background: #fff;\n  text-align: center;\n  cursor: pointer;\n}\n\n.cov-picker-box td[_v-4143a864]:hover {\n  background: #E6E6E6;\n}\n\ntable[_v-4143a864] {\n  border-collapse: collapse;\n  border-spacing: 0;\n  width: 100%;\n}\n\n.day[_v-4143a864] {\n  width: 14.2857143%;\n  display: inline-block;\n  text-align: center;\n  cursor: pointer;\n  height: 34px;\n  padding: 0;\n  line-height: 34px;\n  color: #000;\n  background: #fff;\n  vertical-align: middle;\n}\n\n.week ul[_v-4143a864] {\n  margin: 0 0 8px;\n  padding: 0;\n  list-style: none;\n}\n\n.week ul li[_v-4143a864] {\n  width: 14.2%;\n  display: inline-block;\n  text-align: center;\n  background: transparent;\n  color: #000;\n  font-weight: bold;\n}\n\n.passive-day[_v-4143a864] {\n  color: #bbb;\n}\n\n.checked[_v-4143a864] {\n  background: #F50057;\n  color: #FFF !important;\n  border-radius: 3px;\n}\n\n.unavailable[_v-4143a864] {\n  color: #ccc;\n  cursor: not-allowed;\n}\n\n.cov-date-monthly[_v-4143a864] {\n  height: 150px;\n}\n\n.cov-date-monthly > div[_v-4143a864] {\n  display: inline-block;\n  padding: 0;\n  margin: 0;\n  vertical-align: middle;\n  color: #fff;\n  height: 150px;\n  float: left;\n  text-align: center;\n  cursor: pointer;\n}\n\n.cov-date-previous[_v-4143a864],\n.cov-date-next[_v-4143a864] {\n  position: relative;\n  width: 20% !important;\n  text-indent: -300px;\n  overflow: hidden;\n  color: #fff;\n}\n\n.cov-date-caption[_v-4143a864] {\n  width: 60%;\n  padding: 50px 0!important;\n  box-sizing: border-box;\n  font-size: 24px;\n}\n\n.cov-date-caption span[_v-4143a864]:hover {\n  color: rgba(255, 255, 255, 0.7);\n}\n\n.cov-date-previous[_v-4143a864]:hover,\n.cov-date-next[_v-4143a864]:hover {\n  background: rgba(255, 255, 255, 0.1);\n}\n\n.day[_v-4143a864]:hover {\n  background: #EAEAEA;\n}\n\n.unavailable[_v-4143a864]:hover {\n  background: none;\n}\n\n.checked[_v-4143a864]:hover {\n  background: #FF4F8E;\n}\n\n.cov-date-next[_v-4143a864]::before,\n.cov-date-previous[_v-4143a864]::before {\n  width: 20px;\n  height: 2px;\n  text-align: center;\n  position: absolute;\n  background: #fff;\n  top: 50%;\n  margin-top: -7px;\n  margin-left: -7px;\n  left: 50%;\n  line-height: 0;\n  content: '';\n  -webkit-transform: rotate(45deg);\n  -moz-transform: rotate(45deg);\n  transform: rotate(45deg);\n}\n\n.cov-date-next[_v-4143a864]::after,\n.cov-date-previous[_v-4143a864]::after {\n  width: 20px;\n  height: 2px;\n  text-align: center;\n  position: absolute;\n  background: #fff;\n  margin-top: 6px;\n  margin-left: -7px;\n  top: 50%;\n  left: 50%;\n  line-height: 0;\n  content: '';\n  -webkit-transform: rotate(-45deg);\n  -moz-transform: rotate(-45deg);\n  transform: rotate(-45deg);\n}\n\n.cov-date-previous[_v-4143a864]::after {\n  -webkit-transform: rotate(45deg);\n  -moz-transform: rotate(45deg);\n  transform: rotate(45deg);\n}\n\n.cov-date-previous[_v-4143a864]::before {\n  -webkit-transform: rotate(-45deg);\n  -moz-transform: rotate(-45deg);\n  transform: rotate(-45deg);\n}\n\n.date-item[_v-4143a864] {\n  text-align: center;\n  font-size: 20px;\n  padding: 10px 0;\n  cursor: pointer;\n}\n\n.date-item[_v-4143a864]:hover {\n  background: #e0e0e0;\n}\n\n.date-list[_v-4143a864] {\n  overflow: auto;\n  vertical-align: top;\n  padding: 0;\n}\n\n.cov-vue-date[_v-4143a864] {\n  display: inline-block;\n  color: #5D5D5D;\n}\n\n.button-box[_v-4143a864] {\n  background: #fff;\n  vertical-align: top;\n  height: 50px;\n  line-height: 50px;\n  text-align: right;\n  padding-right: 20px;\n}\n\n.button-box span[_v-4143a864] {\n  cursor: pointer;\n  padding: 10px 20px;\n}\n\n.watch-box[_v-4143a864] {\n  height: 100%;\n  overflow: hidden;\n}\n\n.hour-box[_v-4143a864],\n.min-box[_v-4143a864] {\n  display: inline-block;\n  width: 50%;\n  text-align: center;\n  height: 100%;\n  overflow: auto;\n  float: left;\n}\n\n.hour-box ul[_v-4143a864],\n.min-box ul[_v-4143a864] {\n  list-style: none;\n  margin: 0;\n  padding: 0;\n}\n\n.hour-item[_v-4143a864],\n.min-item[_v-4143a864] {\n  padding: 10px;\n  font-size: 36px;\n  cursor: pointer;\n}\n\n.hour-item[_v-4143a864]:hover,\n.min-item[_v-4143a864]:hover {\n  background: #E3E3E3;\n}\n\n.hour-box .active[_v-4143a864],\n.min-box .active[_v-4143a864] {\n  background: #F50057;\n  color: #FFF !important;\n}\n\n[_v-4143a864]::-webkit-scrollbar {\n  width: 2px;\n}\n\n[_v-4143a864]::-webkit-scrollbar-track {\n  background: #E3E3E3;\n}\n\n[_v-4143a864]::-webkit-scrollbar-thumb {\n  background: #C1C1C1;\n  border-radius: 2px;\n}\n")
+
+
+'use strict';
+
+var _stringify = require('babel-runtime/core-js/json/stringify');
+
+var _stringify2 = _interopRequireDefault2(_stringify);
+
+var _getIterator2 = require('babel-runtime/core-js/get-iterator');
+
+var _getIterator3 = _interopRequireDefault2(_getIterator2);
+
+function _interopRequireDefault2(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _moment = require('moment');
+
+var _moment2 = _interopRequireDefault(_moment);
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
+
+exports.default = {
+  props: {
+    required: false,
+    time: {
+      type: String,
+      required: true
+    },
+    option: {
+      type: Object,
+      default: function _default() {
+        return {
+          type: 'day',
+          SundayFirst: false,
+          week: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
+          month: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+          format: 'YYYY-MM-DD',
+          color: {
+            checked: '#F50057',
+            header: '#3f51b5',
+            headerText: '#fff'
+          },
+          inputStyle: {
+            'display': 'inline-block',
+            'padding': '6px',
+            'line-height': '22px',
+            'font-size': '16px',
+            'border': '2px solid #fff',
+            'box-shadow': '0 1px 3px 0 rgba(0, 0, 0, 0.2)',
+            'border-radius': '2px',
+            'color': '#5F5F5F'
+          },
+          inputClass: 'cov-datepicker',
+          placeholder: 'when?',
+          buttons: {
+            ok: 'OK',
+            cancel: 'Cancel'
+          },
+          overlayOpacity: 0.5,
+          dismissible: true
+        };
+      }
+    },
+    limit: {
+      type: Array,
+      default: function _default() {
+        return [];
+      }
+    }
+  },
+  data: function data() {
+    function hours() {
+      var list = [];
+      var hour = 24;
+      while (hour > 0) {
+        hour--;
+        list.push({
+          checked: false,
+          value: hour < 10 ? '0' + hour : hour
+        });
+      }
+      return list;
+    }
+
+    function mins() {
+      var list = [];
+      var min = 60;
+      while (min > 0) {
+        min--;
+        list.push({
+          checked: false,
+          value: min < 10 ? '0' + min : min
+        });
+      }
+      return list;
+    }
+    return {
+      hours: hours(),
+      mins: mins(),
+      showInfo: {
+        hour: false,
+        day: false,
+        month: false,
+        year: false,
+        check: false
+      },
+      displayInfo: {
+        month: ''
+      },
+      library: {
+        week: this.option.week,
+        month: this.option.month,
+        year: []
+      },
+      checked: {
+        oldtime: '',
+        currentMoment: null,
+        year: '',
+        month: '',
+        day: '',
+        hour: '00',
+        min: '00'
+      },
+      dayList: [],
+      selectedDays: []
+    };
+  },
+
+  methods: {
+    pad: function pad(n) {
+      n = Math.floor(n);
+      return n < 10 ? '0' + n : n;
+    },
+    nextMonth: function nextMonth(type) {
+      var next = null;
+      type === 'next' ? next = (0, _moment2.default)(this.checked.currentMoment).add(1, 'M') : next = (0, _moment2.default)(this.checked.currentMoment).add(-1, 'M');
+      this.showDay(next);
+    },
+    showDay: function showDay(time) {
+      if (time === undefined || !Date.parse(time)) {
+        this.checked.currentMoment = (0, _moment2.default)();
+      } else {
+        this.checked.currentMoment = (0, _moment2.default)(time, this.option.format);
+      }
+      this.showOne('day');
+      this.checked.year = (0, _moment2.default)(this.checked.currentMoment).format('YYYY');
+      this.checked.month = (0, _moment2.default)(this.checked.currentMoment).format('MM');
+      this.checked.day = (0, _moment2.default)(this.checked.currentMoment).format('DD');
+      this.displayInfo.month = this.library.month[(0, _moment2.default)(this.checked.currentMoment).month()];
+      var days = [];
+      var currentMoment = this.checked.currentMoment;
+      var firstDay = (0, _moment2.default)(currentMoment).date(1).day();
+      // gettting previous and next month
+      // let currentMonth = moment(currentMoment)
+      var previousMonth = (0, _moment2.default)(currentMoment);
+      var nextMonth = (0, _moment2.default)(currentMoment);
+      nextMonth.add(1, 'months');
+      previousMonth.subtract(1, 'months');
+      var monthDays = (0, _moment2.default)(currentMoment).daysInMonth();
+      var oldtime = this.checked.oldtime;
+      for (var i = 1; i <= monthDays; ++i) {
+        days.push({
+          value: i,
+          inMonth: true,
+          unavailable: false,
+          checked: false,
+          moment: (0, _moment2.default)(currentMoment).date(i)
+        });
+        if (i === Math.ceil((0, _moment2.default)(currentMoment).format('D')) && (0, _moment2.default)(oldtime, this.option.format).year() === (0, _moment2.default)(currentMoment).year() && (0, _moment2.default)(oldtime, this.option.format).month() === (0, _moment2.default)(currentMoment).month()) {
+          days[i - 1].checked = true;
+        }
+        this.checkBySelectDays(i, days);
+      }
+      if (firstDay === 0) firstDay = 7;
+      for (var _i = 0; _i < firstDay - (this.option.SundayFirst ? 0 : 1); _i++) {
+        var passiveDay = {
+          value: previousMonth.daysInMonth() - _i,
+          inMonth: false,
+          action: 'previous',
+          unavailable: false,
+          checked: false,
+          moment: (0, _moment2.default)(currentMoment).date(1).subtract(_i + 1, 'days')
+        };
+        days.unshift(passiveDay);
+      }
+      if (this.limit.length > 0) {
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+          for (var _iterator = (0, _getIterator3.default)(this.limit), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var li = _step.value;
+
+            switch (li.type) {
+              case 'fromto':
+                days = this.limitFromTo(li, days);
+                break;
+              case 'weekday':
+                days = this.limitWeekDay(li, days);
+                break;
+            }
+          }
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion && _iterator.return) {
+              _iterator.return();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
+          }
+        }
+      }
+      var passiveDaysAtFinal = 42 - days.length;
+      for (var _i2 = 1; _i2 <= passiveDaysAtFinal; _i2++) {
+        var _passiveDay = {
+          value: _i2,
+          inMonth: false,
+          action: 'next',
+          unavailable: false,
+          checked: false,
+          moment: (0, _moment2.default)(currentMoment).add(1, 'months').date(_i2)
+        };
+        days.push(_passiveDay);
+      }
+      this.dayList = days;
+    },
+    checkBySelectDays: function checkBySelectDays(d, days) {
+      var _this = this;
+
+      this.selectedDays.forEach(function (day) {
+        if (_this.checked.year === (0, _moment2.default)(day).format('YYYY') && _this.checked.month === (0, _moment2.default)(day).format('MM') && d === Math.ceil((0, _moment2.default)(day).format('D'))) {
+          days[d - 1].checked = true;
+        }
+      });
+    },
+    limitWeekDay: function limitWeekDay(limit, days) {
+      days.map(function (day) {
+        if (limit.available.indexOf(Math.floor(day.moment.format('d'))) === -1) {
+          day.unavailable = true;
+        }
+      });
+      return days;
+    },
+    limitFromTo: function limitFromTo(limit, days) {
+      var _this2 = this;
+
+      if (limit.from || limit.to) {
+        days.map(function (day) {
+          if (_this2.getLimitCondition(limit, day)) {
+            day.unavailable = true;
+          }
+        });
+      }
+      return days;
+    },
+    getLimitCondition: function getLimitCondition(limit, day) {
+      var tmpMoment = (0, _moment2.default)(this.checked.year + '-' + this.pad(this.checked.month) + '-' + this.pad(day.value));
+      if (limit.from && !limit.to) {
+        return !tmpMoment.isAfter(limit.from);
+      } else if (!limit.from && limit.to) {
+        return !tmpMoment.isBefore(limit.to);
+      } else {
+        return !tmpMoment.isBetween(limit.from, limit.to);
+      }
+    },
+    checkDay: function checkDay(obj) {
+      if (obj.unavailable || obj.value === '') {
+        return false;
+      }
+      if (!obj.inMonth) {
+        this.nextMonth(obj.action);
+      }
+      if (this.option.type === 'day' || this.option.type === 'min') {
+        this.dayList.forEach(function (x) {
+          x.checked = false;
+        });
+        this.checked.day = this.pad(obj.value);
+        obj.checked = true;
+      } else {
+        var day = this.pad(obj.value);
+        var ctime = this.checked.year + '-' + this.checked.month + '-' + day;
+        if (obj.checked === true) {
+          obj.checked = false;
+          this.selectedDays.$remove(ctime);
+        } else {
+          this.selectedDays.push(ctime);
+          obj.checked = true;
+        }
+      }
+      switch (this.option.type) {
+        case 'day':
+          this.picked();
+          break;
+        case 'min':
+          this.showOne('hour');
+          // shift activated time items to visible position.
+          this.shiftActTime();
+          break;
+      }
+    },
+    showYear: function showYear() {
+      var _this3 = this;
+
+      var year = (0, _moment2.default)(this.checked.currentMoment).year();
+      this.library.year = [];
+      var yearTmp = [];
+      for (var i = year - 100; i < year + 5; ++i) {
+        yearTmp.push(i);
+      }
+      this.library.year = yearTmp;
+      this.showOne('year');
+      this.$nextTick(function () {
+        var listDom = document.getElementById('yearList');
+        listDom.scrollTop = listDom.scrollHeight - 100;
+        _this3.addYear();
+      });
+    },
+    showOne: function showOne(type) {
+      switch (type) {
+        case 'year':
+          this.showInfo.hour = false;
+          this.showInfo.day = false;
+          this.showInfo.year = true;
+          this.showInfo.month = false;
+          break;
+        case 'month':
+          this.showInfo.hour = false;
+          this.showInfo.day = false;
+          this.showInfo.year = false;
+          this.showInfo.month = true;
+          break;
+        case 'day':
+          this.showInfo.hour = false;
+          this.showInfo.day = true;
+          this.showInfo.year = false;
+          this.showInfo.month = false;
+          break;
+        case 'hour':
+          this.showInfo.hour = true;
+          this.showInfo.day = false;
+          this.showInfo.year = false;
+          this.showInfo.month = false;
+          break;
+        default:
+          this.showInfo.day = true;
+          this.showInfo.year = false;
+          this.showInfo.month = false;
+          this.showInfo.hour = false;
+      }
+    },
+    showMonth: function showMonth() {
+      this.showOne('month');
+    },
+    addYear: function addYear() {
+      var _this4 = this;
+
+      var listDom = document.getElementById('yearList');
+      listDom.addEventListener('scroll', function (e) {
+        if (listDom.scrollTop < listDom.scrollHeight - 100) {
+          var len = _this4.library.year.length;
+          var lastYear = _this4.library.year[len - 1];
+          _this4.library.year.push(lastYear + 1);
+        }
+      }, false);
+    },
+    setYear: function setYear(year) {
+      this.checked.currentMoment = (0, _moment2.default)(year + '-' + this.checked.month + '-' + this.checked.day);
+      this.showDay(this.checked.currentMoment);
+    },
+    setMonth: function setMonth(month) {
+      var mo = this.library.month.indexOf(month) + 1;
+      if (mo < 10) {
+        mo = '0' + '' + mo;
+      }
+      this.checked.currentMoment = (0, _moment2.default)(this.checked.year + '-' + mo + '-' + this.checked.day);
+      this.showDay(this.checked.currentMoment);
+    },
+    showCheck: function showCheck() {
+      if (this.time === '') {
+        this.showDay();
+      } else {
+        if (this.option.type === 'day' || this.option.type === 'min') {
+          this.checked.oldtime = this.time;
+          this.showDay(this.time);
+        } else {
+          this.selectedDays = JSON.parse(this.time);
+          if (this.selectedDays.length) {
+            this.checked.oldtime = this.selectedDays[0];
+            this.showDay(this.selectedDays[0]);
+          } else {
+            this.showDay();
+          }
+        }
+      }
+      this.showInfo.check = true;
+    },
+    setTime: function setTime(type, obj, list) {
+      var _iteratorNormalCompletion2 = true;
+      var _didIteratorError2 = false;
+      var _iteratorError2 = undefined;
+
+      try {
+        for (var _iterator2 = (0, _getIterator3.default)(list), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var item = _step2.value;
+
+          item.checked = false;
+          if (item.value === obj.value) {
+            item.checked = true;
+            this.checked[type] = item.value;
+          }
+        }
+      } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion2 && _iterator2.return) {
+            _iterator2.return();
+          }
+        } finally {
+          if (_didIteratorError2) {
+            throw _iteratorError2;
+          }
+        }
+      }
+    },
+    picked: function picked() {
+      if (this.option.type === 'day' || this.option.type === 'min') {
+        var ctime = this.checked.year + '-' + this.checked.month + '-' + this.checked.day + ' ' + this.checked.hour + ':' + this.checked.min;
+        this.checked.currentMoment = (0, _moment2.default)(ctime, 'YYYY-MM-DD HH:mm');
+        this.time = (0, _moment2.default)(this.checked.currentMoment).format(this.option.format);
+      } else {
+        this.time = (0, _stringify2.default)(this.selectedDays);
+      }
+      this.showInfo.check = false;
+      this.$emit('change', this.time);
+    },
+    dismiss: function dismiss(evt) {
+      if (evt.target.className === 'datepicker-overlay') {
+        if (this.option.dismissible === undefined || this.option.dismissible) {
+          this.showInfo.check = false;
+          this.$emit('cancel');
+        }
+      }
+    },
+    shiftActTime: function shiftActTime() {
+      // shift activated time items to visible position.
+      this.$nextTick(function () {
+        if (!document.querySelector('.hour-item.active')) {
+          return false;
+        }
+        document.querySelector('.hour-box').scrollTop = (document.querySelector('.hour-item.active').offsetTop || 0) - 250;
+        document.querySelector('.min-box').scrollTop = (document.querySelector('.min-item.active').offsetTop || 0) - 250;
+      });
+    }
+  }
+};
+if (module.exports.__esModule) module.exports = module.exports.default
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"cov-vue-date\" _v-4143a864=\"\">\n  <div class=\"datepickbox\" _v-4143a864=\"\">\n    <input type=\"text\" title=\"input date\" :class=\"option.inputClass\" readonly=\"readonly\" :placeholder=\"option.placeholder\" v-model=\"time\" :required=\"required\" @click=\"showCheck\" @foucus=\"showCheck\" :style=\"option.inputStyle\" _v-4143a864=\"\">\n  </div>\n  <div class=\"datepicker-overlay\" v-if=\"showInfo.check\" @click=\"dismiss($event)\" v-bind:style=\"{'background' : option.overlayOpacity? 'rgba(0,0,0,'+option.overlayOpacity+')' : 'rgba(0,0,0,0.5)'}\" _v-4143a864=\"\">\n    <div class=\"cov-date-body\" :style=\"{'background-color': option.color ? option.color.header : '#3f51b5'}\" _v-4143a864=\"\">\n      <div class=\"cov-date-monthly\" _v-4143a864=\"\">\n        <div class=\"cov-date-previous\" @click=\"nextMonth('pre')\" _v-4143a864=\"\">«</div>\n        <div class=\"cov-date-caption\" :style=\"{'color': option.color ? option.color.headerText : '#fff'}\" _v-4143a864=\"\">\n          <span @click=\"showYear\" _v-4143a864=\"\"><small _v-4143a864=\"\">{{checked.year}}</small></span>\n          <br _v-4143a864=\"\">\n          <span @click=\"showMonth\" _v-4143a864=\"\">{{displayInfo.month}}</span>\n        </div>\n        <div class=\"cov-date-next\" @click=\"nextMonth('next')\" _v-4143a864=\"\">»</div>\n      </div>\n      <div class=\"cov-date-box\" v-if=\"showInfo.day\" _v-4143a864=\"\">\n        <div class=\"cov-picker-box\" _v-4143a864=\"\">\n          <div class=\"week\" _v-4143a864=\"\">\n            <ul _v-4143a864=\"\">\n              <li v-for=\"weekie in library.week\" _v-4143a864=\"\">{{weekie}}</li>\n            </ul>\n          </div>\n          <div class=\"day\" v-for=\"day in dayList\" track-by=\"$index\" @click=\"checkDay(day)\" :class=\"{'checked':day.checked,'unavailable':day.unavailable,'passive-day': !(day.inMonth)}\" :style=\"day.checked ? (option.color &amp;&amp; option.color.checkedDay ? { background: option.color.checkedDay } : { background: '#F50057' }) : {}\" _v-4143a864=\"\">{{day.value}}</div>\n        </div>\n      </div>\n      <div class=\"cov-date-box list-box\" v-if=\"showInfo.year\" _v-4143a864=\"\">\n        <div class=\"cov-picker-box date-list\" id=\"yearList\" _v-4143a864=\"\">\n          <div class=\"date-item\" v-for=\"yearItem in library.year\" track-by=\"$index\" @click=\"setYear(yearItem)\" _v-4143a864=\"\">{{yearItem}}</div>\n        </div>\n      </div>\n      <div class=\"cov-date-box list-box\" v-if=\"showInfo.month\" _v-4143a864=\"\">\n        <div class=\"cov-picker-box date-list\" _v-4143a864=\"\">\n          <div class=\"date-item\" v-for=\"monthItem in library.month\" track-by=\"$index\" @click=\"setMonth(monthItem)\" _v-4143a864=\"\">{{monthItem}}</div>\n        </div>\n      </div>\n      <div class=\"cov-date-box list-box\" v-if=\"showInfo.hour\" _v-4143a864=\"\">\n        <div class=\"cov-picker-box date-list\" _v-4143a864=\"\">\n          <div class=\"watch-box\" _v-4143a864=\"\">\n            <div class=\"hour-box\" _v-4143a864=\"\">\n              <div class=\"mui-pciker-rule mui-pciker-rule-ft\" _v-4143a864=\"\"></div>\n              <ul _v-4143a864=\"\">\n                <li class=\"hour-item\" v-for=\"hitem in hours\" @click=\"setTime('hour', hitem, hours)\" :class=\"{'active':hitem.checked}\" _v-4143a864=\"\">{{hitem.value}}</li>\n              </ul>\n            </div>\n            <div class=\"min-box\" _v-4143a864=\"\">\n              <div class=\"mui-pciker-rule mui-pciker-rule-ft\" _v-4143a864=\"\"></div>\n              <div class=\"min-item\" v-for=\"mitem in mins\" @click=\"setTime('min',mitem, mins)\" :class=\"{'active':mitem.checked}\" _v-4143a864=\"\">{{mitem.value}}</div>\n            </div>\n          </div>\n        </div>\n      </div>\n      <div class=\"button-box\" _v-4143a864=\"\">\n        <span @click=\"showInfo.check=false\" _v-4143a864=\"\">{{option.buttons? option.buttons.cancel : 'Cancel' }}</span>\n        <span @click=\"picked\" _v-4143a864=\"\">{{option.buttons? option.buttons.ok : 'Ok'}}</span>\n      </div>\n    </div>\n  </div>\n</div>\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  module.hot.dispose(function () {
+    __vueify_insert__.cache["\n.datepicker-overlay[_v-4143a864] {\n  position: fixed;\n  width: 100%;\n  height: 100%;\n  z-index: 998;\n  top: 0;\n  left: 0;\n  overflow: hidden;\n  -webkit-animation: fadein 0.5s;\n  /* Safari, Chrome and Opera > 12.1 */\n  -moz-animation: fadein 0.5s;\n  /* Firefox < 16 */\n  -ms-animation: fadein 0.5s;\n  /* Internet Explorer */\n  -o-animation: fadein 0.5s;\n  /* Opera < 12.1 */\n  animation: fadein 0.5s;\n}\n\n@keyframes fadein {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n\n\n/* Firefox < 16 */\n\n@-moz-keyframes fadein {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n\n\n/* Safari, Chrome and Opera > 12.1 */\n\n@-webkit-keyframes fadein {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n\n\n/* Internet Explorer */\n\n@-ms-keyframes fadein {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n\n\n/* Opera < 12.1 */\n\n@-o-keyframes fadein {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n\n.cov-date-body[_v-4143a864] {\n  display: inline-block;\n  background: #3F51B5;\n  overflow: hidden;\n  position: relative;\n  font-size: 16px;\n  font-family: 'Roboto';\n  font-weight: 400;\n  position: fixed;\n  display: block;\n  width: 400px;\n  max-width: 100%;\n  z-index: 999;\n  top: 50%;\n  left: 50%;\n  -webkit-transform: translate(-50%, -50%);\n  -ms-transform: translate(-50%, -50%);\n  transform: translate(-50%, -50%);\n  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2);\n}\n\n.cov-picker-box[_v-4143a864] {\n  background: #fff;\n  width: 100%;\n  display: inline-block;\n  padding: 25px;\n  box-sizing: border-box !important;\n  -moz-box-sizing: border-box !important;\n  -webkit-box-sizing: border-box !important;\n  -ms-box-sizing: border-box !important;\n  width: 400px;\n  max-width: 100%;\n  height: 280px;\n  text-align: start!important;\n}\n\n.cov-picker-box td[_v-4143a864] {\n  height: 34px;\n  width: 34px;\n  padding: 0;\n  line-height: 34px;\n  color: #000;\n  background: #fff;\n  text-align: center;\n  cursor: pointer;\n}\n\n.cov-picker-box td[_v-4143a864]:hover {\n  background: #E6E6E6;\n}\n\ntable[_v-4143a864] {\n  border-collapse: collapse;\n  border-spacing: 0;\n  width: 100%;\n}\n\n.day[_v-4143a864] {\n  width: 14.2857143%;\n  display: inline-block;\n  text-align: center;\n  cursor: pointer;\n  height: 34px;\n  padding: 0;\n  line-height: 34px;\n  color: #000;\n  background: #fff;\n  vertical-align: middle;\n}\n\n.week ul[_v-4143a864] {\n  margin: 0 0 8px;\n  padding: 0;\n  list-style: none;\n}\n\n.week ul li[_v-4143a864] {\n  width: 14.2%;\n  display: inline-block;\n  text-align: center;\n  background: transparent;\n  color: #000;\n  font-weight: bold;\n}\n\n.passive-day[_v-4143a864] {\n  color: #bbb;\n}\n\n.checked[_v-4143a864] {\n  background: #F50057;\n  color: #FFF !important;\n  border-radius: 3px;\n}\n\n.unavailable[_v-4143a864] {\n  color: #ccc;\n  cursor: not-allowed;\n}\n\n.cov-date-monthly[_v-4143a864] {\n  height: 150px;\n}\n\n.cov-date-monthly > div[_v-4143a864] {\n  display: inline-block;\n  padding: 0;\n  margin: 0;\n  vertical-align: middle;\n  color: #fff;\n  height: 150px;\n  float: left;\n  text-align: center;\n  cursor: pointer;\n}\n\n.cov-date-previous[_v-4143a864],\n.cov-date-next[_v-4143a864] {\n  position: relative;\n  width: 20% !important;\n  text-indent: -300px;\n  overflow: hidden;\n  color: #fff;\n}\n\n.cov-date-caption[_v-4143a864] {\n  width: 60%;\n  padding: 50px 0!important;\n  box-sizing: border-box;\n  font-size: 24px;\n}\n\n.cov-date-caption span[_v-4143a864]:hover {\n  color: rgba(255, 255, 255, 0.7);\n}\n\n.cov-date-previous[_v-4143a864]:hover,\n.cov-date-next[_v-4143a864]:hover {\n  background: rgba(255, 255, 255, 0.1);\n}\n\n.day[_v-4143a864]:hover {\n  background: #EAEAEA;\n}\n\n.unavailable[_v-4143a864]:hover {\n  background: none;\n}\n\n.checked[_v-4143a864]:hover {\n  background: #FF4F8E;\n}\n\n.cov-date-next[_v-4143a864]::before,\n.cov-date-previous[_v-4143a864]::before {\n  width: 20px;\n  height: 2px;\n  text-align: center;\n  position: absolute;\n  background: #fff;\n  top: 50%;\n  margin-top: -7px;\n  margin-left: -7px;\n  left: 50%;\n  line-height: 0;\n  content: '';\n  -webkit-transform: rotate(45deg);\n  -moz-transform: rotate(45deg);\n  transform: rotate(45deg);\n}\n\n.cov-date-next[_v-4143a864]::after,\n.cov-date-previous[_v-4143a864]::after {\n  width: 20px;\n  height: 2px;\n  text-align: center;\n  position: absolute;\n  background: #fff;\n  margin-top: 6px;\n  margin-left: -7px;\n  top: 50%;\n  left: 50%;\n  line-height: 0;\n  content: '';\n  -webkit-transform: rotate(-45deg);\n  -moz-transform: rotate(-45deg);\n  transform: rotate(-45deg);\n}\n\n.cov-date-previous[_v-4143a864]::after {\n  -webkit-transform: rotate(45deg);\n  -moz-transform: rotate(45deg);\n  transform: rotate(45deg);\n}\n\n.cov-date-previous[_v-4143a864]::before {\n  -webkit-transform: rotate(-45deg);\n  -moz-transform: rotate(-45deg);\n  transform: rotate(-45deg);\n}\n\n.date-item[_v-4143a864] {\n  text-align: center;\n  font-size: 20px;\n  padding: 10px 0;\n  cursor: pointer;\n}\n\n.date-item[_v-4143a864]:hover {\n  background: #e0e0e0;\n}\n\n.date-list[_v-4143a864] {\n  overflow: auto;\n  vertical-align: top;\n  padding: 0;\n}\n\n.cov-vue-date[_v-4143a864] {\n  display: inline-block;\n  color: #5D5D5D;\n}\n\n.button-box[_v-4143a864] {\n  background: #fff;\n  vertical-align: top;\n  height: 50px;\n  line-height: 50px;\n  text-align: right;\n  padding-right: 20px;\n}\n\n.button-box span[_v-4143a864] {\n  cursor: pointer;\n  padding: 10px 20px;\n}\n\n.watch-box[_v-4143a864] {\n  height: 100%;\n  overflow: hidden;\n}\n\n.hour-box[_v-4143a864],\n.min-box[_v-4143a864] {\n  display: inline-block;\n  width: 50%;\n  text-align: center;\n  height: 100%;\n  overflow: auto;\n  float: left;\n}\n\n.hour-box ul[_v-4143a864],\n.min-box ul[_v-4143a864] {\n  list-style: none;\n  margin: 0;\n  padding: 0;\n}\n\n.hour-item[_v-4143a864],\n.min-item[_v-4143a864] {\n  padding: 10px;\n  font-size: 36px;\n  cursor: pointer;\n}\n\n.hour-item[_v-4143a864]:hover,\n.min-item[_v-4143a864]:hover {\n  background: #E3E3E3;\n}\n\n.hour-box .active[_v-4143a864],\n.min-box .active[_v-4143a864] {\n  background: #F50057;\n  color: #FFF !important;\n}\n\n[_v-4143a864]::-webkit-scrollbar {\n  width: 2px;\n}\n\n[_v-4143a864]::-webkit-scrollbar-track {\n  background: #E3E3E3;\n}\n\n[_v-4143a864]::-webkit-scrollbar-thumb {\n  background: #C1C1C1;\n  border-radius: 2px;\n}\n"] = false
+    document.head.removeChild(__vueify_style__)
+  })
+  if (!module.hot.data) {
+    hotAPI.createRecord("_v-4143a864", module.exports)
+  } else {
+    hotAPI.update("_v-4143a864", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+  }
+})()}
+},{"babel-runtime/core-js/get-iterator":1,"babel-runtime/core-js/json/stringify":2,"moment":57,"vue":63,"vue-hot-reload-api":60,"vueify/lib/insert-css":64}],60:[function(require,module,exports){
 var Vue // late bind
 var map = Object.create(null)
 var shimmed = false
@@ -21872,7 +22998,7 @@ function format (id) {
   return match ? match[0] : id
 }
 
-},{}],5:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 /*!
  * vue-resource v0.9.3
  * https://github.com/vuejs/vue-resource
@@ -23185,7 +24311,7 @@ if (typeof window !== 'undefined' && window.Vue) {
 }
 
 module.exports = plugin;
-},{}],6:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 (function (process){
 /*!
  * vue-validator v2.1.7
@@ -25797,7 +26923,7 @@ if (typeof window !== 'undefined' && window.Vue) {
 
 module.exports = plugin;
 }).call(this,require('_process'))
-},{"_process":3}],7:[function(require,module,exports){
+},{"_process":58}],63:[function(require,module,exports){
 (function (process){
 /*!
  * Vue.js v1.0.28
@@ -36038,7 +37164,7 @@ setTimeout(function () {
 
 module.exports = Vue;
 }).call(this,require('_process'))
-},{"_process":3}],8:[function(require,module,exports){
+},{"_process":58}],64:[function(require,module,exports){
 var inserted = exports.cache = {}
 
 exports.insert = function (css) {
@@ -36058,7 +37184,7 @@ exports.insert = function (css) {
   return elem
 }
 
-},{}],9:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1 {\n  color: #00a8ed;\n}")
 'use strict';
@@ -36210,7 +37336,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update("_v-0f74e9a8", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"vue":7,"vue-hot-reload-api":4,"vueify/lib/insert-css":8}],10:[function(require,module,exports){
+},{"vue":63,"vue-hot-reload-api":60,"vueify/lib/insert-css":64}],66:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1 {\r\n  color: #5C5F56;\r\n}\r\n")
 'use strict';
@@ -36255,6 +37381,7 @@ exports.default = {
             typeAlert: '',
             showRow: '',
             all: {}
+
         };
     },
 
@@ -36263,6 +37390,7 @@ exports.default = {
 
     ready: function ready() {
         this.fetchProduct(this.pagination.current_Page, this.showRow);
+
         var self = this;
         jQuery(self.$els.productcols).select2({
             placeholder: "Coluna",
@@ -36440,7 +37568,7 @@ exports.default = {
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div  id=\"alert-message\" class=\"alert alert-{{typeAlert}}\" transition=\"success\" v-if=\"success\">\r\n\t<button type=\"button\" class=\"close\" data-dismiss=\"alert\">x</button>\r\n\t<i class=\"fa fa-thumbs-o-up text-center\">&nbsp;&nbsp; {{msgSucess}}</i>\r\n</div>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class=\"form-inline pull-right\">\r\n\t\t\t<div class=\"input-group\">\r\n\t\t\t\t<select data-toggle=\"tooltip\" title=\"A mostrar linhas na tabela\" class=\"form-control\" name=\"\" v-model=\"showRow\" @change=\"fetchProduct(1, showRow)\">\r\n\t\t\t\t\t<option class=\"\" value=\"5\">05</option>\r\n\t\t\t\t\t<option class=\"\" value=\"10\" selected>10</option>\r\n\t\t\t\t\t<option class=\"\" value=\"20\">20</option>\r\n\t\t\t\t\t<option class=\"\" value=\"50\">50</option>\r\n\t\t\t\t\t<option class=\"\" value=\"100\">100</option>\r\n\t\t\t\t\t<option class=\"\" value=\"200\">200</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t&nbsp;&nbsp;\r\n\t\t\t<div class=\"input-group\">\r\n\t\t\t\t<select data-toggle=\"tooltip\" title=\"Escolhe as colunas a serem filtrados\" class=\"form-control\" name=\"\" v-model=\"columnsFiltered\" multiple=\"multiple\" v-el:productcols>\r\n\t\t\t\t\t<option class=\"\" value=\"name\"=\"\">Nome</option>\r\n\t\t\t\t\t<option class=\"\" value=\"price\">Preço</option>\r\n\t\t\t\t\t<option class=\"\" value=\"description\">Descrição</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t&nbsp;&nbsp;\r\n\t\t\t<div v-if=\"columnsFiltered.length != 0\" class=\"input-group\">\r\n\t\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<input data-toggle=\"tooltip\" title=\"Escreva o valor a ser procurado na Tabela\"\r\n\t\t\t\tv-model=\"filter.term\"\r\n\t\t\t\t@keyup=\"doFilter\"\r\n\t\t\t\ttype=\"text\"\r\n\t\t\t\tclass=\"form-control\"\r\n\t\t\t\tplaceholder=\"Filtrar dados da tabela\"\r\n\t\t\t\taria-describedby=\"basic-addon1\">\r\n\t\t\t</div>\r\n\r\n\t\t\t<div v-else class=\"input-group\">\r\n\t\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<input :disabled=\"columnsFiltered.length == 0\" data-toggle=\"tooltip\" title=\"Para ativar introduza um valor na Coluna\"\r\n\t\t\t\ttype=\"text\"\r\n\t\t\t\tclass=\"form-control\"\r\n\t\t\t\tplaceholder=\"Filtrar dados da tabela\"\r\n\t\t\t\taria-describedby=\"basic-addon1\">\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-product\"><i class=\"fa fa-plus\"></i> Novo</button>\r\n\t</div>\r\n</div>\r\n\r\n<br>\r\n<div class=\"row\">\r\n\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class='table-responsive'>\r\n\t\t\t<table class='table table-striped table-hover table-success'>\r\n\t\t\t\t<thead>\r\n\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'name')\">Nome</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'price' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'price' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'price')\">Preço</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'description')\">Descrição</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</thead>\r\n\t\t\t\t<tbody>\r\n\t\t\t\t\t<tr v-for=\"product in products | filterBy filter.term | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t\t<td><a href=\"#\" data-toggle=\"modal\" data-target=\"#show-product\" @click=\"getThisProduct(product.id)\">{{ product.name }}</a></td>\r\n\t\t\t\t\t\t<td>{{ product.price }}</td>\r\n\t\t\t\t\t\t<td>{{ product.description }}</td>\r\n\t\t\t\t\t\t<td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-product\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisProduct(product.id)\" > </i></a></td>\r\n\t\t\t\t\t\t<td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-product\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisProduct(product.id)\"></i></a></td>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</tbody>\r\n\t\t\t</table>\r\n\t\t\t<div class=\"row\">\r\n\t\t\t\t<div class=\"col-md-6 pull-left\">\r\n\t\t\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"col-md-6 pull-right\">\r\n\t\t\t\t\t<h6 class=\"text-right text-help\"> Mostrar de <span class=\"badge\">{{pagination.from}}</span>  a <span class=\"badge\">{{pagination.to}}</span>  no total de <span class=\"badge\">{{pagination.total}}</span></h6>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<div id=\"show-product\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Detalhes do {{ newProduct.name }}</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class='table-responsive'>\r\n\t\t\t\t\t\t\t\t\t<table class='table table-striped table-hover'>\r\n\t\t\t\t\t\t\t\t\t\t<thead>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<th class=\"text-center\" colspan=\"2\">INFORMAÇOES DO PRODUTO</th>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t</thead>\r\n\t\t\t\t\t\t\t\t\t\t<tbody>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>ID</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newProduct.id }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Nome</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newProduct.name }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Preço</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><span class=\"label label-info\"><i>{{ newProduct.price }}</i></span></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Responsável</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newProduct.author }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Descrição</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newProduct.description }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Data da criação</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ product.created_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Data de atualização</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ product.updated_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t\t\t</tbody>\r\n\t\t\t\t\t\t\t\t\t</table>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-primary\" data-dismiss=\"modal\"><i class=\"fa fa-check\"></i></button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<div class=\"modal fade\" id=\"modal-delete-product\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newProduct.name}}</span></h5>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\">Cancelar</button>\r\n\t\t\t\t\t\t<button  @keyup.enter=\"deleteProduct(newProduct.id)\" @click=\"deleteProduct(newProduct.id)\" type=\"button\" class=\"btn btn-danger\">Eliminar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-create-product\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Registar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome\" v-model=\"newProduct.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-shopping-basket form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"number\" class=\"form-control\" name=\"price\" placeholder=\"Preço\" v-model=\"newProduct.price\" v-validate:price=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-usd form-control-feedback\">00</span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input  class=\"form-control\" type=\"file\" name=\"productimage\" id=\"articleimage\" v-el:productimage>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newProduct.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createProduct\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-edit-product\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Editar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validation1\">\r\n\t\t\t\t\t\t\t<form methods=\"patch\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome\" v-model=\"newProduct.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-shopping-basket form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p style=\"color:red;\" v-if=\"$validationew.name.required && $validationew.name.touched\"><span data-toggle=\"tooltip\" title=\"Este campo tem de ser preenchida!\">*</span></p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"number\" class=\"form-control\" name=\"price\" placeholder=\"Preço\" v-model=\"newProduct.price\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-usd form-control-feedback\">00</span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newProduct.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedProduct(newProduct.id)\" type=\"button\" class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div  id=\"alert-message\" class=\"alert alert-{{typeAlert}}\" transition=\"success\" v-if=\"success\">\r\n\t<button type=\"button\" class=\"close\" data-dismiss=\"alert\">x</button>\r\n\t<i class=\"fa fa-thumbs-o-up text-center\">&nbsp;&nbsp; {{msgSucess}}</i>\r\n</div>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class=\"form-inline pull-right\">\r\n\t\t\t<div class=\"input-group\">\r\n\t\t\t\t<select data-toggle=\"tooltip\" title=\"A mostrar linhas na tabela\" class=\"form-control\" name=\"\" v-model=\"showRow\" @change=\"fetchProduct(1, showRow)\">\r\n\t\t\t\t\t<option class=\"\" value=\"5\">05</option>\r\n\t\t\t\t\t<option class=\"\" value=\"10\" selected>10</option>\r\n\t\t\t\t\t<option class=\"\" value=\"20\">20</option>\r\n\t\t\t\t\t<option class=\"\" value=\"50\">50</option>\r\n\t\t\t\t\t<option class=\"\" value=\"100\">100</option>\r\n\t\t\t\t\t<option class=\"\" value=\"200\">200</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t&nbsp;&nbsp;\r\n\t\t\t<div class=\"input-group\">\r\n\t\t\t\t<select data-toggle=\"tooltip\" title=\"Escolhe as colunas a serem filtrados\" class=\"form-control\" name=\"\" v-model=\"columnsFiltered\" multiple=\"multiple\" v-el:productcols>\r\n\t\t\t\t\t<option class=\"\" value=\"name\"=\"\">Nome</option>\r\n\t\t\t\t\t<option class=\"\" value=\"price\">Preço</option>\r\n\t\t\t\t\t<option class=\"\" value=\"description\">Descrição</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t&nbsp;&nbsp;\r\n\t\t\t<div v-if=\"columnsFiltered.length != 0\" class=\"input-group\">\r\n\t\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<input data-toggle=\"tooltip\" title=\"Escreva o valor a ser procurado na Tabela\"\r\n\t\t\t\tv-model=\"filter.term\"\r\n\t\t\t\t@keyup=\"doFilter\"\r\n\t\t\t\ttype=\"text\"\r\n\t\t\t\tclass=\"form-control\"\r\n\t\t\t\tplaceholder=\"Filtrar dados da tabela\"\r\n\t\t\t\taria-describedby=\"basic-addon1\">\r\n\t\t\t</div>\r\n\r\n\t\t\t<div v-else class=\"input-group\">\r\n\t\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<input :disabled=\"columnsFiltered.length == 0\" data-toggle=\"tooltip\" title=\"Para ativar introduza um valor na Coluna\"\r\n\t\t\t\ttype=\"text\"\r\n\t\t\t\tclass=\"form-control\"\r\n\t\t\t\tplaceholder=\"Filtrar dados da tabela\"\r\n\t\t\t\taria-describedby=\"basic-addon1\">\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<button class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-product\"><i class=\"fa fa-plus\"></i> Novo</button>\r\n\t</div>\r\n</div>\r\n\r\n<br>\r\n<div class=\"row\">\r\n\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class='table-responsive'>\r\n\t\t\t<table class='table table-striped table-hover'>\r\n\t\t\t\t<thead>\r\n\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'name')\">Nome</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'price' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'price' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'price')\">Preço</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th  class=\"text-center\" colspan=\"3\"><i class=\"fa fa-cogs\"></i> <span class=\"text-primary\">Operações</span></th>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</thead>\r\n\t\t\t\t<tbody>\r\n\t\t\t\t\t<tr v-for=\"product in products | filterBy filter.term | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t\t<td>{{ product.name }}</td>\r\n\t\t\t\t\t\t<td>{{ product.price }}</td>\r\n\r\n\t\t\t\t\t\t<td align=center>  <a class=\"btn btn-default btn-xs\" data-toggle=\"modal\" data-target=\"#show-product\" href=\"#\"> <i class=\"fa fa-search-plus text-success\" @click=\"getThisProduct(product.id)\" > </i></a></td>\r\n\r\n\t\t\t\t\t\t<td align=center>  <a class=\"btn btn-default btn-xs\" data-toggle=\"modal\" data-target=\"#modal-edit-product\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisProduct(product.id)\" > </i></a></td>\r\n\r\n\t\t\t\t\t\t<!-------------------------------------------------------------------->\r\n\t\t\t\t\t\t<td v-if=\"product.promotions.length == 0\" align=center><a class=\"btn btn-default btn-xs\" data-toggle=\"modal\" data-target=\"#modal-delete-product\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisProduct(product.id)\"></i></a></td>\r\n\r\n\t\t\t\t\t\t<td v-else align=center><i class=\"fa fa-ban text-warning\"></i></td>\r\n\t\t\t\t\t\t<!-------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</tbody>\r\n\t\t\t</table>\r\n\t\t\t<div class=\"row\">\r\n\t\t\t\t<div v-if=\"pagination.total > showRow\" class=\"col-md-6 pull-left\">\r\n\t\t\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"col-md-6 pull-right\">\r\n\t\t\t\t\t<h6 class=\"text-right text-help\"> Mostrar de <span class=\"badge\">{{pagination.from}}</span>  a <span class=\"badge\">{{pagination.to}}</span>  no total de <span class=\"badge\">{{pagination.total}}</span></h6>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<div id=\"show-product\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Detalhes</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class='table-responsive'>\r\n\t\t\t\t\t\t\t\t\t<table class='table table-hover table-condensed'>\r\n\t\t\t\t\t\t\t\t\t\t<thead>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<th class=\"text-center\" colspan=\"2\">INFORMAÇOES DO PRODUTO</th>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t</thead>\r\n\t\t\t\t\t\t\t\t\t\t<tbody>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>ID</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newProduct.id }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Nome</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newProduct.name }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Preço</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><span class=\"label label-info\"><i>{{ newProduct.price }}</i></span></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Responsável</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newProduct.author }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Data da criação</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newProduct.created_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Data de atualização</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newProduct.updated_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Descrição</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newProduct.description }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t\t\t</tbody>\r\n\t\t\t\t\t\t\t\t\t</table>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-primary\" data-dismiss=\"modal\"><i class=\"fa fa-check\"></i></button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<div class=\"modal fade\" id=\"modal-delete-product\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t\t<div class=\"modal-dialog modal-sm\">\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t\t<h5 class=\"modal-title\" id=\"\"><i class=\"text-danger fa fa-exclamation-triangle faa-flash animated faa-slow\"></i></h5>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<h5 class=\"text-center\">Eliminar?</h5>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary btn-xs\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i></button>\r\n\t\t\t\t\t\t<button  @keyup.enter=\"deleteProduct(newProduct.id)\" @click=\"deleteProduct(newProduct.id)\" type=\"button\" class=\"btn btn-danger btn-xs\"><i class=\"fa fa-trash\"></i></button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-create-product\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Registar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome\" v-model=\"newProduct.name\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-shopping-basket form-control-feedback\"></span>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"number\" class=\"form-control\" name=\"price\" placeholder=\"Preço\" v-model=\"newProduct.price\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-usd form-control-feedback\">00</span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input  class=\"form-control\" type=\"file\" name=\"productimage\" id=\"articleimage\" v-el:productimage>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newProduct.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t\t<button @click=\"createProduct\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-edit-product\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Editar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t\t<form methods=\"patch\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome\" v-model=\"newProduct.name\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-shopping-basket form-control-feedback\"></span>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"number\" class=\"form-control\" name=\"price\" placeholder=\"Preço\" v-model=\"newProduct.price\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-usd form-control-feedback\">00</span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!---------------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newProduct.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedProduct(newProduct.id)\" type=\"button\" class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -36455,7 +37583,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update("_v-2c902268", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"../../../Pagination/src/Component.vue":9,"lodash":1,"vue":7,"vue-hot-reload-api":4,"vueify/lib/insert-css":8}],11:[function(require,module,exports){
+},{"../../../Pagination/src/Component.vue":65,"lodash":56,"vue":63,"vue-hot-reload-api":60,"vueify/lib/insert-css":64}],67:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
 var __vueify_style__ = __vueify_insert__.insert("h1 {\r\n  color: #5C5F56;\r\n}\r\n")
 'use strict';
@@ -36469,6 +37597,10 @@ var _Component = require('../../../Pagination/src/Component.vue');
 var _Component2 = _interopRequireDefault(_Component);
 
 var _lodash = require('lodash');
+
+var _vueDatepicker = require('vue-datepicker/vue-datepicker-1.vue');
+
+var _vueDatepicker2 = _interopRequireDefault(_vueDatepicker);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -36489,7 +37621,9 @@ exports.default = {
                 trader_id: '',
                 product_id: '',
                 status: '',
-                description: ''
+                description: '',
+                trader: '',
+                product: ''
             },
 
             promotions: {},
@@ -36508,13 +37642,52 @@ exports.default = {
             typeAlert: '',
             showRow: '',
             all: {},
-            date_atual: new Date()
+            auth: [],
+            date_atual: new Date(),
+
+            // Vue-Datepicker
+            option: {
+                type: 'day',
+                week: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom'],
+                month: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+                format: 'YYYY-MM-DD',
+                placeholder: 'Data',
+                inputStyle: {
+                    'display': 'inline-block',
+                    'padding': '6px',
+                    'line-height': '20px',
+                    'font-size': '14px',
+                    'border': '1px solid #d2d6de',
+                    'border-radius': '0px',
+                    'color': '#5F5F5F'
+
+                },
+                color: {
+                    header: '#228074',
+                    headerText: '#ffffff'
+                },
+                buttons: {
+                    cancel: 'Cancelar',
+                    ok: 'Escolher'
+                },
+                overlayOpacity: 0.5, // 0.5 as default
+                dismissible: true // as true as default
+            },
+
+            limit: [{
+                type: 'weekday',
+                available: [1, 2, 3, 4, 5, 6]
+            }, {
+                type: 'fromto',
+                from: '2017-02-01'
+            }]
         };
     },
     ready: function ready() {
         this.fetchPromotion(this.pagination.current_Page, this.showRow);
         this.promotionTrader();
         this.promotionProduct();
+        this.authUser();
         // this.changePromotionStatus()
 
 
@@ -36596,7 +37769,9 @@ exports.default = {
                 trader_id: '',
                 product_id: '',
                 status: '',
-                description: ''
+                description: '',
+                trader: '',
+                product: ''
             };
         },
 
@@ -36609,11 +37784,12 @@ exports.default = {
             var promotion = this.newPromotion;
 
             //Clear form input
-            this.clearField();
             this.$http.post('http://localhost:8000/api/v1/promotions/', promotion).then(function (response) {
                 if (response.status == 200) {
                     console.log('chegando aqui');
                     $('#modal-create-promotion').modal('hide');
+                    _this.clearField();
+
                     console.log(response.data);
                     _this.fetchPromotion(_this.pagination.current_Page, _this.showRow);
                     alert('Promoção Criado com sucesso', 'success');
@@ -36640,6 +37816,8 @@ exports.default = {
         getThisPromotion: function getThisPromotion(id) {
             var _this3 = this;
 
+            this.clearField();
+
             this.$http.get('http://localhost:8000/api/v1/promotions/' + id).then(function (response) {
                 _this3.newPromotion.id = response.data.id;
                 _this3.newPromotion.name = response.data.name;
@@ -36649,6 +37827,12 @@ exports.default = {
                 _this3.newPromotion.product_id = response.data.product_id;
                 _this3.newPromotion.status = response.data.status;
                 _this3.newPromotion.description = response.data.description;
+                _this3.newPromotion.product = response.data.product.name;
+                _this3.newPromotion.trader = response.data.trader.name;
+                // var trader = response.data.trader;
+                // for (var trad in trader) {
+                //     this.newUser.trader.push(trader[trad])
+                // }
             }, function (response) {
                 console.log('Error');
             });
@@ -36660,10 +37844,11 @@ exports.default = {
             var _this4 = this;
 
             var promotion = this.newPromotion;
-            this.clearField();
             this.$http.patch('http://localhost:8000/api/v1/promotions/' + id, promotion).then(function (response) {
                 if (response.status == 200) {
                     $('#modal-edit-promotion').modal('hide');
+                    _this4.clearField();
+
                     // console.log(response.data);
                     _this4.fetchPromotion(_this4.pagination.current_Page, _this4.showRow);
                     _this4.alert('Promoção Atualizado com sucesso', 'info');
@@ -36727,6 +37912,25 @@ exports.default = {
             });
         },
 
+        authUser: function authUser() {
+            var _this9 = this;
+
+            this.$http.get('http://localhost:8000/api/v1/authUser').then(function (response) {
+                _this9.$set('auth', response.data);
+            }, function (response) {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+        checkPermition: function checkPermition() {
+            var roles = this.auth.roles;
+            for (var rol in roles) {
+                if (roles[rol].name == 'admin' || roles[rol].name == 'super-admin' || roles[rol].name == 'manager' || roles[rol].name == 'dpel') {
+                    return true;
+                }
+            }
+        },
+
         // -------------------------Metodo de suporte---------------------------------------------------
         doFilter: function doFilter() {
             var self = this;
@@ -36762,11 +37966,13 @@ exports.default = {
     },
 
     components: {
-        'Pagination': _Component2.default
+        'Pagination': _Component2.default,
+        'date-picker': _vueDatepicker2.default
+
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div  id=\"alert-message\" class=\"alert alert-{{typeAlert}}\" transition=\"success\" v-if=\"success\">\r\n\t<button type=\"button\" class=\"close\" data-dismiss=\"alert\">x</button>\r\n\t<i class=\"fa fa-thumbs-o-up text-center\">&nbsp;&nbsp; {{msgSucess}}</i>\r\n</div>\r\n<div class=\"row\">\r\n\t<div class=\"pull right col-md-4\">\r\n\t\t<label class=\"checkbox-inline\"><input type=\"checkbox\" id=\"\" value=\"\" v-model=\"showColumn.begnning_date\">Início</label>\r\n\t\t<label class=\"checkbox-inline\"><input type=\"checkbox\" id=\"\" value=\"\" v-model=\"showColumn.ending_date\">Término</label>\r\n\t\t<label class=\"checkbox-inline\"><input type=\"checkbox\" id=\"\" value=\"\" v-model=\"showColumn.trader_id\">Comerciante</label>\r\n\t</div>\r\n\r\n\t<div class=\"col-md-8 pull-left\">\r\n\t\t<div class=\"form-inline pull-right\">\r\n\t\t\t<div class=\"input-group\">\r\n\t\t\t\t<select data-toggle=\"tooltip\" title=\"A mostrar linhas na tabela\" class=\"form-control\" name=\"\" v-model=\"showRow\" @change=\"fetchPromotion(1, showRow)\">\r\n\t\t\t\t\t<option class=\"\" value=\"5\">05</option>\r\n\t\t\t\t\t<option class=\"\" value=\"10\" selected>10</option>\r\n\t\t\t\t\t<option class=\"\" value=\"20\">20</option>\r\n\t\t\t\t\t<option class=\"\" value=\"50\">50</option>\r\n\t\t\t\t\t<option class=\"\" value=\"100\">100</option>\r\n\t\t\t\t\t<option class=\"\" value=\"200\">200</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t&nbsp;&nbsp;\r\n\t\t\t<div class=\"input-group\">\r\n\t\t\t\t<select data-toggle=\"tooltip\" title=\"Escolhe as colunas a serem filtrados\" class=\"form-control\" name=\"\" v-model=\"columnsFiltered\" multiple=\"multiple\" v-el:promotioncols>\r\n\t\t\t\t\t<option class=\"\" value=\"name\"=\"\">Nome</option>\r\n\t\t\t\t\t<option class=\"\" value=\"begnning_date\">Inicio</option>\r\n\t\t\t\t\t<option class=\"\" value=\"ending_date\">Término</option>\r\n\t\t\t\t\t<option class=\"\" value=\"trader_id\">Comerciante</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t&nbsp;&nbsp;\r\n\t\t\t<div v-if=\"columnsFiltered.length != 0\" class=\"input-group\">\r\n\t\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<input data-toggle=\"tooltip\" title=\"Escreva o valor a ser procurado na Tabela\"\r\n\t\t\t\tv-model=\"filter.term\"\r\n\t\t\t\t@keyup=\"doFilter\"\r\n\t\t\t\ttype=\"text\"\r\n\t\t\t\tclass=\"form-control\"\r\n\t\t\t\tplaceholder=\"Filtrar dados da tabela\"\r\n\t\t\t\taria-describedby=\"basic-addon1\">\r\n\t\t\t</div>\r\n\r\n\t\t\t<div v-else class=\"input-group\">\r\n\t\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<input :disabled=\"columnsFiltered.length == 0\" data-toggle=\"tooltip\" title=\"Para ativar introduza um valor na Coluna\"\r\n\t\t\t\ttype=\"text\"\r\n\t\t\t\tclass=\"form-control\"\r\n\t\t\t\tplaceholder=\"Filtrar dados da tabela\"\r\n\t\t\t\taria-describedby=\"basic-addon1\">\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n\r\n<div class=\"row\">\r\n\t<div v-if = \"traders.length > 0 && products.length > 0\" class=\"col-md-12\">\r\n\t\t<button @click=\"clearField\" class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-promotion\"><i class=\"fa fa-plus\"></i> Novo</button>&nbsp;&nbsp;\r\n\t</div>\r\n\r\n\t<div v-else class=\"col-md-12\">\r\n\t\t<button data-toggle=\"tooltip\" title=\"Não podes criar promoção referenciar comerciante e produtos\" type=\"button\" class=\"btn btn-danger btn-flat\"><i class=\"fa fa-minus\"></i> Novo</button>&nbsp;&nbsp;\r\n\t</div>\r\n\r\n</div>\r\n\r\n<br>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class='table-responsive'>\r\n\t\t\t<table class='table table-striped table-hover table-condensed'>\r\n\t\t\t\t<thead>\r\n\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'name')\">Nome</a>\r\n\t\t\t\t\t\t</th>\r\n\t\t\t\t\t\t<th class=\"info\" v-if=\"showColumn.begnning_date\">\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'begnning_date' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'begnning_date' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'begnning_date')\">Início</a>\r\n\t\t\t\t\t\t</th>\r\n\t\t\t\t\t\t<th class=\"info\" v-if=\"showColumn.ending_date\">\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'ending_date' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'ending_date' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'ending_date')\">Término</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th   class=\"text-center\">\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'state' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'state' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'state')\">Publicação</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\r\n\t\t\t\t\t\t<th class=\"info\" v-if=\"showColumn.trader_id\">\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'trader_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'trader_id' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'trader_id')\">Comerciante</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\r\n\t\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\"><span><i class=\"fa fa-cogs\"></i></span></th>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</thead>\r\n\t\t\t\t<tbody>\r\n\t\t\t\t\t<tr v-for=\"promotion in promotions | filterBy filter.term | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t\t<td><a href=\"#\" data-toggle=\"modal\" data-target=\"#show-promotion\" @click=\"getThisPromotion(promotion.id)\">{{ promotion.name }}</a></td>\r\n\t\t\t\t\t\t<td class=\"info\" v-if=\"showColumn.begnning_date\">{{ promotion.begnning_date }}</td>\r\n\t\t\t\t\t\t<td class=\"info\" v-if=\"showColumn.ending_date\">{{ promotion.ending_date }}</td>\r\n\r\n\r\n\t\t\t\t\t\t<!------------------------------------------------------------------------------------>\r\n\t\t\t\t\t\t<td  class=\"text-center\" v-if=\"promotion.status\">\r\n\t\t\t\t\t\t\t<button data-toggle=\"tooltip\" title=\"Despublicar esta promoção\" type=\"submit\" @click = \"promotionStatus(promotion.id)\" class='btn btn-xs btn-flat' :class=\"{ 'btn-success': promotion.status, 'btn-warning': !promotion.status }\"><i class=\"fa fa-check\"></i></button>\r\n\t\t\t\t\t\t</td>\r\n\r\n\t\t\t\t\t\t<td  class=\"text-center\" v-if=\"!promotion.status\">\r\n\t\t\t\t\t\t\t<button data-toggle=\"tooltip\" title=\"Publicar esta promoção\" type=\"submit\" @click = \"promotionStatus(promotion.id)\" class='btn btn-xs btn-flat' :class=\"{ 'btn-success': promotion.status, 'btn-warning': !promotion.status }\"><i class=\"fa fa-times\"></i></button>\r\n\t\t\t\t\t\t</td>\r\n\t\t\t\t\t\t<!------------------------------------------------------------------------------------>\r\n\r\n\r\n\t\t\t\t\t\t<td class=\"info\" v-if=\"showColumn.trader_id\">{{ promotion.trader.name }}</td>\r\n\r\n\t\t\t\t\t\t<td align=left>  <a data-toggle=\"modal\" data-target=\"#modal-edit-promotion\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisPromotion(promotion.id)\" > </i></a></td>\r\n\t\t\t\t\t\t<td align=right><a data-toggle=\"modal\" data-target=\"#modal-delete-promotion\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisPromotion(promotion.id)\" ></i></a></td>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</tbody>\r\n\t\t\t</table>\r\n\t\t\t<div class=\"row\">\r\n\t\t\t\t<div class=\"col-md-6 pull-left\">\r\n\t\t\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"col-md-6 pull-right\">\r\n\t\t\t\t\t<h6 class=\"text-right text-help\"> Mostrar de <span class=\"badge\">{{pagination.from}}</span>  a <span class=\"badge\">{{pagination.to}}</span>  no total de <span class=\"badge\">{{pagination.total}}</span></h6>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<div id=\"show-promotion\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Detalhes do(a) {{ newPromotion.name }}</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class='table-responsive'>\r\n\t\t\t\t\t\t\t\t\t<table class='table table-striped table-hover'>\r\n\t\t\t\t\t\t\t\t\t\t<thead>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<th class=\"text-center\" colspan=\"2\">INFORMAÇOES DE PROMOÇÃO</th>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t</thead>\r\n\t\t\t\t\t\t\t\t\t\t<tbody>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>ID</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newPromotion.id }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Nome</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newPromotion.name }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Início</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><span class=\"label label-info\"><i>{{ newPromotion.begnning_date }}</i></span></td>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Término</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newPromotion.ending_date }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Publicação</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><span class='label' :class=\"{ 'label-success': newPromotion.status, 'label-warning': !newPromotion.status }\"><i>{{newPromotion.status ? 'Publicado' : 'Aguardando'}}</i></span></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Descrição</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newPromotion.description }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Data da criação</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ promotion.created_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Data de atualização</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ promotion.updated_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t\t\t</tbody>\r\n\t\t\t\t\t\t\t\t\t</table>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-success\" data-dismiss=\"modal\"><i class=\"fa fa-check\"></i></button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<div class=\"modal fade\" id=\"modal-delete-promotion\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\" id=\"\">Eliminar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<h5>Eliminar - <span class=\"text-uppercase text-danger\">{{newPromotion.name}}</span></h5>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i> Cancelar</button>\r\n\t\t\t\t\t\t<button  @keyup.enter=\"deletePromotion(newPromotion.id)\" @click=\"deletePromotion(newPromotion.id)\" type=\"button\" class=\"btn btn-danger\"><i class=\"fa fa-trash-o\"></i> Eliminar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-create-promotion\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Registar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome\" v-model=\"newPromotion.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-user form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type='date' name=\"begnning_date\" class='form-control' placeholder='' v-model=\"newPromotion.begnning_date\" v-validate:begnning = \"['required']\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<!-- <span class=\"fa fa-calendar-check-o form-control-feedback\"></span> -->\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p class=\"text-help\">Data de início da promoção</p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type='date' name=\"ending_date\" class='form-control' placeholder='' v-model=\"newPromotion.ending_date\"  v-validate:ending_date = \"['required']\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<!-- <span class=\"fa fa-calendar-times-o form-control-feedback\"></span> -->\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p class=\"text-help\">Término da promoção</p>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!------------------------------------------------------------>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select name=\"trader_id\" class=\"form-control\" v-model=\"newPromotion.trader_id\" v-el:tradercreate>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"trader in traders\" value=\"{{trader.id}}\">{{trader.name}}</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select name=\"product_id\" class=\"form-control\" v-model=\"newPromotion.product_id\"v-el:productcreate>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"product in products\" value=\"{{product.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{product.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!------------------------------------------------------------>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newPromotion.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createPromotion\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-edit-promotion\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Editar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validation1\">\r\n\t\t\t\t\t\t\t<form methods=\"patch\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome\" v-model=\"newPromotion.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-user form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type='date' name=\"begnning_date\" class='form-control' placeholder='' v-model=\"newPromotion.begnning_date\" v-validate:begnning = \"['required']\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<!-- <span class=\"fa fa-calendar-check-o form-control-feedback\"></span> -->\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p class=\"text-help\">Data de início da promoção</p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type='date' name=\"ending_date\" class='form-control' placeholder='' v-model=\"newPromotion.ending_date\"  v-validate:ending_date = \"['required']\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<!-- <span class=\"fa fa-calendar-times-o form-control-feedback\"></span> -->\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p class=\"text-help\">Término da promoção</p>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!------------------------------------------------------------>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select name=\"trader_id\" class=\"form-control\" v-model=\"newPromotion.trader_id\" v-el:traderedit>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"trader in traders\" value=\"{{trader.id}}\">{{trader.name}}</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select name=\"product_id\" class=\"form-control\" v-model=\"newPromotion.product_id\"v-el:productedit>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"product in products\" value=\"{{product.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{product.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!------------------------------------------------------------>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newPromotion.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedPromotion(newPromotion.id)\" type=\"button\" class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "<div  id=\"alert-message\" class=\"alert alert-{{typeAlert}}\" transition=\"success\" v-if=\"success\">\r\n\t<button type=\"button\" class=\"close\" data-dismiss=\"alert\">x</button>\r\n\t<i class=\"fa fa-thumbs-o-up text-center\">&nbsp;&nbsp; {{msgSucess}}</i>\r\n</div>\r\n<div class=\"row\">\r\n\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class=\"form-inline pull-right\">\r\n\t\t\t<div class=\"input-group\">\r\n\t\t\t\t<select data-toggle=\"tooltip\" title=\"A mostrar linhas na tabela\" class=\"form-control\" name=\"\" v-model=\"showRow\" @change=\"fetchPromotion(1, showRow)\">\r\n\t\t\t\t\t<option class=\"\" value=\"5\">05</option>\r\n\t\t\t\t\t<option class=\"\" value=\"10\" selected>10</option>\r\n\t\t\t\t\t<option class=\"\" value=\"20\">20</option>\r\n\t\t\t\t\t<option class=\"\" value=\"50\">50</option>\r\n\t\t\t\t\t<option class=\"\" value=\"100\">100</option>\r\n\t\t\t\t\t<option class=\"\" value=\"200\">200</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t&nbsp;&nbsp;\r\n\t\t\t<div class=\"input-group\">\r\n\t\t\t\t<select data-toggle=\"tooltip\" title=\"Escolhe as colunas a serem filtrados\" class=\"form-control\" name=\"\" v-model=\"columnsFiltered\" multiple=\"multiple\" v-el:promotioncols>\r\n\t\t\t\t\t<option class=\"\" value=\"name\"=\"\">Nome</option>\r\n\t\t\t\t\t<option class=\"\" value=\"begnning_date\">Inicio</option>\r\n\t\t\t\t\t<option class=\"\" value=\"ending_date\">Término</option>\r\n\t\t\t\t\t<option class=\"\" value=\"trader_id\">Comerciante</option>\r\n\t\t\t\t</select>\r\n\t\t\t</div>\r\n\t\t\t&nbsp;&nbsp;\r\n\t\t\t<div v-if=\"columnsFiltered.length != 0\" class=\"input-group\">\r\n\t\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<input data-toggle=\"tooltip\" title=\"Escreva o valor a ser procurado na Tabela\"\r\n\t\t\t\tv-model=\"filter.term\"\r\n\t\t\t\t@keyup=\"doFilter\"\r\n\t\t\t\ttype=\"text\"\r\n\t\t\t\tclass=\"form-control\"\r\n\t\t\t\tplaceholder=\"Filtrar dados da tabela\"\r\n\t\t\t\taria-describedby=\"basic-addon1\">\r\n\t\t\t</div>\r\n\r\n\t\t\t<div v-else class=\"input-group\">\r\n\t\t\t\t<span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-search\" aria-hidden=\"true\"></i></span>\r\n\t\t\t\t<input :disabled=\"columnsFiltered.length == 0\" data-toggle=\"tooltip\" title=\"Para ativar introduza um valor na Coluna\"\r\n\t\t\t\ttype=\"text\"\r\n\t\t\t\tclass=\"form-control\"\r\n\t\t\t\tplaceholder=\"Filtrar dados da tabela\"\r\n\t\t\t\taria-describedby=\"basic-addon1\">\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n\r\n<hr>\r\n\r\n<div class=\"row\">\r\n\t<div v-if = \"traders.length > 0 && products.length > 0\" class=\"col-md-12\">\r\n\t\t<button @click=\"clearField\" class=\"btn btn-primary btn-flat btn-outline pull-left\" name=\"button\" data-toggle=\"modal\" data-target=\"#modal-create-promotion\"><i class=\"fa fa-plus\"></i> Novo</button>&nbsp;&nbsp;\r\n\t</div>\r\n\r\n\t<div v-else class=\"col-md-12\">\r\n\t\t<button data-toggle=\"tooltip\" title=\"Não podes criar promoção referenciar comerciante e produtos\" type=\"button\" class=\"btn btn-danger btn-flat\"><i class=\"fa fa-minus\"></i> Novo</button>&nbsp;&nbsp;\r\n\t</div>\r\n\r\n</div>\r\n\r\n<br>\r\n\r\n<div class=\"row\">\r\n\t<div class=\"col-md-12\">\r\n\t\t<div class='table-responsive'>\r\n\t\t\t<table class='table table-striped table-hover table-condensed'>\r\n\t\t\t\t<thead>\r\n\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'name')\">Nome</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th>\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'ending_date' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'ending_date' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'ending_date')\">Término</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\t\t\t\t\t\t<th v-if=\"checkPermition()\" class=\"text-center\">\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'state' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'state' && sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'state')\">Estado</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\r\n\t\t\t\t\t\t<th class=\"info\" v-if=\"showColumn.trader_id\">\r\n\t\t\t\t\t\t\t<i :class = \"{'fa-sort-amount-asc': sortColumn == 'trader_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'trader_id' &&   sortInverse ==-1}\" class=\"fa fa-sort\" aria-hidden=\"true\"></i>\r\n\t\t\t\t\t\t\t<a href=\"#\" @click = \"doSort($event, 'trader_id')\">Comerciante</a>\r\n\t\t\t\t\t\t</th>\r\n\r\n\r\n\t\t\t\t\t\t<th  class=\"text-center\" colspan=\"2\"><i class=\"fa fa-cogs\"></i> <span class=\"text-primary\">Operações</span></th>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</thead>\r\n\t\t\t\t<tbody>\r\n\t\t\t\t\t<tr v-for=\"promotion in promotions | filterBy filter.term | orderBy sortColumn sortInverse\">\r\n\t\t\t\t\t\t<td>{{ promotion.name }}</td>\r\n\t\t\t\t\t\t<td>{{ promotion.ending_date }}</td>\r\n\r\n\r\n\t\t\t\t\t\t<!------------------------------------------------------------------------------------>\r\n\t\t\t\t\t\t<td  class=\"text-center\" v-if=\"promotion.status && checkPermition()\">\r\n\t\t\t\t\t\t\t<button data-toggle=\"tooltip\" title=\"Despublicar esta promoção\" type=\"submit\" @click = \"promotionStatus(promotion.id)\" class='btn btn-xs' :class=\"{ 'btn-success': promotion.status, 'btn-danger': !promotion.status }\"><i class=\"fa fa-check\"></i></button>\r\n\t\t\t\t\t\t</td>\r\n\r\n\t\t\t\t\t\t<td  class=\"text-center\" v-if=\"!promotion.status && checkPermition()\">\r\n\t\t\t\t\t\t\t<button data-toggle=\"tooltip\" title=\"Publicar esta promoção\" type=\"submit\" @click = \"promotionStatus(promotion.id)\" class='btn btn-xs' :class=\"{ 'btn-success': promotion.status, 'btn-danger': !promotion.status }\"><i class=\"fa fa-times\"></i></button>\r\n\t\t\t\t\t\t</td>\r\n\t\t\t\t\t\t<!------------------------------------------------------------------------------------>\r\n\r\n\r\n\t\t\t\t\t\t<td class=\"info\" v-if=\"showColumn.trader_id\">{{ promotion.trader.name }}</td>\r\n\r\n\t\t\t\t\t\t<td align=center>  <a  class=\"btn btn-default btn-xs\" data-toggle=\"modal\" data-target=\"#show-promotion\" href=\"#\"> <i class=\"fa fa-search-plus text-success\" @click=\"getThisPromotion(promotion.id)\" > </i></a></td>\r\n\r\n\t\t\t\t\t\t<td v-show=\"!promotion.status\" align=center>  <a  class=\"btn btn-default btn-xs\" data-toggle=\"modal\" data-target=\"#modal-edit-promotion\" href=\"#\"> <i class=\"fa fa-pencil text-primary\" @click=\"getThisPromotion(promotion.id)\" > </i></a></td>\r\n\r\n\t\t\t\t\t\t<td v-show=\"!promotion.status\" align=center><a  class=\"btn btn-default btn-xs\" data-toggle=\"modal\" data-target=\"#modal-delete-promotion\" href=\"#\"><i class=\"fa fa-trash text-danger\" @click=\"getThisPromotion(promotion.id)\" ></i></a></td>\r\n\t\t\t\t\t</tr>\r\n\t\t\t\t</tbody>\r\n\t\t\t</table>\r\n\t\t\t<div class=\"row\">\r\n\t\t\t\t<div class=\"col-md-6 pull-left\" v-if=\"pagination.total > showRow\">\r\n\t\t\t\t\t<Pagination :source.sync = \"pagination\" @navigate=\"navigate\"></Pagination>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"col-md-6 pull-right\">\r\n\t\t\t\t\t<h6 class=\"text-right text-help\"> Mostrar de <span class=\"badge\">{{pagination.from}}</span>  a <span class=\"badge\">{{pagination.to}}</span>  no total de <span class=\"badge\">{{pagination.total}}</span></h6>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<div id=\"show-promotion\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\"><i class=\"text-success fa fa-eye faa-flash animated faa-slow\"></i> Detalhes</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t<div class='table-responsive'>\r\n\t\t\t\t\t\t\t\t\t<table class='table table-hover table-condensed'>\r\n\t\t\t\t\t\t\t\t\t\t<thead>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<th class=\"text-center\" colspan=\"2\">INFORMAÇOES DE PROMOÇÃO</th>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t</thead>\r\n\t\t\t\t\t\t\t\t\t\t<tbody>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>ID</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newPromotion.id }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Nome</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newPromotion.name }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Início</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><span><i>{{ newPromotion.begnning_date }}</i></span></td>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Término</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newPromotion.ending_date }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Publicação</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><span class='label' :class=\"{ 'label-success': newPromotion.status, 'label-danger': !newPromotion.status }\"><i>{{newPromotion.status ? 'Publicado' : 'Aguardando'}}</i></span></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Comerciante</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i class=\"label label-success\">{{newPromotion.trader}}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Produto</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i class=\"label label-primary\">{{newPromotion.product}}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Criado em: </b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ promotion.created_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Atualizado em: </b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ promotion.updated_at | formatDate 'DD/MM/YYYY' }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><b>Descrição</b></td>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<td><i>{{ newPromotion.description }}</i></td>\r\n\t\t\t\t\t\t\t\t\t\t\t</tr>\r\n\r\n\t\t\t\t\t\t\t\t\t\t</tbody>\r\n\t\t\t\t\t\t\t\t\t</table>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-success\" data-dismiss=\"modal\"><i class=\"fa fa-check\"></i></button>\r\n\r\n\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\t\t<div class=\"modal fade\" id=\"modal-delete-promotion\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"\" aria-hidden=\"true\">\r\n\t\t\t<div class=\"modal-dialog modal-sm\">\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\r\n\t\t\t\t\t\t<h5 class=\"modal-title\" id=\"\"><i class=\"text-danger fa fa-exclamation-triangle faa-flash animated faa-slow\"></i></h5>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<h5 class=\"text-center\">Eliminar?</h5>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary btn-xs\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i></button>\r\n\t\t\t\t\t\t<button  @keyup.enter=\"deletePromotion(newPromotion.id)\" @click=\"deletePromotion(newPromotion.id)\" type=\"button\" class=\"btn btn-danger btn-xs\"><i class=\"fa fa-trash\"></i></button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-create-promotion\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t\t<h4 class=\"modal-title\"><i class=\"fa fa-plus faa-burst animated faa-slow\"></i></h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validationew\">\r\n\t\t\t\t\t\t\t<form action=\"#\" methods=\"POST\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome\" v-model=\"newPromotion.name\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-user form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<date-picker :time.sync=\"newPromotion.begnning_date\" :option=\"option\" :limit=\"limit\"></date-picker>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p class=\"text-help\">Data de início da promoção</p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<date-picker :time.sync=\"newPromotion.ending_date\" :option=\"option\" :limit=\"limit\"></date-picker>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p class=\"text-help\">Término da promoção</p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!------------------------------------------------------------>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select name=\"trader_id\" class=\"form-control\" v-model=\"newPromotion.trader_id\" v-el:tradercreate>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"trader in traders\" value=\"{{trader.id}}\">{{trader.name}}</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select name=\"product_id\" class=\"form-control\" v-model=\"newPromotion.product_id\"v-el:productcreate>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"product in products\" value=\"{{product.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{product.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!------------------------------------------------------------>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newPromotion.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>\r\n\r\n\t\t\t\t\t\t<button :disabled = \"!$validationew.valid\" @click=\"createPromotion\" class=\"btn btn-primary pull-right\" type=\"submit\"><i class=\"fa fa-save\"></i>&nbsp; &nbsp;&nbsp;Guardar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<!--------------------------------------------------------------------------------------------------------->\r\n\r\n\r\n\t\t<!-- Modal -->\r\n\t\t<div id=\"modal-edit-promotion\" class=\"modal fade\" role=\"dialog\">\r\n\t\t\t<div class=\"modal-dialog\">\r\n\r\n\t\t\t\t<!-- Modal content-->\r\n\t\t\t\t<div class=\"modal-content\">\r\n\t\t\t\t\t<div class=\"modal-header\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>\r\n\t\t\t\t\t\t<h4 class=\"modal-title\">Editar</h4>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-body\">\r\n\t\t\t\t\t\t<validator name=\"validation1\">\r\n\t\t\t\t\t\t\t<form methods=\"patch\">\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Nome\" v-model=\"newPromotion.name\" v-validate:name=\"['required']\"/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class=\"fa fa-user form-control-feedback\"></span>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type='date' name=\"begnning_date\" class='form-control' placeholder='' v-model=\"newPromotion.begnning_date\" v-validate:begnning = \"['required']\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<!-- <span class=\"fa fa-calendar-check-o form-control-feedback\"></span> -->\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p class=\"text-help\">Data de início da promoção</p>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<input type='date' name=\"ending_date\" class='form-control' placeholder='' v-model=\"newPromotion.ending_date\"  v-validate:ending_date = \"['required']\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<!-- <span class=\"fa fa-calendar-times-o form-control-feedback\"></span> -->\r\n\t\t\t\t\t\t\t\t\t\t\t\t<p class=\"text-help\">Término da promoção</p>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!------------------------------------------------------------>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select name=\"trader_id\" class=\"form-control\" v-model=\"newPromotion.trader_id\" v-el:traderedit>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"trader in traders\" value=\"{{trader.id}}\">{{trader.name}}</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-6\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<select name=\"product_id\" class=\"form-control\" v-model=\"newPromotion.product_id\"v-el:productedit>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<option v-for=\"product in products\" value=\"{{product.id}}\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{product.name}}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</option>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</select>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t<hr><!------------------------------------------------------------>\r\n\r\n\t\t\t\t\t\t\t\t<div class=\"row\">\r\n\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-md-12\">\r\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"form-group has-feedback\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<textarea name=\"description\" placeholder=\"Descrição...\" class=\"form-control\" rows=\"5\" cols=\"40\" id=\"description\" v-model=\"newPromotion.description\"></textarea>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t</validator>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"modal-footer\">\r\n\t\t\t\t\t\t<button @click=\"clearField\" type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><i class=\"fa fa-times\"></i>&nbsp; &nbsp;&nbsp; Close</button>\r\n\t\t\t\t\t\t<button v-on:show=\"\" @click=\"saveEditedPromotion(newPromotion.id)\" type=\"button\" class=\"btn btn-primary\"><i class=\"fa fa-refresh fa-spin\"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</div>\r\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -36781,7 +37987,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update("_v-39dff6a8", module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"../../../Pagination/src/Component.vue":9,"lodash":1,"vue":7,"vue-hot-reload-api":4,"vueify/lib/insert-css":8}],12:[function(require,module,exports){
+},{"../../../Pagination/src/Component.vue":65,"lodash":56,"vue":63,"vue-datepicker/vue-datepicker-1.vue":59,"vue-hot-reload-api":60,"vueify/lib/insert-css":64}],68:[function(require,module,exports){
 'use strict';
 
 var Vue = require('vue');
@@ -36804,12 +38010,13 @@ new Vue({
 
     components: {
         //------------------------------Product-----------------------------------
-        'show-product-in-front': require('./components/Products/ShowProduct'),
+        'show-product': require('./components/Products/ShowProduct'),
         //------------------------------Promotion-----------------------------------
-        'show-promotion-in-front': require('./components/Promotions/ShowPromotion')
+        'show-promotion': require('./components/Promotions/ShowPromotion')
+        // ------------------------------place-----------------------------------
     }
 });
 
-},{"./components/Products/ShowProduct":10,"./components/Promotions/ShowPromotion":11,"moment":2,"vue":7,"vue-resource":5,"vue-validator":6}]},{},[12]);
+},{"./components/Products/ShowProduct":66,"./components/Promotions/ShowPromotion":67,"moment":57,"vue":63,"vue-resource":61,"vue-validator":62}]},{},[68]);
 
 //# sourceMappingURL=mainfront.js.map

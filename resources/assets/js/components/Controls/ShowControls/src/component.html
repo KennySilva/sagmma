@@ -144,7 +144,7 @@
 			<div class="modal-dialog modal-sm">
 				<div class="modal-content">
 					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<button @click="clearField" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 						<h5 class="modal-title" id=""><i class="text-danger fa fa-exclamation-triangle faa-flash animated faa-slow"></i></h5>
 					</div>
 					<div class="modal-body">
@@ -152,7 +152,7 @@
 					</div>
 					<div class="modal-footer">
 						<button @click="clearField" type="button" class="btn btn-secondary btn-xs" data-dismiss="modal"><i class="fa fa-times"></i></button>
-						<button  @keyup.enter="deletePlace(newControl.id)" @click="deleteControl(newControl.id)" type="button" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></button>
+						<button  @keyup.enter="deleteControl(newControl.id)" @click="deleteControl(newControl.id)" type="button" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></button>
 					</div>
 				</div>
 			</div>

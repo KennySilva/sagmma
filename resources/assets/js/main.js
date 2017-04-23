@@ -23,40 +23,7 @@ new Vue({
         updateimage  : '',
         employeeExcel: '',
     },
-    //
-    // methods: {
-    //     var self = this;
-    //     jQuery(self.$els.state).select2({
-    //         placeholder: "Ilha",
-    //         allowClear: true,
-    //         theme: "bootstrap",
-    //         width: '100%',
-    //         language: 'pt',
-    //     }).on('change', function () {
-    //         self.$set(profile.state, jQuery(this).val());
-    //     });
-    //
-    //     jQuery(self.$els.council).select2({
-    //         placeholder: "Concelho",
-    //         allowClear: true,
-    //         theme: "bootstrap",
-    //         width: '100%',
-    //         language: 'pt',
-    //     }).on('change', function () {
-    //         self.$set(profile.council, jQuery(this).val());
-    //     });
-    //
-    //     jQuery(self.$els.parish).select2({
-    //         placeholder: "Fraguezia",
-    //         allowClear: true,
-    //         theme: "bootstrap",
-    //         width: '100%',
-    //         language: 'pt',
-    //     }).on('change', function () {
-    //         self.$set(profile.parish, jQuery(this).val());
-    //     });
-    // },
-    
+
 
     components: {
         //-----------------------------users--------------------------------------

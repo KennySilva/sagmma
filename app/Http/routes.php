@@ -127,8 +127,7 @@ Route::group(['namespace' => 'ApiControllers'], function()
                 Route::get('contractStatus', 'ApiContractsController@statusContractsChange');
             });
         });
-        Route::group(['middleware' => ['role:super-admin|admin|dpel|manager|trader', 'permission:manage-business
-        ']], function () {
+        Route::group(['middleware' => ['role:super-admin|admin|dpel|manager|trader']], function () {
             // ----------------------------------------Api-promotions----------------------------------
             Route::resource('promotions', 'ApiPromotionsController');
             Route::get('allPromotions/{row}', 'ApiPromotionsController@index');

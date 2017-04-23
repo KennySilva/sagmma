@@ -1,6 +1,7 @@
 import Pagination from '../../../Pagination/src/Component.vue'
 import { _ } from 'lodash'
 
+
 export default{
 
     name: 'show-product',
@@ -29,6 +30,8 @@ export default{
             typeAlert: '',
             showRow: '',
             all: {},
+
+
         }
     },
 
@@ -36,6 +39,7 @@ export default{
 
     ready () {
         this.fetchProduct(this.pagination.current_Page, this.showRow);
+
         var self = this
         jQuery(self.$els.productcols).select2({
             placeholder: "Coluna",
@@ -178,6 +182,8 @@ export default{
                 self.sortInverse = 1
             }
         },
+
+
 
         // --------------------------------------------------------------------------------------------
 

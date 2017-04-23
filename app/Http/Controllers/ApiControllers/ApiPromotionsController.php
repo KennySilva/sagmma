@@ -51,7 +51,7 @@ class ApiPromotionsController extends Controller
         $promotion->description   = $request->description;
         $promotion->begnning_date = $request->begnning_date;
         $promotion->ending_date   = $request->ending_date;
-        $promotion->trader_id     = \Auth::user()->id;
+        $promotion->trader_id     = $request->trader_id;
         $promotion->product_id    = $request->product_id;
         $promotion->status        = false;
         $promotion->save();
@@ -62,6 +62,8 @@ class ApiPromotionsController extends Controller
     public function show($id)
     {
         $promotion = Promotion::findOrFail($id);
+        $promotion->product;
+        $promotion->trader;
         return $promotion;
     }
 

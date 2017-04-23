@@ -181,13 +181,14 @@ return [
         'Typeofplace'    => Sagmma\Models\Sagmma\Typeofplace   ::class,
         'Employee'       => Sagmma\Models\Sagmma\Employee      ::class,
         'Control'        => Sagmma\Models\Sagmma\Control       ::class,
-        'Taxation'       => Sagmma\Models\Sagmma\Taxation       ::class,
+        'Taxation'       => Sagmma\Models\Sagmma\Taxation      ::class,
         'Contract'       => Sagmma\Models\Sagmma\Contract      ::class,
         'Promotion'      => Sagmma\Models\Sagmma\Promotion     ::class,
+        'Product'        => Sagmma\Models\Sagmma\Product       ::class,
         'Occupation'     => Sagmma\Models\Sys\Occupation       ::class,
         'Charge'         => Sagmma\Models\Sys\Charge           ::class,
         'Calendarevent'  => Sagmma\Models\Plugins\Calendarevent::class,
-        'Social'         => Sagmma\Models\Plugins\Social::class,
+        'Social'         => Sagmma\Models\Plugins\Social       ::class,
 
     ],
 

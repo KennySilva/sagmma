@@ -134,6 +134,7 @@
         $("#galeria").attr("href", "/");
         $("#equipa").attr("href", "/");
         $("#contactar").attr("href", "/");
+        $("#myPage").attr("href", "/");
     });
 
 

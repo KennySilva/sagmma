@@ -3,13 +3,8 @@
 	<i class="fa fa-thumbs-o-up text-center">&nbsp;&nbsp; {{msgSucess}}</i>
 </div>
 <div class="row">
-	<div class="pull right col-md-4">
-		<label class="checkbox-inline"><input type="checkbox" id="" value="" v-model="showColumn.begnning_date">Início</label>
-		<label class="checkbox-inline"><input type="checkbox" id="" value="" v-model="showColumn.ending_date">Término</label>
-		<label class="checkbox-inline"><input type="checkbox" id="" value="" v-model="showColumn.trader_id">Comerciante</label>
-	</div>
 
-	<div class="col-md-8 pull-left">
+	<div class="col-md-12">
 		<div class="form-inline pull-right">
 			<div class="input-group">
 				<select data-toggle="tooltip" title="A mostrar linhas na tabela" class="form-control" name="" v-model="showRow" @change="fetchPromotion(1, showRow)">
@@ -79,18 +74,15 @@
 							<i :class = "{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
 							<a href="#" @click = "doSort($event, 'name')">Nome</a>
 						</th>
-						<th class="info" v-if="showColumn.begnning_date">
-							<i :class = "{'fa-sort-amount-asc': sortColumn == 'begnning_date' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'begnning_date' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
-							<a href="#" @click = "doSort($event, 'begnning_date')">Início</a>
-						</th>
-						<th class="info" v-if="showColumn.ending_date">
+
+						<th>
 							<i :class = "{'fa-sort-amount-asc': sortColumn == 'ending_date' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'ending_date' &&   sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
 							<a href="#" @click = "doSort($event, 'ending_date')">Término</a>
 						</th>
 
-						<th   class="text-center">
-							<i :class = "{'fa-sort-amount-asc': sortColumn == 'state' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'state' &&   sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
-							<a href="#" @click = "doSort($event, 'state')">Publicação</a>
+						<th v-if="checkPermition()" class="text-center">
+							<i :class = "{'fa-sort-amount-asc': sortColumn == 'state' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'state' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
+							<a href="#" @click = "doSort($event, 'state')">Estado</a>
 						</th>
 
 
@@ -100,36 +92,38 @@
 						</th>
 
 
-						<th  class="text-center" colspan="2"><span><i class="fa fa-cogs"></i></span></th>
+						<th  class="text-center" colspan="2"><i class="fa fa-cogs"></i> <span class="text-primary">Operações</span></th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr v-for="promotion in promotions | filterBy filter.term | orderBy sortColumn sortInverse">
-						<td><a href="#" data-toggle="modal" data-target="#show-promotion" @click="getThisPromotion(promotion.id)">{{ promotion.name }}</a></td>
-						<td class="info" v-if="showColumn.begnning_date">{{ promotion.begnning_date }}</td>
-						<td class="info" v-if="showColumn.ending_date">{{ promotion.ending_date }}</td>
+						<td>{{ promotion.name }}</td>
+						<td>{{ promotion.ending_date }}</td>
 
 
 						<!------------------------------------------------------------------------------------>
-						<td  class="text-center" v-if="promotion.status">
-							<button data-toggle="tooltip" title="Despublicar esta promoção" type="submit" @click = "promotionStatus(promotion.id)" class='btn btn-xs btn-flat' :class="{ 'btn-success': promotion.status, 'btn-warning': !promotion.status }"><i class="fa fa-check"></i></button>
+						<td  class="text-center" v-if="promotion.status && checkPermition()">
+							<button data-toggle="tooltip" title="Despublicar esta promoção" type="submit" @click = "promotionStatus(promotion.id)" class='btn btn-xs' :class="{ 'btn-success': promotion.status, 'btn-danger': !promotion.status }"><i class="fa fa-check"></i></button>
 						</td>
 
-						<td  class="text-center" v-if="!promotion.status">
-							<button data-toggle="tooltip" title="Publicar esta promoção" type="submit" @click = "promotionStatus(promotion.id)" class='btn btn-xs btn-flat' :class="{ 'btn-success': promotion.status, 'btn-warning': !promotion.status }"><i class="fa fa-times"></i></button>
+						<td  class="text-center" v-if="!promotion.status && checkPermition()">
+							<button data-toggle="tooltip" title="Publicar esta promoção" type="submit" @click = "promotionStatus(promotion.id)" class='btn btn-xs' :class="{ 'btn-success': promotion.status, 'btn-danger': !promotion.status }"><i class="fa fa-times"></i></button>
 						</td>
 						<!------------------------------------------------------------------------------------>
 
 
 						<td class="info" v-if="showColumn.trader_id">{{ promotion.trader.name }}</td>
 
-						<td align=left>  <a data-toggle="modal" data-target="#modal-edit-promotion" href="#"> <i class="fa fa-pencil text-primary" @click="getThisPromotion(promotion.id)" > </i></a></td>
-						<td align=right><a data-toggle="modal" data-target="#modal-delete-promotion" href="#"><i class="fa fa-trash text-danger" @click="getThisPromotion(promotion.id)" ></i></a></td>
+						<td align=center>  <a  class="btn btn-default btn-xs" data-toggle="modal" data-target="#show-promotion" href="#"> <i class="fa fa-search-plus text-success" @click="getThisPromotion(promotion.id)" > </i></a></td>
+
+						<td v-show="!promotion.status" align=center>  <a  class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-edit-promotion" href="#"> <i class="fa fa-pencil text-primary" @click="getThisPromotion(promotion.id)" > </i></a></td>
+
+						<td v-show="!promotion.status" align=center><a  class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-delete-promotion" href="#"><i class="fa fa-trash text-danger" @click="getThisPromotion(promotion.id)" ></i></a></td>
 					</tr>
 				</tbody>
 			</table>
 			<div class="row">
-				<div class="col-md-6 pull-left">
+				<div class="col-md-6 pull-left" v-if="pagination.total > showRow">
 					<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
 				</div>
 				<div class="col-md-6 pull-right">
@@ -146,13 +140,13 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
-						<h4 class="modal-title">Detalhes do(a) {{ newPromotion.name }}</h4>
+						<h4 class="modal-title"><i class="text-success fa fa-eye faa-flash animated faa-slow"></i> Detalhes</h4>
 					</div>
 					<div class="modal-body">
 						<div class="row">
 							<div class="col-md-12">
 								<div class='table-responsive'>
-									<table class='table table-striped table-hover'>
+									<table class='table table-hover table-condensed'>
 										<thead>
 											<tr>
 												<th class="text-center" colspan="2">INFORMAÇOES DE PROMOÇÃO</th>
@@ -169,7 +163,7 @@
 											</tr>
 											<tr>
 												<td><b>Início</b></td>
-												<td><span class="label label-info"><i>{{ newPromotion.begnning_date }}</i></span></td>
+												<td><span><i>{{ newPromotion.begnning_date }}</i></span></td>
 
 											</tr>
 											<tr>
@@ -178,20 +172,30 @@
 											</tr>
 											<tr>
 												<td><b>Publicação</b></td>
-												<td><span class='label' :class="{ 'label-success': newPromotion.status, 'label-warning': !newPromotion.status }"><i>{{newPromotion.status ? 'Publicado' : 'Aguardando'}}</i></span></td>
+												<td><span class='label' :class="{ 'label-success': newPromotion.status, 'label-danger': !newPromotion.status }"><i>{{newPromotion.status ? 'Publicado' : 'Aguardando'}}</i></span></td>
 											</tr>
 
 											<tr>
-												<td><b>Descrição</b></td>
-												<td><i>{{ newPromotion.description }}</i></td>
+												<td><b>Comerciante</b></td>
+												<td><i class="label label-success">{{newPromotion.trader}}</i></td>
 											</tr>
+
 											<tr>
-												<td><b>Data da criação</b></td>
+												<td><b>Produto</b></td>
+												<td><i class="label label-primary">{{newPromotion.product}}</i></td>
+											</tr>
+
+											<tr>
+												<td><b>Criado em: </b></td>
 												<td><i>{{ promotion.created_at | formatDate 'DD/MM/YYYY' }}</i></td>
 											</tr>
 											<tr>
-												<td><b>Data de atualização</b></td>
+												<td><b>Atualizado em: </b></td>
 												<td><i>{{ promotion.updated_at | formatDate 'DD/MM/YYYY' }}</i></td>
+											</tr>
+											<tr>
+												<td><b>Descrição</b></td>
+												<td><i>{{ newPromotion.description }}</i></td>
 											</tr>
 
 										</tbody>
@@ -202,6 +206,8 @@
 					</div>
 					<div class="modal-footer">
 						<button @click="clearField" type="button" class="btn btn-success" data-dismiss="modal"><i class="fa fa-check"></i></button>
+
+
 					</div>
 				</div>
 
@@ -213,18 +219,18 @@
 		<!--------------------------------------------------------------------------------------------------------->
 
 		<div class="modal fade" id="modal-delete-promotion" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
-			<div class="modal-dialog">
+			<div class="modal-dialog modal-sm">
 				<div class="modal-content">
 					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-						<h4 class="modal-title" id="">Eliminar</h4>
+						<button @click="clearField" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h5 class="modal-title" id=""><i class="text-danger fa fa-exclamation-triangle faa-flash animated faa-slow"></i></h5>
 					</div>
 					<div class="modal-body">
-						<h5>Eliminar - <span class="text-uppercase text-danger">{{newPromotion.name}}</span></h5>
+						<h5 class="text-center">Eliminar?</h5>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
-						<button  @keyup.enter="deletePromotion(newPromotion.id)" @click="deletePromotion(newPromotion.id)" type="button" class="btn btn-danger"><i class="fa fa-trash-o"></i> Eliminar</button>
+						<button @click="clearField" type="button" class="btn btn-secondary btn-xs" data-dismiss="modal"><i class="fa fa-times"></i></button>
+						<button  @keyup.enter="deletePromotion(newPromotion.id)" @click="deletePromotion(newPromotion.id)" type="button" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></button>
 					</div>
 				</div>
 			</div>
@@ -240,7 +246,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
-						<h4 class="modal-title">Registar</h4>
+							<h4 class="modal-title"><i class="fa fa-plus faa-burst animated faa-slow"></i></h4>
 					</div>
 					<div class="modal-body">
 						<validator name="validationew">
@@ -249,7 +255,7 @@
 									<div class="col-md-12">
 										<div class="col-md-12">
 											<div class="form-group has-feedback">
-												<input type="text" class="form-control" name="name" placeholder="Nome" v-model="newPromotion.name" v-validate:name="['required']"/>
+												<input type="text" class="form-control" name="name" placeholder="Nome" v-model="newPromotion.name"/>
 												<span class="fa fa-user form-control-feedback"></span>
 											</div>
 										</div>
@@ -260,17 +266,15 @@
 									<div class="col-md-12">
 										<div class="col-md-6">
 											<div class="form-group has-feedback">
-												<input type='date' name="begnning_date" class='form-control' placeholder='' v-model="newPromotion.begnning_date" v-validate:begnning = "['required']">
-												<!-- <span class="fa fa-calendar-check-o form-control-feedback"></span> -->
+												<date-picker :time.sync="newPromotion.begnning_date" :option="option" :limit="limit"></date-picker>
+
 												<p class="text-help">Data de início da promoção</p>
 											</div>
 										</div>
 										<div class="col-md-6">
 											<div class="form-group has-feedback">
-												<input type='date' name="ending_date" class='form-control' placeholder='' v-model="newPromotion.ending_date"  v-validate:ending_date = "['required']">
-												<!-- <span class="fa fa-calendar-times-o form-control-feedback"></span> -->
+												<date-picker :time.sync="newPromotion.ending_date" :option="option" :limit="limit"></date-picker>
 												<p class="text-help">Término da promoção</p>
-
 											</div>
 										</div>
 									</div>

@@ -232,7 +232,6 @@ export default{
         },
 
         checkPermition: function() {
-            this.permition = [];
             var roles = this.auth.roles;
             for (var rol in roles) {
                 if (roles[rol].name == 'admin' || roles[rol].name == 'super-admin' || roles[rol].name == 'manager' || roles[rol].name == 'dpel') {

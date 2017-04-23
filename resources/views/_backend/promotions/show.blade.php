@@ -25,42 +25,28 @@
 
 @section('main-content')
     <div class="sagmma_container">
-        <div class="col-md-12">
-            <div class="box box-default">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Gerir Recursos</h3>
-                    <div class="box-tools pull-right">
-                        <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-                    </div>
-                </div>
-                <div class="box-body">
-                    {{ csrf_field() }}
 
-                    <div id="exTab2" class="">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel with-nav-tabs panel-default">
+                    <div class="panel-heading">
                         <ul class="nav nav-tabs">
-                            <li class="active">
-                                <a  href="#1" data-toggle="tab">PROMOÇÕES</a>
-                            </li>
-                            <li><a href="#2" data-toggle="tab">PRODUTOS</a>
-                            </li>
+                            <li class="active"><a href="#tabProd" data-toggle="tab">PROMOÇÕES</a></li>
+                            <li><a href="#tabPromo" data-toggle="tab">PRODUTOS</a></li>
                         </ul>
-
-                        <div class="tab-content ">
-                            <div class="tab-pane active" id="1">
-                                <br>
-                                <!------------------------------------------------------------------------------------->
+                    </div>
+                    <div class="panel-body">
+                        <div class="tab-content">
+                            {{ csrf_field() }}
+                            <div class="tab-pane fade in active" id="tabProd">
                                 <show-promotion></show-promotion>
-                                <!------------------------------------------------------------------------------------->
                             </div>
-                            <div class="tab-pane" id="2">
-                                <br>
-                                <!------------------------------------------------------------------------------------->
+
+                            <div class="tab-pane fade" id="tabPromo">
                                 <show-product></show-product>
-                                <!-------------------------------------------------------------------------------------->
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>

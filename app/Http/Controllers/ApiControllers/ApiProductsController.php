@@ -13,13 +13,27 @@ use Response;
 use Input;
 use Settings;
 use Intervention\Image\ImageManagerStatic as Image;
+use Auth;
 
 
 class ApiProductsController extends Controller
 {
     public function index($row)
     {
-        return Product::paginate($row);
+        foreach (Auth::user()->roles as $role) {
+            $role = $role->name;
+            if ($role == 'super-admin' || $role == 'amin' || $role == 'dpel' || $role == 'manager') {
+                $products = Product::paginate($row);
+            }else{
+                $products = Product::where('author', '=', Auth::user()->name)->paginate($row);
+            }
+            $products->each(function($products){
+                $products->promotions;
+            });
+            return $products;
+        }
+
+
     }
 
     public function create()

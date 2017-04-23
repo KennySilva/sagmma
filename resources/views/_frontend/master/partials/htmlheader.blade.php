@@ -6,6 +6,8 @@
     <meta name="token" id="token" value="{{ csrf_token() }}">
     <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.css">
     <link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.css" media="screen" title="no title"/>
+    <link href="{{ asset('/bower_components/select2/dist/css/select2.css') }}" rel="stylesheet" type="text/css"/>
+    <link href="{{ asset('/bower_components/select2-bootstrap-theme/dist/select2-bootstrap.css') }}" rel="stylesheet" type="text/css"/>
     <link href="{{ asset('/bower_components/font-awesome-animation/dist/font-awesome-animation.css') }}" rel="stylesheet" type="text/css"/>
     <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet" type="text/css">
@@ -14,8 +16,8 @@
 
     <link rel="stylesheet" href="/bower_components/flexisel/css/style.css">
 
-
     <link rel="stylesheet" href="/bower_components/lightbox2/dist/css/lightbox.css">
+
 
 
 
