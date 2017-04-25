@@ -205,7 +205,7 @@ export default{
         },
 
         // --------------------------------------------------------------------------------------------
-
+        
         fetchPromotion: function(page, row) {
             this.$http.get('http://localhost:8000/api/v1/allPromotions/'+row+'?page='+page).then((response) => {
                 this.$set('promotions', response.data.data);

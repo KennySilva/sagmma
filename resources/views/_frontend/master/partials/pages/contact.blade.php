@@ -65,4 +65,14 @@
         </div>
     </div>
 </div>
-<br><br>
+<br>
+<hr>
+<div class="container-fluid">
+    <div class="row">
+        <div class="table-responsive">
+            <div style="width: 100%; height: 400px;">
+                {!! Mapper::render() !!}
+            </div>
+        </div>
+    </div>
+</div>

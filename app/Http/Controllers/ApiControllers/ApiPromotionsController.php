@@ -19,7 +19,6 @@ class ApiPromotionsController extends Controller
 {
     public function index($row)
     {
-        // this.updatePromotionStatus();
         $promotion = Promotion::paginate($row);
         $promotion->each(function($promotion){
             $promotion->product;
@@ -51,19 +50,17 @@ class ApiPromotionsController extends Controller
         $promotion->description   = $request->description;
         $promotion->begnning_date = $request->begnning_date;
         $promotion->ending_date   = $request->ending_date;
-        $promotion->trader_id     = $request->trader_id;
+        $promotion->trader_id     = \Auth::user()->id;
         $promotion->product_id    = $request->product_id;
         $promotion->status        = false;
         $promotion->save();
 
     }
-
+    
 
     public function show($id)
     {
         $promotion = Promotion::findOrFail($id);
-        $promotion->product;
-        $promotion->trader;
         return $promotion;
     }
 
@@ -94,12 +91,12 @@ class ApiPromotionsController extends Controller
     public function getTraderForPromotion()
     {
         //
-        if (Auth::user()->type=='trad') {
-            $trader = Auth::user();
-        }else {
-            $trader = Trader::all();
-        }
-        // $trader = Trader::all();
+        // if (Auth::user()->type=='Comerciante') {
+        //     $trader = Auth::user();
+        // }else {
+        //     $trader = Trader::all();
+        // }
+        $trader = Trader::all();
         return $trader;
     }
 
@@ -117,16 +114,5 @@ class ApiPromotionsController extends Controller
         return response($promotion, 200);
     }
 
-    // public function updatePromotionStatus()
-    // {
-    //     $promotions = Promotion::where('status', true)->get();
-    //     foreach ($promotions as $promotion) {
-    //         $date_atual = date('Y-m-d');
-    //         if ($promotion->ending_date < $date_atual) {
-    //             $promotion->status = false;
-    //         }
-    //         $promotion->save();
-    //     }
-    //     return;
-    // }
+
 }

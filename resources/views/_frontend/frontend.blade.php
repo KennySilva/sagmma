@@ -3,45 +3,26 @@
 
 @endsection
 @section('content')
-    <!--------------------------------------------------------------------------------------->
     @include('_frontend.master.partials.slide')
-    <!----------------------------Alerts----------------------------------------------------------->
-    <div class="row">
-        <div class="col-md-6">
-            @include('flash::message')
-        </div>
-    </div>
+    @include('_frontend.master.partials.messages')
     @include('_frontend.master.partials.pages.market_info')
-
-    <!-- Container (Services Section) -->
     @include('_frontend.master.partials.pages.values')
-
-    <!-- Container (Portfolio Section) -->
     @include('_frontend.master.partials.pages.gallery')
-
-    <!-- Container (Pricing Section) -->
     @include('_frontend.master.partials.pages.market_team')
-
-    <!-- Container (Contact Section) -->
     @include('_frontend.master.partials.pages.contact')
-
-    <!--------------------------------------------------------------------------------------->
-    @include('_frontend.master.partials.mapscript')
-    <!--------------------------------------------------------------------------------------->
 @endsection
 @push('scripts')
     <script>
     lightbox.option({
         'resizeDuration': 200,
         'wrapAround': true,
-        'albumLabel':	"Imagem %1 of %3"
+        'albumLabel':	"Imagem Numero %1"
     });
 
     //Clear the modal on hiddeng
     $('.modal').on('hidden.bs.modal', function(){
         $(this).find('form')[0].reset();
     });
-
 
     window.setTimeout(function() {
         $(".alert").fadeTo(500, 0).slideUp(500, function(){
@@ -83,14 +64,6 @@
             $('.pager').fadeOut();
         }
     );
-
-    // $(document).ready(function(){
-    //     $("div.box-slider img").hover(
-    //         function(){$(this).siblings("p:first").show();},
-    //         function(){$(this).siblings("p:first").hide();}
-    //     );
-    // });
-
     </script>
 
 @endpush

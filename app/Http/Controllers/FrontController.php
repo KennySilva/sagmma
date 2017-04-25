@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 use Sagmma\Http\Requests;
 use Sagmma\Http\Controllers\Controller;
-
+use Mapper;
 
 class FrontController extends Controller
 {
@@ -14,8 +14,13 @@ class FrontController extends Controller
 
     public function index()
     {
+        Mapper::map(15.09344027, -23.66661474, ['title' => 'Mercado Novo de Achada Riba',
+        'eventDomReady' => 'console.log(1);']);
+        Mapper::marker(15.09670065, -23.66797999, ['title' => 'Pilourinho, Mercado Central',
+        'eventDomReady' => 'console.log(1);']);
+        Mapper::marker(15.09323827, -23.67163584, ['title' => 'Piso, Mercado de Animal',
+        'eventDomReady' => 'console.log(1);']);
         return view('_frontend.frontend');
-
     }
 
     public function create()

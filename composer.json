@@ -21,7 +21,8 @@
         "caffeinated/flash": "~2.0",
         "cviebrock/eloquent-sluggable": "4.1",
         "edvinaskrucas/settings": "1.0.0",
-        "spatie/laravel-analytics": "^1.4"
+        "spatie/laravel-analytics": "^1.4",
+        "cornford/googlmapper": "2.*"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

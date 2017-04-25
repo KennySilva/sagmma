@@ -1,5 +1,6 @@
 <footer class="container-fluid myfooter">
-    <div class="row author">
+    <br>
+    <div class="row">
         <div class="col-md-6">
             <p class="pull-left">Todos os direitos reservados</p>
         </div>
@@ -8,5 +9,5 @@
             <p class="pull-right">Estefanio Pereira </p>
         </div>
     </div>
-    {{-- <hr class="style2"> --}}
+    <br>
 </footer>

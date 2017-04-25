@@ -42404,7 +42404,7 @@ if (module.hot) {(function () {  module.hot.accept()
 })()}
 },{"../../../Pagination/src/Component.vue":100,"lodash":84,"vue":91,"vue-datepicker/vue-datepicker-1.vue":87,"vue-hot-reload-api":88,"vueify/lib/insert-css":92}],108:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
-var __vueify_style__ = __vueify_insert__.insert("h1 {\n  color: #5C5F56;\n}\n")
+var __vueify_style__ = __vueify_insert__.insert("h1 {\r\n  color: #5C5F56;\r\n}\r\n")
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -42711,7 +42711,7 @@ if (module.hot) {(function () {  module.hot.accept()
   hotAPI.install(require("vue"), true)
   if (!hotAPI.compatible) return
   module.hot.dispose(function () {
-    __vueify_insert__.cache["h1 {\n  color: #5C5F56;\n}\n"] = false
+    __vueify_insert__.cache["h1 {\r\n  color: #5C5F56;\r\n}\r\n"] = false
     document.head.removeChild(__vueify_style__)
   })
   if (!module.hot.data) {
@@ -42967,7 +42967,7 @@ if (module.hot) {(function () {  module.hot.accept()
 })()}
 },{"../../../Pagination/src/Component.vue":100,"babel-runtime/helpers/defineProperty":7,"lodash":84,"vue":91,"vue-hot-reload-api":88,"vueify/lib/insert-css":92}],110:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
-var __vueify_style__ = __vueify_insert__.insert("h1 {\n  color: #5C5F56;\n}\n")
+var __vueify_style__ = __vueify_insert__.insert("h1 {\r\n  color: #5C5F56;\r\n}\r\n")
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -43217,7 +43217,7 @@ if (module.hot) {(function () {  module.hot.accept()
   hotAPI.install(require("vue"), true)
   if (!hotAPI.compatible) return
   module.hot.dispose(function () {
-    __vueify_insert__.cache["h1 {\n  color: #5C5F56;\n}\n"] = false
+    __vueify_insert__.cache["h1 {\r\n  color: #5C5F56;\r\n}\r\n"] = false
     document.head.removeChild(__vueify_style__)
   })
   if (!module.hot.data) {
@@ -43356,7 +43356,7 @@ if (module.hot) {(function () {  module.hot.accept()
 })()}
 },{"babel-runtime/core-js/object/keys":4,"babel-runtime/helpers/typeof":8,"vue":91,"vue-hot-reload-api":88,"vueify/lib/insert-css":92}],112:[function(require,module,exports){
 var __vueify_insert__ = require("vueify/lib/insert-css")
-var __vueify_style__ = __vueify_insert__.insert("h1 {\n  color: #5C5F56;\n}\n")
+var __vueify_style__ = __vueify_insert__.insert("h1 {\r\n  color: #5C5F56;\r\n}\r\n")
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -43827,7 +43827,7 @@ if (module.hot) {(function () {  module.hot.accept()
   hotAPI.install(require("vue"), true)
   if (!hotAPI.compatible) return
   module.hot.dispose(function () {
-    __vueify_insert__.cache["h1 {\n  color: #5C5F56;\n}\n"] = false
+    __vueify_insert__.cache["h1 {\r\n  color: #5C5F56;\r\n}\r\n"] = false
     document.head.removeChild(__vueify_style__)
   })
   if (!module.hot.data) {

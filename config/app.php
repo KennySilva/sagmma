@@ -90,6 +90,8 @@ return [
         Cviebrock\EloquentSluggable\ServiceProvider::class,
 
         Krucas\Settings\Providers\SettingsServiceProvider::class,
+// Google maps
+        Cornford\Googlmapper\MapperServiceProvider::class,
 
 
     ],
@@ -155,6 +157,8 @@ return [
         'Flash' => Caffeinated\Flash\Facades\Flash::class,
 
         'Settings' => Krucas\Settings\Facades\Settings::class,
+
+        'Mapper'         => Cornford\Googlmapper\Facades\MapperFacade::class,
 
 
 
