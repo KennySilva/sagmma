@@ -22,18 +22,16 @@ class ApiProductsController extends Controller
     {
         foreach (Auth::user()->roles as $role) {
             $role = $role->name;
-            if ($role == 'super-admin' || $role == 'amin' || $role == 'dpel' || $role == 'manager') {
+            if ($role == 'super-admin' || $role == 'admin' || $role == 'dpel' || $role == 'manager') {
                 $products = Product::paginate($row);
             }else{
                 $products = Product::where('author', '=', Auth::user()->name)->paginate($row);
             }
-            $products->each(function($products){
-                $products->promotions;
-            });
-            return $products;
         }
-
-
+        $products->each(function($products){
+            $products->promotions;
+        });
+        return $products;
     }
 
     public function create()

@@ -19,7 +19,17 @@ class ApiPromotionsController extends Controller
 {
     public function index($row)
     {
-        $promotion = Promotion::paginate($row);
+        foreach (Auth::user()->roles as $role) {
+            $role = $role->name;
+            if ($role == 'super-admin' || $role == 'admin' || $role == 'dpel' || $role == 'manager') {
+                $promotion = Promotion::paginate($row);
+
+            }else{
+                $promotion = Promotion::where(function ($query) {$query->whereHas('product', function($q){
+                    $q->where('author', '=', Auth::user()->name);
+                });})->paginate($row);
+            }
+        }
         $promotion->each(function($promotion){
             $promotion->product;
             $promotion->trader;
@@ -34,29 +44,19 @@ class ApiPromotionsController extends Controller
 
     public function store(PromotionsRequest $request)
     {
-        // if (Auth::user()->type=='Comerciante') {
-        //     $promotion->trader_id = Auth::user()->id;
-        // }
 
-        // $date = date('Y-m-d');
-        // $end = $request->ending_date;
-        // if ($date > $end) {
-        //     $contract->status    = false;
-        // }else {
-        //     $contract->status    = true;
-        // }
-        $promotion                = new Promotion($request->all());
+        $promotion                = new Promotion();
         $promotion->name          = $request->name;
         $promotion->description   = $request->description;
         $promotion->begnning_date = $request->begnning_date;
         $promotion->ending_date   = $request->ending_date;
-        $promotion->trader_id     = \Auth::user()->id;
+        $promotion->trader_id     = $request->trader_id;
         $promotion->product_id    = $request->product_id;
         $promotion->status        = false;
         $promotion->save();
 
     }
-    
+
 
     public function show($id)
     {
@@ -85,18 +85,27 @@ class ApiPromotionsController extends Controller
     //Metodos de auxilio
     public function getProductForPromotion()
     {
-        $product = Product::all();
-        return $product;
+        foreach (Auth::user()->roles as $role) {
+            $role = $role->name;
+            if ($role == 'super-admin' || $role == 'admin' || $role == 'dpel' || $role == 'manager') {
+                $products = Product::all();
+            }else{
+                $products = Product::where('author', '=', Auth::user()->name)->get();
+            }
+        }
+        return $products;
+
     }
     public function getTraderForPromotion()
     {
-        //
-        // if (Auth::user()->type=='Comerciante') {
-        //     $trader = Auth::user();
-        // }else {
-        //     $trader = Trader::all();
-        // }
-        $trader = Trader::all();
+        foreach (Auth::user()->roles as $role) {
+            $role = $role->name;
+            if ($role == 'super-admin' || $role == 'admin' || $role == 'dpel' || $role == 'manager') {
+                $trader = Trader::all();
+            }else{
+                $trader = Trader::where('ic', '=', Auth::user()->ic)->get();
+            }
+        }
         return $trader;
     }
 

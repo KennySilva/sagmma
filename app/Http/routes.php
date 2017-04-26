@@ -8,16 +8,20 @@ Route::group(['middleware' => []], function () {
     Route::resource('/article', 'Web\NewsController');
     Route::resource('/promotions', 'Web\ShowPromotionsController');
     Route::resource('/informations', 'Web\InformationsController');
-    Route::resource('/myBusiness', 'Web\BusinessController');
     Route::get('/myProfile', 'FrontController@myProfile');
     Route::get('/categories/{name}', ['uses' => 'Web\NewsController@searchCategory', 'as'   => 'front.search.category']);
     Route::get('/tags/{name}', ['uses' => 'Web\NewsController@searchTag', 'as'   => 'front.search.tag']);
     Route::get('viewArticle/{slug}', ['uses' => 'Web\NewsController@viewArticle','as'   => 'front.view.article']);
 });
+
+Route::group(['middleware' => ['auth', 'role:super-admin|admin|manager|dpel|trader', 'permission:manage-promotions']], function () {
+    Route::resource('/myBusiness', 'Web\BusinessController');
+
+});
 // #######################################################################################################################
 // ####################################################  Sagmma_Backend  #################################################
 // #######################################################################################################################
-Route::group(['middleware' => ['auth', 'role:super-admin|admin|manager|articles-manager|dpel|administrative-assistant', 'permission:backend-access|']], function () {
+Route::group(['middleware' => ['auth', 'role:super-admin|admin|manager|articles-manager|dpel|administrative-assistant', 'permission:backend-access']], function () {
     Route::resource('/home', 'BackendHomeController');
 });
 // #######################################################################################################################

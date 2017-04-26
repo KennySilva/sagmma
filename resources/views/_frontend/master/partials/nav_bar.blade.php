@@ -35,7 +35,7 @@
                             @endpermission
                             @endrole
 
-                            @role(['super-admin', 'admin', 'trader'])
+                            @role(['super-admin', 'admin', 'trader', 'manager'])
                             @permission(['manage-promotions'])
                             <li><a href="{{ url('myBusiness') }}"><i class="fa fa-shopping-cart"></i> MEU NEGÓCIO</a></li>
                             @endpermission
