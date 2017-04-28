@@ -38006,7 +38006,14 @@ Vue.http.headers.common['X-CSRF-TOKEN'] = document.querySelector('#token').getAt
 new Vue({
     el: '.front_page',
 
-    data: {},
+    data: {
+        profile: {
+            state: '',
+            council: '',
+            parish: ''
+        },
+        updateimage: ''
+    },
 
     components: {
         //------------------------------Product-----------------------------------

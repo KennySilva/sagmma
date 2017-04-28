@@ -1,7 +1,7 @@
 <div class="row">
-    <div class="col-sm-4 col-md-4">
+    <div class="col-sm-4 col-md-3">
         <img src="/uploads/avatars/{!! $user->avatar !!}"
-        alt="" class="img-rounded img-responsive img-thumbnail center-block"/>
+        alt="" class="img-responsive center-block" style="width: 150px; height: 150px; border-radius: 50%;"/>
         <hr>
         <form class="" enctype="multipart/form-data" action="/user/profiles" method="post">
             <input v-model="updateimage" id="input-2" type="file" multiple class="file-loading" name="avatar">
@@ -11,7 +11,7 @@
         </form>
     </div>
 
-    <div class="col-sm-8 col-md-8">
+    <div class="col-sm-8 col-md-9">
         <blockquote>
             <p>{!! $user->name !!}</p> <small><cite title="Source Title">{!! $user->state !!}, {!! $user->council !!}, {!! $user->parish !!}, {!! $user->zone !!} <i class="glyphicon glyphicon-map-marker"></i></cite></small>
         </blockquote>
@@ -56,7 +56,6 @@
                                         <td><i class="label label-warning">Não Especificado</i></td>
                                     @endif
 
-                                    <td><i></i></td>
                                 </tr>
                                 <tr>
                                     <td><b>Genero</b></td>
@@ -136,7 +135,7 @@
                     |
                     <button type="button" id="passEdit" class="btn btn-link pass">Alterar Palavra Passe</button>
                     <div id="editPassword" class="hide">
-                        <form action="{{url('editPassword')}}" id="popForm" method="post">
+                        <form action="{{url('user/editPassword')}}" id="popForm" method="post">
                             <div>
 
                                 {{ csrf_field() }}
@@ -171,14 +170,16 @@
                 </div>
             </div>
         </div>
+        @if (Auth::user()->roles)
+
         <div class="col-md-3">
             <div class="list-group">
-                <li class="list-group-item active">
-                    Sou Um...
+                <li class="list-group-item list-group-item-info">
+                    <b>Sou</b>
                 </li>
                 @foreach (Auth::user()->roles as $role)
-                    <li class="list-group-item list-group-item-success">
-                        {{$role->display_name}}
+                    <li class="list-group-item">
+                        <span data-toggle="tooltip" title="{{$role->description}}">{{$role->display_name}}</span>
                     </li>
                 @endforeach
             </div>
@@ -186,16 +187,18 @@
             <hr>
 
             <div class="list-group">
-                <li class="list-group-item active">
-                    O que eu faço...
+                <li class="list-group-item list-group-item-info">
+                    <b>Faço</b>
                 </li>
                 @foreach (Auth::user()->roles as $role)
                     @foreach ($role->perms as $permission)
-                        <li class="list-group-item list-group-item-success">{{$permission->display_name}}</li>
+                        <li class="list-group-item"><span data-toggle="tooltip" title="{{$permission->description}}">{{$permission->display_name}}</span></li>
                     @endforeach
                 @endforeach
             </div>
         </div>
+    @endif
+
 
 
         <div class="modal fade" id="editProfile" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
@@ -205,7 +208,7 @@
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                         <h4 class="modal-title" id=""></h4>
                     </div>
-                    <form id="form_id" class="" action="{{url('editProfile')}}" method="post">
+                    <form id="form_id" class="" action="{{url('user/editProfile')}}" method="post">
                         <div class="modal-body">
                             {{ csrf_field() }}
 

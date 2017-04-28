@@ -1,6 +1,6 @@
 <div id="gallery" class="container-fluid text-center">
     <h2>GALERIA</h2><hr>
-    <h4>O Mercado Municipal é a Segunda Casa do Povo</h4><hr>
+    <h4 class=".front-h4">O Mercado Municipal é a Segunda Casa do Povo</h4><hr>
     <div class="row text-center slideanim">
         <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
             <div class="hovereffect">

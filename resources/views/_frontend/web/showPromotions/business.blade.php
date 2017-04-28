@@ -31,9 +31,9 @@
         <div class="row">
             <div class="jumbotron junb-styele">
                 <div style="padding-top: 20px;" class="text-center">
-                    <img class="img-rounded" src="/uploads/avatars/{!! Auth::user()->avatar !!}" alt="Placeholder">
+                    <img class="img-responsive" src="/uploads/avatars/{!! Auth::user()->avatar !!}" alt="Placeholder" style="width: 150px; height: 150px; border-radius: 50%;">
                 </div>
-                <div class="text-center">
+                <div class="text-left">
                     <h4 class="text-style"><span>@</span>{{Auth::user()->name}}</h4>
 
                 </div>

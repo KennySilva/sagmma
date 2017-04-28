@@ -1,7 +1,8 @@
 <div id="values" class="container-fluid text-center bg-grey">
-    <h2>Valores</h2>
+    <h2>VALORES</h2>
+    <hr>
     <h4>A Honra de servir Santa Catarina com degnidade</h4>
-    <br>
+    <hr>
     <div class="row slideanim">
         <div class="col-sm-4">
             <span class="fa fa-handshake-o logo-small"></span>

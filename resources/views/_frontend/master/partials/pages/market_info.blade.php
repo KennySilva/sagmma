@@ -6,7 +6,7 @@
                     <img class="img-thumbnail img-responsive" src="img/frontend_img/doc/MNAR.jpg" alt="" />
                 </a>
                 <h2 class="post-title">
-                    <h2>MERCADO NOVO DE ACHADA RIBA</h2>
+                    <h2 class="front-h2">MERCADO NOVO DE ACHADA RIBA</h2>
                 </h2>
 
 
@@ -21,7 +21,7 @@
                     <img class="img-thumbnail img-responsive" src="img/frontend_img/doc/MC.jpg" alt="" />
                 </a>
                 <h2 class="post-title">
-                    <h2>PILOURINHO</h2>
+                    <h2 class="front-h2">PILOURINHO</h2>
                 </h2>
                 <p class="post-contenido text-justify">
                     <div class="comment more">

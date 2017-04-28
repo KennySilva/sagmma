@@ -174,6 +174,22 @@ return [
             'digits'    => 'Aceita :digits Números',
         ],
 
+        'old_password' => [
+            'required' => 'Obrigatório',
+            'exists'               => ':attribute é inválido.',
+        ],
+
+        'new_password' => [
+            'required' => 'Obrigatório',
+            'confirmed'            => 'A confirmação não Coencide',
+            'different'            => 'Este palavra é igual a Palavra Passe Atual',
+
+        ],
+
+        'new_password_confirmation' => [
+            'required' => 'Obrigatório',
+        ],
+
     ],
 
 
@@ -214,6 +230,9 @@ return [
         'description'    => 'Descrição',
         'typeofemployee_id'    => 'Tipo de Funcionário',
         'service_beginning'    => 'Data de Início',
+        'old_password'    => 'Palavra Passe Atual',
+        'new_password'    => 'Nova Palavra Passe',
+        'new_password_confirmation'    => 'Conformação',
     ],
 
 ];

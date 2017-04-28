@@ -3,6 +3,8 @@
 
 @endsection
 @section('content')
+    <div class="front-body">
+
     @include('_frontend.master.partials.slide')
     @include('_frontend.master.partials.messages')
     @include('_frontend.master.partials.pages.market_info')
@@ -10,6 +12,7 @@
     @include('_frontend.master.partials.pages.gallery')
     @include('_frontend.master.partials.pages.market_team')
     @include('_frontend.master.partials.pages.contact')
+</div>
 @endsection
 @push('scripts')
     <script>

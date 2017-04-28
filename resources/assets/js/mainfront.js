@@ -15,6 +15,12 @@ new Vue({
     el: '.front_page',
 
     data: {
+        profile      : {
+            state: '',
+            council: '',
+            parish: '',
+        },
+        updateimage  : '',
     },
 
     components: {

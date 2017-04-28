@@ -86,7 +86,7 @@ class UsersController extends Controller
         $user = Auth::user()->load(['roles' => function ($query) {
             $query->orderBy('display_name', 'asc');
         }]);
-        
+
         return view('_backend.users.profile')->with('user', $user);
     }
 
@@ -102,7 +102,8 @@ class UsersController extends Controller
             $user->avatar = $filename;
             $user->save();
             Flash::success('Imagem de Perfil Actualizada Com Sucesso');
-            return view('_backend.users.profile')->with('user', $user);
+            return redirect()->back()->with('user', $user);
+            // return view('_backend.users.profile')->with('user', $user);
 
         }
     }
@@ -119,7 +120,8 @@ class UsersController extends Controller
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             Flash::warning('Informações não atualizadas, Verifique os dados Introduzidos');
-            return redirect('user/profiles')->withErrors($validator);
+            // return redirect('user/profiles')->withErrors($validator);
+            return redirect()->back()->withErrors($validator);
         }else {
             $user = new User;
             $user->where('id', '=', Auth::user()->id)
@@ -135,8 +137,9 @@ class UsersController extends Controller
                 'zone' => $request->zone,
             ]);
 
-            Flash::success('Informações atualizadas com sucesso');
-            return redirect('user/profiles');
+            Flash::success('Informações atualizada com sucesso');
+            // return redirect('user/profiles');
+            return redirect()->back();
 
         }
     }
@@ -144,7 +147,7 @@ class UsersController extends Controller
     public function updatePassword(Request $request)
     {
         $rules = [
-            'old_password' => 'required',
+            'old_password' => 'required|exists:users,password',
             'new_password' => 'required|min:3|different:old_password|confirmed',
             'new_password_confirmation' => 'required',
         ];
@@ -160,10 +163,11 @@ class UsersController extends Controller
                 $user->where('id', '=', Auth::user()->id)->update(['password' => bcrypt($request->new_password)]);
 
                 Flash::success('Palavra passe atualizada com sucesso');
-                return redirect('user/profiles');
+                return redirect()->back();
             }else {
                 Flash::error('Palavra passe Introduzida está incorreta');
-                return redirect('user/profiles');
+                return redirect()->back();
+                // return redirect('user/profiles');
             }
         }
 

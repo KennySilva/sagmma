@@ -1,8 +1,9 @@
-<div id="market_team" class="container-fluid bg-grey">
-    <div class="text-center">
-        <h2>Equipa da gestão do mercado</h2>
-        <h4>Juntos podemos podemos andar rumo ao sucesso</h4>
-    </div>
+<div id="market_team" class="container-fluid bg-grey text-center">
+    
+    <h2>EQUIPA</h2>
+    <hr>
+    <h4>Juntos podemos podemos andar rumo ao sucesso</h4>
+    <hr>
     <div class="row slideanim">
         <div class="col-md-12 col-md-push-1">
             {{-----------------------------------------------------------}}

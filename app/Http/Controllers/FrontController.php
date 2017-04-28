@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Sagmma\Http\Requests;
 use Sagmma\Http\Controllers\Controller;
 use Mapper;
+use Auth;
 
 class FrontController extends Controller
 {
@@ -58,7 +59,10 @@ class FrontController extends Controller
 
     public function myProfile($value='')
     {
-        return view('_frontend.web.profile.frontProfile');
 
+        $user = Auth::user()->load(['roles' => function ($query) {
+            $query->orderBy('display_name', 'asc');
+        }]);
+        return view('_frontend.web.profile.frontProfile')->with('user', $user);
     }
 }
