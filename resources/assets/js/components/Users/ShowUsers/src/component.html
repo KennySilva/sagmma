@@ -8,7 +8,7 @@
 	<div class="col-md-12">
 		<div class="form-inline pull-right">
 			<div class="input-group">
-				<select data-toggle="tooltip" title="A mostrar linhas na tabela" class="form-control" name="" v-model="showRow" @change="fetchUser(1, showRow)">
+				<select data-toggle="tooltip" title="A mostrar linhas na tabela" class="selectpicker show-tick show-menu-arrow" data-style="btn-primary" name="" v-model="showRow" @change="fetchUser(1, showRow)">
 					<option class="" value="5">05</option>
 					<option class="" value="10" selected>10</option>
 					<option class="" value="20">20</option>
@@ -309,7 +309,7 @@
 									<div class="col-md-12">
 										<div class="col-md-6">
 											<div class="form-group {{ errors.name ? ' has-error' : '' }} has-feedback">
-												<input type="text" class="form-control" name="name" placeholder="Nome Completo" v-model="newUser.name"/>
+												<input id="name" type="text" class="form-control" name="name" placeholder="Nome Completo" v-model="newUser.name"/>
 												<span class="fa fa-user form-control-feedback"></span>
 												<p v-if="errors.name" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.name }}</p>
 											</div>
@@ -347,7 +347,7 @@
 									<div class="col-md-12">
 										<div class="col-md-6">
 											<div class="form-group {{ errors.ic ? ' has-error' : '' }} has-feedback">
-												<input v-model="newUser.ic" type="number" class='form-control' placeholder="BI">
+												<input  id="ic" v-model="newUser.ic" type="text" class='form-control' placeholder="BI">
 												<span class="fa fa-id-card form-control-feedback"></span>
 												<p v-if="errors.ic" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.ic }}</p>
 											</div>
@@ -355,7 +355,7 @@
 
 										<div class="col-md-6">
 											<div class="form-group {{ errors.phone ? ' has-error' : '' }} has-feedback">
-												<input v-model="newUser.phone"  id="tel" type='number' class='form-control tel' placeholder='Introduza o Numero'>
+												<input v-model="newUser.phone"  id="phone" type='text' class='form-control tel' placeholder='Introduza Tel/Movel'>
 												<span class="fa fa-phone form-control-feedback"></span>
 												<p v-if="errors.phone" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.phone }}</p>
 											</div>
@@ -596,7 +596,7 @@
 									<div class="col-md-12">
 										<div class="col-md-6">
 											<div class="form-group {{ errors.ic ? ' has-error' : '' }} has-feedback">
-												<input v-model="newUser.ic" type="number" class='form-control' placeholder="BI">
+												<input id="iced" v-model="newUser.ic" type="text" class='form-control' placeholder="BI">
 												<span class="fa fa-id-card form-control-feedback"></span>
 												<p v-if="errors.ic" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.ic }}</p>
 											</div>
@@ -604,7 +604,7 @@
 
 										<div class="col-md-6">
 											<div class="form-group {{ errors.phone ? ' has-error' : '' }} has-feedback">
-												<input v-model="newUser.phone"  id="tel" type='number' class='form-control tel' placeholder='Introduza o Numero'>
+												<input v-model="newUser.phone"  id="phoneed" type='text' class='form-control tel' placeholder='Introduza o Numero'>
 												<span class="fa fa-phone form-control-feedback"></span>
 												<p v-if="errors.phone" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.phone }}</p>
 											</div>

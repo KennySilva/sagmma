@@ -9,6 +9,10 @@ Vue.filter('formatDate', function(value, formatString) {
     }
     return moment(value).format('DD/MMM/YYYY');
 });
+// 
+// Vue.directive('mask', function (maskval) {
+//     $(this.el).mask(maskval);
+// });
 
 Vue.http.headers.common['X-CSRF-TOKEN'] = document.querySelector('#token').getAttribute('value');
 new Vue({
