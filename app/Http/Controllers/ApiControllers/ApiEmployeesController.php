@@ -162,12 +162,18 @@ class ApiEmployeesController extends Controller
                 ));
             }
         }
-
+        
 
 
         public function destroy($id)
         {
-            return Employee::destroy($id);
+            $employee =  Employee::where('id', '=', $id)->first();
+            $user = User::where('ic', '=', $employee->ic)->first();
+
+            $employee->delete();
+            if ($user) {
+                $user->delete();
+            }
         }
 
         public function deleteAll($ids)

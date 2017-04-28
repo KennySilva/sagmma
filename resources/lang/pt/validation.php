@@ -132,6 +132,19 @@ return [
             'unique'    => 'Este :attribute já existe',
         ],
 
+        'email' => [
+            'required' => 'Obrigatório',
+            'min' => 'Minimo caractere é :min',
+            'max' => 'Maximo de caractere é :max',
+            'unique'    => 'Este :attribute já existe',
+        ],
+
+        'password' => [
+            'required' => 'Obrigatório',
+            'min' => 'Minimo caractere é :min',
+            'max' => 'Maximo de caractere é :max',
+        ],
+
         'display_name' => [
             'required' => 'Obrigatório',
             'min' => 'Minimo caractere é :min',

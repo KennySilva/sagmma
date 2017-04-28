@@ -24,7 +24,7 @@ export default{
             },
 
             taxations : {},
-            employees : [],
+            employees : {},
             placesInt    : [],
             placesExt    : [],
 
@@ -51,6 +51,7 @@ export default{
             },
             sendTaxation: '',
             errors: [],
+            verifyEmployee: false,
 
             myDate: new Date(),
 
@@ -177,6 +178,7 @@ export default{
         }).on('change', function () {
             self.$set('newTaxation.employee_id', jQuery(this).val());
         });
+
     },
 
     // -----------------------------------------------------------------------------------------------
@@ -205,6 +207,7 @@ export default{
             };
             this.sendTaxation = '';
         },
+
 
 
         createTaxation: function() {
@@ -333,6 +336,15 @@ export default{
             });
         },
 
+        checkPermition: function() {
+            var roles = this.auth.roles;
+            for (var rol in roles) {
+                if (roles[rol].name == 'admin' || roles[rol].name == 'super-admin' || roles[rol].name == 'manager' || roles[rol].name == 'dpel') {
+                    return true;
+                }
+            }
+        },
+
 
 
         taxationExtPlace: function() {
@@ -344,6 +356,8 @@ export default{
                 console.log("Ocorreu um erro na operação");
             });
         },
+
+
         //-----------------------------------------------------------------------------------------------
 
         taxationEmployee: function() {
@@ -353,7 +367,6 @@ export default{
                 console.log("Ocorreu um erro na operação");
             });
         },
-
 
 
         // --------------------------------------------------------------------------------------------
@@ -380,6 +393,8 @@ export default{
                 self.sortInverse = 1
             }
         },
+
+
 
 
         // --------------------------------------------------------------------------------------------

@@ -20,7 +20,7 @@ export default{
             newUser: {
                 id                      : '',
                 name                    : '',
-                username                : '',
+                username                : '', 
                 ic                      : '',
                 email                   : '',
                 password                : '',

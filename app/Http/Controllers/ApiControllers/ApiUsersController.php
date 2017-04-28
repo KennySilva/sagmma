@@ -200,7 +200,18 @@ class ApiUsersController extends Controller
 
     public function destroy($id)
     {
-        return User::destroy($id);
+        $user =  User::where('id', '=', $id)->first();
+        $employee = Employee::where('ic', '=', $user->ic)->first();
+        $trader = Trader::where('ic', '=', $user->ic)->first();
+
+        $user->delete();
+        if ($employee) {
+            $employee->delete();
+        }
+
+        if ($trader) {
+            $trader->delete();
+        }
     }
 
     public function showThisUser($id)

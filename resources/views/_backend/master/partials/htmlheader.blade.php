@@ -13,6 +13,7 @@
     <link href="{{ asset('/css/_all-skins.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('/plugins/iCheck/square/blue.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('/css/back/back.css') }}" rel="stylesheet" type="text/css"/>
+    <link href="{{ asset('/bower_components/bootstrap-select/dist/css/bootstrap-select.css') }}" rel="stylesheet" type="text/css"/>
     <link href="{{ asset('/bower_components/select2/dist/css/select2.css') }}" rel="stylesheet" type="text/css"/>
     <link href="{{ asset('/bower_components/select2-bootstrap-theme/dist/select2-bootstrap.css') }}" rel="stylesheet" type="text/css"/>
     <!--------------------------------------------------------------------------------------------------------->

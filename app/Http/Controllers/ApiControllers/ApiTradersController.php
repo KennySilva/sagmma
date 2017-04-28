@@ -131,8 +131,11 @@ class ApiTradersController extends Controller
 
         public function destroy($id)
         {
-            return Trader::destroy($id);
+            $trader =  Trader::where('id', '=', $id)->first();
+            $user = User::where('ic', '=', $trader->ic)->first();
+            $trader->delete();
+            if ($user) {
+                $user->delete();
+            }
         }
-
-
     }

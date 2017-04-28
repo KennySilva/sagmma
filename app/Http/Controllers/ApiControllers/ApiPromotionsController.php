@@ -12,7 +12,7 @@ use Promotion;
 use Product;
 use Trader;
 use Response;
-use Input;
+use Input; 
 use Auth;
 
 class ApiPromotionsController extends Controller

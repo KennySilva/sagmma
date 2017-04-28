@@ -8,7 +8,7 @@
 	<div class="col-md-12">
 		<div class="form-inline pull-left">
 			<div class="input-group">
-				<select data-toggle="tooltip" title="Escolhe Tipo de Cobrança a apresentar" class="form-control" name="" v-model="typeData"  @change="fetchTaxation(1, showRow, typeData)">>
+				<select data-toggle="tooltip" title="Escolhe Tipo de Cobrança a apresentar" class="form-control selectpicker show-tick show-menu-arrow" data-style="btn-primary" name="" v-model="typeData"  @change="fetchTaxation(1, showRow, typeData)">
 					<option class="" selected value="0"="">Todos</option>
 					<option class="" value="1">CI Interno</option>
 					<option class="" value="2">CI Externo</option>
@@ -18,7 +18,7 @@
 
 		<div class="form-inline pull-right">
 			<div class="input-group">
-				<select data-toggle="tooltip" title="Nº de linhas" class="form-control" name="" v-model="showRow" @change="fetchTaxation(1, showRow, typeData)">
+				<select data-toggle="tooltip" title="Nº de linhas" class="selectpicker show-tick show-menu-arrow" data-style="btn-primary" name="" v-model="showRow" @change="fetchTaxation(1, showRow, typeData)">
 					<option class="" value="5">05</option>
 					<option class="" value="10" selected>10</option>
 					<option class="" value="20">20</option>
@@ -65,11 +65,11 @@
 
 		</div>
 		<div class="btn-group">
-			<a class="btn btn-primary btn-flat btn-outline" href="/export/taxationsPDF"><i class="fa fa-download"></i> PDF</a>
+			<a class="btn btn-primary btn-flat btn-outline" href="/export/taxationsPDF"><i class="fa fa-file-pdf-o"></i> PDF</a>
 
 		</div>
 		<div class="btn-group">
-			<button type="button" class="btn btn-info btn-flat  btn-outline">Relatório</button>
+			<button type="button" class="btn btn-info btn-flat  btn-outline"><i class="fa fa-file-text-o"></i> Relatório</button>
 			<button type="button" class="btn btn-info btn-flat  btn-outline dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				<span class="caret"></span>
 				<span class="sr-only">Toggle Dropdown</span>
@@ -80,136 +80,122 @@
 				<li><a data-toggle="modal" data-target="#modal-report-year" href="#">Anual</a></li>
 			</ul>
 		</div>
-
-
-		<!-- <div class="btn-group">
-		<button type="button" class="btn btn-primary btn-flat btn-outline dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-eye"></i> Ver Relatórios   <span class="caret"></span></button>
-		<ul class="dropdown-menu">
-		<li><a data-toggle="modal" data-target="#modal-report-date" href="#">Relatório Diário</a></li>
-		<li><a data-toggle="modal" data-target="#modal-report-month" href="#">Relatório Mensal</a></li>
-		<li><a data-toggle="modal" data-target="#modal-report-year" href="#">Relatório Anual</a></li>
-	</ul>
-</div> -->
-</div>
-
-<!-- <div v-else class="col-md-12">
-<button data-toggle="tooltip" title="Certifique-se de criar comerciante e espaço para poder criar registo de cobrança" type="button" class="btn btn-danger btn-flat"><i class="fa fa-minus"></i> Novo</button>&nbsp;&nbsp;
-</div> -->
-
-<div class="modal fade" id="modal-report-date" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
-	<div class="modal-dialog modal-sm">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-				<h4 class="modal-title" id=""><i class="fa fa-calendar faa-burst animated faa-slow"></i></h4>
-			</div>
-			<div class="modal-body">
-				<div class="form-group">
-					<div class="table-responsive">
-						<date-picker :time.sync="report.day" :option="option" :limit="limit"></date-picker>
-						<span class="text-help text-success">Introduza a data</span>
-					</div>
-				</div>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary btn-xs" data-dismiss="modal"><i class="fa fa-times" aria-hidden="true"></i></button>
-				<a v-if="report.day" class="btn btn-primary btn-xs" href="/export/dateRoportInformation/{{report.day}}"><i class="fa fa-list faa-horizontal animated" aria-hidden="true"> Enviar</i></a>
-			</div>
-		</div>
 	</div>
-</div>
 
-<div class="modal fade" id="modal-report-month" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
-	<div class="modal-dialog modal-sm">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-				<h4 class="modal-title" id=""><i class="fa fa-calendar faa-burst animated faa-slow"></i></h4>
-			</div>
-			<div class="modal-body">
-
-				<div class="row">
-					<div class="col-md-12">
-						<div class="col-md-12">
-							<div class="form-group">
-								<select class="form-control" v-model="report.month">
-									<option value="">Mês</option>
-									<option value="01">Janeiro</option>
-									<option value="02">Fevereiro</option>
-									<option value="03">Março</option>
-									<option value="04">Abril</option>
-									<option value="05">Maio</option>
-									<option value="06">Junho</option>
-									<option value="07">Julho</option>
-									<option value="08">Agosto</option>
-									<option value="09">Setembro</option>
-									<option value="10">Outubro</option>
-									<option value="11">Novembro</option>
-									<option value="12">Desembro</option>
-								</select>
-							</div>
+	<div class="modal fade" id="modal-report-date" role="dialog" aria-labelledby="" aria-hidden="true">
+		<div class="modal-dialog modal-sm">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id=""><i class="fa fa-calendar faa-burst animated faa-slow"></i></h4>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+						<div class="table-responsive">
+							<date-picker :time.sync="report.day" :option="option" :limit="limit"></date-picker>
+							<span class="text-help text-success">Introduza a data</span>
 						</div>
 					</div>
 				</div>
-				<div class="row">
-					<div  class="col-md-12">
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary btn-xs" data-dismiss="modal"><i class="fa fa-times" aria-hidden="true"></i></button>
+					<a v-if="report.day" class="btn btn-primary btn-xs" href="/export/dateRoportInformation/{{report.day}}"><i class="fa fa-list faa-horizontal animated" aria-hidden="true"> Enviar</i></a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="modal-report-month" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+		<div class="modal-dialog modal-sm">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id=""><i class="fa fa-calendar faa-burst animated faa-slow"></i></h4>
+				</div>
+				<div class="modal-body">
+
+					<div class="row">
+						<div class="col-md-12">
+							<div class="col-md-12">
+								<div class="form-group">
+									<select class="form-control" v-model="report.month">
+										<option value="">Mês</option>
+										<option value="01">Janeiro</option>
+										<option value="02">Fevereiro</option>
+										<option value="03">Março</option>
+										<option value="04">Abril</option>
+										<option value="05">Maio</option>
+										<option value="06">Junho</option>
+										<option value="07">Julho</option>
+										<option value="08">Agosto</option>
+										<option value="09">Setembro</option>
+										<option value="10">Outubro</option>
+										<option value="11">Novembro</option>
+										<option value="12">Desembro</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
 						<div  class="col-md-12">
-							<div class="form-group">
-								<select v-if="report.month" class="form-control" v-model="report.year">
-									<option value="">Ano</option>
-									<option value="2013">2013</option>
-									<option value="2014">2014</option>
-									<option value="2015">2015</option>
-									<option value="2016">2016</option>
-									<option value="2017">2017</option>
-								</select>
+							<div  class="col-md-12">
+								<div class="form-group">
+									<select v-if="report.month" class="form-control" v-model="report.year">
+										<option value="">Ano</option>
+										<option value="2013">2013</option>
+										<option value="2014">2014</option>
+										<option value="2015">2015</option>
+										<option value="2016">2016</option>
+										<option value="2017">2017</option>
+									</select>
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
 
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary btn-xs" data-dismiss="modal"><i class="fa fa-times" aria-hidden="true"></i></button>
-				<a v-if="report.year && report.month" class="btn btn-primary btn-xs" href="/export/monthRoportInformation/{{report.month}}/{{report.year}}"> <i class="fa fa-list faa-horizontal animated" aria-hidden="true">Enviar</i></a>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary btn-xs" data-dismiss="modal"><i class="fa fa-times" aria-hidden="true"></i></button>
+					<a v-if="report.year && report.month" class="btn btn-primary btn-xs" href="/export/monthRoportInformation/{{report.month}}/{{report.year}}"> <i class="fa fa-list faa-horizontal animated" aria-hidden="true"> Enviar</i></a>
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
 
-<div class="modal fade" id="modal-report-year" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
-	<div class="modal-dialog modal-sm">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-				<h4 class="modal-title" id=""><i class="fa fa-calendar faa-burst animated faa-slow"></i></h4>
-			</div>
-			<div class="modal-body">
-				<div class="row">
-					<div class="col-md-12">
+	<div class="modal fade" id="modal-report-year" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+		<div class="modal-dialog modal-sm">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id=""><i class="fa fa-calendar faa-burst animated faa-slow"></i></h4>
+				</div>
+				<div class="modal-body">
+					<div class="row">
 						<div class="col-md-12">
-							<div class="form-group">
-								<select class="form-control" v-model="report.year" v-el:year>
-									<option value="" selected>Ano</option>
-									<option value="2013">2013</option>
-									<option value="2014">2014</option>
-									<option value="2015">2015</option>
-									<option value="2016">2016</option>
-									<option value="2017">2017</option>
-								</select>
+							<div class="col-md-12">
+								<div class="form-group">
+									<select class="form-control" v-model="report.year" v-el:year>
+										<option value="" selected>Ano</option>
+										<option value="2013">2013</option>
+										<option value="2014">2014</option>
+										<option value="2015">2015</option>
+										<option value="2016">2016</option>
+										<option value="2017">2017</option>
+									</select>
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
 
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary btn-xs" data-dismiss="modal"><i class="fa fa-times" aria-hidden="true"></i></button>
-				<a v-if="report.year" class="btn btn-primary btn-xs" href="/export/yearRoportInformation/{{report.year}}"><i class="fa fa-list faa-horizontal animated" aria-hidden="true">Enviar</i></a>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary btn-xs" data-dismiss="modal"><i class="fa fa-times" aria-hidden="true"></i></button>
+					<a v-if="report.year" class="btn btn-primary btn-xs" href="/export/yearRoportInformation/{{report.year}}"><i class="fa fa-list faa-horizontal animated" aria-hidden="true"> Enviar</i></a>
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
 </div>
 
 <br>
@@ -217,7 +203,7 @@
 <div class="row">
 	<div class="col-md-12">
 		<div class='table-responsive'>
-			<table class='table table-striped table-hover table-condensed'>
+			<table class='table table-striped table-hover'>
 				<thead>
 					<tr>
 						<th>
@@ -246,9 +232,9 @@
 
 						<td align=center><a class="btn btn-default btn-xs" @click="getThisTaxation(taxation.id)" href="" data-toggle="modal" data-target="#view-taxation"><i class="fa fa-search-plus text-success"></i></a></td>
 
-						<td align=center>  <a class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-edit-taxation" href="#"><i class="fa fa-edit text-primary" @click="getThisTaxation(taxation.id)"></i></a></td>
+						<td v-if="checkPermition()" align=center>  <a class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-edit-taxation" href="#"><i class="fa fa-edit text-primary" @click="getThisTaxation(taxation.id)"></i></a></td>
 
-						<td align=center><a class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-delete-taxation" href="#"><i class="fa fa-trash text-danger" @click="getThisTaxation(taxation.id)"></i></a></td>
+						<td v-if="checkPermition()" align=center><a class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-delete-taxation" href="#"><i class="fa fa-trash text-danger" @click="getThisTaxation(taxation.id)"></i></a></td>
 
 						<td align=center><a class="btn btn-default btn-xs" href="/export/receiptInformation/{{taxation.id}}"><i class="fa fa-print text-info"></i></a></td>
 
@@ -418,7 +404,7 @@
 										<div class="form-group {{ errors.employee_id ? ' has-error' : '' }} has-feedback">
 											<select :disabled = "newTaxation.type == 1" class="form-control" v-model="newTaxation.employee_id" v-el:employeecreate>
 												<option value=""></option>
-												<option v-if="newTaxation.type == 2" v-for="employee in employees" value="{{employee.id}}">
+												<option  v-if="newTaxation.type == 2" v-for="employee in employees" value="{{employee.id}}">
 													{{employee.name}}
 												</option>
 											</select>
@@ -499,7 +485,7 @@
 										<div class="form-group {{ errors.type ? ' has-error' : '' }} has-feedback">
 											<select name="state" class="form-control" v-model="newTaxation.type" v-el:typeedit>
 												<option value=""></option>
-												<option v-for="employee in employees" value="1" v-if="employee.ic == auth.ic">Cobrança interno</option>
+												<option value="1">Cobrança interno</option>
 												<option value="2">Cobrança Externo</option>
 											</select>
 											<span v-if="errors.type" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.type }}</span>
@@ -513,9 +499,9 @@
 								<div class="col-md-12">
 									<div class="col-md-12">
 										<div class="form-group {{ errors.employee_id ? ' has-error' : '' }} has-feedback">
-											<select :disabled = "newTaxation.type == 1" class="form-control" v-model="newTaxation.employee_id" v-el:employeee dit>
+											<select :disabled = "newTaxation.type == 1" class="form-control" v-model="newTaxation.employee_id" v-el:employeeedit>
 												<option value=""></option>
-												<option v-if="newTaxation.type == 2" v-for="employee in employees" value="{{employee.id}}">
+												<option  v-if="newTaxation.type == 2" v-for="employee in employees" value="{{employee.id}}">
 													{{employee.name}}
 												</option>
 											</select>

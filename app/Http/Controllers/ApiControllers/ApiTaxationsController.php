@@ -43,7 +43,7 @@ class ApiTaxationsController extends Controller
 
     public function store(TaxationsRequest $request)
     {
-        $employee = Employee::where('ic', '=', Auth::user()->ic);
+        $employee = Employee::where('ic', '=', Auth::user()->ic)->first();
         $taxation= new Taxation();
         $place_id = $request->place_id;
         $place = Place::where('id', '=', $place_id)->first();
