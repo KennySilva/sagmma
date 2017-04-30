@@ -12,6 +12,9 @@ export default{
                 employee_id : '',
                 material_id : '',
                 status      : '',
+                author      : '',
+                employee: [],
+                material: [],
             },
 
             controls : {},
@@ -35,6 +38,8 @@ export default{
                 author: false,
 
             },
+            errors: [],
+
         }
     },
 
@@ -115,6 +120,9 @@ export default{
                 employee_id : '',
                 material_id : '',
                 status      : '',
+                author      : '',
+                employee: [],
+                material: [],
             };
         },
 
@@ -123,15 +131,16 @@ export default{
             var control = this.newControl;
 
             //Clear form input
-            this.clearField();
             this.$http.post('http://localhost:8000/api/v1/controls/', control).then((response) => {
                 if (response.status == 200) {
                     $('#modal-create-control').modal('hide');
+                    this.clearField();
                     this.fetchControl(this.pagination.current_Page, this.showRow);
                     alert('Registo Criado com sucesso', 'success');
+                    this.$set('errors', '')
                 }
             }, (response) => {
-
+                this.$set('errors', response.data)
             });
         },
 
@@ -150,11 +159,25 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         getThisControl: function(id){
+            this.clearField()
+
             this.$http.get('http://localhost:8000/api/v1/controls/' + id).then((response) => {
                 this.newControl.id          = response.data.id;
                 this.newControl.employee_id = response.data.employee_id;
                 this.newControl.material_id = response.data.material_id;
+                this.newControl.author      = response.data.author;
                 this.newControl.status      = response.data.status;
+
+                var employee        = response.data.employees;
+                var material        = response.data.materials;
+
+                for (var emp in employee) {
+                    self.newControl.employee.push(employee[emp])
+                }
+
+                for (var mat in material) {
+                    self.newControl.material.push(material[mat])
+                }
             }, (response) => {
                 console.log('Error');
             });
@@ -164,19 +187,18 @@ export default{
 
         saveEditedControl: function(id) {
             var control = this.newControl;
-            this.clearField();
             this.$http.patch('http://localhost:8000/api/v1/controls/'+ id, control).then((response) => {
                 if (response.status == 200) {
                     $('#modal-edit-control').modal('hide');
+                    this.clearField();
                     this.fetchControl(this.pagination.current_Page, this.showRow);
                     this.alert('Registo Atualizado com sucesso', 'info');
-
+                    this.$set('errors', '')
                 }
             }, (response) => {
-                console.log("Ocorreu um erro na operação");
+                this.$set('errors', response.data)
             });
         },
-
         // --------------------------------------------------------------------------------------------
 
         deleteControl: function(id) {

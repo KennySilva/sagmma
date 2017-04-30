@@ -62,11 +62,9 @@
 	<div class="col-md-12">
 		<div class="btn-group">
 			<button @click="clearField" class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-taxation"><i class="fa fa-plus"></i> Novo</button>
-
 		</div>
 		<div class="btn-group">
 			<a class="btn btn-primary btn-flat btn-outline" href="/export/taxationsPDF"><i class="fa fa-file-pdf-o"></i> PDF</a>
-
 		</div>
 		<div class="btn-group">
 			<button type="button" class="btn btn-info btn-flat  btn-outline"><i class="fa fa-file-text-o"></i> Relatório</button>
@@ -141,7 +139,7 @@
 						<div  class="col-md-12">
 							<div  class="col-md-12">
 								<div class="form-group">
-									<select v-if="report.month" class="form-control" v-model="report.year">
+									<select v-if="report.month"  class="form-control" v-model="report.year">
 										<option value="">Ano</option>
 										<option value="2013">2013</option>
 										<option value="2014">2014</option>

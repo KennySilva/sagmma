@@ -6,9 +6,9 @@
         @include('_backend.master.partials.mainheader')
         @include('_backend.master.partials.sidebar')
         <div class="content-wrapper">
-            @include('_backend.master.partials.contentheader')
+            {{-- @include('_backend.master.partials.contentheader') --}}
             <br>
-            <br>
+            {{-- <br> --}}
             <div class="row">
                 <div class="col-md-6">
                     @include('flash::message')
@@ -33,7 +33,7 @@
             $(this).remove();
         });
     }, 6000);
-    
+
     </script>
 </body>
 </html>

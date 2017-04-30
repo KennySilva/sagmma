@@ -2,16 +2,12 @@
 	<button type="button" class="close" data-dismiss="alert">x</button>
 	<i class="fa fa-thumbs-o-up text-center">&nbsp;&nbsp; {{msgSucess}}</i>
 </div>
-<!--
-<pre>
-{{$data.starttime | json}}
-</pre> -->
 
 <div class="row">
 	<div class="col-md-12">
 		<div class="form-inline pull-right">
 			<div class="input-group">
-				<select data-toggle="tooltip" title="A mostrar linhas na tabela" class="form-control" name="" v-model="showRow" @change="fetchContract(1, showRow)">
+				<select data-toggle="tooltip" title="A mostrar linhas na tabela" class="selectpicker show-tick show-menu-arrow" data-style="btn-primary" name="" v-model="showRow" @change="fetchContract(1, showRow)">
 					<option class="" value="5">05</option>
 					<option class="" value="10" selected>10</option>
 					<option class="" value="20">20</option>
@@ -54,8 +50,15 @@
 <hr>
 <div class="row">
 	<div class="col-md-12">
-		<button @click="clearField" class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-contract"><i class="fa fa-plus"></i> Novo</button>&nbsp;&nbsp;
-		<a class="btn btn-primary btn-flat btn-outline" href="#"><i class="fa fa-print"></i> Imprimir</a>
+		<div class="btn-group">
+			<button @click="clearField" class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-contract"><i class="fa fa-plus"></i> Novo</button>
+		</div>
+		<div class="btn-group">
+			<a class="btn btn-primary btn-flat btn-outline" href="#"><i class="fa fa-print"></i> Imprimir</a>
+		</div>
+		<div class="btn-group">
+			<a class="btn btn-primary btn-flat btn-outline" href="#"><i class="fa fa-envelope"></i> Enviar</a>
+		</div>
 	</div>
 </div>
 
@@ -65,7 +68,7 @@
 <div class="row">
 	<div class="col-md-12">
 		<div class="table-responsive">
-			<table class="table table-striped table-hover table-condensed">
+			<table class="table table-striped table-hover">
 				<thead>
 					<tr>
 						<th>
@@ -85,7 +88,8 @@
 						</th>
 
 
-						<th  class="text-center" colspan="4"><span><i class="fa fa-cogs"></i></span></th>
+
+						<th class="text-center" colspan="4"><i class="fa fa-cogs"></i> <span class=" text-primary">Operações</span></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -99,13 +103,13 @@
 							<!-- <button type="submit" @click = "statusContractsChange(contract.id)" class="btn btn-xs" :class="{ 'btn-info': contract.status, 'btn-danger': !contract.status }">{{contract.status ? 'Normalizado' : 'Pendente'}}</button> -->
 						</td>
 						<!------------------------------------------------------------------------------------------>
-						<td align=center><a data-toggle="modal" data-target="#modal-view-contract" href="#"><i class="fa fa-eye text-success" @click="getThisContract(contract.id)"></i></a></td>
+						<td align=center><a class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-view-contract" href="#"><i class="fa fa-eye text-success" @click="getThisContract(contract.id)"></i></a></td>
 
-						<td align=center>  <a data-toggle="modal" data-target="#modal-edit-contract" href="#"> <i class="fa fa-edit text-primary" @click="getThisContract(contract.id)" > </i></a></td>
+						<td align=center>  <a class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-edit-contract" href="#"> <i class="fa fa-edit text-primary" @click="getThisContract(contract.id)" > </i></a></td>
 
-						<td align=center><a data-toggle="modal" data-target="#modal-delete-contract" href="#"><i class="fa fa-trash text-danger" @click="getThisContract(contract.id)"></i></a></td>
+						<td align=center><a class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-delete-contract" href="#"><i class="fa fa-trash text-danger" @click="getThisContract(contract.id)"></i></a></td>
 
-						<td align=center><a href="#"><i class="fa fa-print text-info" @click="getThisContract(contract.id)"></i></a></td>
+						<td align=center><a class="btn btn-default btn-xs" href="#"><i class="fa fa-print text-info" @click="getThisContract(contract.id)"></i></a></td>
 
 					</tr>
 				</tbody>

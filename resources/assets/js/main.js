@@ -9,7 +9,7 @@ Vue.filter('formatDate', function(value, formatString) {
     }
     return moment(value).format('DD/MMM/YYYY');
 });
-// 
+//
 // Vue.directive('mask', function (maskval) {
 //     $(this.el).mask(maskval);
 // });
@@ -27,6 +27,17 @@ new Vue({
         updateimage  : '',
         employeeExcel: '',
     },
+
+    ready() {
+        jQuery(function($){
+            $.mask.definitions['c']='[295]';
+            $("#phone").mask("(+238) c99-99-99",{placeholder:"_"});
+            $("#phoneed").mask("(+238) c99-99-99",{placeholder:"_"});
+            $("#ic").mask("999999",{placeholder:"_"});
+            $("#iced").mask("999999",{placeholder:"_"});
+        });
+    },
+
 
 
     components: {

@@ -97,17 +97,7 @@ return [
         'g-recaptcha-response' => [
             'required' => 'Xiii Não és Humano...!!',
         ],
-        'place_id' => [
-            'required' => 'A selecão do :attribute é obrigatória',
-        ],
-        'trader_id' => [
-            'required' => 'A selecão do :attribute é obrigatória',
-        ],
 
-        'ending_date' => [
-            'required' => 'A introdução do :attribute é obrigatória',
-            'after'    => 'A :attribute deve ser no minino 1 Ano (Depois de :date).',
-        ],
         'income' => [
             'max' => 'Certifique este valor, é muito elevado o máximo aceite é 20000',
             'min' => 'Valor muito pequeno, o minimo aceite é 500$00',
@@ -197,6 +187,25 @@ return [
             'confirmed'            => 'A confirmação não Coencide',
             'different'            => 'Este palavra é igual a Palavra Passe Atual',
 
+        ],
+
+        'place_id' => [
+            'required' => 'Obrigatório',
+        ],
+        'employee_id' => [
+            'required' => 'Obrigatório',
+        ],
+
+        'trader_id' => [
+            'required' => 'Obrigatório',
+        ],
+
+        'material_id' => [
+            'required' => 'Obrigatório',
+        ],
+
+        'ending_date' => [
+            'required' => 'Obrigatório',
         ],
 
         'new_password_confirmation' => [

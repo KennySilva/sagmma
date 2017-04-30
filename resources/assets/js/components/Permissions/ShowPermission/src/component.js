@@ -21,7 +21,7 @@ export default{
             filter: {
                 term: ''
             },
-            columnsFiltered: [],
+            columnsFiltered: ['name'],
             pagination: {},
             success: false,
             showRow: '',
@@ -164,6 +164,15 @@ export default{
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
             });
+        },
+
+        checkPermition: function() {
+            var roles = this.auth.roles;
+            for (var rol in roles) {
+                if (roles[rol].name == 'super-admin') {
+                    return true;
+                }
+            }
         },
 
         // --------------------------------------------------------------------------------------------

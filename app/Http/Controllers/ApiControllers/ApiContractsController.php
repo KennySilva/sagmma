@@ -36,7 +36,7 @@ class ApiContractsController extends Controller
 
     public function store(ContractsRequest $request)
     {
-        $contract            = new Contract($request->all());
+        $contract            = new Contract();
         $place = Place::where('id', '=', $request->place_id)->first();
         $contract->place_id    = $request->place_id;
         $contract->trader_id   = $request->trader_id;

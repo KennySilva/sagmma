@@ -9,19 +9,23 @@
 
 @section('main-content')
     <div class="row">
-        <div class="info-box">
-            <span class="info-box-icon bg-blue"><i class="fa fa-users"></i></span>
-            <div class="info-box-content">
-                <span class="info-box-text">Funciionários</span>
-                <span class="info-box-number">Imprimir {{ $totalEmployees }} Funcionários</span>
+        <div class="col-md-6">
+            <div class="info-box">
+                <span class="info-box-icon bg-blue"><i class="fa fa-file-text-o"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Funcionários</span>
+                    <span class="info-box-number">Imprimir {{ $totalEmployees }} Funcionários</span>
+                </div>
             </div>
         </div>
     </div>
     <hr>
     <div class="row">
-        <div class="col-md-6 pull-left">
-            <a class="btnPrint btn btn-success btn-lg btn-flat" href="{{URL::to('export/printEmployeePreview')}}"><i class="fa fa-print fa-5x"></i></a>
-            <a class="btn btn-default btn-lg btn-flat" href="{{URL::to('sagmma/employees')}}"><i class="fa fa-times fa-5x "></i></a>
+        <div class="col-md-6">
+            <div class="col-md-6 pull-left">
+                <a class="btnPrint btn btn-link" href="{{URL::to('export/printEmployeePreview')}}"><i class="fa fa-print faa-pulse animated"></i> Imprimir</a>
+                <a class="btn btn-link" href="{{URL::to('sagmma/employees')}}"><i class="fa fa-angle-double-left faa-passing-reverse animated"></i> Voltar</a>
+            </div>
         </div>
     </div>
 

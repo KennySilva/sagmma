@@ -38,7 +38,6 @@
                         <table class='table table-striped table-active table-hover'>
                             <thead>
                                 <tr>
-                                    <th>Identificação</th>
                                     <th>Funcionario</th>
                                     <th>Espaço</th>
                                     <th>Valor Cobrado</th>
@@ -48,7 +47,6 @@
                             <tbody>
                                 @foreach($taxations as $taxation)
                                     <tr>
-                                        <td>{{$taxation->id}}</td>
                                         @if ($taxation->type == 1)
                                             <td>{{$taxation->author}}</td>
                                         @else
@@ -70,11 +68,11 @@
                     </div>
                 </div>
                 <div class="box-footer">
-                    <a class="btnPrint btn btn-primary btn-sm btn-flat" href="{{ route('printThisMonthReport', [$month, $year]) }}"><i class="fa fa-print"></i>  <b>Imprimir</b></a>
-                    <a class="btn btn-default btn-sm btn-flat" href="{{URL::to('sagmma/taxations')}}"><i class="fa fa-reply"></i> <b>Voltar</b></a>
+                    <a class="btnPrint btn btn-link" href="{{ route('printThisMonthReport', [$month, $year]) }}"><i class="fa fa-print"></i>  <b>Imprimir</b></a>
+                    <a class="btn btn-link" href="{{URL::to('sagmma/taxations')}}"><i class="fa fa-reply"></i> <b>Voltar</b></a>
 
                     <div class="box-tools pull-right">
-                        <span class="text-info">Total de Receita: <span class="label label-danger">{{$total}}$00</span></span>
+                        <span class="text-info">Total de Receita: <span class="label label-danger">{{ number_format($total,2,",",".") }} $00</span></span>
                     </div>
 
                 </div>

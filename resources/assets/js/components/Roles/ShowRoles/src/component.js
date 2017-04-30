@@ -213,6 +213,15 @@ export default{
             });
         },
 
+        checkPermition: function() {
+            var roles = this.auth.roles;
+            for (var rol in roles) {
+                if (roles[rol].name == 'super-admin') {
+                    return true;
+                }
+            }
+        },
+
         // --------------------------------------------------------------------------------------------
 
         doSort: function(ev, column) {

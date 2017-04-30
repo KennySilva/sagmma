@@ -1,6 +1,7 @@
 <?php
 
 namespace Sagmma\Models\Sagmma;
+use User;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,6 +13,14 @@ class Control extends Model
 
 
     //------------------------------------------------------------------------------
+    public function getAuthorAttribute($value)
+    {
+        if ($value) {
+            $author = User::find($value);
+        }
+        return $author->name;
+    }
+
     public function getStatusAttribute($value)
     {
         if ($value) {
@@ -19,6 +28,8 @@ class Control extends Model
         }
         return false;
     }
+
+
 
 
     public function employees()

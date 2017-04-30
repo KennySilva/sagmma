@@ -198,15 +198,19 @@ export default{
             self.$set('newUser.parish', jQuery(this).val());
         });
 
-        jQuery(function($){
-            $.mask.definitions['c']='[95]';
-            $("#phone").mask("(+238) c99-99-99",{placeholder:"_"});
-            $("#phoneed").mask("(+238) c99-99-99",{placeholder:"_"});
-            $("#ic").mask("999999",{placeholder:"_"});
-            $("#iced").mask("999999",{placeholder:"_"});
-        });
-    },
 
+        // jQuery(function($){
+        //     $.mask.definitions['c']='[95]';
+        //     $("#phone").mask("(+238) c99-99-99",{placeholder:"_"});
+        //     $("#phoneed").mask("(+238) c99-99-99",{placeholder:"_"});
+        //     $("#ic").mask("999999",{placeholder:"_"});
+        //     $("#iced").mask("999999",{placeholder:"_"});
+        // });
+        //
+
+
+
+    },
 
     methods: {
 

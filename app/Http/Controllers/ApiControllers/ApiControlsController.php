@@ -33,11 +33,11 @@ class ApiControlsController extends Controller
 
     public function store(ControlsRequest $request)
     {
-        $control              = new Control($request->all());
+        $control              = new Control();
         $control->employee_id = $request->employee_id;
         $control->material_id = $request->material_id;
         $control->status = $request->status;
-        $control->author = \Auth::user()->name;
+        $control->author = \Auth::user()->id;
         $control->save();
 
     }
@@ -46,6 +46,8 @@ class ApiControlsController extends Controller
     public function show($id)
     {
         $control = Control::findOrFail($id);
+        $control->employees;
+        $control->materials;
         return $control;
     }
 
@@ -54,10 +56,15 @@ class ApiControlsController extends Controller
         //
     }
 
-    public function update(Req $request, $id)
+    public function update(ControlsRequest $request, $id)
     {
-        Control::findOrFail($id)->update($request::all());
-        return Response::json($request::all());
+        $employee_id    = $request->employee_id;
+        $material_id   = $request->material_id;
+        $control = new Control();
+        $control->where('id', $id)->update(array(
+            'employee_id'    => $employee_id,
+            'material_id'   => $material_id,
+        ));
 
     }
 
@@ -72,6 +79,12 @@ class ApiControlsController extends Controller
     {
         $employee = Employee::all();
         return $employee;
+
+        $employees = Employee::wherehas('typeofemployees', function($type)
+        {
+            $type->where('name', '=', 'Ajudantes dos Serviços Gerais')->orWhere('name', '=', 'Cobradores')->orWhere('name', '=', 'Vigilantes')->orWhere('name', '=', 'Funcionárias de Linpezas');
+        })->get();
+        return $employees;
     }
 
     public function getMaterialForControl()

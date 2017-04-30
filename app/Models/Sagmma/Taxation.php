@@ -9,6 +9,15 @@ class Taxation extends Model
     protected $table = 'employee_place';
     protected $guarded = ['id'];
 
+    // public function getIncomeAttribute($value)
+    // {
+    //     if ($value) {
+    //         // return number_format($value, 2);
+    //         return sprintf('%s $00', number_format($value,2,",","."));
+    //     }
+    // }
+
+
     //------------------------------------------------------------------------------
     public function employees()
     {

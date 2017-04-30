@@ -2,7 +2,7 @@
 // #######################################################################################################################
 // ####################################################  Route Presentation  ##################################################
 // #######################################################################################################################
-Route::group(['middleware' => []], function () {  
+Route::group(['middleware' => []], function () {
     //-------------------------------------Página Principal------------------------------------------------------
     Route::resource('/', 'FrontController');
     Route::resource('/article', 'Web\NewsController');
@@ -91,7 +91,7 @@ Route::group(['namespace' => 'ApiControllers'], function()
                 Route::get('allMaterials/{row}', 'ApiMaterialsController@index');
                 // ----------------------------------------Api-employee----------------------------------
                 Route::resource('employees', 'ApiEmployeesController');
-                Route::delete('deleteMultEmployees/{ids}', 'ApiEmployeesController@deleteAll');
+                Route::resource('deleteMultEmployees', 'ApiEmployeesController@deleteAll');
                 Route::get('marketEmployee', 'ApiEmployeesController@getMarketforEmployee');
                 Route::get('allEmployees/{row}', 'ApiEmployeesController@index');
                 // Route::get('employeeMarket', 'ApiEmployeesController@getMarketforEmployee');

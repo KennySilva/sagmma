@@ -49,6 +49,8 @@ class PrintController extends Controller
     public function dateReport($date)
     {
         $taxations = Taxation::whereDate('created_at', '=', $date)->get();
+        $total = $taxations->sum('income');
+
         if (count($taxations) > 0) {
             return view('exportation.printDateReport', compact('taxations', 'date'));
         }else {
@@ -94,7 +96,7 @@ class PrintController extends Controller
         }
 
     }
-    
+
     public function printThisYearReport($year)
     {
         $taxations = Taxation::whereYear('created_at', '=', $year)->get();

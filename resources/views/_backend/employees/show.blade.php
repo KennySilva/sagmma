@@ -42,3 +42,6 @@
     </div>
     </div>
 @endsection
+@push('scripts')
+    <script src="/bower_components/jquery.maskedinput/dist/jquery.maskedinput.min.js" charset="utf-8"></script>
+@endpush

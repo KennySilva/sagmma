@@ -34,6 +34,7 @@ export default{
                 photo             : '',
                 description       : '',
                 markets           : [],
+                type           : '',
                 get_acount        : false,
 
             },
@@ -278,6 +279,14 @@ export default{
         }).on('change', function () {
             self.$set('newEmployee.echelon', jQuery(this).val());
         });
+
+        // jQuery(function($){
+        //     $.mask.definitions['c']='[95]';
+        //     $("#phoneemp").mask("(+238) c99-99-99",{placeholder:"_"});
+        //     $("#phoneed").mask("(+238) c99-99-99",{placeholder:"_"});
+        //     $("#ic").mask("999999",{placeholder:"_"});
+        //     $("#iced").mask("999999",{placeholder:"_"});
+        // });
     },
 
 
@@ -324,6 +333,7 @@ export default{
                 get_acount       : '',
                 description       : '',
                 markets           : [],
+                type           : '',
                 get_acount        : false,
             };
         },
@@ -370,6 +380,17 @@ export default{
             });
         },
 
+
+        canDeleteAll: function() {
+            var emps = this.employees;
+            for (var emp in emps) {
+                if (emps[emp].taxation != null || emps[emp].controls != null || emps[emp].markets.length > 0) {
+                    return true;
+                }
+            }
+        },
+
+
         // --------------------------------------------------------------------------------------------
 
         getThisEmployee: function(id){
@@ -391,9 +412,10 @@ export default{
                 this.newEmployee.market_id         = response.data.market_id;
                 this.newEmployee.typeofemployee_id = response.data.typeofemployee_id;
                 this.newEmployee.description       = response.data.description;
+                this.newEmployee.type       = response.data.typeofemployees.name;
                 var markets = response.data.markets;
                 for (var market in markets) {
-                    this.newEmployee.markets.push(markets[market].id)
+                    this.newEmployee.markets.push(markets[market])
                 }
             }, (response) => {
                 console.log('Error');
@@ -435,6 +457,8 @@ export default{
         deleteMultEmployee: function() {
             this.$http.delete('http://localhost:8000/api/v1/deleteMultEmployees/'+ this.deleteMultIten).then((response) => {
                 if (response.status == 200) {
+                    $('#deleteAll').modal('hide');
+                    this.deleteMultIten  = [];
                     this.fetchEmployee(this.pagination.current_page, this.showRow);
                     this.alert('Funcionários eliminados com sucesso', 'warning');
                 }

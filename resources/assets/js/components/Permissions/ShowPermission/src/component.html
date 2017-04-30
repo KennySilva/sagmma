@@ -8,7 +8,7 @@
 	<div class="col-md-12">
 		<div class="form-inline pull-right">
 			<div class="input-group">
-				<select data-toggle="tooltip" title="A mostrar linhas na tabela" class="form-control" name="" v-model="showRow" @change="fetchPermission(1, showRow)">
+				<select data-toggle="tooltip" title="A mostrar linhas na tabela" class="selectpicker show-tick show-menu-arrow" data-style="btn-primary" name="" v-model="showRow" @change="fetchPermission(1, showRow)">
 					<option class="" value="5">05</option>
 					<option class="" value="10" selected>10</option>
 					<option class="" value="20">20</option>
@@ -52,7 +52,7 @@
 <hr>
 <div class="row">
 	<div class="col-md-12" v-for="authRole in auth.roles">
-		<button :disabled="authRole.name != 'super-admin'" class="btn btn-flat btn-outline pull-left" :class = "{'btn-info': authRole.name != 'super-admin', 'btn-primary':authRole.name == 'super-admin'}"  name="button" data-toggle="modal" data-target="#modal-create-permission"><i class="fa fa-plus"></i> Novo</button>
+		<button :disabled="!checkPermition()" class="btn btn-primary btn-flat btn-outline pull-left"  name="button" data-toggle="modal" data-target="#modal-create-permission"><i class="fa fa-plus"></i> Novo</button>
 	</div>
 </div>
 <br>
@@ -61,7 +61,7 @@
 
 	<div class="col-md-12">
 		<div class='table-responsive'>
-			<table class='table table-striped table-hover' v-for="authRole in auth.roles">
+			<table class='table table-striped table-hover'>
 				<thead>
 					<tr>
 						<th>
@@ -79,7 +79,7 @@
 							<a href="#" @click = "doSort($event, 'description')">Descriçãos</a>
 						</th>
 
-						<th v-if="authRole.name == 'super-admin'"  class="text-center" colspan="2"><span><i class="fa fa-cogs"></i></span></th>
+						<th v-if="checkPermition()"  class="text-center" colspan="2"><i class="fa fa-cogs"></i> <span class="text-primary">Operações</span></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -87,8 +87,8 @@
 						<td>{{ permission.name }}</td>
 						<td>{{ permission.display_name }}</td>
 						<td>{{ permission.description }}</td>
-						<td v-if="authRole.name == 'super-admin'" align=left>  <a data-toggle="modal" data-target="#modal-edit-permission" href="#"> <i class="fa fa-pencil text-primary" @click="getThisPermission(permission.id)" > </i></a></td>
-						<td v-if="authRole.name == 'super-admin'" align=right><a data-toggle="modal" data-target="#modal-delete-permission" href="#"><i class="fa fa-trash text-danger" @click="getThisPermission(permission.id)"></i></a></td>
+						<td v-if="checkPermition()" align=left>  <a class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-edit-permission" href="#"> <i class="fa fa-pencil text-primary" @click="getThisPermission(permission.id)" > </i></a></td>
+						<td v-if="checkPermition()" align=right><a class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-delete-permission" href="#"><i class="fa fa-trash text-danger" @click="getThisPermission(permission.id)"></i></a></td>
 					</tr>
 				</tbody>
 			</table>

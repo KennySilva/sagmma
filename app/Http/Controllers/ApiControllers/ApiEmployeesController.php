@@ -98,6 +98,7 @@ class ApiEmployeesController extends Controller
         {
             $employee = Employee::findOrFail($id);
             $employee->markets;
+            $employee->typeofemployees;
             return $employee;
         }
 
@@ -162,7 +163,7 @@ class ApiEmployeesController extends Controller
                 ));
             }
         }
-        
+
 
 
         public function destroy($id)
@@ -178,10 +179,9 @@ class ApiEmployeesController extends Controller
 
         public function deleteAll($ids)
         {
-            // Employee::find(explode(',', $ids))->delete();
-            return Employee::whereIn('id', $ids)->delete();
-            // return Employee::destroy($ids);
-
+            // Employee::destroy($ids);
+            Employee::destroy(explode(',', $ids));
+            // $employees->delete();
         }
 
 
