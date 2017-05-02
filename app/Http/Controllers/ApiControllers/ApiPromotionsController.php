@@ -12,13 +12,16 @@ use Promotion;
 use Product;
 use Trader;
 use Response;
-use Input; 
+use Input;
 use Auth;
+use Carbon\Carbon;
 
 class ApiPromotionsController extends Controller
 {
     public function index($row)
     {
+        $this->promotionStatusChange();
+
         foreach (Auth::user()->roles as $role) {
             $role = $role->name;
             if ($role == 'super-admin' || $role == 'admin' || $role == 'dpel' || $role == 'manager') {
@@ -69,16 +72,28 @@ class ApiPromotionsController extends Controller
         //
     }
 
-    public function update(Req $request, $id)
+    public function update(PromotionsRequest $request, $id)
     {
-        Promotion::findOrFail($id)->update($request::all());
-        return Response::json($request::all());
 
+
+        $promotion                = Promotion::findOrFail($id);
+        $promotion->name          = $request->name;
+        $promotion->description   = $request->description;
+        $promotion->begnning_date = $request->begnning_date;
+        $promotion->ending_date   = $request->ending_date;
+        $promotion->trader_id     = $request->trader_id;
+        $promotion->product_id    = $request->product_id;
+        $promotion->save();
     }
 
     public function destroy($id)
     {
         return Promotion::destroy($id);
+    }
+
+    public function deleteAll($ids)
+    {
+        Promotion::destroy(explode(',', $ids));
     }
 
 
@@ -122,6 +137,19 @@ class ApiPromotionsController extends Controller
         $promotion->save();
         return response($promotion, 200);
     }
+
+    public function promotionStatusChange()
+    {
+        $promotions = Promotion::all();
+        foreach ($promotions as $promo) {
+            if ($promo->ending_date < Carbon::today()->toDateTimeString()) {
+                $promo->status = 0;
+                $promo->save();
+            }
+        }
+    }
+
+
 
 
 }

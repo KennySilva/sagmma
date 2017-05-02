@@ -138,4 +138,9 @@ class ApiTradersController extends Controller
                 $user->delete();
             }
         }
+
+        public function deleteAll($ids)
+        {
+            Trader::destroy(explode(',', $ids));
+        }
     }

@@ -30,6 +30,14 @@ export default{
             typeAlert: '',
             showRow: '',
             all: {},
+            errors: [],
+
+
+            deleteMultIten: [],
+            allSelected: false,
+            selected: [],
+            sendEmployee: '',
+
 
 
         }
@@ -56,6 +64,16 @@ export default{
     // ---------------------------------------------------------------------------------
 
     methods: {
+
+        selectAll: function() {
+            this.deleteMultIten = [];
+            if (!this.allSelected) {
+                for (type in this.products) {
+                    this.deleteMultIten.push(this.products[type].id);
+                }
+            }
+        },
+
         alert: function(msg, typeAlert) {
             var self = this;
             this.success = true;
@@ -81,17 +99,18 @@ export default{
             this.uploadsImages();
             var product = this.newProduct;
             //Clear form input
-            this.clearField();
 
             this.$http.post('http://localhost:8000/api/v1/products/', product).then((response) => {
                 if (response.status == 200) {
                     console.log('chegando aqui');
                     $('#modal-create-product').modal('hide');
+                    this.clearField();
                     this.fetchProduct(this.pagination.current_Page, this.showRow);
                     this.alert('Produto Criado com sucesso', 'success');
+                    this.$set('errors', '')
                 }
             }, (response) => {
-
+                this.$set('errors', response.data)
             });
         },
 
@@ -105,6 +124,15 @@ export default{
             }, (response) => {
                 console.log("Ocorreu um erro na operação")
             });
+        },
+
+        canDeleteAll: function() {
+            var prods = this.products;
+            for (var prod in prods) {
+                if (prods[prod].promotions.length > 0) {
+                    return true;
+                }
+            }
         },
 
         // --------------------------------------------------------------------------------------------
@@ -127,17 +155,17 @@ export default{
         saveEditedProduct: function(id) {
             var product = this.newProduct;
 
-            this.clearField();
             this.$http.patch('http://localhost:8000/api/v1/products/'+ id, product).then((response) => {
                 if (response.status == 200) {
                     $('#modal-edit-product').modal('hide');
+                    this.clearField();
                     // console.log(response.data);
                     this.fetchProduct(this.pagination.current_Page, this.showRow);
                     this.alert('Produto atualizado com sucesso', 'info');
-
+                    this.$set('errors', '')
                 }
             }, (response) => {
-                console.log("Ocorreu um erro na operação");
+                this.$set('errors', response.data)
             });
         },
 
@@ -156,6 +184,20 @@ export default{
                 console.log("Ocorreu um erro na operação");
             });
         },
+
+        deleteMultProducts: function() {
+            this.$http.delete('http://localhost:8000/api/v1/deleteMultProducts/'+ this.deleteMultIten).then((response) => {
+                if (response.status == 200) {
+                    $('#deleteAllProducts').modal('hide');
+                    this.deleteMultIten  = [];
+                    this.fetchProduct(this.pagination.current_page, this.showRow);
+                    this.alert('Materiais eliminados com sucesso', 'warning');
+                }
+            }, (response) => {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
 
         // --------------------------------------------------------------------------------------------
         doFilter: function() {
@@ -189,7 +231,7 @@ export default{
 
         // Outros funções
         navigate (page) {
-            this.fetchProduct(page, this.sowRow);
+            this.fetchProduct(page, this.showRow);
         },
 
         uploadsImages: function() {

@@ -103,6 +103,7 @@ Route::group(['namespace' => 'ApiControllers'], function()
                 Route::get('employeeType', 'ApiEmployeesController@getTypeforEmployee');
                 // ----------------------------------------Api-traders----------------------------------
                 Route::resource('traders', 'ApiTradersController');
+                Route::resource('deleteMultTraders', 'ApiTradersController@deleteAll');
                 Route::get('allTraders/{row}', 'ApiTradersController@index');
             });
             // ------------------------------------Api-Control (employee_material)--------------------
@@ -140,12 +141,15 @@ Route::group(['namespace' => 'ApiControllers'], function()
         Route::group(['middleware' => ['role:super-admin|admin|dpel|manager|trader']], function () {
             // ----------------------------------------Api-promotions----------------------------------
             Route::resource('promotions', 'ApiPromotionsController');
+            Route::resource('deleteMultPromotions', 'ApiPromotionsController@deleteAll');
             Route::get('allPromotions/{row}', 'ApiPromotionsController@index');
             Route::get('promotionTrader', 'ApiPromotionsController@getTraderForPromotion');
             Route::get('promotionProduct', 'ApiPromotionsController@getProductForPromotion');
             Route::post('promotionStatus', 'ApiPromotionsController@statusPromotionsChange');
+            Route::get('promotionChStatus', 'ApiPromotionsController@promotionStatusChange');
             // ----------------------------------------Api-Products----------------------------------
             Route::resource('products', 'ApiProductsController');
+            Route::resource('deleteMultProducts', 'ApiProductsController@deleteAll');
             Route::get('allProducts/{row}', 'ApiProductsController@index');
             Route::post('productImageUpload', 'ApiProductsController@uploadImage');
         });

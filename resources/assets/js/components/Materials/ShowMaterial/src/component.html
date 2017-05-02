@@ -17,14 +17,12 @@
 					<option class="" value="200">200</option>
 				</select>
 			</div>
-			&nbsp;&nbsp;
 			<div class="input-group">
 				<select data-toggle="tooltip" title="Escolhe as colunas a serem filtrados" class="form-control" name="" v-model="columnsFiltered" multiple="multiple" v-el:materialcols>
 					<option class="" value="name"="">Nome</option>
 					<option class="" value="description">Descrição</option>
 				</select>
 			</div>
-			&nbsp;&nbsp;
 			<div v-if="columnsFiltered.length != 0" class="input-group">
 				<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
 				<input data-toggle="tooltip" title="Escreva o valor a ser procurado na Tabela"
@@ -52,34 +50,33 @@
 <div class="row">
 	<div class="col-md-8">
 		<div class="btn-group">
-
-		<button class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-material"><i class="fa fa-plus"></i> Novo</button>
+			<button class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-material"><i class="fa fa-plus"></i> Novo</button>
+		</div>
 	</div>
+
+	<div class="col-md-4 pull-right">
+		<div class="btn-group">
+			<button data-toggle="modal" data-target="#deleteAllMaterials"  v-if="deleteMultIten.length > 0" class="btn btn-danger btn-flat btn-outline"  type="button" name="button"><i class="fa fa-trash-o"></i> Apagar Todos</button>
+		</div>
 	</div>
 
-	<div class="col-md-2 pull-right">
-	<div class="btn-group">
-		<button data-toggle="modal" data-target="#deleteAllMaterials"  v-if="deleteMultIten.length > 0" class="btn btn-danger btn-flat btn-outline"  type="button" name="button"><i class="fa fa-trash-o"></i> Apagar Todos</button>
-	</div>
-</div>
-
-<div class="modal fade" id="deleteAllMaterials" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
-	<div class="modal-dialog modal-sm">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-				<h5 class="modal-title" id=""><i class="text-danger fa fa-exclamation-triangle faa-flash animated faa-slow"></i></h5>
-			</div>
-			<div class="modal-body">
-				<h5 class="text-center">Eliminar {{deleteMultIten.length}} Registo(s)?</h5>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary btn-xs" data-dismiss="modal"><i class="fa fa-times"></i></button>
-				<button  @click = "deleteMultMaterials" type="button" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></button>
+	<div class="modal fade" id="deleteAllMaterials" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+		<div class="modal-dialog modal-sm">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h5 class="modal-title" id=""><i class="text-danger fa fa-exclamation-triangle faa-flash animated faa-slow"></i></h5>
+				</div>
+				<div class="modal-body">
+					<h5 class="text-center">Eliminar {{deleteMultIten.length}} Registo(s)?</h5>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary btn-xs" data-dismiss="modal"><i class="fa fa-times"></i></button>
+					<button  @click = "deleteMultMaterials" type="button" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></button>
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
 </div>
 <br>
 <div class="row">
@@ -180,32 +177,32 @@
 						<h4 class="modal-title"><i class="fa fa-plus faa-burst animated faa-slow"></i></h4>
 					</div>
 					<div class="modal-body">
-							<form action="#" methods="POST">
-								<div class="row">
+						<form action="#" methods="POST">
+							<div class="row">
+								<div class="col-md-12">
 									<div class="col-md-12">
-										<div class="col-md-12">
-											<div class="form-group {{ errors.name ? ' has-error' : '' }} has-feedback">
-												<input type="text" class="form-control" name="name" placeholder="Nome do  Material" v-model="newMaterial.name"/>
-												<span class="fa fa-briefcase form-control-feedback"></span>
-													<p v-if="errors.name" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.name }}</p>
-											</div>
+										<div class="form-group {{ errors.name ? ' has-error' : '' }} has-feedback">
+											<input type="text" class="form-control" name="name" placeholder="Nome do  Material" v-model="newMaterial.name"/>
+											<span class="fa fa-briefcase form-control-feedback"></span>
+											<p v-if="errors.name" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.name }}</p>
 										</div>
 									</div>
 								</div>
+							</div>
 
-								<hr><!---------------------------------------------------------------------------------------------------------------->
+							<hr><!---------------------------------------------------------------------------------------------------------------->
 
-								<div class="row">
+							<div class="row">
+								<div class="col-md-12">
 									<div class="col-md-12">
-										<div class="col-md-12">
-											<div class="form-group {{ errors.description ? ' has-error' : '' }} has-feedback">
-												<textarea name="description" placeholder="Descrição deste Mescado" class="form-control" rows="5" cols="40" id="description" v-model="newMaterial.description"></textarea>
-													<p v-if="errors.description" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.description }}</p>
-											</div>
+										<div class="form-group {{ errors.description ? ' has-error' : '' }} has-feedback">
+											<textarea name="description" placeholder="Descrição deste Mescado" class="form-control" rows="5" cols="40" id="description" v-model="newMaterial.description"></textarea>
+											<p v-if="errors.description" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.description }}</p>
 										</div>
 									</div>
 								</div>
-							</form>
+							</div>
+						</form>
 
 					</div>
 					<div class="modal-footer">
@@ -230,32 +227,32 @@
 					</div>
 					<div class="modal-body">
 
-							<form methods="patch">
-								<div class="row">
+						<form methods="patch">
+							<div class="row">
+								<div class="col-md-12">
 									<div class="col-md-12">
-										<div class="col-md-12">
-											<div class="form-group {{ errors.name ? ' has-error' : '' }} has-feedback">
-												<input type="text" class="form-control" name="name" placeholder="Nome do  Material" v-model="newMaterial.name"/>
-												<span class="fa fa-briefcase form-control-feedback"></span>
-													<p v-if="errors.name" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.name }}</p>
-											</div>
+										<div class="form-group {{ errors.name ? ' has-error' : '' }} has-feedback">
+											<input type="text" class="form-control" name="name" placeholder="Nome do  Material" v-model="newMaterial.name"/>
+											<span class="fa fa-briefcase form-control-feedback"></span>
+											<p v-if="errors.name" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.name }}</p>
 										</div>
 									</div>
 								</div>
+							</div>
 
-								<hr><!---------------------------------------------------------------------------------------------------------------->
+							<hr><!---------------------------------------------------------------------------------------------------------------->
 
-								<div class="row">
+							<div class="row">
+								<div class="col-md-12">
 									<div class="col-md-12">
-										<div class="col-md-12">
-											<div class="form-group {{ errors.description ? ' has-error' : '' }} has-feedback">
-												<textarea name="description" placeholder="Descrição deste Mescado" class="form-control" rows="5" cols="40" id="description" v-model="newMaterial.description"></textarea>
-													<p v-if="errors.description" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.description }}</p>
-											</div>
+										<div class="form-group {{ errors.description ? ' has-error' : '' }} has-feedback">
+											<textarea name="description" placeholder="Descrição deste Mescado" class="form-control" rows="5" cols="40" id="description" v-model="newMaterial.description"></textarea>
+											<p v-if="errors.description" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.description }}</p>
 										</div>
 									</div>
 								</div>
-							</form>
+							</div>
+						</form>
 					</div>
 					<div class="modal-footer">
 						<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Close</button>

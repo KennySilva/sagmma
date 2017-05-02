@@ -58,8 +58,8 @@ export default{
         selectAll: function() {
             this.deleteMultIten = [];
             if (!this.allSelected) {
-                for (type in this.typeofemployees) {
-                    this.deleteMultIten.push(this.typeofemployees[type].id);
+                for (type in this.materials) {
+                    this.deleteMultIten.push(this.materials[type].id);
                 }
             }
         },
@@ -88,6 +88,8 @@ export default{
 
 
         },
+
+
 
         createMaterial: function() {
             var material = this.newMaterial;

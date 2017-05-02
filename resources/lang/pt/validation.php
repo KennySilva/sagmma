@@ -169,6 +169,16 @@ return [
             'before' => 'Introduzir data menor ou igual a :date',
         ],
 
+        'begnning_date' => [
+            'required' => 'Obrigatório',
+            'after' => 'Introduzir data superior a :date',
+        ],
+
+        'ending_date' => [
+            'required' => 'Obrigatório',
+            'after' => 'Introduzir data superior ao :date',
+        ],
+
         'ic' => [
             'required' => 'Obrigatório',
             'min' => 'Minimo caractere é :min',
@@ -204,7 +214,11 @@ return [
             'required' => 'Obrigatório',
         ],
 
-        'ending_date' => [
+        'product_id' => [
+            'required' => 'Obrigatório',
+        ],
+
+        'price' => [
             'required' => 'Obrigatório',
         ],
 
@@ -238,9 +252,11 @@ return [
         'g-recaptcha-response'    => 'ReCaptcha',
 
 
+        'product_id'    => 'Produto',
         'place_id'    => 'Espaço',
         'trader_id'    => 'Comerciante',
-        'ending_date'    => 'Data de Expiração',
+        'begnning_date'    => 'Início',
+        'ending_date'    => 'Término',
 
         'income'    => 'Taxa Diária',
         'employee_id'    => 'Funcionário',

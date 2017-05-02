@@ -63,17 +63,25 @@ class ApiProductsController extends Controller
         //
     }
 
-    public function update(Req $request, $id)
+    public function update(ProductsRequest $request, $id)
     {
-        Product::findOrFail($id)->update($request::all());
-        return Response::json($request::all());
-
+        $product = Product::findOrFail($id);
+        $product->name        = $request->name;
+        $product->price       = $request->price;
+        $product->description = $request->description;
+        $product->save();
     }
 
     public function destroy($id)
     {
         return Product::destroy($id);
     }
+
+    public function deleteAll($ids)
+    {
+        Product::destroy(explode(',', $ids));
+    }
+
 
     public function uploadImage(Request $request)
     {

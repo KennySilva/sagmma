@@ -59,7 +59,7 @@
                                         @foreach ($taxation->places as $place)
                                             <td>{{$place->name}}</td>
                                         @endforeach
-                                        <td>{{$taxation->income}}</td>
+                                        <td>ECV {{ number_format($taxation->income,2,".",",")}}</td>
                                         <td>{{$taxation->author}}</td>
                                     </tr>
                                 @endforeach
@@ -72,7 +72,7 @@
                     <a class="btn btn-link" href="{{URL::to('sagmma/taxations')}}"><i class="fa fa-reply"></i> <b>Voltar</b></a>
 
                     <div class="box-tools pull-right">
-                        <span class="text-info">Total de Receita: <span class="label label-danger">{{ number_format($total,2,",",".") }} $00</span></span>
+                        <span class="text-info">Total de Receita: <span class="label label-danger">ECV {{ number_format($total,2,".",",") }}</span></span>
                     </div>
                 </div>
             </div>

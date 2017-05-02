@@ -42,6 +42,11 @@ export default{
             showRow: '',
             errors           : [],
             auth: [],
+
+            deleteMultIten: [],
+            allSelected: false,
+            selected: [],
+            sendTrader: '',
         }
     },
 
@@ -125,6 +130,16 @@ export default{
 
 
     methods: {
+
+        selectAll: function() {
+                    this.deleteMultIten = [];
+                    if (!this.allSelected) {
+                        for (trader in this.traders) {
+                            this.deleteMultIten.push(this.traders[trader].id);
+                        }
+                    }
+                },
+
         alert: function(msg, typeAlert) {
             var self = this;
             this.success = true;
@@ -188,6 +203,15 @@ export default{
             });
         },
 
+        canDeleteAll: function() {
+            var trads = this.traders;
+            for (var trad in trads) {
+                if (trads[trad].contract != null || trads[trad].promotion.length > 0) {
+                    return true;
+                }
+            }
+        },
+
         // --------------------------------------------------------------------------------------------
 
         getThisTrader: function(id){
@@ -236,6 +260,19 @@ export default{
                 if (response.status == 200) {
                     this.fetchTrader(this.pagination.current_page, this.showRow);
                     this.alert('Comerciante eliminado com sucesso', 'warning');
+                }
+            }, (response) => {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+        deleteMultTrader: function() {
+            this.$http.delete('http://localhost:8000/api/v1/deleteMultTraders/'+ this.deleteMultIten).then((response) => {
+                if (response.status == 200) {
+                    $('#deleteAll').modal('hide');
+                    this.deleteMultIten  = [];
+                    this.fetchTrader(this.pagination.current_page, this.showRow);
+                    this.alert('Funcionários eliminados com sucesso', 'warning');
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");

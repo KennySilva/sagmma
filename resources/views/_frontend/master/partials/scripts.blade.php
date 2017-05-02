@@ -1,6 +1,7 @@
 <script src="{{ asset('/bower_components/jquery/dist/jQuery.js') }}"></script>
 <script type="text/javascript" src="/bower_components/flexisel/js/jquery.flexisel.js"></script>
 <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+<script src="{{ asset('/bower_components/bootstrap-select/dist/js/bootstrap-select.js') }}"></script>
 <script src="{{ asset('/bower_components/select2/dist/js/select2.full.js') }}"></script>
 <script src="{{ asset('/bower_components/select2/dist/js/i18n/pt.js') }}"></script>
 <script src="/bower_components/lightbox2/dist/js/lightbox.js"></script>

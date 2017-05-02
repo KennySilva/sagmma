@@ -43,8 +43,15 @@ export default{
             typeAlert: '',
             showRow: '',
             all: {},
+            errors: [],
+
             auth: [],
             date_atual: new Date(),
+
+            deleteMultIten: [],
+            allSelected: false,
+            selected: [],
+            sendEmployee: '',
 
             // Vue-Datepicker
             option: {
@@ -151,11 +158,15 @@ export default{
     },
 
     methods: {
-        // changePromotionStatus: function() {
-        //     this.$http.get('http://localhost:8000/api/v1/changePromotionStatus').then((response) => {
-        //     }, (response) => {
-        //     });
-        // },
+        selectAll: function() {
+            this.deleteMultIten = [];
+            if (!this.allSelected) {
+                for (type in this.promotions) {
+                    this.deleteMultIten.push(this.promotions[type].id);
+                }
+            }
+        },
+
         alert: function(msg, typeAlert) {
             var self = this;
             this.success = true;
@@ -179,6 +190,16 @@ export default{
                 trader   : '',
                 product   : '',
             };
+            this.resetDeleteAll();
+            // this.resetErrors();
+
+        },
+
+        resetDeleteAll: function() {
+            this.deleteMultIten = []
+            this.allSelected = false
+            this.selected = []
+            this.sendEmployee = ''
         },
 
         // --------------------------------------------------------------------------------------------
@@ -197,15 +218,19 @@ export default{
                     console.log(response.data);
                     this.fetchPromotion(this.pagination.current_Page, this.showRow);
                     alert('Promoção Criado com sucesso', 'success');
-
+                    this.$set('errors', '')
                 }
             }, (response) => {
-
+                this.$set('errors', response.data)
             });
         },
 
+        resetErrors: function() {
+            this.errors = [];
+        },
+
         // --------------------------------------------------------------------------------------------
-        
+
         fetchPromotion: function(page, row) {
             this.$http.get('http://localhost:8000/api/v1/allPromotions/'+row+'?page='+page).then((response) => {
                 this.$set('promotions', response.data.data);
@@ -214,6 +239,15 @@ export default{
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
             });
+        },
+
+        canDeleteAll: function() {
+            var promos = this.promotions;
+            for (var promo in promos) {
+                if (promos[promo].status == true) {
+                    return true;
+                }
+            }
         },
 
         // --------------------------------------------------------------------------------------------
@@ -253,9 +287,10 @@ export default{
                     // console.log(response.data);
                     this.fetchPromotion(this.pagination.current_Page, this.showRow);
                     this.alert('Promoção Atualizado com sucesso', 'info');
+                    this.$set('errors', '')
                 }
             }, (response) => {
-                console.log("Ocorreu um erro na operação");
+                this.$set('errors', response.data)
             });
         },
 
@@ -269,6 +304,20 @@ export default{
                     // console.log(response.data);
                     this.fetchPromotion(this.pagination.current_Page, this.showRow);
                     this.alert('Promoção Eliminado com sucesso', 'success');
+                }
+            }, (response) => {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+
+        deleteMultPromotions: function() {
+            this.$http.delete('http://localhost:8000/api/v1/deleteMultPromotions/'+ this.deleteMultIten).then((response) => {
+                if (response.status == 200) {
+                    $('#deleteAllPromotions').modal('hide');
+                    this.deleteMultIten  = [];
+                    this.fetchPromotion(this.pagination.current_page, this.showRow);
+                    this.alert('Materiais eliminados com sucesso', 'warning');
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -293,7 +342,7 @@ export default{
 
         promotionStatus: function(status) {
             var postData = {id: status};
-
+            this.resetDeleteAll();
             this.$http.post('http://localhost:8000/api/v1/promotionStatus/', postData).then((response) => {
                 console.log(response.status);
                 console.log(response.data);
