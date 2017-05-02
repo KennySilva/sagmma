@@ -61,4 +61,10 @@ class ApiMarketsController extends Controller
     {
         return Market::destroy($id);
     }
+
+    public function deleteAll($ids)
+    {
+        Market::destroy(explode(',', $ids));
+    }
+
 }

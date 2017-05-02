@@ -281,13 +281,6 @@ export default{
             self.$set('newEmployee.echelon', jQuery(this).val());
         });
 
-        // jQuery(function($){
-        //     $.mask.definitions['c']='[95]';
-        //     $("#phoneemp").mask("(+238) c99-99-99",{placeholder:"_"});
-        //     $("#phoneed").mask("(+238) c99-99-99",{placeholder:"_"});
-        //     $("#ic").mask("999999",{placeholder:"_"});
-        //     $("#iced").mask("999999",{placeholder:"_"});
-        // });
     },
 
 

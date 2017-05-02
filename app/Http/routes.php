@@ -79,16 +79,19 @@ Route::group(['namespace' => 'ApiControllers'], function()
             Route::group(['middleware' => ['permission:manage-resources']], function () {
                 // ----------------------------------------Api-Markets----------------------------------
                 Route::resource('markets', 'ApiMarketsController');
+                Route::resource('deleteMultMarkets', 'ApiMarketsController@deleteAll');
                 Route::get('getAllMarkets/{row}', 'ApiMarketsController@index');
                 // ----------------------------------------Api-Typeofemployees------------------------------
                 Route::resource('typeofemployees', 'ApiTypeofemployeesController');
+                Route::resource('deleteMultTypeofemployees', 'ApiTypeofemployeesController@deleteAll');
                 Route::get('allTypeofemployees/{row}', 'ApiTypeofemployeesController@index');
                 // ----------------------------------------Api-Typeofplaces-------------------------------
                 Route::resource('typeofplaces', 'ApiTypeofplacesController');
                 Route::get('allTypeofplaces/{row}', 'ApiTypeofplacesController@index');
-                Route::resource('deleteMultTypeofemployees', 'ApiTypeofemployeesController@deleteAll');
+                Route::resource('deleteMultTypeofplaces', 'ApiTypeofplacesController@deleteAll');
                 // ----------------------------------------Api-Materials----------------------------------
                 Route::resource('materials', 'ApiMaterialsController');
+                Route::resource('deleteMultMaterials', 'ApiMaterialsController@deleteAll');
                 Route::get('allMaterials/{row}', 'ApiMaterialsController@index');
                 // ----------------------------------------Api-employee----------------------------------
                 Route::resource('employees', 'ApiEmployeesController');
@@ -110,6 +113,7 @@ Route::group(['namespace' => 'ApiControllers'], function()
             Route::post('controlStatus', 'ApiControlsController@statusControlsChange');
             // ----------------------------------------Api-place----------------------------------
             Route::resource('places', 'ApiPlacesController');
+            Route::resource('deleteMultPlaces', 'ApiPlacesController@deleteAll');
             Route::get('allPlaces/{row}', 'ApiPlacesController@index');
 
             Route::get('placeType', 'ApiPlacesController@getTypeForPlace');

@@ -94,4 +94,9 @@ class ApiTypeofplacesController extends Controller
         {
             return Typeofplace::destroy($id);
         }
+
+        public function deleteAll($ids)
+        {
+            Typeofplace::destroy(explode(',', $ids));
+        }
     }

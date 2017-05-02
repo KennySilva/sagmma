@@ -30,6 +30,12 @@ export default{
             auth: [],
 
 
+            deleteMultIten: [],
+            allSelected: false,
+            selected: [],
+            sendplace: '',
+
+
         }
     },
 
@@ -53,6 +59,15 @@ export default{
     // ---------------------------------------------------------------------------------
 
     methods: {
+
+        selectAll: function() {
+            this.deleteMultIten = [];
+            if (!this.allSelected) {
+                for (type in this.typeofplaces) {
+                    this.deleteMultIten.push(this.typeofplaces[type].id);
+                }
+            }
+        },
         alert: function(msg, typeAlert) {
             var self = this;
             this.success = true;
@@ -109,6 +124,15 @@ export default{
             });
         },
 
+        canDeleteAll: function() {
+            var types = this.typeofplaces;
+            for (var type in types) {
+                if (types[type].places.length > 0) {
+                    return true;
+                }
+            }
+        },
+
         // --------------------------------------------------------------------------------------------
 
         getThisTypeofplace: function(id){
@@ -153,6 +177,19 @@ export default{
                     this.fetchTypeofplace(this.pagination.current_Page, this.showRow);
                     this.alert('Tipo de Funcionário eliminado com sucesso', 'warning');
 
+                }
+            }, (response) => {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+        deleteMultTypeofplaces: function() {
+            this.$http.delete('http://localhost:8000/api/v1/deleteMultTypeofplaces/'+ this.deleteMultIten).then((response) => {
+                if (response.status == 200) {
+                    $('#deleteAllTypeofplaces').modal('hide');
+                    this.deleteMultIten  = [];
+                    this.fetchTypeofplace(this.pagination.current_page, this.showRow);
+                    this.alert('Tipos de Funcionários eliminados com sucesso', 'warning');
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");

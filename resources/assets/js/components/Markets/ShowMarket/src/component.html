@@ -8,7 +8,7 @@
 	<div class="col-md-12">
 		<div class="form-inline pull-right">
 			<div class="input-group">
-				<select data-toggle="tooltip" title="A mostrar linhas na tabela" class="form-control" name="" v-model="showRow" @change="fetchMarket(1, showRow)">
+				<select data-toggle="tooltip" title="A mostrar linhas na tabela" class="selectpicker show-tick show-menu-arrow" data-style="btn-primary" name="" v-model="showRow" @change="fetchMarket(1, showRow)">
 					<option class="" value="05">05</option>
 					<option class="" value="10" selected>10</option>
 					<option class="" value="20">20</option>
@@ -17,14 +17,12 @@
 					<option class="" value="200">200</option>
 				</select>
 			</div>
-			&nbsp;&nbsp;
 			<div class="input-group">
 				<select data-toggle="tooltip" title="Escolhe as colunas a serem filtrados" class="form-control" name="" v-model="columnsFiltered" multiple="multiple" v-el:colmarket>
 					<option class="" value="name"="">Nome</option>
 					<option class="" value="location">Localização</option>
 				</select>
 			</div>
-			&nbsp;&nbsp;
 			<div v-if="columnsFiltered.length != 0" class="input-group">
 				<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
 				<input data-toggle="tooltip" title="Escreva o valor a ser procurado na Tabela"
@@ -48,16 +46,48 @@
 	</div>
 </div>
 <hr>
-<div class="col-md-12">
-	<button class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-market"><i class="fa fa-plus"></i> Novo</button>
+<div class="row">
+	<div class="col-md-8">
+		<div class="btn-group">
+			<button class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-market"><i class="fa fa-plus"></i> Novo</button>
+		</div>
+	</div>
+
+	<div class="col-md-2 pull-right">
+		<div class="btn-group">
+			<button data-toggle="modal" data-target="#deleteAllMarkets"  v-if="deleteMultIten.length > 0" class="btn btn-danger btn-flat btn-outline"  type="button" name="button"><i class="fa fa-trash-o"></i> Apagar Todos</button>
+		</div>
+	</div>
+
+	<div class="modal fade" id="deleteAllMarkets" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+		<div class="modal-dialog modal-sm">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h5 class="modal-title" id=""><i class="text-danger fa fa-exclamation-triangle faa-flash animated faa-slow"></i></h5>
+				</div>
+				<div class="modal-body">
+					<h5 class="text-center">Eliminar {{deleteMultIten.length}} Mercado(s)?</h5>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary btn-xs" data-dismiss="modal"><i class="fa fa-times"></i></button>
+					<button  @click = "deleteMultMarkets" type="button" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></button>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
-<br><br>
+<br>
+<div class="row">
 
 <div class="col-md-12">
 	<div class='table-responsive'>
-		<table class='table table-striped table-hover table-success'>
+		<table class='table table-striped table-hover'>
 			<thead>
 				<tr>
+					<th><input :disabled="canDeleteAll()" type="checkbox" name="" value="" @click="selectAll" v-model="allSelected"></th>
+
+
 					<th>
 						<i :class = "{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
 						<a href="#" @click = "doSort($event, 'name')">Nome</a>
@@ -68,25 +98,22 @@
 						<a href="#" @click = "doSort($event, 'location')">Localização</a>
 					</th>
 
-					<!-- <th>
-					<i :class = "{'fa-sort-amount-asc': sortColumn == 'description' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'description' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
-					<a href="#" @click = "doSort($event, 'description')">Descrição</a>
-				</th> -->
-
 				<th  class="text-center" colspan="2"><span><i class="fa fa-cogs"></i></span></th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr v-for="market in markets | orderBy sortColumn sortInverse">
-				<td><a href="#" data-toggle="modal" data-target="#show-market" @click="getThisMarket(market.id)">{{ market.name }}</a></td>
+				<td><input :disabled="market.employees.length != 0" type="checkbox" name="" v-model="deleteMultIten" :value="market.id"></td>
+
+				<td>{{ market.name }}</td>
 				<td>{{ market.location }}</td>
-				<!-- <td>{{ market.description }}</td> -->
-				<td align=left>  <a data-toggle="modal" data-target="#modal-edit-market" href="#"> <i class="fa fa-edit text-primary" @click="getThisMarket(market.id)" > </i></a></td>
+				<td align=center>  <a  href="#" class="btn btn-default btn-xs" data-toggle="modal" data-target="#show-market" @click="getThisMarket(market.id)"><i class="fa fa-eye text-success"></i></a></td>
+				<td align=center>  <a class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-edit-market" href="#"> <i class="fa fa-edit text-primary" @click="getThisMarket(market.id)" > </i></a></td>
 
 				<!---------------------------------------------------------------------------->
-				<td v-if="market.employees.length == 0" align=right><a data-toggle="modal" data-target="#modal-delete-market" href="#"><i class="fa fa-trash text-danger" @click="getThisMarket(market.id)" ></i></a></td>
+				<td v-if="market.employees.length == 0" align=center><a class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-delete-market" href="#"  @click="getThisMarket(market.id)" ><i class="fa fa-trash text-danger"></i></a></td>
 
-				<td v-else align=right><a data-toggle="modal" data-target="#modal-undeleted-market" href="#"><i class="fa fa-ban text-warning" @click="getThisMarket(market.id)" ></i></a></td>
+				<td v-else align=center><a class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-undeleted-market" href="#"  @click="getThisMarket(market.id)" ><i class="fa fa-ban text-warning"></i></a></td>
 				<!---------------------------------------------------------------------------->
 
 			</tr>
@@ -124,10 +151,6 @@
 									</tr>
 								</thead>
 								<tbody>
-									<tr>
-										<td><b>ID</b></td>
-										<td><i>{{ newMarket.id }}</i></td>
-									</tr>
 									<tr>
 										<td><b>Nome</b></td>
 										<td><i>{{ newMarket.name }}</i></td>
@@ -329,5 +352,6 @@
 			</div>
 		</div>
 	</div>
+</div>
 </div>
 </div>

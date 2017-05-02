@@ -96,6 +96,11 @@ class ApiPlacesController extends Controller
             return Place::destroy($id);
         }
 
+        public function deleteAll($ids)
+        {
+            Place::destroy(explode(',', $ids));
+        }
+
         public function getTypeForPlace()
         {
             $typeofplace = Typeofplace::all();

@@ -10,7 +10,7 @@
 	<div class="col-md-12">
 		<div class="form-inline pull-right">
 			<div class="input-group">
-				<select data-toggle="tooltip" title="A mostrar linhas na tabela" class="form-control" name="" v-model="showRow" @change="fetchTypeofplace(1, showRow)">
+				<select data-toggle="tooltip" title="A mostrar linhas na tabela" class="selectpicker show-tick show-menu-arrow" data-style="btn-primary" name="" v-model="showRow" @change="fetchTypeofplace(1, showRow)">
 					<option class="" value="5">05</option>
 					<option class="" value="10" selected>10</option>
 					<option class="" value="20">20</option>
@@ -19,14 +19,12 @@
 					<option class="" value="200">200</option>
 				</select>
 			</div>
-			&nbsp;&nbsp;
 			<div class="input-group">
 				<select data-toggle="tooltip" title="Escolhe as colunas a serem filtrados" class="form-control" name="" v-model="columnsFiltered" multiple="multiple" v-el:typeofplacecols>
 					<option class="" value="name"="">Nome</option>
 					<option class="" value="description">Descrição</option>
 				</select>
 			</div>
-			&nbsp;&nbsp;
 			<div v-if="columnsFiltered.length != 0" class="input-group">
 				<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
 				<input data-toggle="tooltip" title="Escreva o valor a ser procurado na Tabela"
@@ -52,17 +50,44 @@
 
 <hr>
 <div class="row">
-	<div class="col-md-12">
+	<div class="col-md-8">
 		<button class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-typeofplace"><i class="fa fa-plus"></i> Novo</button>
+	</div>
+
+	<div class="col-md-2 pull-right">
+		<div class="btn-group">
+			<button data-toggle="modal" data-target="#deleteAllTypeofplaces"  v-if="deleteMultIten.length > 0" class="btn btn-danger btn-flat btn-outline"  type="button" name="button"><i class="fa fa-trash-o"></i> Apagar Todos</button>
+		</div>
+	</div>
+
+	<div class="modal fade" id="deleteAllTypeofplaces" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+		<div class="modal-dialog modal-sm">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h5 class="modal-title" id=""><i class="text-danger fa fa-exclamation-triangle faa-flash animated faa-slow"></i></h5>
+				</div>
+				<div class="modal-body">
+					<h5 class="text-center">Eliminar {{deleteMultIten.length}} Registo(s)?</h5>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary btn-xs" data-dismiss="modal"><i class="fa fa-times"></i></button>
+					<button  @click = "deleteMultTypeofplaces" type="button" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></button>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 <br>
 <div class="row">
 	<div class="col-md-12">
 		<div class='table-responsive'>
-			<table class='table table-striped table-hover table-success'>
+			<table class='table table-striped table-hover'>
 				<thead>
 					<tr>
+						<th>
+							<input :disabled="canDeleteAll()" type="checkbox" name="" value="" @click="selectAll" v-model="allSelected">
+						</th>
 						<th>
 							<i :class = "{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
 							<a href="#" @click = "doSort($event, 'name')">Nome</a>
@@ -77,18 +102,16 @@
 				</thead>
 				<tbody>
 					<tr v-for="typeofplace in typeofplaces | orderBy sortColumn sortInverse">
+						<td><input :disabled="typeofplace.places.length > 0" type="checkbox" name="" v-model="deleteMultIten" :value="typeofplace.id"></td>
 						<td>{{ typeofplace.name }}</td>
 						<td>{{ typeofplace.description }}</td>
 
-						<td align=right><a data-toggle="modal" data-target="#modal-edit-typeofplace" href="#"><i class="fa fa-edit text-primary" @click="getThisTypeofplace(typeofplace.id)"></i></a></td>
+						<td align=center><a class="btn btn-default btn-xs" @click="getThisTypeofplace(typeofplace.id)" data-toggle="modal" data-target="#modal-edit-typeofplace" href="#"><i class="fa fa-edit text-primary"></i></a></td>
 						<!---------------------------------------------------------------------------->
-						<!-- <span v-for="place in typeofplace.places"> -->
-						<td v-for="role in auth.roles" v-if="role.name == 'super-admin'" align=right><a data-toggle="modal" data-target="#modal-delete-typeofplace" href="#"><i class="fa fa-trash text-danger" @click="getThisTypeofplace(typeofplace.id)" ></i></a></td>
+						<td v-if="typeofplace.places.length == 0" align=center><a class="btn btn-default btn-xs" @click="getThisTypeofplace(typeofplace.id)" data-toggle="modal" data-target="#modal-delete-typeofplace" href="#"><i class="fa fa-trash text-danger"></i></a></td>
 
-						<!-- <td v-if="place != null" align=right><a data-toggle="modal" data-target="#modal-undeleted-typeofplace" href="#"><i class="fa fa-trash text-warning" @click="getThisTypeofplace(typeofplace.id)" ></i></a></td>
-						</span> -->
+							<td v-else align=center><a @click="getThisTypeofplace(typeofplace.id)" class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-undeleted-typeofplace" href="#"><i class="fa fa-ban text-warning"></i></a></td>
 						<!---------------------------------------------------------------------------->
-
 					</tr>
 				</tbody>
 			</table>
@@ -105,41 +128,42 @@
 		<!--------------------------------------------------------------------------------------------------------->
 
 		<div class="modal fade" id="modal-delete-typeofplace" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button @click="clearField" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-						<h4 class="modal-title" id="">Eliminar</h4>
-					</div>
-					<div class="modal-body">
-						<h5>Eliminar - <span class="text-uppercase text-danger">{{newTypeofplace.name}}</span></h5>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-						<button  @keyup.enter="deleteTypeofplace(newTypeofplace.id)" @click="deleteTypeofplace(newTypeofplace.id)" type="button" class="btn btn-danger">Eliminar</button>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<div class="modal fade" id="modal-undeleted-typeofplace" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-						<h4 class="modal-title label label-warning" id=""><i class='fa fa-exclamation-circle fa-spin'></i></h4>
-					</div>
-					<div class="modal-body">
-						<h4 class="text-center"><span class="text-uppercase text-danger">{{newTypeofplace.name}}</span>, não pode ser apagado enquanto é referenciado po um Espaço</h4>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-success" data-dismiss="modal"><i class="fa fa-check"></i> Sair</button>
-
-						<a class="btn btn-primary" href="places">Verificar Espaços</a>
+				<div class="modal-dialog modal-sm">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h5 class="modal-title" id=""><i class="text-danger fa fa-exclamation-triangle faa-flash animated faa-slow"></i></h5>
+						</div>
+						<div class="modal-body">
+							<h5 class="text-center">Eliminar {{newTypeofplace.name}}</h5>
+						</div>
+						<div class="modal-footer">
+							<button @click="clearField" type="button" class="btn btn-secondary btn-xs" data-dismiss="modal"><i class="fa fa-times"></i></button>
+							<button  @keyup.enter="deleteTypeofplace(newTypeofplace.id)" @click="deleteTypeofplace(newTypeofplace.id)" type="button" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></button>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
+
+
+			<div class="modal fade" id="modal-undeleted-typeofplace" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+					<div class="modal-dialog modal-sm">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+								<h4 class="modal-title text-danger" id=""><i class='fa fa-ban'></i></h4>
+							</div>
+							<div class="modal-body">
+								<h5 class="text-center"><span class="text-uppercase text-truncate">{{newTypeofplace.name}}</span> Relaciona com outro registo</h5>
+							</div>
+							<div class="modal-footer">
+
+								<a class="btn btn-secondary btn-sm" href="places">Ver Funcionários</a>
+								<button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal"><i class="fa fa-check"></i></button>
+							</div>
+						</div>
+					</div>
+				</div>
 
 
 
@@ -152,7 +176,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
-						<h4 class="modal-title">Registar</h4>
+							<h4 class="modal-title"><i class="fa fa-plus faa-burst faa-slow animated text-primary"></i></h4>
 					</div>
 					<div class="modal-body">
 						<form action="#" methods="POST">
@@ -200,7 +224,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
-						<h4 class="modal-title">Editar</h4>
+							<h4 class="modal-title"><i class="fa fa-edit faa-burst faa-slow animated text-primary"></i></h4>
 					</div>
 					<div class="modal-body">
 						<validator name="validation1">

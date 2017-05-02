@@ -9,7 +9,7 @@
 	<div class="col-md-12">
 		<div class="form-inline pull-right">
 			<div class="input-group">
-				<select data-toggle="tooltip" title="A mostrar linhas na tabela" class="selectpicker show-tick show-menu-arrow" data-style="btn-primary name=" v-model="showRow" @change="fetchTypeofemployee(1, showRow)">
+				<select data-toggle="tooltip" title="A mostrar linhas na tabela" class="selectpicker show-tick show-menu-arrow" data-style="btn-primary" v-model="showRow" @change="fetchTypeofemployee(1, showRow)">
 					<option class="" value="5">05</option>
 					<option class="" value="10" selected>10</option>
 					<option class="" value="20">20</option>
@@ -103,172 +103,172 @@
 				<tbody>
 					<tr v-for="typeofemployee in typeofemployees | orderBy sortColumn sortInverse">
 						<td><input :disabled="typeofemployee.employees.length > 0" type="checkbox" name="" v-model="deleteMultIten" :value="typeofemployee.id"></td>
-							<td>{{ typeofemployee.name }}</td>
-							<td>{{ typeofemployee.description }}</td>
-							<td align=center>  <a data-toggle="modal" class="btn btn-default btn-xs" data-target="#modal-edit-typeofemployee" href="#" @click="getThisTypeofemployee(typeofemployee.id)"> <i class="fa fa-edit text-primary"> </i></a></td>
-							<!------------------------------------------------------------------------------------------->
-							<td v-if="typeofemployee.employees.length == 0" align=center><a @click="getThisTypeofemployee(typeofemployee.id)" class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-delete-typeofemployee" href="#"><i class="fa fa-trash text-danger"></i></a></td>
+						<td>{{ typeofemployee.name }}</td>
+						<td>{{ typeofemployee.description }}</td>
+						<td align=center>  <a data-toggle="modal" class="btn btn-default btn-xs" data-target="#modal-edit-typeofemployee" href="#" @click="getThisTypeofemployee(typeofemployee.id)"> <i class="fa fa-edit text-primary"> </i></a></td>
+						<!------------------------------------------------------------------------------------------->
+						<td v-if="typeofemployee.employees.length == 0" align=center><a @click="getThisTypeofemployee(typeofemployee.id)" class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-delete-typeofemployee" href="#"><i class="fa fa-trash text-danger"></i></a></td>
 
-							<td v-else align=center><a @click="getThisTypeofemployee(typeofemployee.id)" class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-undeleted-typeofemployee" href="#"><i class="fa fa-ban text-warning"></i></a></td>
+						<td v-else align=center><a @click="getThisTypeofemployee(typeofemployee.id)" class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-undeleted-typeofemployee" href="#"><i class="fa fa-ban text-warning"></i></a></td>
 
-							<!------------------------------------------------------------------------------------------->
-						</tr>
-					</tbody>
-				</table>
-				<div class="row">
-					<div v-if="pagination.total > showRow" class="col-md-6 pull-left">
-						<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
+						<!------------------------------------------------------------------------------------------->
+					</tr>
+				</tbody>
+			</table>
+			<div class="row">
+				<div v-if="pagination.total > showRow" class="col-md-6 pull-left">
+					<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
+				</div>
+				<div class="col-md-6 pull-right">
+					<h6 class="text-right text-help"> Mostrar de <span class="badge">{{pagination.from}}</span>  a <span class="badge">{{pagination.to}}</span>  no total de <span class="badge">{{pagination.total}}</span></h6>
+				</div>
+			</div>
+		</div>
+
+		<!--------------------------------------------------------------------------------------------------------->
+
+		<div class="modal fade" id="modal-delete-typeofemployee" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+			<div class="modal-dialog modal-sm">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h5 class="modal-title" id=""><i class="text-danger fa fa-exclamation-triangle faa-flash animated faa-slow"></i></h5>
 					</div>
-					<div class="col-md-6 pull-right">
-						<h6 class="text-right text-help"> Mostrar de <span class="badge">{{pagination.from}}</span>  a <span class="badge">{{pagination.to}}</span>  no total de <span class="badge">{{pagination.total}}</span></h6>
+					<div class="modal-body">
+						<h5 class="text-center">Eliminar {{newTypeofemployee.name}}</h5>
+					</div>
+					<div class="modal-footer">
+						<button @click="clearField" type="button" class="btn btn-secondary btn-xs" data-dismiss="modal"><i class="fa fa-times"></i></button>
+						<button  @keyup.enter="deleteTypeofemployee(newTypeofemployee.id)" @click="deleteTypeofemployee(newTypeofemployee.id)" type="button" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></button>
 					</div>
 				</div>
 			</div>
+		</div>
 
-			<!--------------------------------------------------------------------------------------------------------->
 
-			<div class="modal fade" id="modal-delete-typeofemployee" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
-				<div class="modal-dialog modal-sm">
-					<div class="modal-content">
-						<div class="modal-header">
-							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-							<h5 class="modal-title" id=""><i class="text-danger fa fa-exclamation-triangle faa-flash animated faa-slow"></i></h5>
-						</div>
-						<div class="modal-body">
-							<h5 class="text-center">Eliminar {{newTypeofemployee.name}}</h5>
-						</div>
-						<div class="modal-footer">
-							<button @click="clearField" type="button" class="btn btn-secondary btn-xs" data-dismiss="modal"><i class="fa fa-times"></i></button>
-							<button  @keyup.enter="deleteTypeofemployee(newTypeofemployee.id)" @click="deleteTypeofemployee(newTypeofemployee.id)" type="button" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></button>
-						</div>
+		<div class="modal fade" id="modal-undeleted-typeofemployee" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+			<div class="modal-dialog modal-sm">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title text-danger" id=""><i class='fa fa-ban'></i></h4>
+					</div>
+					<div class="modal-body">
+						<h5 class="text-center"><span class="text-uppercase text-truncate">{{newTypeofemployee.name}}</span> Relaciona com outro registo</h5>
+					</div>
+					<div class="modal-footer">
+
+						<a class="btn btn-secondary btn-sm" href="employees">Ver Funcionários</a>
+						<button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal"><i class="fa fa-check"></i></button>
 					</div>
 				</div>
 			</div>
+		</div>
 
 
-			<div class="modal fade" id="modal-undeleted-typeofemployee" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
-				<div class="modal-dialog modal-sm">
-					<div class="modal-content">
-						<div class="modal-header">
-							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-							<h4 class="modal-title text-danger" id=""><i class='fa fa-ban'></i></h4>
-						</div>
-						<div class="modal-body">
-							<h5 class="text-center"><span class="text-uppercase text-truncate">{{newTypeofemployee.name}}</span> Relaciona com outro registo</h5>
-						</div>
-						<div class="modal-footer">
 
-							<a class="btn btn-secondary btn-sm" href="employees">Ver Funcionários</a>
-							<button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal"><i class="fa fa-check"></i></button>
-						</div>
+		<!--------------------------------------------------------------------------------------------------------->
+		<!-- Modal -->
+		<div id="modal-create-typeofemployee" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title"><i class="fa fa-plus faa-burst animated faa-slow"></i></h4>
 					</div>
-				</div>
-			</div>
-
-
-
-			<!--------------------------------------------------------------------------------------------------------->
-			<!-- Modal -->
-			<div id="modal-create-typeofemployee" class="modal fade" role="dialog">
-				<div class="modal-dialog">
-
-					<!-- Modal content-->
-					<div class="modal-content">
-						<div class="modal-header">
-							<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
-							<h4 class="modal-title"><i class="fa fa-plus faa-burst animated faa-slow"></i></h4>
-						</div>
-						<div class="modal-body">
-							<form action="#" methods="POST">
-								<div class="row">
+					<div class="modal-body">
+						<form action="#" methods="POST">
+							<div class="row">
+								<div class="col-md-12">
 									<div class="col-md-12">
-										<div class="col-md-12">
-											<div class="form-group {{ errors.name ? ' has-error' : '' }} has-feedback">
-												<input type="text" class="form-control" name="name" placeholder="Nome do Tipo de Funcionário" v-model="newTypeofemployee.name"/>
-												<span class="fa fa-users form-control-feedback"></span>
-												<p v-if="errors.name" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.name }}</p>
-											</div>
+										<div class="form-group {{ errors.name ? ' has-error' : '' }} has-feedback">
+											<input type="text" class="form-control" name="name" placeholder="Nome do Tipo de Funcionário" v-model="newTypeofemployee.name"/>
+											<span class="fa fa-users form-control-feedback"></span>
+											<p v-if="errors.name" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.name }}</p>
 										</div>
 									</div>
 								</div>
-
-								<hr><!---------------------------------------------------------------------------------------------------------------->
-
-								<div class="row">
-									<div class="col-md-12">
-										<div class="col-md-12">
-											<div class="form-group {{ errors.description ? ' has-error' : '' }} has-feedback">
-												<textarea name="description" placeholder="Descrição..." class="form-control" rows="5" cols="40" id="description" v-model="newTypeofemployee.description"></textarea>
-
-												<p v-if="errors.description" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.description }}</p>
-											</div>
-										</div>
-									</div>
-								</div>
-							</form>
-
-						</div>
-						<div class="modal-footer">
-							<div class="col-md-12">
-								<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
-
-								<button @click="createTypeofemployee" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
-
 							</div>
+
+							<hr><!---------------------------------------------------------------------------------------------------------------->
+
+							<div class="row">
+								<div class="col-md-12">
+									<div class="col-md-12">
+										<div class="form-group {{ errors.description ? ' has-error' : '' }} has-feedback">
+											<textarea name="description" placeholder="Descrição..." class="form-control" rows="5" cols="40" id="description" v-model="newTypeofemployee.description"></textarea>
+
+											<p v-if="errors.description" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.description }}</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</form>
+
+					</div>
+					<div class="modal-footer">
+						<div class="col-md-12">
+							<button @click="clearField" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
+
+							<button @click="createTypeofemployee" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
+
 						</div>
 					</div>
 				</div>
 			</div>
+		</div>
 
-			<!--------------------------------------------------------------------------------------------------------->
+		<!--------------------------------------------------------------------------------------------------------->
 
-			<!-- Modal -->
-			<div id="modal-edit-typeofemployee" class="modal fade" role="dialog">
-				<div class="modal-dialog">
-					<!-- Modal content-->
-					<div class="modal-content">
-						<div class="modal-header">
-							<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
-							<h4 class="modal-title"><i class="fa fa-edit faa-burst faa-slow animated text-primary"></i></h4>
-						</div>
-						<div class="modal-body">
-							<form methods="patch">
-								<div class="row">
+		<!-- Modal -->
+		<div id="modal-edit-typeofemployee" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<button @click="clearField" type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title"><i class="fa fa-edit faa-burst faa-slow animated text-primary"></i></h4>
+					</div>
+					<div class="modal-body">
+						<form methods="patch">
+							<div class="row">
+								<div class="col-md-12">
 									<div class="col-md-12">
-										<div class="col-md-12">
-											<div class="form-group {{ errors.name ? ' has-error' : '' }} has-feedback">
-												<input type="text" class="form-control" name="name" placeholder="Nome do Tipo de Funcionário" v-model="newTypeofemployee.name"/>
-												<span class="fa fa-users form-control-feedback"></span>
-												<p v-if="errors.name" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.name }}</p>
-											</div>
+										<div class="form-group {{ errors.name ? ' has-error' : '' }} has-feedback">
+											<input type="text" class="form-control" name="name" placeholder="Nome do Tipo de Funcionário" v-model="newTypeofemployee.name"/>
+											<span class="fa fa-users form-control-feedback"></span>
+											<p v-if="errors.name" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.name }}</p>
 										</div>
 									</div>
 								</div>
-
-								<hr><!---------------------------------------------------------------------------------------------------------------->
-
-								<div class="row">
-									<div class="col-md-12">
-										<div class="col-md-12">
-											<div class="form-group {{ errors.description ? ' has-error' : '' }} has-feedback">
-												<textarea name="description" placeholder="Descrição..." class="form-control" rows="5" cols="40" id="description" v-model="newTypeofemployee.description"></textarea>
-
-												<p v-if="errors.description" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.description }}</p>
-											</div>
-										</div>
-									</div>
-								</div>
-							</form>
-						</div>
-						<div class="modal-footer">
-							<div class="col-md-12">
-								<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
-								<button @click="saveEditedTypeofemployee(newTypeofemployee.id)" type="button" class="btn btn-primary"><i class="fa fa-refresh fa-spin"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>
-
 							</div>
+
+							<hr><!---------------------------------------------------------------------------------------------------------------->
+
+							<div class="row">
+								<div class="col-md-12">
+									<div class="col-md-12">
+										<div class="form-group {{ errors.description ? ' has-error' : '' }} has-feedback">
+											<textarea name="description" placeholder="Descrição..." class="form-control" rows="5" cols="40" id="description" v-model="newTypeofemployee.description"></textarea>
+
+											<p v-if="errors.description" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.description }}</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<div class="col-md-12">
+							<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
+							<button @click="saveEditedTypeofemployee(newTypeofemployee.id)" type="button" class="btn btn-primary"><i class="fa fa-refresh fa-spin"></i>&nbsp; &nbsp;&nbsp; Atualizar</button>
+
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
+</div>

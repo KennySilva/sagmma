@@ -8,7 +8,7 @@
 	<div class="col-md-12">
 		<div class="form-inline pull-right">
 			<div class="input-group">
-				<select data-toggle="tooltip" title="A mostrar linhas na tabela" class="form-control" name="" v-model="showRow" @change="fetchMaterial(1, showRow)">
+				<select data-toggle="tooltip" title="A mostrar linhas na tabela" class="selectpicker show-tick show-menu-arrow" data-style="btn-primary" name="" v-model="showRow" @change="fetchMaterial(1, showRow)">
 					<option class="" value="5">05</option>
 					<option class="" value="10" selected>10</option>
 					<option class="" value="20">20</option>
@@ -50,9 +50,36 @@
 
 <hr>
 <div class="row">
-	<div class="col-md-12">
+	<div class="col-md-8">
+		<div class="btn-group">
+
 		<button class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-material"><i class="fa fa-plus"></i> Novo</button>
 	</div>
+	</div>
+
+	<div class="col-md-2 pull-right">
+	<div class="btn-group">
+		<button data-toggle="modal" data-target="#deleteAllMaterials"  v-if="deleteMultIten.length > 0" class="btn btn-danger btn-flat btn-outline"  type="button" name="button"><i class="fa fa-trash-o"></i> Apagar Todos</button>
+	</div>
+</div>
+
+<div class="modal fade" id="deleteAllMaterials" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h5 class="modal-title" id=""><i class="text-danger fa fa-exclamation-triangle faa-flash animated faa-slow"></i></h5>
+			</div>
+			<div class="modal-body">
+				<h5 class="text-center">Eliminar {{deleteMultIten.length}} Registo(s)?</h5>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary btn-xs" data-dismiss="modal"><i class="fa fa-times"></i></button>
+				<button  @click = "deleteMultMaterials" type="button" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></button>
+			</div>
+		</div>
+	</div>
+</div>
 </div>
 <br>
 <div class="row">
@@ -61,6 +88,9 @@
 			<table class='table table-striped table-hover'>
 				<thead>
 					<tr>
+						<th>
+							<input :disabled="canDeleteAll()" type="checkbox" name="" value="" @click="selectAll" v-model="allSelected">
+						</th>
 						<th>
 							<i :class = "{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
 							<a href="#" @click = "doSort($event, 'name')">Nome</a>
@@ -75,13 +105,14 @@
 				</thead>
 				<tbody>
 					<tr v-for="material in materials | orderBy sortColumn sortInverse">
+						<td><input :disabled="material.employees.length > 0" type="checkbox" name="" v-model="deleteMultIten" :value="material.id"></td>
 						<td>{{ material.name }}</td>
 						<td>{{ material.description }}</td>
-						<td align=left>  <a data-toggle="modal" data-target="#modal-edit-material" href="#"> <i class="fa fa-edit text-primary" @click="getThisMaterial(material.id)" > </i></a></td>
+						<td align=left>  <a @click="getThisMaterial(material.id)" data-toggle="modal" data-target="#modal-edit-material" href="#"> <i class="fa fa-edit text-primary"> </i></a></td>
 						<!---------------------------------------------------------------------------->
-						<td v-if="material.employees.length == 0" align=right><a data-toggle="modal" data-target="#modal-delete-material" href="#"><i class="fa fa-trash text-danger" @click="getThisMaterial(material.id)" ></i></a></td>
+						<td v-if="material.employees.length == 0" align=right><a @click="getThisMaterial(material.id)" data-toggle="modal" data-target="#modal-delete-material" href="#"><i class="fa fa-trash text-danger"></i></a></td>
 
-						<td v-else align=right><a data-toggle="modal" data-target="#modal-undeleted-material" href="#"><i class="fa fa-ban text-warning" @click="getThisMaterial(material.id)" ></i></a></td>
+						<td v-else align=right><a @click="getThisMaterial(material.id)" data-toggle="modal" data-target="#modal-undeleted-material" href="#"><i class="fa fa-ban text-warning"></i></a></td>
 						<!---------------------------------------------------------------------------->
 					</tr>
 				</tbody>

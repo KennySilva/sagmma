@@ -40,6 +40,11 @@ export default{
             all            : {},
             // auth           : [],
             errors         : [],
+
+            deleteMultIten: [],
+            allSelected: false,
+            selected: [],
+            sendPlace: '',
         }
     },
 
@@ -82,6 +87,17 @@ export default{
 
 
     methods: {
+
+        selectAll: function() {
+            this.deleteMultIten = [];
+            if (!this.allSelected) {
+                for (place in this.places) {
+                    this.deleteMultIten.push(this.places[place].id);
+                }
+            }
+        },
+
+
         alert: function(msg, typeAlert) {
             var self = this;
             this.success = true;
@@ -143,6 +159,15 @@ export default{
             });
         },
 
+        canDeleteAll: function() {
+            var places = this.places;
+            for (var place in places) {
+                if (places[place].taxation != null || places[place].contract != null) {
+                    return true;
+                }
+            }
+        },
+
         // --------------------------------------------------------------------------------------------
 
         getThisPlace: function(id){
@@ -190,6 +215,19 @@ export default{
                     this.fetchPlace(this.pagination.current_Page, this.showRow);
                     this.alert('Estaço eliminado com sucesso', 'warning');
 
+                }
+            }, (response) => {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+        deleteMultPlace: function() {
+            this.$http.delete('http://localhost:8000/api/v1/deleteMultPlaces/'+ this.deleteMultIten).then((response) => {
+                if (response.status == 200) {
+                    $('#deleteAll').modal('hide');
+                    this.deleteMultIten  = [];
+                    this.fetchPlace(this.pagination.current_page, this.showRow);
+                    this.alert('Funcionários eliminados com sucesso', 'warning');
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");

@@ -57,4 +57,10 @@ class ApiMaterialsController extends Controller
         {
             return Material::destroy($id);
         }
+
+        public function deleteAll($ids)
+        {
+            Material::destroy(explode(',', $ids));
+        }
+
     }
