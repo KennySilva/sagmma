@@ -86,6 +86,7 @@ Route::group(['namespace' => 'ApiControllers'], function()
                 // ----------------------------------------Api-Typeofplaces-------------------------------
                 Route::resource('typeofplaces', 'ApiTypeofplacesController');
                 Route::get('allTypeofplaces/{row}', 'ApiTypeofplacesController@index');
+                Route::resource('deleteMultTypeofemployees', 'ApiTypeofemployeesController@deleteAll');
                 // ----------------------------------------Api-Materials----------------------------------
                 Route::resource('materials', 'ApiMaterialsController');
                 Route::get('allMaterials/{row}', 'ApiMaterialsController@index');

@@ -8,27 +8,34 @@
 @endsection
 
 @section('contentheader_title')
-    Importar informações de Funcionários em Ficheiros Excel
+    Importar Ficheiros Excel
 @endsection
 
 @section('main-content')
-    <div class="col-md-6">
-        <form class="" action="postEmployeeImport" method="post" enctype="multipart/form-data">
-            <input type="hidden" name="_token" value="{{csrf_token()}}">
-            <div class="form-group">
-                <label for="employee" class="control-label">Selecionar um Ficheiro CSV para Importar</label>
-                <input v-model="employeeExcel" type="file" name="employee" value=""  id="excelInput">
-            </div>
+    <div class="sagmma_container">
 
-            <div class="form-group">
-                <button v-if="!employeeExcel" type="submit" class="btn btn-primary">
-                    <i class="fa fa-upload"></i>
-                </button>
+        <div class="col-md-6">
+            <form class="" action="postEmployeeImport" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="_token" value="{{csrf_token()}}">
+                <div class="form-group">
+                    <label for="employee" class="control-label">Selecionar um Ficheiro CSV para Importar</label>
+                    <input v-model="employeeExcel" type="file" name="employee" value=""  id="excelInput">
+                </div>
+                <hr>
+                <div class="form-group">
+                    <button v-if="employeeExcel != ''" type="submit" class="btn btn-link">
+                        <i class="fa fa-upload"></i> Importar
+                    </button>
 
-                <a class="btn btn-primary" href="/sagmma/employees"><i class="fa fa-undo"></i></a>
-            </div>
-        </form>
+                    <a class="btn btn-link" href="/sagmma/employees"><i class="fa fa-undo"></i> Voltar</a>
+                </div>
+                <hr>
+                <br>
+                <span class="text-help text-warning"><i class="fa fa-exclamation-triangle"></i> Nota: Certifique que o ficheiro execel contem informações válidadas para a Base de Dados</span>
+            </form>
+        </div>
     </div>
+
 @endsection
 
 @push('scripts')

@@ -468,15 +468,6 @@ export default{
             });
         },
 
-
-        // employeeMarket: function() {
-        //     this.$http.get('http://localhost:8000/api/v1/employeeMarket').then((response) => {
-        //         this.$set('markets', response.data);
-        //     }, (response) => {
-        //         console.log("Ocorreu um erro na operação");
-        //     });
-        // },
-
         employeeType: function() {
             this.$http.get('http://localhost:8000/api/v1/employeeType').then((response) => {
                 this.$set('types', response.data);
@@ -503,11 +494,11 @@ export default{
         // --------------------------------------------------------------------------------------------
         sendEmployeePerEmail: function() {
             var sendEmployee = this.sendEmployee;
+            this.sendEmployee = '';
             this.$http.get('http://localhost:8000/api/v1/sendEmployee/'+sendEmployee).then((response) => {
                 $('#send-employee-per-email').modal('hide');
                 if (response.status == 200) {
-                    this.alert('Recibo enviado para '+this.sendEmployee+' com sucesso', 'success');
-                    this.sendEmployee = '';
+                    this.alert('Email enviado com sucesso', 'success');
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -549,6 +540,21 @@ export default{
         },
 
 
+    },
+
+    computed: {
+        myValidation: function() {
+            return {
+                email: /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[ 0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(this.sendEmployee),
+            }
+        },
+
+        isValid: function() {
+            var validation = this.validation;
+            return Object.keys(validation).every(function(key){
+                return validation[key];
+            });
+        },
     },
 
 

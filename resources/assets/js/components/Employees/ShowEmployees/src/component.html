@@ -8,7 +8,7 @@
 	<div class="col-md-12">
 		<div class="form-inline pull-right">
 			<div class="input-group">
-				<select data-toggle="tooltip" title="A mostrar linhas na tabela" class="form-control" name="" v-model="showRow" @change="fetchEmployee(1, showRow)">
+				<select data-toggle="tooltip" title="A mostrar linhas na tabela" class="selectpicker show-tick show-menu-arrow" data-style="btn-primary name=" v-model="showRow" @change="fetchEmployee(1, showRow)">
 					<option class="" value="5">05</option>
 					<option class="" value="10" selected>10</option>
 					<option class="" value="20">20</option>
@@ -17,7 +17,7 @@
 					<option class="" value="200">200</option>
 				</select>
 			</div>
-			&nbsp;&nbsp;
+
 			<div class="input-group">
 				<select data-toggle="tooltip" title="Escolhe as colunas a serem filtrados" class="form-control" name="" v-model="columnsFiltered" multiple="multiple" v-el:employeescols>
 					<option class="" value="name">Nome</option>
@@ -25,7 +25,6 @@
 					<option class="" value="type">Tipo</option>
 				</select>
 			</div>
-			&nbsp;&nbsp;
 			<div v-if="columnsFiltered.length != 0" class="input-group">
 				<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
 				<input data-toggle="tooltip" title="Escreva o valor a ser procurado na Tabela"
@@ -80,9 +79,9 @@
 		</div>
 	</div>
 
-	<div class="col-md-2 pull-right">
+	<div class="col-md-2 pull-left">
 		<div class="btn-group">
-			<button data-toggle="modal" data-target="#deleteAll" v-if="deleteMultIten.length > 0" class="btn btn-danger btn-flat pull-left btn-outline"  type="button" name="button"><i class="fa fa-trash-o"></i> Apagar Seleção</button>&nbsp;
+			<button data-toggle="modal" data-target="#deleteAll" v-if="deleteMultIten.length > 0" class="btn btn-danger btn-flat btn-outline"  type="button" name="button"><i class="fa fa-trash-o"></i> Apagar Todos</button>
 		</div>
 	</div>
 
@@ -103,7 +102,7 @@
 					</div>
 				</div>
 				<div class="modal-footer">
-					<button @click="sendEmployeePerEmail()" type='submit' class='btn btn-sm btn-primary '><i class="fa fa-send"></i></button>
+					<button :disabled="!myValidation.email" @click="sendEmployeePerEmail()" type='submit' class='btn btn-sm btn-primary '><i class="fa fa-send"></i></button>
 				</div>
 			</div>
 		</div>

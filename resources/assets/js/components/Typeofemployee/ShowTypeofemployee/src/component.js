@@ -28,6 +28,11 @@ export default{
             all: {},
             errors: [],
 
+            deleteMultIten: [],
+            allSelected: false,
+            selected: [],
+            sendEmployee: '',
+
         }
     },
 
@@ -50,6 +55,16 @@ export default{
     // ---------------------------------------------------------------------------------
 
     methods: {
+
+        selectAll: function() {
+            this.deleteMultIten = [];
+            if (!this.allSelected) {
+                for (type in this.typeofemployees) {
+                    this.deleteMultIten.push(this.typeofemployees[type].id);
+                }
+            }
+        },
+
         alert: function(msg, typeAlert) {
             var self = this;
             this.success = true;
@@ -103,6 +118,15 @@ export default{
             });
         },
 
+        canDeleteAll: function() {
+            var types = this.typeofemployees;
+            for (var type in types) {
+                if (types[type].employees.length > 0) {
+                    return true;
+                }
+            }
+        },
+
         // --------------------------------------------------------------------------------------------
 
         getThisTypeofemployee: function(id){
@@ -144,6 +168,19 @@ export default{
                     this.fetchTypeofemployee(this.pagination.current_Page, this.showRow);
                     this.alert('Tipo de Funcionário eliminado com sucesso', 'warning');
 
+                }
+            }, (response) => {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+        deleteMultTypeofemployees: function() {
+            this.$http.delete('http://localhost:8000/api/v1/deleteMultTypeofemployees/'+ this.deleteMultIten).then((response) => {
+                if (response.status == 200) {
+                    $('#deleteAllTypeofemployees').modal('hide');
+                    this.deleteMultIten  = [];
+                    this.fetchTypeofemployee(this.pagination.current_page, this.showRow);
+                    this.alert('Tipos de Funcionários eliminados com sucesso', 'warning');
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");

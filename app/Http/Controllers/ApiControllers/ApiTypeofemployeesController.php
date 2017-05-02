@@ -40,7 +40,7 @@ class ApiTypeofemployeesController extends Controller
             $typeofemployee = Typeofemployee::findOrFail($id);
             return $typeofemployee;
         }
-        
+
         public function edit($id)
         {
             //
@@ -57,4 +57,10 @@ class ApiTypeofemployeesController extends Controller
         {
             return Typeofemployee::destroy($id);
         }
+
+        public function deleteAll($ids)
+        {
+            Typeofemployee::destroy(explode(',', $ids));
+        }
+
     }
