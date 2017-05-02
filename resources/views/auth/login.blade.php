@@ -51,7 +51,7 @@
             <div class="col-xs-8">
                 <div class="checkbox icheck">
                     <label>
-                        <input type="checkbox" name="remember"> Lembrar
+                        <input type="checkbox" name="remember"> Manter Sessão
                     </label>
                 </div>
             </div><!-- /.col -->

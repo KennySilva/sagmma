@@ -17,6 +17,10 @@ use Response;
 use Input;
 use Validator;
 use Carbon\Carbon;
+use Auth;
+use Mail;
+use PDF;
+
 
 class ApiEmployeesController extends Controller
 {
@@ -189,12 +193,23 @@ class ApiEmployeesController extends Controller
         {
             $markets = Market::all();
             return $markets;
-
         }
 
         public function getTypeForEmployee()
         {
             $typeofemployee = Typeofemployee::all();
             return $typeofemployee;
+        }
+
+        public function sendEmployeePerEmail($sendEmployee)
+        {
+            $owner = Auth::user()->email;
+            $email = $sendEmployee;
+            $code = str_random(30);
+            Mail::send('emails.sendEmployeeLink', ['code'=>$code, 'owner'=>$owner], function($ms) use ($email, $owner){
+                $ms->subject('Funcionários Registrado no SAGMMA');
+                $ms->to($email);
+                $ms->from($owner, 'SAGMMA');
+            });
         }
     }

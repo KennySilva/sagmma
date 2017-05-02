@@ -94,6 +94,7 @@ Route::group(['namespace' => 'ApiControllers'], function()
                 Route::resource('deleteMultEmployees', 'ApiEmployeesController@deleteAll');
                 Route::get('marketEmployee', 'ApiEmployeesController@getMarketforEmployee');
                 Route::get('allEmployees/{row}', 'ApiEmployeesController@index');
+                Route::get('sendEmployee/{sendEmployee}', 'ApiEmployeesController@sendEmployeePerEmail');
                 // Route::get('employeeMarket', 'ApiEmployeesController@getMarketforEmployee');
                 Route::get('employeeType', 'ApiEmployeesController@getTypeforEmployee');
                 // ----------------------------------------Api-traders----------------------------------
@@ -305,17 +306,10 @@ Route::get('data','PluginsControllers\AnalyticsController@index');
 // ###################################################  Links externos #############################################
 // ###################################################################################################################
 Route::get('acesso_ao_recibo/{id}/{code}', 'PluginsControllers\PDFController@downloadreciboempdf');
+Route::get('sagmmaEmployees/{code}', 'PluginsControllers\ExcelController@getEmployeeExport');
 // ###################################################################################################################
 // ###################################################  Testes ######################################################
 // ###################################################################################################################
-Route::get('cycle', function()
-{
-    return view('cycleTeste');
-});
 
-Route::get('cycle2', function()
-{
-    return view('cycle2');
-});
 
 Route::get('setroles', 'ApiRolesController@superAdminPermissions');

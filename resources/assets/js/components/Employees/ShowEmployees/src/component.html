@@ -76,7 +76,7 @@
 			</ul>
 		</div>
 		<div class="btn-group">
-			<a class="btn btn-primary btn-flat btn-outline" href="#"><i class="fa fa-envelope-o"></i> Enviar</a>
+			<a class="btn btn-primary btn-flat btn-outline" href="#" data-toggle="modal" data-target="#send-employee-per-email"><i class="fa fa-envelope-o"></i> Enviar</a>
 		</div>
 	</div>
 
@@ -85,6 +85,30 @@
 			<button data-toggle="modal" data-target="#deleteAll" v-if="deleteMultIten.length > 0" class="btn btn-danger btn-flat pull-left btn-outline"  type="button" name="button"><i class="fa fa-trash-o"></i> Apagar Seleção</button>&nbsp;
 		</div>
 	</div>
+
+	<!-- iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii -->
+	<div id="send-employee-per-email" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-sm">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+						<h5 class="modal-title"><i class="fa fa-send faa-flash animated faa-slow text-success"></i></h5>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+						<label for="">Email</label>
+						<input v-model="sendEmployee" type="email" class="form-control" id="" placeholder="Introduza o email">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button @click="sendEmployeePerEmail()" type='submit' class='btn btn-sm btn-primary '><i class="fa fa-send"></i></button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii -->
 
 
 	<div class="modal fade" id="deleteAll" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">

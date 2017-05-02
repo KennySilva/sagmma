@@ -9,7 +9,7 @@
     <body class="login-page">
         <div class="login-box">
             <div class="login-logo">
-                <a href="{{ url('/home') }}"><b>Sagmma</b></a>
+            <a href="{{ url('/') }}"><i class="fa fa-unlock fa-2x faa-burst animated faa-slow"></i></a>
             </div><!-- /.login-logo -->
 
             @if (session('status'))
@@ -30,7 +30,7 @@
             @endif
 
             <div class="login-box-body">
-                <p class="login-box-msg">Redifinir Palavra Passe</p>
+                <p class="login-box-msg">Redefinir Palavra Passe</p>
                 <form action="{{ url('/password/reset') }}" method="post">
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
@@ -61,8 +61,11 @@
                     </div>
                 </form>
 
-                <a href="{{ url('/auth/login') }}">Lembrei, quero entrar</a><br>
-                <a href="{{ url('/auth/register') }}" class="text-center">Não é preciso, quero criar uma nova conta</a>
+                <a href="{{ url('/auth/login') }}">Lembrei, quero autenticar</a><br>
+                <a href="{{ url('/auth/register') }}" class="text-center">Em vez disso, quero criar uma nova conta</a>
+                <hr>
+                <a href="{{ url('/') }}" class="text-center"><i class="fa fa-home faa-shake animated"></i></a>
+
 
             </div><!-- /.login-box-body -->
 

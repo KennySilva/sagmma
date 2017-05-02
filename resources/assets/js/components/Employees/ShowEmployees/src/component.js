@@ -60,6 +60,7 @@ export default{
             deleteMultIten: [],
             allSelected: false,
             selected: [],
+            sendEmployee: '',
 
             // Vue-Datepicker
             option: {
@@ -500,6 +501,20 @@ export default{
             });
         },
         // --------------------------------------------------------------------------------------------
+        sendEmployeePerEmail: function() {
+            var sendEmployee = this.sendEmployee;
+            this.$http.get('http://localhost:8000/api/v1/sendEmployee/'+sendEmployee).then((response) => {
+                $('#send-employee-per-email').modal('hide');
+                if (response.status == 200) {
+                    this.alert('Recibo enviado para '+this.sendEmployee+' com sucesso', 'success');
+                    this.sendEmployee = '';
+                }
+            }, (response) => {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+
 
         doSort: function(ev, column) {
             var self = this;

@@ -40,14 +40,11 @@ class ExcelController extends Controller
             });
 
         })->export('xls');
+        Flash::success('Ficheiro Execel DEscarregado com sucesso');
         return Redirect::back();
 
     }
 
-    // public function deleteAll()
-    // {
-    //     DB::table('employees')->delete();
-    //     return Redirect::back();
-    //
-    // }
+
+
 }

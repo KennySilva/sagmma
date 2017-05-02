@@ -20,7 +20,7 @@
                 <strong><i class="fa fa-user-plus"></i></strong>    Registe-se e obtenha uma conta.
             </div> --}}
             <div class="register-box-body">
-                <p class="login-box-msg"><h3 class="text-center">Rigistar</h3></p>
+                <p class="login-box-msg"><h3 class="text-center">Registar</h3></p>
                 <form action="{{ url('/auth/register') }}" method="post">
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <div class="form-group has-feedback">
@@ -111,7 +111,7 @@
                 </form>
                 <br>
                 <div class="social-auth-links text-center">
-                    <p>«Iniciar Sessão com»</p>
+                    <p>«Autenticar com»</p>
                     <div style="padding: 1px;" class="col-md-12">
 
                         <div style="padding: 1px;" class="col-md-6">

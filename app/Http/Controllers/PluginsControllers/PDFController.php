@@ -9,6 +9,8 @@ use Sagmma\Http\Controllers\Controller;
 use PDF;
 use Typeofplace;
 Use Taxation;
+Use Employee;
+Use Auth;
 
 class PDFController extends Controller
 {
@@ -33,4 +35,15 @@ class PDFController extends Controller
         $pdf = PDF::loadView('pdf.sendTaxation', ['taxation' => $taxation]);
         return $pdf->download('relatoriocobarnca.pdf');
     }
+
+    public function downloadAllEmployeesinpdf()
+    {
+        $employees = Employee::all();
+        $pdf = PDF::loadView('pdf.sendEmployee', ['employees' => $employees]);
+        return $pdf->download('allEmployee.pdf');
+    }
+
+
+
+
 }
