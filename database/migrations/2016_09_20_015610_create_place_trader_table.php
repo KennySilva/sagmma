@@ -19,12 +19,12 @@ class CreatePlaceTraderTable extends Migration
             $table->timestamps();
 
             // Chaves estrangeiras;
-            $table->foreign('place_id')->references('id')->on('places');
-            $table->foreign('trader_id')->references('id')->on('traders');
+            $table->foreign('place_id')->references('id')->on('places')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('trader_id')->references('id')->on('traders')->onUpdate('cascade')->onDelete('cascade');
 
         });
     }
-    
+
     public function down()
     {
         Schema::drop('place_trader');

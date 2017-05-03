@@ -13,12 +13,12 @@ class CreateArticleTagTable extends Migration
             $table->integer('tag_id')->unsigned();
             $table->integer('article_id')->unsigned();
 
-            $table->foreign('tag_id')->references('id')->on('tags');
-            $table->foreign('article_id')->references('id')->on('articles');
+            $table->foreign('tag_id')->references('id')->on('tags')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('article_id')->references('id')->on('articles')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 
-    
+
     public function down()
     {
         Schema::drop('article_tag');

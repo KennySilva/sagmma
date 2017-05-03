@@ -16,11 +16,11 @@ class CreateEmployeeMarketTable extends Migration
             $table->timestamps();
 
             // Chaves estrangeiras;
-            $table->foreign('employee_id')->references('id')->on('employees');
-            $table->foreign('market_id')->references('id')->on('markets');
+            $table->foreign('employee_id')->references('id')->on('employees')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('market_id')->references('id')->on('markets')->onUpdate('cascade')->onDelete('cascade');
         });
     }
-    
+
 
     public function down()
     {

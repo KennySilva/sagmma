@@ -55,6 +55,11 @@ export default{
             all: {},
             auth: [],
             errors: [],
+
+            deleteMultIten: [],
+            allSelected: false,
+            selected: [],
+            sendEmployee: '',
         }
     },
 
@@ -214,6 +219,15 @@ export default{
 
     methods: {
 
+        selectAll: function() {
+            this.deleteMultIten = [];
+            if (!this.allSelected) {
+                for (type in this.users) {
+                    this.deleteMultIten.push(this.users[type].id);
+                }
+            }
+        },
+
         // --------------------------------------------------------------------------------------------
         alert: function(msg, typeAlert) {
             var self = this;
@@ -285,6 +299,15 @@ export default{
             });
         },
 
+        // canDeleteAll: function() {
+        //     var us = this.users;
+        //     for (var u in us) {
+        //         if (us[u].employees.length > 0) {
+        //             return true;
+        //         }
+        //     }
+        // },
+
         getThisUser: function(id){
             var self = this;
 
@@ -353,6 +376,19 @@ export default{
                 console.log("Ocorreu um erro na operação");
             });
             // }
+        },
+
+        deleteMultUsers: function() {
+            this.$http.delete('http://localhost:8000/api/v1/deleteMultUsers/'+ this.deleteMultIten).then((response) => {
+                if (response.status == 200) {
+                    $('#deleteAllUsers').modal('hide');
+                    this.deleteMultIten  = [];
+                    this.fetchUser(this.pagination.current_page, this.showRow);
+                    this.alert('Materiais eliminados com sucesso', 'warning');
+                }
+            }, (response) => {
+                console.log("Ocorreu um erro na operação");
+            });
         },
 
         // -------------------------Metodo de suporte---------------------------------------------------

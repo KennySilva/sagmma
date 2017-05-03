@@ -17,7 +17,6 @@
 					<option class="" value="200">200</option>
 				</select>
 			</div>
-			&nbsp;&nbsp;
 			<div class="input-group">
 				<select data-toggle="tooltip" title="Escolhe as colunas a serem filtrados" class="form-control" name="" v-model="columnsFiltered" multiple="multiple" v-el:usercols>
 					<option class="" value="name">Nome</option>
@@ -25,7 +24,6 @@
 					<option class="" value="username">Nome de Utilizador</option>
 				</select>
 			</div>
-			&nbsp;&nbsp;
 			<div v-if="columnsFiltered.length != 0" class="input-group">
 				<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
 				<input data-toggle="tooltip" title="Escreva o valor a ser procurado na Tabela"
@@ -52,10 +50,42 @@
 <hr>
 
 <div class="row">
-	<div class="col-md-12">
-		<button @click="clearField" class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-user"><i class="fa fa-plus"></i> Novo</button>&nbsp;&nbsp;
-		<a class="btn btn-primary btn-flat btn-outline" href="/export/printableUserInformation"><i class="fa fa-print"></i> Imprimir</a>
+	<div class="col-md-8">
+		<div class="btn-group">
+			<button @click="clearField" class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-user"><i class="fa fa-plus"></i> Novo</button>
+		</div>
+		<div class="btn-group">
+			<a class="btn btn-primary btn-flat btn-outline" href="/export/printableUserInformation"><i class="fa fa-print"></i> Imprimir</a>
+		</div>
+
+		<div class="btn-group">
+			<a class="btn btn-primary btn-flat btn-outline" href="#"><i class="fa fa-envelope-o"></i> Enviar</a>
+		</div>
 	</div>
+
+	<div class="col-md-4">
+		<div class="btn-group pull-right">
+			<button data-toggle="modal" data-target="#deleteAllUsers"  v-if="deleteMultIten.length > 0" class="btn btn-danger btn-flat btn-outline"  type="button" name="button"><i class="fa fa-trash-o"></i> Apagar Todos</button>
+		</div>
+	</div>
+
+	<div class="modal fade" id="deleteAllUsers" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h5 class="modal-title" id=""><i class="text-danger fa fa-exclamation-triangle faa-flash animated faa-slow"></i></h5>
+			</div>
+			<div class="modal-body">
+				<h5 class="text-center">Eliminar {{deleteMultIten.length}} Registo(s)?</h5>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary btn-xs" data-dismiss="modal"><i class="fa fa-times"></i></button>
+				<button  @click = "deleteMultUsers" type="button" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></button>
+			</div>
+		</div>
+	</div>
+</div>
 </div>
 
 <br>
@@ -67,6 +97,9 @@
 				<thead class="thead-default">
 					<tr>
 						<th>
+						<input :disabled="" type="checkbox" name="" value="" @click="selectAll" v-model="allSelected">
+					</th>
+						<th>
 							<i :class = "{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
 							<a href="#" @click = "doSort($event, 'name')">Nome</a>
 						</th>
@@ -75,7 +108,7 @@
 							<a href="#" @click = "doSort($event, 'phone')">Tel</a>
 						</th>
 
-						<th>
+						<th class="text-center">
 							<i :class = "{'fa-sort-amount-asc': sortColumn == 'status' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'status' &&   sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
 							<a href="#" @click = "doSort($event, 'status')">Estado</a>
 						</th>
@@ -93,33 +126,37 @@
 				</thead>
 				<tbody  v-for="user in users | orderBy sortColumn sortInverse">
 					<tr>
-						<td>{{ user.name }}</td>
+						<td><input :disabled="user.status || user.id == auth.id" type="checkbox" name="" v-model="deleteMultIten" :value="user.id"></td>
+
+						<td><span v-if="user.status" data-toggle="tooltip" title="Não se pode apagar Utilizador ativo"><i class="fa fa-exclamation-circle faa-flash animated-hover text-warning"></i></span> {{ user.name }}</td>
 						<td v-if="user.phone">{{ user.phone }}</td>
 						<td v-else>__ __ __</td>
 						<!----------------------------------------------------------------------------------->
-						<td v-if="user.id != auth.id">
-							<button type="submit" @click = "estado_utilizador(user.id)" class='btn btn-xs btn-flat' :class="{ 'btn-info': user.status, 'btn-danger': !user.status }">{{user.status ? 'Ativado' : 'Disativado'}}</button>
+						<td class="text-center" v-if="user.id != auth.id">
+							<button type="submit" @click = "estado_utilizador(user.id)" class='btn btn-xs btn-flat' :class="{ 'btn-info': user.status, 'btn-danger': !user.status }">{{user.status ? 'Ativo' : 'Disativo'}}</button>
 						</td>
 
-						<td v-else>
+						<td class="text-center" v-else>
 							<span><i class="fa fa-circle text-success"></i> Online</span>
 						</td>
 
-						<td><a class="btn btn-default btn-xs" href="#" data-toggle="modal" data-target="#show-user" @click="getThisUser(user.id)"><i class="fa fa-search-plus text-success"></i></a></td>
+						<td><a class="btn btn-default btn-xs" href="#" data-toggle="modal" data-target="#show-user" @click="getThisUser(user.id)"><i class="fa fa-eye text-success"></i></a></td>
 
 
 						<!----------------------------------------------------------------------------------->
-						<td class="text-center">  <a class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-edit-user" href="#"> <i class="fa fa-edit text-primary" @click="getThisUser(user.id)"> </i></a></td>
+						<td v-if="user.id != auth.id" class="text-center">  <a class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-edit-user" href="#"> <i class="fa fa-edit text-primary" @click="getThisUser(user.id)"> </i></a></td>
+
+						<td v-else class="text-center"><i class="fa fa-check text-success"></i></td>
 						<!------------------------------------------------------------------------------->
 
-						<td v-if="user.id != auth.id" class="text-center"><a class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-delete-user" href="#"><i class="fa fa-trash text-danger" @click="getThisUser(user.id)" ></i></a></td>
+						<td v-if="user.id != auth.id" class="text-center"><a :disabled = "user.status" class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-delete-user" href="#"><i class="fa fa-trash text-danger" @click="getThisUser(user.id)" ></i></a></td>
 
-						<td v-else class="text-center"><i class="fa fa-check-square text-success"></i></td>
-
+						<td v-else class="text-center"><i class="fa fa-check text-success"></i></td>
 						<!------------------------------------------------------------------------------->
 						<td width=75 class="text-center">
 							<a class="btn btn-default btn-xs" @click = "doOpenDetails($event, user.id)" v-show="user.roles != ''" href="#"><i data-toggle="tooltip" data-placement="left" title="Ver Papeis de utilizador" class="fa text-primary" :class="{'fa-plus-square': openDetails.indexOf(user.id) == -1, 'fa-minus-square': openDetails.indexOf(user.id) > -1}"></i></a>
-						    <i class="fa fa-plus-square" v-show="user.roles == ''" style="opacity: 0.3"></i>
+
+							<button disabled v-show="user.roles == ''" type="button" class="btn btn-default btn-xs"><i class="fa fa-plus-square"  style="opacity: 0.3"></i></button>
 						</td>
 
 						<!------------------------------------------------------------------------------->

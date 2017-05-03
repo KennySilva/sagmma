@@ -8,3 +8,6 @@
 <script src="{{ asset('/bower_components/select2/dist/js/i18n/pt.js') }}"></script>
 <script src="{{ asset('/js/app.min.js') }}" type="text/javascript"></script>
 <script src="{{ asset('/js/main.js') }}" type="text/javascript"></script>
+<noscript>
+    <h1>Requer Java script</h1>
+</noscript>

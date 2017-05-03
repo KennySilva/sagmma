@@ -15,7 +15,7 @@ class RolesRequest extends Request
     public function rules()
     {
         return [
-            'name'     => 'min:6|max:49|alpha_dash|required|unique:roles,name,'.$this->id,
+            'name'     => 'min:4|max:49|alpha_dash|required|unique:roles,name,'.$this->id,
             'display_name'     => 'min:6|max:59|required|unique:roles,name,'.$this->id,
         ];
     }

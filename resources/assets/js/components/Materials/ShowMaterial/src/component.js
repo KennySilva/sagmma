@@ -93,9 +93,6 @@ export default{
 
         createMaterial: function() {
             var material = this.newMaterial;
-
-            //Clear form input
-
             this.$http.post('http://localhost:8000/api/v1/materials/', material).then((response) => {
                 if (response.status == 200) {
                     console.log('chegando aqui');

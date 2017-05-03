@@ -17,8 +17,8 @@ class CreateEmployeeMaterialTable extends Migration
             $table->timestamps();
 
             // Chaves estrangeiras;
-            $table->foreign('employee_id')->references('id')->on('employees');
-            $table->foreign('material_id')->references('id')->on('materials');
+            $table->foreign('employee_id')->references('id')->on('employees')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('material_id')->references('id')->on('materials')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

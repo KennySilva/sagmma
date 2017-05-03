@@ -29,6 +29,11 @@ export default{
             typeAlert: '',
             errors: [],
             auth: [],
+
+            deleteMultIten: [],
+            allSelected: false,
+            selected: [],
+            sendEmployee: '',
         }
     },
 
@@ -56,6 +61,15 @@ export default{
     // ---------------------------------------------------------------------------------
 
     methods: {
+
+        selectAll: function() {
+            this.deleteMultIten = [];
+            if (!this.allSelected) {
+                for (type in this.permissions) {
+                    this.deleteMultIten.push(this.permissions[type].id);
+                }
+            }
+        },
 
         alert: function(msg, typeAlert) {
             var self = this;
@@ -107,24 +121,20 @@ export default{
                 this.$set('permissions', response.data.data)
                 this.$set('all', response.data.data)
                 this.$set('pagination', response.data)
-
-                // jQuery(self.$els.perms).select2({
-                //     placeholder: "Coluna",
-                //     allowClear: true,
-                //     theme: "bootstrap",
-                //     width: '100%',
-                //     language: 'pt',
-                //
-                //
-                // }).on('change', function () {
-                //     self.$set('columnsFiltered', jQuery(this).val());
-                // });
-
-
             }, (response) => {
                 console.log("Ocorreu um erro na operação")
             });
         },
+
+        canDeleteAll: function() {
+            var perms = this.permissions;
+            for (var perm in perms) {
+                if (perms[perm].employees.length > 0) {
+                    return true;
+                }
+            }
+        },
+
 
         // --------------------------------------------------------------------------------------------
 
@@ -191,6 +201,19 @@ export default{
             });
         },
 
+        deleteMultPermissions: function() {
+            this.$http.delete('http://localhost:8000/api/v1/deleteMultPermissions/'+ this.deleteMultIten).then((response) => {
+                if (response.status == 200) {
+                    $('#deleteAllPermissions').modal('hide');
+                    this.deleteMultIten  = [];
+                    this.fetchPermission(this.pagination.current_page, this.showRow);
+                    this.alert('Materiais eliminados com sucesso', 'warning');
+                }
+            }, (response) => {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
         // --------------------------------------------------------------------------------------------
         doFilter: function() {
             // this.$set('filter.term', ev.currentTarget.value)
@@ -208,21 +231,7 @@ export default{
             }
 
             self.$set('permissions', filtered)
-            // filtered = self.cervejarias.all;
-            //
-            // if(self.interaction.filterTerm != '' && self.interaction.columnsToFilter.length > 0)
-            // {
-            //     filtered = _.filter(self.cervejarias.all, function(cervejaria)
-            //     {
-            //         return self.interaction.columnsToFilter.some(function(column)
-            //         {
-            //             return cervejaria[column].toLowerCase().indexOf(self.interaction.filterTerm.toLowerCase()) > -1
-            //         });
-            //     });
-            // }
-            //
-            // self.setPaginationData(filtered);
-            //
+
 
         },
 

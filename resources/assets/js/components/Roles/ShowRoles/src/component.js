@@ -38,6 +38,12 @@ export default{
             auth: [],
 
 
+
+                        deleteMultIten: [],
+                        allSelected: false,
+                        selected: [],
+                        sendEmployee: '',
+
         }
     },
 
@@ -87,6 +93,15 @@ export default{
     // ---------------------------------------------------------------------------------
 
     methods: {
+        selectAll: function() {
+                    this.deleteMultIten = [];
+                    if (!this.allSelected) {
+                        for (type in this.roles) {
+                            this.deleteMultIten.push(this.roles[type].id);
+                        }
+                    }
+                },
+
         clearField: function(){
             this.newRole = {
                 id           : '',
@@ -141,6 +156,15 @@ export default{
             });
         },
 
+        // canDeleteAll: function() {
+        //     var rols = this.roles;
+        //     for (var rol in rols) {
+        //         if (rols[rol].employees.length > 0) {
+        //             return true;
+        //         }
+        //     }
+        // },
+
         // --------------------------------------------------------------------------------------------
 
         getThisRole: function(id){
@@ -190,6 +214,19 @@ export default{
                     // console.log(response.data);
                     this.fetchRole(1, this.showRow);
                     this.alert('Papel eliminado com sucesso', 'warning');
+                }
+            }, (response) => {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+        deleteMultRoles: function() {
+            this.$http.delete('http://localhost:8000/api/v1/deleteMultRoles/'+ this.deleteMultIten).then((response) => {
+                if (response.status == 200) {
+                    $('#deleteAllRoles').modal('hide');
+                    this.deleteMultIten  = [];
+                    this.fetchRole(this.pagination.current_page, this.showRow);
+                    this.alert('Materiais eliminados com sucesso', 'warning');
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");

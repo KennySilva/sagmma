@@ -30,6 +30,7 @@ class ApiRolesController extends Controller
                 $roles = Role::paginate($row);
                 $roles->each(function($roles){
                     $roles->perms;
+                    $roles->users;
                 });
             }else{
                 $roles = Role::where('name', '!=', 'admin')->where('name', '!=', 'super-admin')->paginate($row);
@@ -96,6 +97,11 @@ class ApiRolesController extends Controller
         public function destroy($id)
         {
             return Role::destroy($id);
+        }
+
+        public function deleteAll($ids)
+        {
+            Role::destroy(explode(',', $ids));
         }
 
         // Outros Metodos

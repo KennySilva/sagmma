@@ -214,6 +214,12 @@ class ApiUsersController extends Controller
         }
     }
 
+    public function deleteAll($ids)
+    {
+        User::destroy(explode(',', $ids));
+    }
+
+
     public function showThisUser($id)
     {
         return view('test');

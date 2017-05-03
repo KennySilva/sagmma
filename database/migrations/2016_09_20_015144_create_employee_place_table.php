@@ -18,8 +18,8 @@ class CreateEmployeePlaceTable extends Migration
             $table->timestamps();
 
             // Chaves estrangeiras;
-            $table->foreign('employee_id')->references('id')->on('employees');
-            $table->foreign('place_id')->references('id')->on('places');
+            $table->foreign('employee_id')->references('id')->on('employees')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('place_id')->references('id')->on('places')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

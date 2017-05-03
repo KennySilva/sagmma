@@ -68,4 +68,9 @@ class ApiPermissionsController extends Controller
     {
         return Permission::destroy($id);
     }
+
+    public function deleteAll($ids)
+    {
+        Permission::destroy(explode(',', $ids));
+    }
 }

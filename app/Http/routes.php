@@ -62,14 +62,17 @@ Route::group(['namespace' => 'ApiControllers'], function()
         // ###############################################################################################################
         Route::group(['middleware' => ['role:super-admin|admin|dpel', 'permission:manage-users']], function () {
             Route::resource('users', 'ApiUsersController');
+            Route::resource('deleteMultUsers', 'ApiUsersController@deleteAll');
             Route::get('allUsers/{row}', 'ApiUsersController@index');
             Route::get('roleuser', 'ApiUsersController@getRoleForUser');
             Route::post('estado_utilizador', 'ApiUsersController@estado_utilizador');
             // -------------------------------------------------------------------------
             Route::resource('roles', 'ApiRolesController');
+            Route::resource('deleteMultRoles', 'ApiRolesController@deleteAll');
             Route::get('allRoles/{row}', 'ApiRolesController@index');
             Route::get('permissionrole', 'ApiRolesController@getPermissionForRole');
             Route::resource('permissions', 'ApiPermissionsController');
+            Route::resource('deleteMultPermissions', 'ApiPermissionsController@deleteAll');
             Route::get('getAllpermissions/{row}', 'ApiPermissionsController@index');
         });
         // ##################################################################################################################

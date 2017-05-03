@@ -17,7 +17,6 @@
 					<option class="" value="200">200</option>
 				</select>
 			</div>
-			&nbsp;&nbsp;
 			<div class="input-group">
 				<select data-toggle="tooltip" title="Escolhe as colunas a serem filtrados" class="form-control" name="" v-model="columnsFiltered" multiple="multiple" v-el:rolecols>
 					<option class="" value="name">Nome</option>
@@ -25,7 +24,6 @@
 					<option class="" value="description">Descrição</option>
 				</select>
 			</div>
-			&nbsp;&nbsp;
 			<div v-if="columnsFiltered.length != 0" class="input-group">
 				<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
 				<input data-toggle="tooltip" title="Escreva o valor a ser procurado na Tabela"
@@ -51,8 +49,34 @@
 
 <hr>
 <div class="row">
-	<div class="col-md-12">
-		<button :disabled="!checkPermition()" class="btn btn-primary btn-flat btn-outline pull-left"  name="button" data-toggle="modal" data-target="#modal-create-role"><i class="fa fa-plus"></i> Novo</button>
+	<div class="col-md-8">
+		<div class="btn-group">
+			<button :disabled="!checkPermition()" class="btn btn-primary btn-flat btn-outline pull-left"  name="button" data-toggle="modal" data-target="#modal-create-role"><i class="fa fa-plus"></i> Novo</button>
+		</div>
+	</div>
+
+	<div class="col-md-4">
+		<div class="btn-group pull-right">
+			<button data-toggle="modal" data-target="#deleteAllRoles"  v-if="deleteMultIten.length > 0" class="btn btn-danger btn-flat btn-outline"  type="button" name="button"><i class="fa fa-trash-o"></i> Apagar Todos</button>
+		</div>
+	</div>
+
+	<div class="modal fade" id="deleteAllRoles" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+		<div class="modal-dialog modal-sm">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h5 class="modal-title" id=""><i class="text-danger fa fa-exclamation-triangle faa-flash animated faa-slow"></i></h5>
+				</div>
+				<div class="modal-body">
+					<h5 class="text-center">Eliminar {{deleteMultIten.length}} Registo(s)?</h5>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary btn-xs" data-dismiss="modal"><i class="fa fa-times"></i></button>
+					<button  @click = "deleteMultRoles" type="button" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></button>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 <br>
@@ -63,6 +87,10 @@
 			<table class='table table-hover'>
 				<thead class="active">
 					<tr>
+						<th>
+							<input type="checkbox" :disabled = "!checkPermition()" name="" value="" @click="selectAll" v-model="allSelected">
+						</th>
+
 						<th>
 							<i :class = "{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
 							<a href="#" @click = "doSort($event, 'name')">Nome do papel</a>
@@ -91,6 +119,8 @@
 				</thead>
 				<tbody  v-for="role in roles | orderBy sortColumn sortInverse">
 					<tr>
+						<td><input type="checkbox" :disabled = "!checkPermition()" name="" v-model="deleteMultIten" :value="role.id"></td>
+
 						<td>{{ role.name }}</td>
 						<td>{{ role.display_name }}</td>
 						<td>{{ role.description }}</td>
@@ -99,8 +129,9 @@
 						<td v-if="checkPermition()" align=right><a class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-delete-role" href="#"><i class="fa fa-trash text-danger" @click="getThisRole(role.id)"></i></a></td>
 
 						<td width=75 class="text-center">
-							<a class="btn btn-default btn-xs" @click = "doOpenDetails($event, role.id)" v-show="role.perms != ''" href="#"><i data-toggle="tooltip" data-placement="left" title="Ver Permissões" class="fa" :class="{'fa-plus-square': openDetails.indexOf(role.id) == -1, 'fa-minus-square': openDetails.indexOf(role.id) > -1}"></i></a>
-							<i class="fa fa-plus-square" v-show="role.perms == ''" style="opacity: 0.3"></i>
+							<a class="btn btn-default btn-xs" @click = "doOpenDetails($event, role.id)" v-show="role.perms != ''" href="#"><i data-toggle="tooltip" data-placement="left" title="Ver Permissões" class="fa text-primary" :class="{'fa-plus-square': openDetails.indexOf(role.id) == -1, 'fa-minus-square': openDetails.indexOf(role.id) > -1}"></i></a>
+
+							<button disabled v-show="role.perms == ''" type="button" class="btn btn-default btn-xs"><i class="fa fa-plus-square"  style="opacity: 0.3"></i></button>
 						</td>
 
 					</tr>
