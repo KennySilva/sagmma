@@ -73,6 +73,11 @@ class ApiControlsController extends Controller
         return Control::destroy($id);
     }
 
+    public function deleteAll($ids)
+    {
+        Control::destroy(explode(',', $ids));
+    }
+
 
     //Metodos de auxilio
     public function getEmployeeForControl()

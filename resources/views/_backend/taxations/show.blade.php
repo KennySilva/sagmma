@@ -8,7 +8,7 @@
 @endsection
 
 @section('contentheader_title')
-    
+
 @endsection
 
 @section('main-content')
@@ -59,8 +59,10 @@
                     <div class="panel-heading">
                         <ul class="nav nav-tabs">
                             <li class="active"><a href="#tabTax" data-toggle="tab">COBRANÇA</a></li>
+                            @permission(['manage-resources'])
                             <li><a href="#tabEmp" data-toggle="tab">FUNCIONÁRIOS</a></li>
                             <li><a href="#tabPla" data-toggle="tab">ESPAÇOS</a></li>
+                            @endpermission
                         </ul>
                     </div>
                     <div class="panel-body">
@@ -69,6 +71,7 @@
                             <div class="tab-pane fade in active" id="tabTax">
                                 <show-taxation></show-taxation>
                             </div>
+                            @permission(['manage-resources'])
 
                             <div class="tab-pane fade" id="tabEmp">
                                 <show-employee></show-employee>
@@ -77,6 +80,8 @@
                             <div class="tab-pane fade" id="tabPla">
                                 <show-place></show-place>
                             </div>
+                            @endpermission
+
                         </div>
                     </div>
                 </div>

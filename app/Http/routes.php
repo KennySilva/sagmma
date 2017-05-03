@@ -111,6 +111,7 @@ Route::group(['namespace' => 'ApiControllers'], function()
             });
             // ------------------------------------Api-Control (employee_material)--------------------
             Route::resource('controls', 'ApiControlsController');
+            Route::resource('deleteMultControls', 'ApiControlsController@deleteAll');
             Route::get('allControls/{row}', 'ApiControlsController@index');
             Route::get('controlEmployee', 'ApiControlsController@getEmployeeForControl');
             Route::get('controlMaterial', 'ApiControlsController@getMaterialForControl');
@@ -123,6 +124,7 @@ Route::group(['namespace' => 'ApiControllers'], function()
             Route::get('placeType', 'ApiPlacesController@getTypeForPlace');
             Route::get('placeStatus', 'ApiPlacesController@placeStatusChange');
             Route::resource('taxations', 'ApiTaxationsController');
+            Route::resource('deleteMultTaxations', 'ApiTaxationsController@deleteAll');
             Route::get('allTaxations/{row}/{type}', 'ApiTaxationsController@index');
             Route::get('sendTaxation/{id}/{sendTaxation}', 'ApiTaxationsController@sendTaxation');
             // -----------------------------------------------------------------------------------
@@ -134,6 +136,7 @@ Route::group(['namespace' => 'ApiControllers'], function()
             // ------------------------------------Api-Contract (place_trader)--------------------Atores Dpel e Admins
             Route::group(['middleware' => ['permission:manage-contracts']], function () {
                 Route::resource('contracts', 'ApiContractsController');
+                Route::resource('deleteMultContracts', 'ApiContractsController@deleteAll');
                 Route::get('allContracts/{row}', 'ApiContractsController@index');
                 // -----------------------------------------------------------------------------------------
                 Route::get('contractTrader', 'ApiContractsController@getTraderForContract');

@@ -59,7 +59,7 @@
 
 <div class="row">
 	<!-- <div v-if="(placesInt.length > 0 | placesInt.length > 0) && employees.length > 0" class="col-md-12"> -->
-	<div class="col-md-12">
+	<div class="col-md-8">
 		<div class="btn-group">
 			<button @click="clearField" class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-taxation"><i class="fa fa-plus"></i> Novo</button>
 		</div>
@@ -79,6 +79,32 @@
 			</ul>
 		</div>
 	</div>
+
+	<div class="col-md-4">
+		<div class="btn-group pull-right">
+			<button data-toggle="modal" data-target="#deleteAllTaxations"  v-if="deleteMultIten.length > 0" class="btn btn-danger btn-flat btn-outline"  type="button" name="button"><i class="fa fa-trash-o"></i> Apagar Todos</button>
+		</div>
+	</div>
+
+	<div class="modal fade" id="deleteAllTaxations" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+		<div class="modal-dialog modal-sm">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h5 class="modal-title" id=""><i class="text-danger fa fa-exclamation-triangle faa-flash animated faa-slow"></i></h5>
+				</div>
+				<div class="modal-body">
+					<h5 class="text-center">Eliminar {{deleteMultIten.length}} Mercado(s)?</h5>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary btn-xs" data-dismiss="modal"><i class="fa fa-times"></i></button>
+					<button  @click = "deleteMultTaxations" type="button" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
 
 	<div class="modal fade" id="modal-report-date" role="dialog" aria-labelledby="" aria-hidden="true">
 		<div class="modal-dialog modal-sm">
@@ -204,6 +230,8 @@
 			<table class='table table-striped table-hover'>
 				<thead>
 					<tr>
+						<th><input :disabled="!checkPermition()" type="checkbox" name="" value="" @click="selectAll" v-model="allSelected"></th>
+
 						<th>
 							<i :class = "{'fa-sort-amount-asc': sortColumn == 'place_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'place_id' && sortInverse == -1}" class="fa fa-sort" aria-hidden="true"></i>
 							<a href="#" @click = "doSort($event, 'place_id')">Espaços</a>
@@ -219,6 +247,7 @@
 				</thead>
 				<tbody>
 					<tr v-for="taxation in taxations | orderBy sortColumn sortInverse">
+						<td><input :disabled = "!checkPermition()" type="checkbox" name="" v-model="deleteMultIten" :value="taxation.id"></td>
 
 						<td v-for="place in taxation.places">
 							<span v-if="place.traders.length > 0">
@@ -226,9 +255,9 @@
 							</span>
 							<span class="label label-default" v-else>{{ place.name }}</span>
 						</td>
-						<td>{{ taxation.income }}</td>
+						<td>{{ taxation.income  | currency 'ECV  ' 2 }}</td>
 
-						<td align=center><a class="btn btn-default btn-xs" @click="getThisTaxation(taxation.id)" href="" data-toggle="modal" data-target="#view-taxation"><i class="fa fa-search-plus text-success"></i></a></td>
+						<td align=center><a class="btn btn-default btn-xs" @click="getThisTaxation(taxation.id)" href="" data-toggle="modal" data-target="#view-taxation"><i class="fa fa-eye text-success"></i></a></td>
 
 						<td v-if="checkPermition()" align=center>  <a class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-edit-taxation" href="#"><i class="fa fa-edit text-primary" @click="getThisTaxation(taxation.id)"></i></a></td>
 
@@ -450,15 +479,21 @@
 						</form>
 					</div>
 					<div v-if="newTaxation.type == 1" class="modal-footer">
+						<div class="col-md-12">
+
 						<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
 
 						<button :disabled = "newTaxation.place_id == ''" @click="createTaxation" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
 					</div>
+					</div>
 
 					<div v-else class="modal-footer">
+						<div class="col-md-12">
+
 						<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
 
 						<button :disabled = "newTaxation.income == '' || newTaxation.employee_id == ''" @click="createTaxation" class="btn btn-primary pull-right" type="submit"><i class="fa fa-save"></i>&nbsp; &nbsp;&nbsp;Guardar</button>
+					</div>
 					</div>
 				</div>
 			</div>
@@ -547,15 +582,21 @@
 						</form>
 					</div>
 					<div v-if="newTaxation.type == 1" class="modal-footer">
+						<div class="col-md-12">
+
 						<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
 
 						<button :disabled = "newTaxation.place_id == ''" @click="saveEditedTaxation(newTaxation.id)" class="btn btn-primary pull-right" type="submit"><i class="fa fa-refresh fa-spin"></i>&nbsp; &nbsp;&nbsp;Actualizar</button>
 					</div>
+					</div>
 
 					<div v-else class="modal-footer">
+						<div class="col-md-12">
+
 						<button @click="clearField" type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; &nbsp;&nbsp; Cancelar</button>
 
 						<button :disabled = "newTaxation.income == '' || newTaxation.employee_id == ''" @click="saveEditedTaxation(newTaxation.id)" class="btn btn-primary pull-right" type="submit"><i class="fa fa-refresh fa-spin"></i>&nbsp; &nbsp;&nbsp;Actualizar</button>
+					</div>
 					</div>
 				</div>
 			</div>

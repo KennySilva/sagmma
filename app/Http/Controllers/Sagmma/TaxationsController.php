@@ -25,7 +25,7 @@ class TaxationsController extends Controller
         ->aggregateColumn('income', 'sum')
         ->groupByMonth('2017', true)
         ->elementLabel("Total de Cobrança por dia")
-        ->title('Cobranças Internos');
+        ->title('Cobrança Interno');
 
         $chart1 = Charts::database(Taxation::all()->where('type', '2'), 'line', 'highcharts')
         ->dateColumn('created_at')
@@ -33,7 +33,7 @@ class TaxationsController extends Controller
         ->aggregateColumn('income', 'sum')
         ->lastByDay(7, true)
         ->elementLabel("Total de Cobrança por dia")
-        ->title('Cobranças Externos');
+        ->title('Cobrança Externo');
 
         return view('_backend.taxations.show', ['chart' => $chart, 'chart1' => $chart1]);
     }

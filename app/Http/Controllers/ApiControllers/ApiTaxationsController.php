@@ -105,6 +105,11 @@ class ApiTaxationsController extends Controller
         return Taxation::destroy($id);
     }
 
+    public function deleteAll($ids)
+    {
+        Taxation::destroy(explode(',', $ids));
+    }
+
     //Metodos de auxilio
     public function getEmployeeForTaxation()
     {

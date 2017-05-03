@@ -21,6 +21,7 @@ class ApiContractsController extends Controller
 {
     public function index($row)
     {
+        $this->contractStatusChange();
         $contract = Contract::paginate($row);
         $contract->each(function($contract){
             $contract->places;
@@ -80,6 +81,12 @@ class ApiContractsController extends Controller
         return Contract::destroy($id);
     }
 
+    public function deleteAll($ids)
+    {
+        Contract::destroy(explode(',', $ids));
+    }
+
+
     //Metodos de auxilio
     public function getPlaceForContract()
     {
@@ -99,17 +106,16 @@ class ApiContractsController extends Controller
         return $trader;
     }
 
-    public function statusContractsChange()
+
+
+    public function contractStatusChange()
     {
-        $now = Carbon::now();
         $contracts = Contract::all();
         foreach ($contracts as $contract) {
-            if ($contract->ending_date <= $now ) {
+            if ($contract->ending_date < Carbon::today()->toDateTimeString()) {
                 $contract->status = 0;
-            }else {
-                $contract->status = 1;
+                $contract->save();
             }
-            $contract->save();
         }
     }
 }

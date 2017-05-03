@@ -40,6 +40,11 @@ export default{
             },
             errors: [],
 
+            deleteMultIten: [],
+            allSelected: false,
+            selected: [],
+            sendEmployee: '',
+
         }
     },
 
@@ -104,6 +109,16 @@ export default{
     // ---------------------------------------------------------------------------------
 
     methods: {
+
+        selectAll: function() {
+                    this.deleteMultIten = [];
+                    if (!this.allSelected) {
+                        for (type in this.controls) {
+                            this.deleteMultIten.push(this.controls[type].id);
+                        }
+                    }
+                },
+
         alert: function(msg, typeAlert) {
             var self = this;
             this.success = true;
@@ -154,6 +169,15 @@ export default{
             }, (response) => {
                 console.log("Ocorreu um erro na operação")
             });
+        },
+
+        canDeleteAll: function() {
+            var contrs = this.controls;
+            for (var cl in contrs) {
+                if (contrs[cl].status == false) {
+                    return true;
+                }
+            }
         },
 
         // --------------------------------------------------------------------------------------------
@@ -214,6 +238,20 @@ export default{
                 console.log("Ocorreu um erro na operação");
             });
         },
+
+        deleteMultControls: function() {
+            this.$http.delete('http://localhost:8000/api/v1/deleteMultControls/'+ this.deleteMultIten).then((response) => {
+                if (response.status == 200) {
+                    $('#deleteAllControls').modal('hide');
+                    this.deleteMultIten  = [];
+                    this.fetchControl(this.pagination.current_page, this.showRow);
+                    this.alert('Mercado(s) eliminado(s) com sucesso', 'warning');
+                }
+            }, (response) => {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
 
         // -------------------------Metodo de suporte---------------------------------------------------
         controlEmployee: function() {

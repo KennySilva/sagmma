@@ -23,7 +23,6 @@
 					<option class="" value="200">200</option>
 				</select>
 			</div>
-			&nbsp;&nbsp;
 			<div class="input-group">
 				<select data-toggle="tooltip" title="Escolhe as colunas a serem filtrados" class="form-control" name="" v-model="columnsFiltered" multiple="multiple" v-el:controlcols>
 					<option class="" value="employee_id"="">Funcionário</option>
@@ -31,7 +30,6 @@
 					<option class="" value="create_at">Data</option>
 				</select>
 			</div>
-			&nbsp;&nbsp;
 			<div v-if="columnsFiltered.length != 0" class="input-group">
 				<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
 				<input data-toggle="tooltip" title="Escreva o valor a ser procurado na Tabela"
@@ -58,14 +56,41 @@
 <hr>
 
 <div class="row">
-	<div v-if = "employees.length > 0 && materials.length > 0" class="col-md-12">
-		<button @click="clearField" class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-control"><i class="fa fa-plus"></i> Novo</button>&nbsp;&nbsp;
+	<div class="col-md-8">
+		<div class="btn-group">
+			<button v-if = "employees.length > 0 && materials.length > 0" @click="clearField" class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-control"><i class="fa fa-plus"></i> Novo</button>
+
+			<button v-else data-toggle="tooltip" title="Tens de criar os funcionários e os material para poder criar este registo" type="button" class="btn btn-danger btn-flat"><i class="fa fa-minus"></i> Novo</button>
+		</div>
+
+		<div class="btn-group">
+			<button class="btn btn-primary btn-flat btn-outline pull-left" name="button"><i class="fa fa-plus"></i> Enviar</button>
+		</div>
 	</div>
 
-	<div v-else class="col-md-12">
-		<button data-toggle="tooltip" title="Tens de criar os funcionários e os material para poder criar este registo" type="button" class="btn btn-danger btn-flat"><i class="fa fa-minus"></i> Novo</button>&nbsp;&nbsp;
+	<div class="col-md-4">
+		<div class="btn-group pull-right">
+			<button data-toggle="modal" data-target="#deleteAllControls"  v-if="deleteMultIten.length > 0" class="btn btn-danger btn-flat btn-outline"  type="button" name="button"><i class="fa fa-trash-o"></i> Apagar Todos</button>
+		</div>
 	</div>
 
+	<div class="modal fade" id="deleteAllControls" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+		<div class="modal-dialog modal-sm">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h5 class="modal-title" id=""><i class="text-danger fa fa-exclamation-triangle faa-flash animated faa-slow"></i></h5>
+				</div>
+				<div class="modal-body">
+					<h5 class="text-center">Eliminar {{deleteMultIten.length}} Registo(s)?</h5>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary btn-xs" data-dismiss="modal"><i class="fa fa-times"></i></button>
+					<button  @click = "deleteMultControls" type="button" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></button>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
 <br>
@@ -76,6 +101,10 @@
 			<table class='table table-striped table-hover'>
 				<thead>
 					<tr>
+						<th>
+							<input :disabled="canDeleteAll()" type="checkbox" name="" value="" @click="selectAll" v-model="allSelected">
+						</th>
+
 						<th>
 							<i :class = "{'fa-sort-amount-asc': sortColumn == 'employee_id' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'employee_id' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
 							<a href="#" @click = "doSort($event, 'employee_id')">Funcionário(a)</a>
@@ -94,6 +123,7 @@
 				</thead>
 				<tbody>
 					<tr v-for="control in controls | orderBy sortColumn sortInverse">
+						<td><input :disabled="!control.status" type="checkbox" name="" v-model="deleteMultIten" :value="control.id"></td>
 						<td v-for="emp in control.employees">{{ emp.name }}</td>
 						<td v-if="moreColumn.author" class="info">{{ control.author }}</td>
 						<!------------------------------------------------------------------------------------------>
@@ -109,7 +139,7 @@
 
 						<td align=center>  <a class="btn btn-default btn-xs" v-if="checkPermition()" data-toggle="modal" data-target="#modal-edit-control" href="#"> <i class="fa fa-edit text-primary" @click="getThisControl(control.id)" > </i></a></td>
 
-						<td align=center><a class="btn btn-default btn-xs" v-if="checkPermition()" data-toggle="modal" data-target="#modal-delete-control" href="#"><i class="fa fa-trash text-danger" @click="getThisControl(control.id)"></i></a></td>
+						<td align=center><a :disabled = "!control.status" class="btn btn-default btn-xs" v-if="checkPermition()" data-toggle="modal" data-target="#modal-delete-control" href="#"><i class="fa fa-trash text-danger" @click="getThisControl(control.id)"></i></a></td>
 					</tr>
 				</tbody>
 			</table>
@@ -279,7 +309,7 @@
 								<div class="col-md-12">
 									<div class="col-md-12">
 										<div class="form-group {{ errors.employee_id ? ' has-error' : '' }} has-feedback">
-											<select class="form-control" v-model="newControl.employee_id" v-el:employeecreate>
+											<select class="form-control" v-model="newControl.employee_id" v-el:employeeedit>
 												<option v-for="employee in employees" value="{{employee.id}}">
 													{{employee.name}}
 												</option>
@@ -296,7 +326,7 @@
 								<div class="col-md-12">
 									<div class="col-md-12">
 										<div class="form-group {{ errors.material_id ? ' has-error' : '' }} has-feedback">
-											<select class="form-control" v-model="newControl.material_id" v-el:materialcreate>
+											<select class="form-control" v-model="newControl.material_id" v-el:materialedit>
 												<option v-for="material in materials" value="{{material.id}}">
 													{{material.name}}
 												</option>

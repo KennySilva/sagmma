@@ -53,6 +53,11 @@ export default{
             errors: [],
             verifyEmployee: false,
 
+            deleteMultIten: [],
+            allSelected: false,
+            selected: [],
+            sendEmployee: '',
+
             myDate: new Date(),
 
             // Vue-Datepicker
@@ -184,6 +189,16 @@ export default{
     // -----------------------------------------------------------------------------------------------
 
     methods: {
+
+        selectAll: function() {
+            this.deleteMultIten = [];
+            if (!this.allSelected) {
+                for (type in this.taxations) {
+                    this.deleteMultIten.push(this.taxations[type].id);
+                }
+            }
+        },
+
         alert: function(msg, typeAlert) {
             var self = this;
             this.success = true;
@@ -239,6 +254,16 @@ export default{
                 console.log("Ocorreu um erro na operação")
             });
         },
+
+
+        // canDeleteAll: function() {
+        //     var taxs = this.taxations;
+        //     for (var tx in taxs) {
+        //         if (taxs[tx].status == true) {
+        //             return true;
+        //         }
+        //     }
+        // },
 
         // --------------------------------------------------------------------------------------------
 
@@ -302,6 +327,20 @@ export default{
                 console.log("Ocorreu um erro na operação");
             });
         },
+
+        deleteMultTaxations: function() {
+            this.$http.delete('http://localhost:8000/api/v1/deleteMultTaxations/'+ this.deleteMultIten).then((response) => {
+                if (response.status == 200) {
+                    $('#deleteAllTaxations').modal('hide');
+                    this.deleteMultIten  = [];
+                    this.fetchTaxation(this.pagination.current_page, this.showRow);
+                    this.alert('Mercado(s) eliminado(s) com sucesso', 'warning');
+                }
+            }, (response) => {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
 
         sendEmailTaxation: function(id) {
             var sendTaxation = this.sendTaxation;

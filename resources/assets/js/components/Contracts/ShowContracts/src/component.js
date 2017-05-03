@@ -40,6 +40,11 @@ export default{
             all: {},
             auth: [],
             errors: [],
+
+            deleteMultIten: [],
+            allSelected: false,
+            selected: [],
+            sendEmployee: '',
             // Vue-Datepicker
             option: {
                 type: 'day',
@@ -145,11 +150,14 @@ export default{
     // ---------------------------------------------------------------------------------
 
     methods: {
-        // getTraders: function() {
-        //     var self = this;
-        //     // this.options = this.traders.name;
-        //     this.options.push(this.traders.name);
-        // },
+        selectAll: function() {
+            this.deleteMultIten = [];
+            if (!this.allSelected) {
+                for (type in this.contracts) {
+                    this.deleteMultIten.push(this.contracts[type].id);
+                }
+            }
+        },
 
         alert: function(msg, typeAlert) {
             var self = this;
@@ -252,6 +260,19 @@ export default{
                     this.fetchContract(this.pagination.current_Page, this.showRow);
                     this.alert('Estaço eliminado com sucesso', 'warning');
 
+                }
+            }, (response) => {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+        deleteMultContracts: function() {
+            this.$http.delete('http://localhost:8000/api/v1/deleteMultContracts/'+ this.deleteMultIten).then((response) => {
+                if (response.status == 200) {
+                    $('#deleteAllContracts').modal('hide');
+                    this.deleteMultIten  = [];
+                    this.fetchContract(this.pagination.current_page, this.showRow);
+                    this.alert('Materiais eliminados com sucesso', 'warning');
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
