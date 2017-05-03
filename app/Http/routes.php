@@ -124,6 +124,11 @@ Route::group(['namespace' => 'ApiControllers'], function()
             Route::get('placeType', 'ApiPlacesController@getTypeForPlace');
             Route::get('placeStatus', 'ApiPlacesController@placeStatusChange');
             Route::resource('taxations', 'ApiTaxationsController');
+            Route::resource('trashedTaxation', 'ApiTaxationsController@allTrashedTaxation');
+            Route::resource('restoreTrashedTaxation', 'ApiTaxationsController@restoreTrashed');
+            Route::resource('deleteTrashedTaxation', 'ApiTaxationsController@deleteTrashed');
+            Route::resource('restoreAllTrashedTaxation', 'ApiTaxationsController@restoreAllTrashed');
+            Route::resource('deleteAllTrashedTaxation', 'ApiTaxationsController@deleteAllTrashed');
             Route::resource('deleteMultTaxations', 'ApiTaxationsController@deleteAll');
             Route::get('allTaxations/{row}/{type}', 'ApiTaxationsController@index');
             Route::get('sendTaxation/{id}/{sendTaxation}', 'ApiTaxationsController@sendTaxation');

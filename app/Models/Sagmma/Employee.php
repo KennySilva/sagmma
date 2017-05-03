@@ -3,12 +3,18 @@
 namespace Sagmma\Models\Sagmma;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Employee extends Model
 {
+    use SoftDeletes;
+    
     protected $table = 'employees';
 
     protected $guarded = ['id'];
+
+    protected $dates = ['deleted_at'];
+
 
     public function getDates()
     {

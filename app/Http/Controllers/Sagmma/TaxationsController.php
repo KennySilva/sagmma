@@ -8,10 +8,10 @@ use Sagmma\Http\Requests;
 use Sagmma\Http\Controllers\Controller;
 use Taxation;
 use Charts;
-use Employee;
-use Typeofplace;
 use DB;
 use User;
+use Caffeinated\Flash\Facades\Flash;
+
 
 
 

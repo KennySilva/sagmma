@@ -3,20 +3,14 @@
 namespace Sagmma\Models\Sagmma;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Taxation extends Model
 {
+    use SoftDeletes;
+    protected $dates = ['deleted_at'];
     protected $table = 'employee_place';
     protected $guarded = ['id'];
-
-    // public function getIncomeAttribute($value)
-    // {
-    //     if ($value) {
-    //         // return number_format($value, 2);
-    //         return sprintf('%s $00', number_format($value,2,",","."));
-    //     }
-    // }
-
 
     //------------------------------------------------------------------------------
     public function employees()

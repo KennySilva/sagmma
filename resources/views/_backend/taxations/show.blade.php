@@ -1,6 +1,8 @@
 @extends('_backend.master.app')
 @section('sagmma-style')
     {!! Charts::assets() !!}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.2.0/jquery-confirm.min.css">
+
 @endsection
 
 @section('htmlheader_title')
@@ -81,7 +83,6 @@
                                 <show-place></show-place>
                             </div>
                             @endpermission
-
                         </div>
                     </div>
                 </div>
@@ -90,7 +91,9 @@
     </div>
 @endsection
 @push('scripts')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.2.0/jquery-confirm.min.js"></script>
     <script>
+
     $(document).ready(function(){
         $('[data-toggle="popover"]').popover();
     });

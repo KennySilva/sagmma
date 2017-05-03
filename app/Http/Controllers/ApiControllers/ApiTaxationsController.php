@@ -102,12 +102,18 @@ class ApiTaxationsController extends Controller
 
     public function destroy($id)
     {
-        return Taxation::destroy($id);
+        $tax = Taxation::find($id);
+        $tax->delete();
+        // return Taxation::delete($id);
     }
 
     public function deleteAll($ids)
     {
+    //     $id = explode(",", $ids);
+        // Taxation::find($id)->each(function($product){ $product->delete(); });
+    // $tax = Taxation::whereIn('id', $ids)->get();
         Taxation::destroy(explode(',', $ids));
+        // $tax->delete();
     }
 
     //Metodos de auxilio
@@ -151,6 +157,33 @@ class ApiTaxationsController extends Controller
             $ms->to($email);
             $ms->from($owner, 'Your Application');
         });
+    }
+
+    public function allTrashedTaxation()
+    {
+        $trashedTaxation = Taxation::onlyTrashed()->get();
+        $trashedTaxation->each(function($trashedTaxation){
+            $trashedTaxation->employees;
+        });
+        return $trashedTaxation;
+        # code...
+    }
+    // -----------------------------------------------------------
+    public function restoreTrashed($id)
+    {
+        $tax = Taxation::withTrashed()->where('id', $id)->restore();
+    }
+    public function deleteTrashed($id)
+    {
+        $tax = Taxation::withTrashed()->where('id', $id)->forceDelete();
+    }
+    public function restoreAllTrashed()
+    {
+        $tax = Taxation::withTrashed()->restore();
+    }
+    public function deleteAllTrashed()
+    {
+        $tax = Taxation::onlyTrashed()->forceDelete();
     }
 
 }

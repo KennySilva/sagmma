@@ -4,9 +4,14 @@ namespace Sagmma\Models\Sagmma;
 use User;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Control extends Model
 {
+    use SoftDeletes;
+
+    protected $dates = ['deleted_at'];
+
     protected $table = 'employee_material';
     protected $guarded = ['id'];
 

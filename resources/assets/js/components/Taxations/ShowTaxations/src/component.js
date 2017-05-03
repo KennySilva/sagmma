@@ -25,13 +25,15 @@ export default{
 
             taxations : {},
             employees : {},
+            trashedTaxations : {},
             placesInt    : [],
             placesExt    : [],
 
             sortColumn : 'employee_id',
             sortInverse: 1,
             filter: {
-                term: ''
+                term: '',
+                trash: '',
             },
             columnsFiltered: [],
             pagination: {},
@@ -184,6 +186,9 @@ export default{
             self.$set('newTaxation.employee_id', jQuery(this).val());
         });
 
+
+
+
     },
 
     // -----------------------------------------------------------------------------------------------
@@ -246,6 +251,7 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         fetchTaxation: function(page, row, type) {
+            this.trashedTaxation()
             this.$http.get('http://localhost:8000/api/v1/allTaxations/'+row+'/'+type+'?page='+page).then((response) => {
                 this.$set('taxations', response.data.data)
                 this.$set('all', response.data.data)
@@ -404,6 +410,69 @@ export default{
                 this.$set('employees', response.data);
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
+            });
+        },
+
+
+        trashedTaxation: function() {
+            this.$http.get('/api/v1/trashedTaxation').then((response) => {
+                this.$set('trashedTaxations', response.data);
+            }, (response) => {
+            });
+        },
+
+        deleteTrashedTaxation: function(id) {
+            var con = confirm("Certeza que queres apagar esta informação?");
+            if (con) {
+                this.$http.delete('/api/v1/deleteTrashedTaxation/'+ id).then((response) => {
+                    // $('#trashedTaxation').modal('hide');
+                    if (response.status == 200) {
+                        this.fetchTaxation(this.pagination.current_Page, this.showRow, this.typeData);
+                        this.alert('Registo Apagado Permanentemente', 'info');
+                    }
+                }, (response) => {
+                });
+            }
+        },
+
+        deleteAllTrashedTaxation: function() {
+            var con = confirm("Operação sem retorno, continuar?");
+            if (con) {
+                this.$http.get('/api/v1/deleteAllTrashedTaxation').then((response) => {
+                    $('#trashedTaxation').modal('hide');
+                    if (response.status == 200) {
+                        this.fetchTaxation(this.pagination.current_Page, this.showRow, this.typeData);
+                        this.alert('Todos os Registos Apagado Permanentemente', 'info');
+                    }
+                }, (response) => {
+                });
+            }
+
+        },
+
+
+        restoreTrashedTaxation: function(id) {
+
+
+            this.$http.get('/api/v1/restoreTrashedTaxation/'+ id).then((response) => {
+                // $('#trashedTaxation').modal('hide');
+                if (response.status == 200) {
+                    this.fetchTaxation(this.pagination.current_Page, this.showRow, this.typeData);
+                    this.alert('Registo Restaurado com sucesso', 'success');
+                }
+            }, (response) => {
+            });
+        },
+
+        restoreAllTrashedTaxation: function() {
+            this.$http.get('/api/v1/restoreAllTrashedTaxation').then((response) => {
+                $('#trashedTaxation').modal('hide');
+
+                if (response.status == 200) {
+                    this.fetchTaxation(this.pagination.current_Page, this.showRow, this.typeData);
+                    this.alert('Registos Restaurado com sucesso', 'success');
+                }
+            }, (response) => {
             });
         },
 
