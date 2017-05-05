@@ -6,14 +6,25 @@ use Illuminate\Http\Request;
 
 use Sagmma\Http\Requests;
 use Sagmma\Http\Controllers\Controller;
-use Article;
+use Promotion;
 
 
 class ShowPromotionsController extends Controller
 {
     public function index()
     {
-        return view('_frontend.web.showPromotions.promotions');
+        $slidePromotions = Promotion::orderBy('name', 'desc')->take(4)->get();
+        $slidePromotions->each(function($slidePromotions){
+            $slidePromotions->product;
+            $slidePromotions->trader;
+        });
+        $allPromotions = Promotion::where('status', true)->get();
+        $allPromotions->each(function($allPromotions){
+            $allPromotions->product;
+            $allPromotions->trader->load('places');
+        });
+        // dd($allPromotions);
+        return view('_frontend.web.showPromotions.promotions', ['slidePromotions' => $slidePromotions, 'allPromotions' => $allPromotions]);
     }
 
     public function create()

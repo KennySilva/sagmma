@@ -1,5 +1,5 @@
 <div id="market_team" class="container-fluid bg-grey text-center">
-    
+
     <h2>EQUIPA</h2>
     <hr>
     <h4>Juntos podemos podemos andar rumo ao sucesso</h4>
@@ -8,38 +8,45 @@
         <div class="col-md-12 col-md-push-1">
             {{-----------------------------------------------------------}}
             <div class="col-md-3">
-                <div class="thumbnail">
-                    <div class="caption">
+                <div class="thumbnail teamThumb thumbTeam">
+                    <img src="img/frontend_img/team/diretor_test.png" alt="...">
+
+                    <div class="teamCaption">
                         <h4>Diretor(a)</h4>
                         <p>Dr. Nelson Marcarenha</p>
-                        <p><a href="img/frontend_img/team/diretor_test.png" data-lightbox="photo1" data-title="Diretor Dapromoção da Economia Local" class="label label-danger" rel="tooltip" title="Ver"><i class="fa fa-eye"></i></a>
-                            <a href="" class="label label-primary" rel="tooltip" title="Enviar email para o Diretor" data-toggle="modal" data-target="#modal-director"><i class="fa fa-envelope"></i></a></p>
+                        <hr>
+
+                        <p><a href="img/frontend_img/team/diretor_test.png" data-lightbox="photo1" data-title="Diretor Dapromoção da Economia Local" class="btn btn-default pull-left" rel="tooltip" title="Ver"><i class="fa fa-search-plus"></i></a>
+                            <a href="" class="btn btn-primary pull-right" rel="tooltip" title="Enviar email para o Diretor" data-toggle="modal" data-target="#modal-director"><i class="fa fa-envelope"></i></a></p>
                         </div>
-                        <img src="img/frontend_img/team/diretor_test.png" alt="...">
                     </div>
                 </div>
                 {{-----------------------------------------------------------}}
                 <div class="col-md-3">
-                    <div class="thumbnail">
-                        <div class="caption">
+                    <div class="thumbnail teamThumb">
+                        <img src="img/frontend_img/team/gestor_test.png" alt="...">
+                        <div class="teamCaption">
                             <h4>Gestor(a)</h4>
                             <p>Maria Semedo</p>
-                            <p><a href="img/frontend_img/team/gestor_test.png" data-lightbox="photo1" data-title="Gestor do Mercado Novo" class="label label-danger" rel="tooltip" title="Ver"><i class="fa fa-eye"></i></a>
-                                <a href="" class="label label-primary" rel="tooltip" title="Enviar email para o Gestor" data-toggle="modal" data-target="#modal-manager"><i class="fa fa-envelope"></i></a></p>
+                            <hr>
+
+                            <p><a href="img/frontend_img/team/gestor_test.png" data-lightbox="photo1" data-title="Gestor do Mercado Novo" class="btn btn-default pull-left" rel="tooltip" title="Ver"><i class="fa fa-search-plus"></i></a>
+                                <a href="" class="btn btn-primary pull-right" rel="tooltip" title="Enviar email para o Gestor" data-toggle="modal" data-target="#modal-manager"><i class="fa fa-envelope"></i></a></p>
                             </div>
-                            <img src="img/frontend_img/team/gestor_test.png" alt="...">
                         </div>
                     </div>
                     {{-----------------------------------------------------------}}
                     <div class="col-md-3">
-                        <div class="thumbnail">
-                            <div class="caption">
+                        <div class="thumbnail teamThumb">
+                            <img src="img/frontend_img/team/auxiliar_test.png" alt="...">
+                            <div class="teamCaption">
+
                                 <h4>Auxiliar Administrativo</h4>
                                 <p>Jacinto Gomes</p>
-                                <p><a href="img/frontend_img/team/auxiliar_test.png" data-lightbox="photo1" data-title="Auxiliar Administrativo" class="label label-danger" rel="tooltip" title="Ver"><i class="fa fa-eye"></i></a>
-                                    <a href="" class="label label-primary" rel="tooltip" title="Enviar email para o Auxiliar Administrativo" data-toggle="modal" data-target="#modal-auxiliar"><i class="fa fa-envelope"></i></a></p>
+                                <hr>
+                                <p><a href="img/frontend_img/team/auxiliar_test.png" data-lightbox="photo1" data-title="Auxiliar Administrativo" class="btn btn-default pull-left" rel="tooltip" title="Ver"><i class="fa fa-search-plus"></i></a>
+                                    <a href="" class="btn btn-primary pull-right" rel="tooltip" title="Enviar email para o Auxiliar Administrativo" data-toggle="modal" data-target="#modal-auxiliar"><i class="fa fa-envelope"></i></a></p>
                                 </div>
-                                <img src="img/frontend_img/team/auxiliar_test.png" alt="...">
                             </div>
                         </div>
 

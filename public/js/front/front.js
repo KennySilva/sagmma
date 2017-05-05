@@ -23,12 +23,12 @@ $(document).ready(function(){
 
     $("[rel='tooltip']").tooltip();
 
-    $('.thumbnail').hover(
+    $('.teamThumb').hover(
         function(){
-            $(this).find('.caption').slideDown(250); //.fadeIn(250)
+            $(this).find('.teamCaption').slideDown(250); //.fadeIn(250)
         },
         function(){
-            $(this).find('.caption').slideUp(250); //.fadeOut(205)
+            $(this).find('.teamCaption').slideUp(250); //.fadeOut(205)
         }
     );
 

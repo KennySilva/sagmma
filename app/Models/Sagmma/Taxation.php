@@ -4,6 +4,7 @@ namespace Sagmma\Models\Sagmma;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use User;
 
 class Taxation extends Model
 {
@@ -11,6 +12,14 @@ class Taxation extends Model
     protected $dates = ['deleted_at'];
     protected $table = 'employee_place';
     protected $guarded = ['id'];
+
+    public function getAuthorAttribute($value)
+    {
+        if ($value) {
+            $author = User::find($value);
+        }
+        return $author->name;
+    }
 
     //------------------------------------------------------------------------------
     public function employees()

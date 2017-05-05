@@ -205,17 +205,12 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         createPromotion: function() {
-            //Promotion input
             var promotion = this.newPromotion;
-
-            //Clear form input
-            this.$http.post('http://localhost:8000/api/v1/promotions/', promotion).then((response) => {
+            this.$http.post('/api/v1/promotions/', promotion).then((response) => {
                 if (response.status == 200) {
                     console.log('chegando aqui');
                     $('#modal-create-promotion').modal('hide');
                     this.clearField();
-
-                    console.log(response.data);
                     this.fetchPromotion(this.pagination.current_Page, this.showRow);
                     alert('Promoção Criado com sucesso', 'success');
                     this.$set('errors', '')
@@ -232,7 +227,7 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         fetchPromotion: function(page, row) {
-            this.$http.get('http://localhost:8000/api/v1/allPromotions/'+row+'?page='+page).then((response) => {
+            this.$http.get('/api/v1/allPromotions/'+row+'?page='+page).then((response) => {
                 this.$set('promotions', response.data.data);
                 this.$set('all', response.data.data)
                 this.$set('pagination', response.data);
@@ -255,7 +250,7 @@ export default{
         getThisPromotion: function(id){
             this.clearField();
 
-            this.$http.get('http://localhost:8000/api/v1/promotions/' + id).then((response) => {
+            this.$http.get('/api/v1/promotions/' + id).then((response) => {
                 this.newPromotion.id            = response.data.id;
                 this.newPromotion.name          = response.data.name;
                 this.newPromotion.begnning_date = response.data.begnning_date;
@@ -279,7 +274,7 @@ export default{
 
         saveEditedPromotion: function(id) {
             var promotion = this.newPromotion;
-            this.$http.patch('http://localhost:8000/api/v1/promotions/'+ id, promotion).then((response) => {
+            this.$http.patch('/api/v1/promotions/'+ id, promotion).then((response) => {
                 if (response.status == 200) {
                     $('#modal-edit-promotion').modal('hide');
                     this.clearField();
@@ -298,7 +293,7 @@ export default{
 
 
         deletePromotion: function(id) {
-            this.$http.delete('http://localhost:8000/api/v1/promotions/'+ id).then((response) => {
+            this.$http.delete('/api/v1/promotions/'+ id).then((response) => {
                 $('#modal-delete-promotion').modal('hide');
                 if (response.status == 200) {
                     // console.log(response.data);
@@ -312,7 +307,7 @@ export default{
 
 
         deleteMultPromotions: function() {
-            this.$http.delete('http://localhost:8000/api/v1/deleteMultPromotions/'+ this.deleteMultIten).then((response) => {
+            this.$http.delete('/api/v1/deleteMultPromotions/'+ this.deleteMultIten).then((response) => {
                 if (response.status == 200) {
                     $('#deleteAllPromotions').modal('hide');
                     this.deleteMultIten  = [];
@@ -325,7 +320,7 @@ export default{
         },
 
         promotionTrader: function() {
-            this.$http.get('http://localhost:8000/api/v1/promotionTrader').then((response) => {
+            this.$http.get('/api/v1/promotionTrader').then((response) => {
                 this.$set('traders', response.data);
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -333,7 +328,7 @@ export default{
         },
 
         promotionProduct: function() {
-            this.$http.get('http://localhost:8000/api/v1/promotionProduct').then((response) => {
+            this.$http.get('/api/v1/promotionProduct').then((response) => {
                 this.$set('products', response.data);
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -343,7 +338,7 @@ export default{
         promotionStatus: function(status) {
             var postData = {id: status};
             this.resetDeleteAll();
-            this.$http.post('http://localhost:8000/api/v1/promotionStatus/', postData).then((response) => {
+            this.$http.post('/api/v1/promotionStatus/', postData).then((response) => {
                 console.log(response.status);
                 console.log(response.data);
                 if (response.status == 200) {
@@ -356,7 +351,7 @@ export default{
 
 
         authUser: function() {
-            this.$http.get('http://localhost:8000/api/v1/authUser').then((response) => {
+            this.$http.get('/api/v1/authUser').then((response) => {
                 this.$set('auth', response.data);
             }, (response) => {
                 console.log("Ocorreu um erro na operação");

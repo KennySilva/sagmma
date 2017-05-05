@@ -30,6 +30,7 @@ class ApiPlacesController extends Controller
             $place->contract;
             $place->typeofplace;
             $place->taxation;
+
         });
 
 
@@ -109,16 +110,32 @@ class ApiPlacesController extends Controller
 
         public function placeStatusChange()
         {
-            $places = Place::has('traders')->get();
+            $places = Place::all();
+            $places->each(function($places){
+                $places->contract;
+            });
+
             foreach ($places as $place) {
-                $place->status = 1;
+                if ($place->contract == null) {
+                    $place->status = 0;
+                }else {
+                    $place->status = 1;
+                }
                 $place->save();
             }
 
-            $places2 = Place::whereDoesntHave('traders')->get();
-            foreach ($places2 as $place2) {
-                $place2->status = 0;
-                $place2->save();
-            }
+
+
+            // $places = Place::has('traders')->get();
+            // foreach ($places as $place) {
+            //     $place->status = 1;
+            //     $place->save();
+            // }
+            //
+            // $places2 = Place::whereDoesntHave('traders')->get();
+            // foreach ($places2 as $place2) {
+            //     $place2->status = 0;
+            //     $place2->save();
+            // }
         }
     }

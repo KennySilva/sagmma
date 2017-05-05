@@ -78,6 +78,10 @@
 				<li><a data-toggle="modal" data-target="#modal-report-year" href="#">Anual</a></li>
 			</ul>
 		</div>
+
+		<div class="btn-group">
+			<button class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#"><i class="fa fa-envelope-o"></i> Enviar</button>
+		</div>
 	</div>
 
 	<div class="col-md-4">
@@ -280,7 +284,7 @@
 			<br>
 			<hr>
 			<div class="pull-left">
-				<button v-if="trashedTaxations.length > 0" data-toggle="modal" data-target = "#trashedTaxation" type="button" class="btn btn-link">Ver Cobranças Apagadas</button>
+				<button v-if="trashedTaxations.length > 0 && checkSuperPermition()" data-toggle="modal" data-target = "#trashedTaxation" type="button" class="btn btn-link">Ver Cobranças Apagadas</button>
 
 				<div class="modal fade" id="trashedTaxation" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
 					<div class="modal-dialog">

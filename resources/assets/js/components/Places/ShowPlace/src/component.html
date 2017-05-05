@@ -148,10 +148,10 @@
 						<td v-if="place.typeofplace_id != 1">
 							<span :class="{ 'label-danger': place.status, 'label-success': !place.status }" class="label">{{place.status ? 'Ocupado' : 'Livre'}}</span>
 						</td>
+						
 						<td v-else>
 							<span><i class="fa fa-map-marker"></i></span>
 						</td>
-						<td class="info" v-if="showColumn.typeofplace_id">{{ place.typeofplace.name }}</td>
 
 						<td align=center>  <a  href="#" class="btn btn-default btn-xs" data-toggle="modal" data-target="#show-place" @click="getThisPlace(place.id)"><i class="fa fa-eye text-success"></i></a></td>
 

@@ -6,18 +6,23 @@ use Illuminate\Http\Request;
 
 use Sagmma\Http\Requests;
 use Sagmma\Http\Controllers\Controller;
-use Article;
+use Place;
+use Trader;
 
 
 class InformationsController extends Controller
 {
     public function index()
     {
-        return view('_frontend.web.showInformations.informations');
+        $places = Place::orderBy('name', 'desc')->where('status', false)->paginate(10);
+        $lastPlaces = Place::orderBy('updated_at', 'desc')->where('status', false)->take(5)->get();
+        $traders = Trader::orderBy('name', 'desc')->get();
+        return view('_frontend.web.showInformations.informations', ['places' => $places, 'traders' => $traders, 'lastPlaces' => $lastPlaces]);
     }
 
     public function create()
     {
+        
     }
 
 

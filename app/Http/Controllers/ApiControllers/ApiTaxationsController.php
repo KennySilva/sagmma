@@ -56,7 +56,7 @@ class ApiTaxationsController extends Controller
         }
         $taxation->place_id    = $place_id;
         $taxation->type        = $request->type;
-        $taxation->author      = Auth::user()->name;
+        $taxation->author      = Auth::user()->id;
         $taxation->save();
     }
 
@@ -87,7 +87,6 @@ class ApiTaxationsController extends Controller
         }
         $place_id    =  $request->place_id;
         $type        = $request->type;
-        $author      = Auth::user()->name;
 
         $taxation = new Taxation();
         $taxation->where('id', $id)->update(array(
@@ -95,16 +94,15 @@ class ApiTaxationsController extends Controller
             'place_id'    => $place_id,
             'income'      => $income,
             'type'        => $type,
-            'author'      => $author
         ));
 
     }
 
     public function destroy($id)
     {
-        $tax = Taxation::find($id);
-        $tax->delete();
-        // return Taxation::delete($id);
+        // $tax = Taxation::find($id);
+        // $tax->delete();
+        Taxation::destroy($id);
     }
 
     public function deleteAll($ids)

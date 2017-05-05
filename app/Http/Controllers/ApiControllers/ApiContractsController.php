@@ -43,7 +43,7 @@ class ApiContractsController extends Controller
         $contract->trader_id   = $request->trader_id;
         $contract->status      = true;
         $contract->rate        = $place->price;
-        $contract->author      = Auth::user()->name;
+        $contract->author      = Auth::user()->id;
         $contract->ending_date = $request->ending_date;
         $contract->save();
     }
@@ -118,4 +118,19 @@ class ApiContractsController extends Controller
             }
         }
     }
+
+    // public function placeStatusChange()
+    // {
+    //     $places = Place::has('traders')->get();
+    //     foreach ($places as $place) {
+    //         $place->status = 1;
+    //         $place->save();
+    //     }
+    //
+    //     $places2 = Place::whereDoesntHave('traders')->get();
+    //     foreach ($places2 as $place2) {
+    //         $place2->status = 0;
+    //         $place2->save();
+    //     }
+    // }
 }

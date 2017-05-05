@@ -235,7 +235,7 @@ export default{
 
             //Clear form input
             this.clearField();
-            this.$http.post('http://localhost:8000/api/v1/taxations/', taxation).then((response) => {
+            this.$http.post('/api/v1/taxations/', taxation).then((response) => {
                 if (response.status == 200) {
                     $('#modal-create-taxation').modal('hide');
                     this.fetchTaxation(this.pagination.current_Page, this.showRow, this.typeData);
@@ -252,7 +252,7 @@ export default{
 
         fetchTaxation: function(page, row, type) {
             this.trashedTaxation()
-            this.$http.get('http://localhost:8000/api/v1/allTaxations/'+row+'/'+type+'?page='+page).then((response) => {
+            this.$http.get('/api/v1/allTaxations/'+row+'/'+type+'?page='+page).then((response) => {
                 this.$set('taxations', response.data.data)
                 this.$set('all', response.data.data)
                 this.$set('pagination', response.data)
@@ -277,7 +277,7 @@ export default{
             var self = this;
             this.clearField()
 
-            this.$http.get('http://localhost:8000/api/v1/taxations/' + id).then((response) => {
+            this.$http.get('/api/v1/taxations/' + id).then((response) => {
                 this.newTaxation.id          = response.data.id;
                 this.newTaxation.employee_id = response.data.employee_id;
                 this.newTaxation.place_id    = response.data.place_id;
@@ -305,7 +305,7 @@ export default{
         saveEditedTaxation: function(id) {
             var taxation = this.newTaxation;
             this.clearField();
-            this.$http.patch('http://localhost:8000/api/v1/taxations/'+ id, taxation).then((response) => {
+            this.$http.patch('/api/v1/taxations/'+ id, taxation).then((response) => {
                 if (response.status == 200) {
                     $('#modal-edit-taxation').modal('hide');
                     // console.log(response.data);
@@ -321,7 +321,7 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         deleteTaxation: function(id) {
-            this.$http.delete('http://localhost:8000/api/v1/taxations/'+ id).then((response) => {
+            this.$http.delete('/api/v1/taxations/'+ id).then((response) => {
                 $('#modal-delete-taxation').modal('hide');
                 if (response.status == 200) {
                     // console.log(response.data);
@@ -335,7 +335,7 @@ export default{
         },
 
         deleteMultTaxations: function() {
-            this.$http.delete('http://localhost:8000/api/v1/deleteMultTaxations/'+ this.deleteMultIten).then((response) => {
+            this.$http.delete('/api/v1/deleteMultTaxations/'+ this.deleteMultIten).then((response) => {
                 if (response.status == 200) {
                     $('#deleteAllTaxations').modal('hide');
                     this.deleteMultIten  = [];
@@ -350,7 +350,7 @@ export default{
 
         sendEmailTaxation: function(id) {
             var sendTaxation = this.sendTaxation;
-            this.$http.get('http://localhost:8000/api/v1/sendTaxation/'+id+'/'+sendTaxation).then((response) => {
+            this.$http.get('/api/v1/sendTaxation/'+id+'/'+sendTaxation).then((response) => {
                 $('#send-email').modal('hide');
                 if (response.status == 200) {
                     this.alert('Recibo enviado para '+this.sendTaxation+' com sucesso', 'success');
@@ -364,7 +364,7 @@ export default{
 
         // -------------------------Metodo de suporte---------------------------------------------------
         taxationIntPlace: function() {
-            this.$http.get('http://localhost:8000/api/v1/taxationIntPlace').then((response) => {
+            this.$http.get('/api/v1/taxationIntPlace').then((response) => {
                 this.$set('placesInt', response.data);
                 // this.$set('options', response.data.name);
                 // this.options = response.data.items
@@ -374,7 +374,7 @@ export default{
         },
 
         authUser: function() {
-            this.$http.get('http://localhost:8000/api/v1/authUser').then((response) => {
+            this.$http.get('/api/v1/authUser').then((response) => {
                 this.$set('auth', response.data);
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -390,10 +390,19 @@ export default{
             }
         },
 
+        checkSuperPermition: function() {
+            var roles = this.auth.roles;
+            for (var rol in roles) {
+                if (roles[rol].name == 'super-admin') {
+                    return true;
+                }
+            }
+        },
+
 
 
         taxationExtPlace: function() {
-            this.$http.get('http://localhost:8000/api/v1/taxationExtPlace').then((response) => {
+            this.$http.get('/api/v1/taxationExtPlace').then((response) => {
                 this.$set('placesExt', response.data);
                 // this.$set('options', response.data.name);
                 // this.options = response.data.items
@@ -406,7 +415,7 @@ export default{
         //-----------------------------------------------------------------------------------------------
 
         taxationEmployee: function() {
-            this.$http.get('http://localhost:8000/api/v1/taxationEmployee').then((response) => {
+            this.$http.get('/api/v1/taxationEmployee').then((response) => {
                 this.$set('employees', response.data);
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -422,18 +431,19 @@ export default{
         },
 
         deleteTrashedTaxation: function(id) {
-            var con = confirm("Certeza que queres apagar esta informação?");
+
             if (con) {
-                this.$http.delete('/api/v1/deleteTrashedTaxation/'+ id).then((response) => {
-                    // $('#trashedTaxation').modal('hide');
-                    if (response.status == 200) {
-                        this.fetchTaxation(this.pagination.current_Page, this.showRow, this.typeData);
-                        this.alert('Registo Apagado Permanentemente', 'info');
-                    }
-                }, (response) => {
-                });
+            this.$http.delete('/api/v1/deleteTrashedTaxation/'+ id).then((response) => {
+                // $('#trashedTaxation').modal('hide');
+                if (response.status == 200) {
+                    this.fetchTaxation(this.pagination.current_Page, this.showRow, this.typeData);
+                    this.alert('Registo Apagado Permanentemente', 'info');
+                }
+            }, (response) => {
+            });
             }
         },
+
 
         deleteAllTrashedTaxation: function() {
             var con = confirm("Operação sem retorno, continuar?");
