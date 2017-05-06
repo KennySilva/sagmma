@@ -172,7 +172,7 @@
 						</tr>
 					</tbody>
 				</table>
-				<div class="row">
+				<hr>
 					<div v-if="pagination.total > showRow" class="col-md-6 pull-left">
 						<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
 					</div>
@@ -181,7 +181,6 @@
 						<!-- <h5  class="text-right"><span>Mostrando de {{pagination.from}} para {{pagination.to}} de {{pagination.total}} linhas</span></h5> -->
 						<h6 class="text-right text-help"> Mostrar de <span class="badge">{{pagination.from}}</span>  a <span class="badge">{{pagination.to}}</span>  no total de <span class="badge">{{pagination.total}}</span></h6>
 					</div>
-				</div>
 			</div>
 
 			<!--------------------------------------------------------------------------------------------------------->
@@ -248,34 +247,35 @@
 												</tr>
 												<tr>
 													<td><b>Telefone</b></td>
-													<td v-if="newUser.phone != ''"><span class="label" :class="{ 'label-info': newUser.phone, 'none': !newUser.phone }"><i>{{ newUser.phone }}</i></span></td>
+													<td v-if="newUser.phone"><i>{{ newUser.phone }}</i></td>
 
 													<td v-else><i class="label label-warning">Não especificado</i></td>
 
 												</tr>
 												<tr>
 													<td><b>Ilha</b></td>
-													<td v-if="newUser.state != null"><i>{{ newUser.state }}</i></td>
+													<td v-if="newUser.state"><i>{{ newUser.state }}</i></td>
 													<td v-else><i class="label label-warning">Não especificado</i></td>
 												</tr>
 												<tr>
 													<td><b>Concelho</b></td>
-													<td v-if="newUser.council != null"><i>{{ newUser.council }}</i></td>
+													<td v-if="newUser.council"><i>{{ newUser.council }}</i></td>
 													<td v-else><i class="label label-warning">Não especificado</i></td>
 												</tr>
 												<tr>
 													<td><b>Freguesia</b></td>
-													<td v-if="newUser.parish != null"><i>{{ newUser.parish }}</i></td>
+													<td v-if="newUser.parish"><i>{{ newUser.parish }}</i></td>
 													<td v-else><i class="label label-warning">Não especificado</i></td>
 												</tr>
 												<tr>
 													<td><b>Zona</b></td>
-													<td v-if="newUser.zone != ''"><i>{{ newUser.zone }}</i></td>
+													<td v-if="newUser.zone"><i>{{ newUser.zone }}</i></td>
 													<td v-else><i class="label label-warning">Não especificado</i></td>
 												</tr>
 												<tr>
 													<td><b>Tipo</b></td>
-													<td><span class="label label-primary"><i>{{ newUser.type }}</i></span></td>
+													<td v-if="newUser.type"><span class="label label-primary"><i>{{ newUser.type }}</i></span></td>
+													<td v-else><i class="label label-warning">Não especificado</i></td>
 
 												</tr>
 												<tr>

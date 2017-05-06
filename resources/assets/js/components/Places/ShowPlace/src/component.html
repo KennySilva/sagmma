@@ -148,7 +148,7 @@
 						<td v-if="place.typeofplace_id != 1">
 							<span :class="{ 'label-danger': place.status, 'label-success': !place.status }" class="label">{{place.status ? 'Ocupado' : 'Livre'}}</span>
 						</td>
-						
+
 						<td v-else>
 							<span><i class="fa fa-map-marker"></i></span>
 						</td>
@@ -161,7 +161,7 @@
 						<!---------------------------------------------------------------------------->
 						<td v-if="( place.contract == null && place.taxation == null) " align=center><a class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-delete-place" href="#" @click="getThisPlace(place.id)" ><i class="fa fa-trash text-danger"></i></a></td>
 
-						<td v-else align=center><a class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-undeleted-place" href="#" @click="getThisPlace(place.id)"><i class="fa fa-ban text-warning"></i></a></td>
+						<td v-else align=center><a class="btn btn-default btn-xs" href="#" @click = "undelete_alert()"><i class="fa fa-ban text-warning"></i></a></td>
 						<!---------------------------------------------------------------------------->
 
 					</tr>
@@ -278,7 +278,7 @@
 
 
 
-		<div class="modal fade" id="modal-undeleted-place" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+		<!-- <div class="modal fade" id="modal-undeleted-place" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
 			<div class="modal-dialog modal-sm">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -296,7 +296,7 @@
 					</div>
 				</div>
 			</div>
-		</div>
+		</div> -->
 
 
 		<!--------------------------------------------------------------------------------------------------------->

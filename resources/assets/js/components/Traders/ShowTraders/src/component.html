@@ -54,7 +54,7 @@
 		</div>
 
 		<div class="btn-group">
-			<a class="btn btn-primary btn-flat btn-outline" href="/export/printableTraderInformation"><i class="fa fa-print"></i> Imprimir</a>
+			<a class="btn btn-primary btn-flat btn-outline" href="#"><i class="fa fa-print"></i> Imprimir</a>
 		</div>
 
 		<div class="btn-group">
@@ -146,7 +146,7 @@
 						<!------------------------------------------------------------------------------------->
 						<td v-if="trader.contract == null && trader.promotion.length == 0" align=center><a @click="getThisTrader(trader.id)" class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-delete-trader" href="#"><i class="fa fa-trash text-danger"></i></a></td>
 
-						<td v-else align=center><a @click="getThisTrader(trader.id)" class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-undeleted-trader" href="#"><i class="fa fa-ban text-warning"></i></a></td>
+						<td v-else align=center><a @click = "undelete_alert()" class="btn btn-default btn-xs" href="#"><i class="fa fa-ban text-warning"></i></a></td>
 						<!------------------------------------------------------------------------------------->
 
 					</tr>
@@ -294,7 +294,7 @@
 			</div>
 		</div>
 
-		<div class="modal fade" id="modal-undeleted-trader" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+		<!-- <div class="modal fade" id="modal-undeleted-trader" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
 			<div class="modal-dialog modal-sm">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -311,7 +311,7 @@
 					</div>
 				</div>
 			</div>
-		</div>
+		</div> -->
 
 		<!--------------------------------------------------------------------------------------------------------->
 		<!-- Modal -->

@@ -71,7 +71,7 @@
 			<ul class="dropdown-menu" role="menu"  id="export-menu">
 				<li id="export-to-excel"><a href="/export/getEmployeeExport"><i class="fa fa-file-excel-o"> </i>Exportar para Excel</a></li>
 				<li role="separator" class="divider"></li>
-				<li id="export-to-pdf"><a href="#"><i class="fa fa-file-pdf-o"></i> Exportar para PDF</a></li>
+				<li id="export-to-pdf"><a href="/export/employeesPDF"><i class="fa fa-file-pdf-o"></i> Exportar para PDF</a></li>
 			</ul>
 		</div>
 		<div class="btn-group">
@@ -167,7 +167,7 @@
 				</thead>
 				<tbody>
 					<tr v-for="employee in employees | orderBy sortColumn sortInverse">
-						<td><input :disabled="employee.taxation != null || employee.controls != null ||  employee.markets.length > 0" type="checkbox" name="" v-model="deleteMultIten" :value="employee.id"></td>
+						<td><input :disabled="employee.taxation != null || employee.controls != null" type="checkbox" name="" v-model="deleteMultIten" :value="employee.id"></td>
 						<td>{{ employee.name }}</td>
 						<td class="info" v-if="showColumn.ic">{{ employee.ic }}</td>
 						<td v-if="employee.phone">{{ employee.phone }}</td>
@@ -180,9 +180,9 @@
 						<td align=center>  <a class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-edit-employee" href="#" @click="getThisEmployee(employee.id)"><i class="fa fa-edit text-primary"></i></a></td>
 
 						<!----------------------------------------------------------------------------------->
-						<td v-if="employee.taxation == null && employee.controls == null && employee.markets.length == 0" align=center><a class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-delete-employee" href="#" @click="getThisEmployee(employee.id)"><i class="fa fa-trash text-danger"></i></a></td>
+						<td v-if="employee.taxation == null && employee.controls == null" align=center><a class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-delete-employee" href="#" @click="getThisEmployee(employee.id)"><i class="fa fa-trash text-danger"></i></a></td>
 
-						<td v-else align=center><a class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-undeleted-employee" href="#" @click="getThisEmployee(employee.id)"><i class="fa fa-ban text-warning" ></i></a></td>
+						<td v-else align=center><a class="btn btn-default btn-xs" href="#" @click="undelete_alert()"><i class="fa fa-ban text-warning" ></i></a></td>
 						<!----------------------------------------------------------------------------------->
 
 					</tr>
@@ -230,46 +230,65 @@
 											</tr>
 											<tr>
 												<td><b>Idade</b></td>
-												<td><i>{{ newEmployee.age }}</i></td>
+												<td v-if="newEmployee.age > 0"><i>{{ newEmployee.age }}</i></td>
+												<td v-else><i class="label label-warning">Não Especificado</i></td>
 											</tr>
 											<tr>
 												<td><b>Sexo</b></td>
-												<td><i>{{ newEmployee.gender }}</i></td>
+												<td v-if="newEmployee.gender"><i>{{ newEmployee.gender }}</i></td>
+												<td v-else><i class="label label-warning">Não Especificado</i></td>
+
 											</tr>
 											<tr>
 												<td><b>Email</b></td>
-												<td><span class="label label-info"><i>{{ newEmployee.email }}</i></span></td>
+												<td v-if="newEmployee.email"><span class="label label-info"><i>{{ newEmployee.email }}</i></span></td>
+												<td v-else><i class="label label-warning">Não Especificado</i></td>
+
 
 											</tr>
 											<tr>
 												<td><b>Ilha</b></td>
-												<td><i>{{ newEmployee.state }}</i></td>
+												<td v-if="newEmployee.state"><i>{{ newEmployee.state }}</i></td>
+												<td v-else><i class="label label-warning">Não Especificado</i></td>
+
 											</tr>
 											<tr>
 												<td><b>Concelho</b></td>
-												<td><i>{{ newEmployee.council }}</i></td>
+												<td v-if="newEmployee.council"><i>{{ newEmployee.council }}</i></td>
+												<td v-else><i class="label label-warning">Não Especificado</i></td>
+
 											</tr>
 											<tr>
 												<td><b>Freguesia</b></td>
-												<td><i>{{ newEmployee.parish }}</i></td>
+												<td v-if="newEmployee.parish"><i>{{ newEmployee.parish }}</i></td>
+												<td v-else><i class="label label-warning">Não Especificado</i></td>
+
 											</tr>
 											<tr>
 												<td><b>Zona</b></td>
-												<td><i>{{ newEmployee.zone }}</i></td>
+												<td v-if="newEmployee.zone"><i>{{ newEmployee.zone }}</i></td>
+												<td v-else><i class="label label-warning">Não Especificado</i></td>
+
 											</tr>
 
 											<tr>
 												<td><b>Telefone</b></td>
-												<td><span class="label" :class="{ 'label-info': newEmployee.phone, 'none': !newEmployee.phone }"><i>{{ newEmployee.phone }}</i></span></td>
+												<td v-if="newEmployee.zone"><span><i>{{ newEmployee.phone }}</i></span></td>
+												<td v-else><i class="label label-warning">Não Especificado</i></td>
+
 
 											</tr>
 											<tr>
 												<td><b>Escalão</b></td>
-												<td><i>{{ newEmployee.echelon }}</i></td>
+												<td v-if="newEmployee.echelon"><i>{{ newEmployee.echelon }}</i></td>
+												<td v-else><i class="label label-warning">Não Especificado</i></td>
+
 											</tr>
 											<tr>
 												<td><b>Tipo</b></td>
-												<td><span class="label label-primary"><i>{{ newEmployee.type }}</i></span></td>
+												<td v-if="newEmployee.type"><span class="label label-primary"><i>{{ newEmployee.type }}</i></span></td>
+												<td v-else><i class="label label-warning">Não Especificado</i></td>
+
 											</tr>
 
 											<tr v-if="newEmployee.markets.length > 0">
@@ -331,7 +350,7 @@
 			</div>
 		</div>
 
-		<div class="modal fade" id="modal-undeleted-employee" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+		<!-- <div class="modal fade" id="modal-undeleted-employee" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
 			<div class="modal-dialog modal-sm">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -349,7 +368,7 @@
 					</div>
 				</div>
 			</div>
-		</div>
+		</div> -->
 
 
 

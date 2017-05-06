@@ -273,6 +273,7 @@ Route::group(['namespace' => 'PluginsControllers'], function()
             // -----------------------------PDF-Download---------------------------------------------
             Route::resource('/getPDF', 'PDFController@getPDF');
             Route::resource('/taxationsPDF', 'PDFController@TaxationsPDF');
+            Route::resource('/employeesPDF', 'PDFController@employees_PDF');
             //-------------------------------Impressão-----------------------------------------------
             Route::get('/printableUserInformation', 'PrintController@indexUser');
             Route::get('/printUserPreview', 'PrintController@printUserPreview');

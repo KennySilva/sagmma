@@ -29,6 +29,13 @@ class PDFController extends Controller
         return $pdf->download('relatoriocobarnca.pdf');
     }
 
+    public function employees_PDF()
+    {
+        $employee = Employee::all();
+        $pdf = PDF::loadView('pdf.employeesPDF', ['employee' => $employee]);
+        return $pdf->download('todos_os_funciuonarios.pdf');
+    }
+
     public function downloadreciboempdf($id, $code)
     {
         $taxation = Taxation::findOrFail($id);

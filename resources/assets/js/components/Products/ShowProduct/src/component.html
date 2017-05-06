@@ -119,21 +119,20 @@
 						<!-------------------------------------------------------------------->
 						<td v-if="product.promotions.length == 0" align=center><a @click="getThisProduct(product.id)" class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-delete-product" href="#"><i class="fa fa-trash text-danger"></i></a></td>
 
-						<td v-else align=center><a @click="getThisProduct(product.id)" data-toggle="modal" data-target="#modal-undeleted-product" href="#"><i class="fa fa-ban text-warning"></i></a></td>
+						<td v-else align=center><a @click = "undelete_alert()" href="#"><i class="fa fa-ban text-warning"></i></a></td>
 
 						<!-------------------------------------------------------------------->
 
 					</tr>
 				</tbody>
 			</table>
-			<div class="row">
+			<hr>
 				<div v-if="pagination.total > showRow" class="col-md-6 pull-left">
 					<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
 				</div>
 				<div class="col-md-6 pull-right">
 					<h6 class="text-right text-help"> Mostrar de <span class="badge">{{pagination.from}}</span>  a <span class="badge">{{pagination.to}}</span>  no total de <span class="badge">{{pagination.total}}</span></h6>
 				</div>
-			</div>
 		</div>
 
 		<!--------------------------------------------------------------------------------------------------------->

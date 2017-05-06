@@ -93,7 +93,7 @@ export default{
 
         createMaterial: function() {
             var material = this.newMaterial;
-            this.$http.post('http://localhost:8000/api/v1/materials/', material).then((response) => {
+            this.$http.post('/api/v1/materials/', material).then((response) => {
                 if (response.status == 200) {
                     console.log('chegando aqui');
                     $('#modal-create-material').modal('hide');
@@ -111,7 +111,7 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         fetchMaterial: function(page, row) {
-            this.$http.get('http://localhost:8000/api/v1/allMaterials/'+row+'?page='+page).then((response) => {
+            this.$http.get('/api/v1/allMaterials/'+row+'?page='+page).then((response) => {
                 this.$set('materials', response.data.data)
                 this.$set('all', response.data.data)
                 this.$set('pagination', response.data)
@@ -132,7 +132,7 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         getThisMaterial: function(id){
-            this.$http.get('http://localhost:8000/api/v1/materials/' + id).then((response) => {
+            this.$http.get('/api/v1/materials/' + id).then((response) => {
                 this.newMaterial.id       = response.data.id;
                 this.newMaterial.name     = response.data.name;
                 this.newMaterial.location = response.data.location;
@@ -147,7 +147,7 @@ export default{
 
         saveEditedMaterial: function(id) {
             var material = this.newMaterial;
-            this.$http.patch('http://localhost:8000/api/v1/materials/'+ id, material).then((response) => {
+            this.$http.patch('/api/v1/materials/'+ id, material).then((response) => {
                 if (response.status == 200) {
                     $('#modal-edit-material').modal('hide');
                     this.clearField();
@@ -164,7 +164,7 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         deleteMaterial: function(id) {
-            this.$http.delete('http://localhost:8000/api/v1/materials/'+ id).then((response) => {
+            this.$http.delete('/api/v1/materials/'+ id).then((response) => {
                 $('#modal-delete-material').modal('hide');
                 if (response.status == 200) {
                     // console.log(response.data);
@@ -178,7 +178,7 @@ export default{
         },
 
         deleteMultMaterials: function() {
-            this.$http.delete('http://localhost:8000/api/v1/deleteMultMaterials/'+ this.deleteMultIten).then((response) => {
+            this.$http.delete('/api/v1/deleteMultMaterials/'+ this.deleteMultIten).then((response) => {
                 if (response.status == 200) {
                     $('#deleteAllMaterials').modal('hide');
                     this.deleteMultIten  = [];
@@ -214,6 +214,14 @@ export default{
             }else {
                 self.sortInverse = 1
             }
+        },
+
+        undelete_alert: function() {
+            $.alert({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Ação Crítico',
+                content: 'Informação realacionada com a Integridade de outros dados!!',
+            });
         },
 
         // --------------------------------------------------------------------------------------------

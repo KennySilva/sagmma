@@ -133,7 +133,7 @@ export default{
 
             //Clear form input
             this.clearField();
-            this.$http.post('http://localhost:8000/api/v1/places/', place).then((response) => {
+            this.$http.post('/api/v1/places/', place).then((response) => {
                 if (response.status == 200) {
                     console.log('chegando aqui');
                     $('#modal-create-place').modal('hide');
@@ -150,7 +150,7 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         fetchPlace: function(page, row) {
-            this.$http.get('http://localhost:8000/api/v1/allPlaces/'+row+'?page='+page).then((response) => {
+            this.$http.get('/api/v1/allPlaces/'+row+'?page='+page).then((response) => {
                 this.$set('places', response.data.data);
                 this.$set('all', response.data.data);
                 this.$set('pagination', response.data);
@@ -171,7 +171,7 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         getThisPlace: function(id){
-            this.$http.get('http://localhost:8000/api/v1/places/' + id).then((response) => {
+            this.$http.get('/api/v1/places/' + id).then((response) => {
                 this.newPlace.id             = response.data.id;
                 this.newPlace.name           = response.data.name;
                 this.newPlace.price          = response.data.price;
@@ -186,12 +186,20 @@ export default{
             });
         },
 
+        undelete_alert: function() {
+            $.alert({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Ação Crítico',
+                content: 'Informação realacionada com a Integridade de outros dados!!',
+            });
+        },
+
         // --------------------------------------------------------------------------------------------
 
         saveEditedPlace: function(id) {
             var place = this.newPlace;
             this.clearField();
-            this.$http.patch('http://localhost:8000/api/v1/places/'+ id, place).then((response) => {
+            this.$http.patch('/api/v1/places/'+ id, place).then((response) => {
                 if (response.status == 200) {
                     $('#modal-edit-place').modal('hide');
                     // console.log(response.data);
@@ -208,7 +216,7 @@ export default{
 
 
         deletePlace: function(id) {
-            this.$http.delete('http://localhost:8000/api/v1/places/'+ id).then((response) => {
+            this.$http.delete('/api/v1/places/'+ id).then((response) => {
                 $('#modal-delete-place').modal('hide');
                 if (response.status == 200) {
                     // console.log(response.data);
@@ -222,7 +230,7 @@ export default{
         },
 
         deleteMultPlace: function() {
-            this.$http.delete('http://localhost:8000/api/v1/deleteMultPlaces/'+ this.deleteMultIten).then((response) => {
+            this.$http.delete('/api/v1/deleteMultPlaces/'+ this.deleteMultIten).then((response) => {
                 if (response.status == 200) {
                     $('#deleteAll').modal('hide');
                     this.deleteMultIten  = [];
@@ -235,7 +243,7 @@ export default{
         },
 
         placeType: function() {
-            this.$http.get('http://localhost:8000/api/v1/placeType').then((response) => {
+            this.$http.get('/api/v1/placeType').then((response) => {
                 this.$set('types', response.data);
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -244,7 +252,7 @@ export default{
         //
         //
         // authUser: function() {
-        //     this.$http.get('http://localhost:8000/api/v1/authUser').then((response) => {
+        //     this.$http.get('/api/v1/authUser').then((response) => {
         //         this.$set('auth', response.data);
         //     }, (response) => {
         //         console.log("Ocorreu um erro na operação");

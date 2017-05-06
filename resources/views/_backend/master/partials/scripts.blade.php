@@ -6,6 +6,7 @@
 <script src="{{ asset('/bower_components/bootstrap-select/dist/js/bootstrap-select.js') }}"></script>
 <script src="{{ asset('/bower_components/select2/dist/js/select2.full.js') }}"></script>
 <script src="{{ asset('/bower_components/select2/dist/js/i18n/pt.js') }}"></script>
+<script src="{{ asset('/bower_components/jquery-confirm2/js/jquery-confirm.js') }}"></script>
 <script src="{{ asset('/js/app.min.js') }}" type="text/javascript"></script>
 <script src="{{ asset('/js/main.js') }}" type="text/javascript"></script>
 <noscript>

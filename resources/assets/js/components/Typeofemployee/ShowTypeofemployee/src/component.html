@@ -109,7 +109,7 @@
 						<!------------------------------------------------------------------------------------------->
 						<td v-if="typeofemployee.employees.length == 0" align=center><a @click="getThisTypeofemployee(typeofemployee.id)" class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-delete-typeofemployee" href="#"><i class="fa fa-trash text-danger"></i></a></td>
 
-						<td v-else align=center><a @click="getThisTypeofemployee(typeofemployee.id)" class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-undeleted-typeofemployee" href="#"><i class="fa fa-ban text-warning"></i></a></td>
+						<td v-else align=center><a class="btn btn-default btn-xs" @click = "undelete_alert()" href="#"><i class="fa fa-ban text-warning"></i></a></td>
 
 						<!------------------------------------------------------------------------------------------->
 					</tr>
@@ -146,7 +146,7 @@
 		</div>
 
 
-		<div class="modal fade" id="modal-undeleted-typeofemployee" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+		<!-- <div class="modal fade" id="modal-undeleted-typeofemployee" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
 			<div class="modal-dialog modal-sm">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -163,7 +163,7 @@
 					</div>
 				</div>
 			</div>
-		</div>
+		</div> -->
 
 
 

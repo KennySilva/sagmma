@@ -220,6 +220,14 @@ export default{
             self.$set('markets', filtered)
         },
 
+        undelete_alert: function() {
+            $.alert({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Atenção',
+                content: 'Esta informação não pode ser apagada porque esta relacionada a outra informação',
+            });
+        },
+
         // --------------------------------------------------------------------------------------------
 
         // Outros funções

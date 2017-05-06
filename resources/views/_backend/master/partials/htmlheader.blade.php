@@ -16,6 +16,7 @@
     <link href="{{ asset('/bower_components/bootstrap-select/dist/css/bootstrap-select.css') }}" rel="stylesheet" type="text/css"/>
     <link href="{{ asset('/bower_components/select2/dist/css/select2.css') }}" rel="stylesheet" type="text/css"/>
     <link href="{{ asset('/bower_components/select2-bootstrap-theme/dist/select2-bootstrap.css') }}" rel="stylesheet" type="text/css"/>
+    <link href="{{ asset('/bower_components/jquery-confirm2/css/jquery-confirm.css') }}" rel="stylesheet" type="text/css"/>
     <!--------------------------------------------------------------------------------------------------------->
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->

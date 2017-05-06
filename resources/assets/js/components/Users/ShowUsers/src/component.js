@@ -202,23 +202,9 @@ export default{
         }).on('change', function () {
             self.$set('newUser.parish', jQuery(this).val());
         });
-
-
-        // jQuery(function($){
-        //     $.mask.definitions['c']='[95]';
-        //     $("#phone").mask("(+238) c99-99-99",{placeholder:"_"});
-        //     $("#phoneed").mask("(+238) c99-99-99",{placeholder:"_"});
-        //     $("#ic").mask("999999",{placeholder:"_"});
-        //     $("#iced").mask("999999",{placeholder:"_"});
-        // });
-        //
-
-
-
     },
 
     methods: {
-
         selectAll: function() {
             this.deleteMultIten = [];
             if (!this.allSelected) {
@@ -384,7 +370,7 @@ export default{
                     $('#deleteAllUsers').modal('hide');
                     this.deleteMultIten  = [];
                     this.fetchUser(this.pagination.current_page, this.showRow);
-                    this.alert('Materiais eliminados com sucesso', 'warning');
+                    this.alert('Utilizadores eliminado com sucesso', 'warning');
                 }
             }, (response) => {
                 console.log("Ocorreu um erro na operação");

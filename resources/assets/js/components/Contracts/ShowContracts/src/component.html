@@ -140,7 +140,6 @@
 					</tr>
 				</tbody>
 			</table>
-			<div class="row">
 				<div  v-if="pagination.total > showRow" class="col-md-6 pull-left">
 					<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
 				</div>
@@ -149,7 +148,6 @@
 					<h6 class="text-right text-help"> Mostrar de <span class="badge">{{pagination.from}}</span>  a <span class="badge">{{pagination.to}}</span> no total de <span class="badge">{{pagination.total}}</span></h6>
 				</div>
 
-			</div>
 		</div>
 
 		<!--------------------------------------------------------------------------------------------------------->

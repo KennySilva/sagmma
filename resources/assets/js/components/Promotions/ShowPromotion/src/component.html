@@ -56,7 +56,7 @@
 			<button v-else data-toggle="tooltip" title="Não podes criar promoção referenciar comerciante e produtos" type="button" class="btn btn-danger btn-flat"><i class="fa fa-minus"></i> Novo</button>
 		</div>
 		<div class="btn-group">
-			<a class="btn btn-primary btn-flat btn-outline" href="#" data-toggle="modal" data-target="#send-trader-per-email"><i class="fa fa-envelope-o"></i> Enviar</a>
+			<a disabled = "traders.length == 0 || products.length == 0" class="btn btn-primary btn-flat btn-outline" href="#" data-toggle="modal" data-target="#send-trader-per-email"><i class="fa fa-envelope-o"></i> Enviar</a>
 		</div>
 	</div>
 	<div class="col-md-4">
@@ -149,14 +149,12 @@
 					</tr>
 				</tbody>
 			</table>
-			<div class="row">
 				<div class="col-md-6 pull-left" v-if="pagination.total > showRow">
 					<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
 				</div>
 				<div class="col-md-6 pull-right">
 					<h6 class="text-right text-help"> Mostrar de <span class="badge">{{pagination.from}}</span>  a <span class="badge">{{pagination.to}}</span>  no total de <span class="badge">{{pagination.total}}</span></h6>
 				</div>
-			</div>
 		</div>
 
 		<!--------------------------------------------------------------------------------------------------------->

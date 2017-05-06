@@ -178,7 +178,7 @@ export default{
 
             //Clear form input
             this.clearField();
-            this.$http.post('http://localhost:8000/api/v1/traders/', trader).then((response) => {
+            this.$http.post('/api/v1/traders/', trader).then((response) => {
                 if (response.status == 200) {
                     console.log('chegando aqui');
                     $('#modal-create-trader').modal('hide');
@@ -194,7 +194,7 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         fetchTrader: function(page, row) {
-            this.$http.get('http://localhost:8000/api/v1/allTraders/'+row+'?page='+page).then((response) => {
+            this.$http.get('/api/v1/allTraders/'+row+'?page='+page).then((response) => {
                 this.$set('traders', response.data.data);
                 this.$set('all', response.data.data);
                 this.$set('pagination', response.data);
@@ -212,10 +212,18 @@ export default{
             }
         },
 
+        undelete_alert: function() {
+            $.alert({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Ação Crítico',
+                content: 'Informação realacionada com a Integridade de outros dados!!',
+            });
+        },
+
         // --------------------------------------------------------------------------------------------
 
         getThisTrader: function(id){
-            this.$http.get('http://localhost:8000/api/v1/traders/' + id).then((response) => {
+            this.$http.get('/api/v1/traders/' + id).then((response) => {
                 this.newTrader.id                = response.data.id;
                 this.newTrader.name              = response.data.name;
                 this.newTrader.ic                = response.data.ic;
@@ -239,7 +247,7 @@ export default{
         saveEditedTrader: function(id) {
             var trader = this.newTrader;
             this.clearField();
-            this.$http.patch('http://localhost:8000/api/v1/traders/'+ id, trader).then((response) => {
+            this.$http.patch('/api/v1/traders/'+ id, trader).then((response) => {
                 if (response.status == 200) {
                     $('#modal-edit-trader').modal('hide');
                     this.fetchTrader(this.pagination.current_page, this.showRow);
@@ -255,7 +263,7 @@ export default{
 
 
         deleteTrader: function(id) {
-            this.$http.delete('http://localhost:8000/api/v1/traders/'+ id).then((response) => {
+            this.$http.delete('/api/v1/traders/'+ id).then((response) => {
                 $('#modal-delete-trader').modal('hide');
                 if (response.status == 200) {
                     this.fetchTrader(this.pagination.current_page, this.showRow);
@@ -267,7 +275,7 @@ export default{
         },
 
         deleteMultTrader: function() {
-            this.$http.delete('http://localhost:8000/api/v1/deleteMultTraders/'+ this.deleteMultIten).then((response) => {
+            this.$http.delete('/api/v1/deleteMultTraders/'+ this.deleteMultIten).then((response) => {
                 if (response.status == 200) {
                     $('#deleteAll').modal('hide');
                     this.deleteMultIten  = [];

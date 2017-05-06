@@ -154,12 +154,12 @@ export default{
 
         jQuery(self.$els.marketcreate).select2({
             placeholder: "Mercado",
+            maximumSelectionLength: 1,
             allowClear: false,
             theme: "bootstrap",
             width: '100%',
             language: 'pt',
-            closeOnSelect: false,
-            cache: false,
+            closeOnSelect: true,
 
         }).on('change', function () {
             self.$set('newEmployee.markets', jQuery(this).val());
@@ -168,13 +168,12 @@ export default{
 
         jQuery(self.$els.marketedit).select2({
             placeholder: "Mercado",
+            maximumSelectionLength: 1,
             allowClear: false,
             theme: "bootstrap",
             width: '100%',
             language: 'pt',
-            closeOnSelect: false,
-            cache: false,
-
+            closeOnSelect: true,
 
         }).on('change', function () {
             self.$set('newEmployee.markets', jQuery(this).val());
@@ -348,7 +347,7 @@ export default{
             var employee = this.newEmployee;
 
             //Clear form input
-            this.$http.post('http://localhost:8000/api/v1/employees/', employee).then((response) => {
+            this.$http.post('/api/v1/employees/', employee).then((response) => {
                 if (response.status == 200) {
                     console.log('chegando aqui');
                     $('#modal-create-employee').modal('hide');
@@ -365,7 +364,7 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         fetchEmployee: function(page, row) {
-            this.$http.get('http://localhost:8000/api/v1/allEmployees/'+row+'?page='+page).then((response) => {
+            this.$http.get('/api/v1/allEmployees/'+row+'?page='+page).then((response) => {
                 this.$set('employees', response.data.data);
                 this.$set('all', response.data.data);
                 this.$set('pagination', response.data);
@@ -378,10 +377,18 @@ export default{
         canDeleteAll: function() {
             var emps = this.employees;
             for (var emp in emps) {
-                if (emps[emp].taxation != null || emps[emp].controls != null || emps[emp].markets.length > 0) {
+                if (emps[emp].taxation != null || emps[emp].controls != null) {
                     return true;
                 }
             }
+        },
+
+        undelete_alert: function() {
+            $.alert({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Ação Crítico',
+                content: 'Informação realacionada com a Integridade de outros dados!!',
+            });
         },
 
 
@@ -389,7 +396,7 @@ export default{
 
         getThisEmployee: function(id){
             this.clearField()
-            this.$http.get('http://localhost:8000/api/v1/employees/' + id).then((response) => {
+            this.$http.get('/api/v1/employees/' + id).then((response) => {
                 this.newEmployee.id                = response.data.id;
                 this.newEmployee.name              = response.data.name;
                 this.newEmployee.ic                = response.data.ic;
@@ -420,7 +427,7 @@ export default{
 
         saveEditedEmployee: function(id) {
             var employee = this.newEmployee;
-            this.$http.patch('http://localhost:8000/api/v1/employees/'+ id, employee).then((response) => {
+            this.$http.patch('/api/v1/employees/'+ id, employee).then((response) => {
                 if (response.status == 200) {
                     $('#modal-edit-employee').modal('hide');
                     this.clearField();
@@ -437,7 +444,7 @@ export default{
 
 
         deleteEmployee: function(id) {
-            this.$http.delete('http://localhost:8000/api/v1/employees/'+ id).then((response) => {
+            this.$http.delete('/api/v1/employees/'+ id).then((response) => {
                 $('#modal-delete-employee').modal('hide');
                 if (response.status == 200) {
                     this.fetchEmployee(this.pagination.current_page, this.showRow);
@@ -449,7 +456,7 @@ export default{
         },
 
         deleteMultEmployee: function() {
-            this.$http.delete('http://localhost:8000/api/v1/deleteMultEmployees/'+ this.deleteMultIten).then((response) => {
+            this.$http.delete('/api/v1/deleteMultEmployees/'+ this.deleteMultIten).then((response) => {
                 if (response.status == 200) {
                     $('#deleteAll').modal('hide');
                     this.deleteMultIten  = [];
@@ -462,7 +469,7 @@ export default{
         },
 
         employeeType: function() {
-            this.$http.get('http://localhost:8000/api/v1/employeeType').then((response) => {
+            this.$http.get('/api/v1/employeeType').then((response) => {
                 this.$set('types', response.data);
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -470,7 +477,7 @@ export default{
         },
 
         authUser: function() {
-            this.$http.get('http://localhost:8000/api/v1/authUser').then((response) => {
+            this.$http.get('/api/v1/authUser').then((response) => {
                 this.$set('auth', response.data);
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -478,7 +485,7 @@ export default{
         },
         // -------------------------Metodo de suporte---------------------------------------------------
         marketEmployee: function() {
-            this.$http.get('http://localhost:8000/api/v1/marketEmployee').then((response) => {
+            this.$http.get('/api/v1/marketEmployee').then((response) => {
                 this.$set('markets', response.data);
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -488,7 +495,7 @@ export default{
         sendEmployeePerEmail: function() {
             var sendEmployee = this.sendEmployee;
             this.sendEmployee = '';
-            this.$http.get('http://localhost:8000/api/v1/sendEmployee/'+sendEmployee).then((response) => {
+            this.$http.get('/api/v1/sendEmployee/'+sendEmployee).then((response) => {
                 $('#send-employee-per-email').modal('hide');
                 if (response.status == 200) {
                     this.alert('Email enviado com sucesso', 'success');

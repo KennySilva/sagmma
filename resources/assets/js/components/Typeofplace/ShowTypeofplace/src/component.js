@@ -95,7 +95,7 @@ export default{
 
             //Clear form input
 
-            this.$http.post('http://localhost:8000/api/v1/typeofplaces/', typeofplace).then((response) => {
+            this.$http.post('/api/v1/typeofplaces/', typeofplace).then((response) => {
                 if (response.status == 200) {
                     this.clearField();
                     console.log('chegando aqui');
@@ -115,7 +115,7 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         fetchTypeofplace: function(page, row) {
-            this.$http.get('http://localhost:8000/api/v1/allTypeofplaces/'+row+'?page='+page).then((response) => {
+            this.$http.get('/api/v1/allTypeofplaces/'+row+'?page='+page).then((response) => {
                 this.$set('typeofplaces', response.data.data)
                 this.$set('all', response.data.data)
                 this.$set('pagination', response.data)
@@ -136,7 +136,7 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         getThisTypeofplace: function(id){
-            this.$http.get('http://localhost:8000/api/v1/typeofplaces/' + id).then((response) => {
+            this.$http.get('/api/v1/typeofplaces/' + id).then((response) => {
                 this.newTypeofplace.id       = response.data.id;
                 this.newTypeofplace.name     = response.data.name;
                 this.newTypeofplace.location = response.data.location;
@@ -151,7 +151,7 @@ export default{
 
         saveEditedTypeofplace: function(id) {
             var typeofplace = this.newTypeofplace;
-            this.$http.patch('http://localhost:8000/api/v1/typeofplaces/'+ id, typeofplace).then((response) => {
+            this.$http.patch('/api/v1/typeofplaces/'+ id, typeofplace).then((response) => {
                 if (response.status == 200) {
                     this.clearField();
                     $('#modal-edit-typeofplace').modal('hide');
@@ -167,10 +167,18 @@ export default{
             });
         },
 
+        undelete_alert: function() {
+            $.alert({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Ação Crítico',
+                content: 'Informação realacionada com a Integridade de outros dados!!',
+            });
+        },
+
         // --------------------------------------------------------------------------------------------
 
         deleteTypeofplace: function(id) {
-            this.$http.delete('http://localhost:8000/api/v1/typeofplaces/'+ id).then((response) => {
+            this.$http.delete('/api/v1/typeofplaces/'+ id).then((response) => {
                 $('#modal-delete-typeofplace').modal('hide');
                 if (response.status == 200) {
                     // console.log(response.data);
@@ -184,7 +192,7 @@ export default{
         },
 
         deleteMultTypeofplaces: function() {
-            this.$http.delete('http://localhost:8000/api/v1/deleteMultTypeofplaces/'+ this.deleteMultIten).then((response) => {
+            this.$http.delete('/api/v1/deleteMultTypeofplaces/'+ this.deleteMultIten).then((response) => {
                 if (response.status == 200) {
                     $('#deleteAllTypeofplaces').modal('hide');
                     this.deleteMultIten  = [];
@@ -198,7 +206,7 @@ export default{
 
 
         authUser: function() {
-            this.$http.get('http://localhost:8000/api/v1/authUser').then((response) => {
+            this.$http.get('/api/v1/authUser').then((response) => {
                 this.$set('auth', response.data);
                 // this.$set('options', response.data.name);
                 // this.options = response.data.items

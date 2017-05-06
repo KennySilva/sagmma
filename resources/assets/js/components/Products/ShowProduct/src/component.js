@@ -225,6 +225,14 @@ export default{
             }
         },
 
+        undelete_alert: function() {
+            $.alert({
+                icon: 'fa fa-exclamation-triangle',
+                title: 'Ação Crítico',
+                content: 'Informação realacionada com a Integridade de outros dados!!',
+            });
+        },
+
 
 
         // --------------------------------------------------------------------------------------------
