@@ -112,7 +112,7 @@ class ApiArticlesController extends Controller
         return response($article, 200);
     }
 
-    public function articleFeatures(Request $request)
+    public function articleChangeFeatures(Request $request)
     {
         $id  = $request->id;
         $article = Article::find($id);

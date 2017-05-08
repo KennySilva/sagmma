@@ -3,7 +3,7 @@
 @section('front-style')
 <style media="screen">
 
-#custom_carousel .item {
+/*#custom_carousel .item {
 
     color:#000;
     background-color:#fff;
@@ -38,20 +38,20 @@
     margin-top:5px;
     font-weight:bold
 }
-</style>
+</style>*/
 
 @endsection
 
 @section('content')
     <div class="container-fluid">
-        <div class="row">
+        {{-- <div class="row">
             <div class="jumbotron">
                 <h1 class="text-center">Santa Catarina</h1>
                 <h5 class="text-center">Corração de Santiago</h5>
             </div>
 
             @include('_frontend.master.partials.caroucelNews')
-        </div>
+        </div> --}}
         <br>
         <br>
         <div class="row">

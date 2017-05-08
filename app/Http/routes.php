@@ -167,7 +167,7 @@ Route::group(['namespace' => 'ApiControllers'], function()
         // ###########################################################################################################
         // ##################################################  API Web  ##############################################
         // ###########################################################################################################
-        Route::group(['middleware' => ['role:super-admin|admin|articles-manager', 'permission:manage-articles']], function () {
+        Route::group(['middleware' => ['role:super-admin|admin|manager|articles-manager', 'permission:manage-articles']], function () {
             // -----------------------------------Categories--------------------------------------
             Route::resource('categories', 'ApiCategoriesController');
             Route::get('allCategories/{row}', 'ApiCategoriesController@index');
@@ -178,7 +178,7 @@ Route::group(['namespace' => 'ApiControllers'], function()
             Route::resource('articles', 'ApiArticlesController');
             Route::get('allArticles/{row}', 'ApiArticlesController@index');
             Route::post('articleStatus', 'ApiArticlesController@articleStatus');
-            Route::post('articleFeatures', 'ApiArticlesController@articleFeatures');
+            Route::post('articleFeatures', 'ApiArticlesController@articleChangeFeatures');
             Route::get('articleTag', 'ApiArticlesController@getTagforArticle');
             Route::get('articleCategory', 'ApiArticlesController@getCategoryForArticle');
             Route::get('articleUser', 'ApiArticlesController@getUserforArticle');
@@ -251,7 +251,7 @@ Route::group(['namespace' => 'Sagmma'], function()
 Route::group(['namespace' => 'Web'], function()
 {
     Route::group(['prefix' => 'web', 'middleware' => 'auth'], function () {
-        Route::group(['middleware' => ['role:super-admin|admin|articles-manager', 'permission:backend-access', 'permission:manage-articles']], function () {
+        Route::group(['middleware' => ['role:super-admin|admin|manager|articles-manager', 'permission:backend-access', 'permission:manage-articles']], function () {
             // ----------------------------------------Categories----------------------------------
             Route::resource('categories', 'CategoriesController');
             // -------------------------------------------Tags-------------------------------------

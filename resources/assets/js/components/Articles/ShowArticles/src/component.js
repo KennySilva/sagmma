@@ -14,6 +14,7 @@ export default{
                 status     : '',
                 featured   : '',
                 user_id    : '',
+
                 category_id: '',
                 tags       : [],
 

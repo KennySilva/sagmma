@@ -21,13 +21,21 @@ class NewsController extends Controller
     public function index()
     {
         // $articles = Article::take(5)->get();
-        $articles = Article::paginate(5);
+        $articles = Article::where('status', true)->paginate(5);
         $articles->each(function ($articles)
         {
             $articles->category;
             $articles->images;
             // $articles->user;
         });
+
+        // $featuresArticle = Article::where('status', true)->where('featured', true)->paginate(5);
+        // $featuresArticle->each(function ($featuresArticle)
+        // {
+        //     $featuresArticle->category;
+        //     $featuresArticle->images;
+        //     // $featuresArticle->user;
+        // });
         return view('_frontend.web.articlesPresentation.index')->with('articles', $articles);
     }
     public function create()

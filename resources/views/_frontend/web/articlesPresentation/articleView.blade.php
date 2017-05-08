@@ -1,4 +1,8 @@
 @extends('_frontend.master.app')
+@section('front-style')
+
+@endsection
+
 @section('content')
     <div class="container-fluid">
         <div class="row">
@@ -35,20 +39,20 @@
 
 @endsection
 
-    @push('scripts')
+@push('scripts')
 
-        <script type="text/javascript">
+    <script type="text/javascript">
 
-        $(document).ready(function(ev){
+    $(document).ready(function(ev){
 
-            //Changing the url after click on link 'NOTICIA'
-            $("#sagmma").attr("href", "/");
-            $("#mmsc").attr("href", "/");
-            $("#valores").attr("href", "/");
-            $("#galeria").attr("href", "/");
-            $("#equipa").attr("href", "/");
-            $("#contactar").attr("href", "/");
-            $("#myPage").attr("href", "/");
-        });
-        </script>
-    @endpush
+        //Changing the url after click on link 'NOTICIA'
+        $("#sagmma").attr("href", "/");
+        $("#mmsc").attr("href", "/");
+        $("#valores").attr("href", "/");
+        $("#galeria").attr("href", "/");
+        $("#equipa").attr("href", "/");
+        $("#contactar").attr("href", "/");
+        $("#myPage").attr("href", "/");
+    });
+    </script>
+@endpush

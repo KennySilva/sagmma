@@ -19,22 +19,14 @@
     </div>
 </div>
 
-{{-- <h4>Artigos Recentes</h4>
-<a href="#" class="list-group-item">
-    <h4 class="list-group-item-heading">Inicio de curso HTML5 mas rapido possivel</h4>
-    <p class="list-group-item-text">
+
+
+<h4>Artigos Em Destaque</h4>
+@foreach ($featuresArticle as $article)
+<a href="{{route('front.view.article', $article->slug)}}" class="list-group-item">
+    <h4 class="list-group-item-heading">{{$article->title}}</h4>
+    {{-- <p class="list-group-item-text">
         Aliquip aliqua laboris eu et tempor officia dolor aliquip.
-    </p>
+    </p> --}}
 </a>
-<a href="#" class="list-group-item">
-    <h4 class="list-group-item-heading">Inicio de curso HTML5 mas rapido possivel</h4>
-    <p class="list-group-item-text">
-        Aliquip aliqua laboris eu et tempor officia dolor aliquip.
-    </p>
-</a>
-<a href="#" class="list-group-item">
-    <h4 class="list-group-item-heading">Inicio de curso HTML5 mas rapido possivel</h4>
-    <p class="list-group-item-text">
-        Aliquip aliqua laboris eu et tempor officia dolor aliquip.
-    </p>
-</a> --}}
+@endforeach
