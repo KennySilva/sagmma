@@ -1,6 +1,5 @@
 @extends('_frontend.master.app')
 
-@section('front-style')
     @section('content')
         <div class="container-fluid">
             <br><br>

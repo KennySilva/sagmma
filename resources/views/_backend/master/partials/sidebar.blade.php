@@ -68,7 +68,7 @@
                         @endpermission
                         @endrole
 
-                        @role(['super-admin', 'admin', 'dpel', 'articles-manager'])
+                        @role(['super-admin', 'admin', 'dpel', 'articles-manager', 'manager'])
                         @permission(['backend-access','manage-articles', 'create-post', 'edit-post', 'delete-post', 'view-post'])
                         <li class="treeview">
                             <a href="#"><i class='fa fa-desktop'></i> <span>APLICAÇÃO E CONTEÚDO</span> <i class="fa fa-angle-left pull-right"></i></a>

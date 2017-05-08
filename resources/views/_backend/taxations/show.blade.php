@@ -92,6 +92,8 @@
 @endsection
 @push('scripts')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.2.0/jquery-confirm.min.js"></script>
+    <script src="/bower_components/jquery.maskedinput/dist/jquery.maskedinput.min.js" charset="utf-8"></script>
+    
     <script>
 
     $(document).ready(function(){

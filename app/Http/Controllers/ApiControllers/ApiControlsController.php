@@ -82,8 +82,8 @@ class ApiControlsController extends Controller
     //Metodos de auxilio
     public function getEmployeeForControl()
     {
-        $employee = Employee::all();
-        return $employee;
+        // $employee = Employee::all();
+        // return $employee;
 
         $employees = Employee::wherehas('typeofemployees', function($type)
         {

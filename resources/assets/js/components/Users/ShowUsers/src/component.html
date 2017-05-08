@@ -59,7 +59,7 @@
 		</div>
 
 		<div class="btn-group">
-			<a class="btn btn-primary btn-flat btn-outline" href="#"><i class="fa fa-envelope-o"></i> Enviar</a>
+			<a data-toggle="modal" data-target = "#send-email" class="btn btn-primary btn-flat btn-outline" href="#"><i class="fa fa-envelope-o"></i> Enviar</a>
 		</div>
 	</div>
 
@@ -68,6 +68,30 @@
 			<button data-toggle="modal" data-target="#deleteAllUsers"  v-if="deleteMultIten.length > 0" class="btn btn-danger btn-flat btn-outline"  type="button" name="button"><i class="fa fa-trash-o"></i> Apagar Todos</button>
 		</div>
 	</div>
+
+	<div id="send-email" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-sm">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+						<h5 class="modal-title"><i class="fa fa-send faa-flash animated faa-slow text-success"></i></h5>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+						<label for="">Email</label>
+						<input type="email" class="form-control" id="" placeholder="Introduza o email">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type='submit' class='btn btn-sm btn-primary '><i class="fa fa-send"></i></button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
 
 	<div class="modal fade" id="deleteAllUsers" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
 	<div class="modal-dialog modal-sm">
@@ -97,7 +121,7 @@
 				<thead class="thead-default">
 					<tr>
 						<th>
-						<input :disabled="" type="checkbox" name="" value="" @click="selectAll" v-model="allSelected">
+						<input :disabled="canDeleteAll()" type="checkbox" name="" value="" @click="selectAll" v-model="allSelected">
 					</th>
 						<th>
 							<i :class = "{'fa-sort-amount-asc': sortColumn == 'name' && sortInverse == 1, 'fa-sort-amount-desc':sortColumn == 'name' && sortInverse ==-1}" class="fa fa-sort" aria-hidden="true"></i>
@@ -214,10 +238,6 @@
 												</tr>
 											</thead>
 											<tbody>
-												<tr>
-													<td><b>ID</b></td>
-													<td><i>{{ newUser.id }}</i></td>
-												</tr>
 												<tr>
 													<td><b>Nome</b></td>
 													<td><i>{{ newUser.name }}</i></td>

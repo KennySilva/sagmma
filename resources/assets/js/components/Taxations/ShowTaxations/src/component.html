@@ -10,8 +10,8 @@
 			<div class="input-group">
 				<select data-toggle="tooltip" title="Escolhe Tipo de Cobrança a apresentar" class="form-control selectpicker show-tick show-menu-arrow" data-style="btn-primary" name="" v-model="typeData"  @change="fetchTaxation(1, showRow, typeData)">
 					<option class="" selected value="0"="">Todos</option>
-					<option class="" value="1">CI Interno</option>
-					<option class="" value="2">CI Externo</option>
+					<option class="" value="1">CI Interna</option>
+					<option class="" value="2">CI Externa</option>
 				</select>
 			</div>
 		</div>
@@ -66,7 +66,7 @@
 		<div class="btn-group">
 			<a class="btn btn-primary btn-flat btn-outline" href="/export/taxationsPDF"><i class="fa fa-file-pdf-o"></i> PDF</a>
 		</div>
-		<div class="btn-group">
+		<div v-if="checkPermition()" class="btn-group">
 			<button type="button" class="btn btn-info btn-flat  btn-outline"><i class="fa fa-file-text-o"></i> Relatório</button>
 			<button type="button" class="btn btn-info btn-flat  btn-outline dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				<span class="caret"></span>
@@ -80,13 +80,35 @@
 		</div>
 
 		<div class="btn-group">
-			<button class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#"><i class="fa fa-envelope-o"></i> Enviar</button>
+			<button class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#send-email"><i class="fa fa-envelope-o"></i> Enviar</button>
 		</div>
 	</div>
 
 	<div class="col-md-4">
 		<div class="btn-group pull-right">
 			<button data-toggle="modal" data-target="#deleteAllTaxations"  v-if="deleteMultIten.length > 0" class="btn btn-danger btn-flat btn-outline"  type="button" name="button"><i class="fa fa-trash-o"></i> Apagar Todos</button>
+		</div>
+	</div>
+
+	<div id="send-email" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-sm">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+						<h5 class="modal-title"><i class="fa fa-send faa-flash animated faa-slow text-success"></i></h5>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+						<label for="">Email</label>
+						<input type="email" class="form-control" id="" placeholder="Introduza o email">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button :disabled="!myValidation.email" @click="sendTaxationPerEmail()" type='submit' class='btn btn-sm btn-primary '><i class="fa fa-send"></i></button>
+				</div>
+			</div>
 		</div>
 	</div>
 
@@ -300,7 +322,7 @@
 
 									type="text"
 									class="form-control"
-									placeholder="Filtrar dados da tabela"
+									placeholder="Filtrar Informações"
 									aria-describedby="basic-addon1">
 								</div>
 								<hr>
@@ -319,16 +341,17 @@
 												<td>{{trashed.id}}</td>
 												<td v-for="emp in trashed.employees">{{emp.name}}</td>
 												<td>{{trashed.income | currency 'ECV  ' 2 }}</td>
-												<td align=Center><button type="button" data-toggle="tooltip" title = "Restaurar" class="btn btn-primary btn-xs"><i class="fa fa-external-link-square" @click = "restoreTrashedTaxation(trashed.id)"></i></button></td>
-												<td align=Center><button type="button" data-toggle="tooltip" title = "Apagar"  class="btn btn-danger btn-xs delConfirm" @click = "deleteTrashedTaxation(trashed.id)"><i class="fa fa-times"></i></button></td>
+
+												<td><button type="button" class="btn btn-link" @click = "restoreTrashedTaxation(trashed.id)">Restaurar</button></td>
+												<td><button type="button" class="btn btn-link" @click = "deleteTrashedTaxation(trashed.id)">Apagar Permanentemente</button></td>
 											</tr>
 										</tbody>
 									</table>
 								</div>
 							</div>
 							<div class="modal-footer">
-								<button type="button" class="btn btn-link" @click = "restoreAllTrashedTaxation()">Restaurar Todos</button>
-								<button type="button" class="btn btn-link" @click = "deleteAllTrashedTaxation()">Limpar Histórico</button>
+								<button v-if="trashedTaxations.length > 0" type="button" class="btn btn-link" @click = "restoreAllTrashedTaxation()">Restaurar Todos</button>
+								<button v-if="trashedTaxations.length > 0" type="button" class="btn btn-link" @click = "deleteAllTrashedTaxation()">Limpar Histórico</button>
 								<button type="button" class="btn btn-success btn-xs" data-dismiss="modal"><i class="fa fa-check"></i></button>
 							</div>
 						</div>
@@ -473,8 +496,8 @@
 										<div class="form-group {{ errors.type ? ' has-error' : '' }} has-feedback">
 											<select name="state" class="form-control" v-model="newTaxation.type" v-el:typecreate>
 												<option value=""></option>
-												<option value="1">Cobrança interno</option>
-												<option value="2">Cobrança Externo</option>
+												<option value="1">Cobrança Interna</option>
+												<option value="2">Cobrança Externa</option>
 											</select>
 											<span v-if="errors.type" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.type }}</span>
 										</div>
@@ -576,8 +599,8 @@
 										<div class="form-group {{ errors.type ? ' has-error' : '' }} has-feedback">
 											<select name="state" class="form-control" v-model="newTaxation.type" v-el:typeedit>
 												<option value=""></option>
-												<option value="1">Cobrança interno</option>
-												<option value="2">Cobrança Externo</option>
+												<option value="1">Cobrança Interna</option>
+												<option value="2">Cobrança Externa</option>
 											</select>
 											<span v-if="errors.type" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.type }}</span>
 										</div>

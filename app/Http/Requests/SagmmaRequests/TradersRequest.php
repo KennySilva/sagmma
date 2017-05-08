@@ -17,7 +17,7 @@ class TradersRequest extends Request
             'name'              => 'required|max:60|min:4',
             'ic'                => 'required|digits:6|Integer|unique:traders,ic,'.$this->id,
             'email'             => 'email|unique:traders,email,'.$this->id,
-            'phone'             => 'digits:7|unique:traders,phone,'.$this->id,
+            'phone'             => 'unique:traders,phone,'.$this->id,
         ];
     }
 }

@@ -6,6 +6,7 @@ use Socialite;
 use User;
 use Auth;
 use Social;
+use Caffeinated\Flash\Facades\Flash;
 
 class SocialController extends Controller
 {
@@ -37,7 +38,7 @@ class SocialController extends Controller
                 $new_user->email       = $user->email;
                 $new_user->status      = false;
                 $new_user->type      = 'member';
-                $new_user->avatar      =  $user->avatar;;
+                $new_user->avatar      =  'default.png';
                 $new_user->social      = true;
                 $new_user->save();
                 $social = new Social();
@@ -45,10 +46,9 @@ class SocialController extends Controller
                 $social->provider     = $provider;
                 $social->uid_provider = $user->id;
                 $social->save();
-
+                Flash::success('Registo efectuado com sucesso aguerde a ativação');
+                return redirect('/');
             }
-            Flash::success('Registo efectuado com sucesso aguerde a ativação');
-            return redirect('/');
         }else {
             return '!!ERRO!!';
         }

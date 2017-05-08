@@ -7,7 +7,7 @@
 	<div class="col-md-12">
 		<div class="form-inline pull-right">
 			<div class="input-group">
-				<select data-toggle="tooltip" title="A mostrar linhas na tabela" class="form-control" name="" v-model="showRow" @change="fetchArticle(1, showRow)">
+				<select data-toggle="tooltip" title="A mostrar linhas na tabela" class="selectpicker show-tick show-menu-arrow" data-style="btn-primary" name="" v-model="showRow" @change="fetchArticle(1, showRow)">
 					<option class="" value="5">05</option>
 					<option class="" value="10" selected>10</option>
 					<option class="" value="20">20</option>
@@ -114,33 +114,31 @@
 				</tr>
 			</tbody>
 		</table>
+		<hr>
 
-		<div class="row">
-			<div class="col-md-6 pull-left">
-				<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
-			</div>
-			<div class="col-md-6 pull-right">
-				<h6 class="text-right text-help"> Mostrar de <span class="badge">{{pagination.from}}</span>  a <span class="badge">{{pagination.to}}</span>  no total de <span class="badge">{{pagination.total}}</span></h6>
-			</div>
+		<div class="col-md-6 pull-left">
+			<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
+		</div>
+		<div class="col-md-6 pull-right">
+			<h6 class="text-right text-help"> Mostrar de <span class="badge">{{pagination.from}}</span>  a <span class="badge">{{pagination.to}}</span>  no total de <span class="badge">{{pagination.total}}</span></h6>
 		</div>
 
 	</div>
 
 	<!--------------------------------------------------------------------------------------------------------->
-
 	<div class="modal fade" id="modal-delete-article" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
-		<div class="modal-dialog">
+		<div class="modal-dialog modal-sm">
 			<div class="modal-content">
 				<div class="modal-header">
-					<button @click="clearField" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-					<h4 class="modal-title" id="">Eliminar</h4>
+					<button  @click="clearField" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h5 class="modal-title" id=""><i class="text-danger fa fa-exclamation-triangle faa-flash animated faa-slow"></i></h5>
 				</div>
 				<div class="modal-body">
-					<h5>Eliminar - <span class="text-uppercase text-danger">{{newArticle.name}}</span></h5>
+					<h5 class="text-center">Eliminar {{newArticle.name}}</h5>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-					<button  @keyup.enter="deleteArticle(newArticle.id)" @click="deleteArticle(newArticle.id)" type="button" class="btn btn-danger">Eliminar</button>
+					<button  @click="clearField" type="button" class="btn btn-secondary btn-xs" data-dismiss="modal"><i class="fa fa-times"></i></button>
+					<button  @keyup.enter="deleteArticle(newArticle.id)" @click="deleteArticle(newArticle.id)" type="button" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></button>
 				</div>
 			</div>
 		</div>

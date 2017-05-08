@@ -21,7 +21,7 @@ class EmployeesRequest extends Request
             'phone'             => 'unique:employees,phone,'.$this->id,
             'service_beginning' => 'date|before:'.$date,
             'typeofemployee_id' => 'required',
-
+            'age'              => 'size:2',
         ];
     }
 }

@@ -14,44 +14,41 @@
                     <div class="teamCaption">
                         <h4>Diretor(a)</h4>
                         <p>Dr. Nelson Marcarenha</p>
-                        <hr>
-
-                        <p><a href="img/frontend_img/team/diretor_test.png" data-lightbox="photo1" data-title="Diretor Dapromoção da Economia Local" class="btn btn-default pull-left" rel="tooltip" title="Ver"><i class="fa fa-search-plus"></i></a>
-                            <a href="" class="btn btn-primary pull-right" rel="tooltip" title="Enviar email para o Diretor" data-toggle="modal" data-target="#modal-director"><i class="fa fa-envelope"></i></a></p>
+                        <p><a href="img/frontend_img/team/diretor_test.png" data-lightbox="photo1" data-title="Diretor Dapromoção da Economia Local" class="btn btn-link btn-xs pull-left" rel="tooltip" title="Ver"><i class="fa fa-search-plus"></i></a>
+                            <a href="" class="btn btn-link btn-xs pull-right" rel="tooltip" title="Enviar email para o Diretor" data-toggle="modal" data-target="#modal-director"><i class="fa fa-envelope"></i></a></p>
                         </div>
                     </div>
                 </div>
                 {{-----------------------------------------------------------}}
                 <div class="col-md-3">
-                    <div class="thumbnail teamThumb">
+                    <div class="thumbnail teamThumb thumbTeam">
                         <img src="img/frontend_img/team/gestor_test.png" alt="...">
                         <div class="teamCaption">
                             <h4>Gestor(a)</h4>
                             <p>Maria Semedo</p>
-                            <hr>
-
-                            <p><a href="img/frontend_img/team/gestor_test.png" data-lightbox="photo1" data-title="Gestor do Mercado Novo" class="btn btn-default pull-left" rel="tooltip" title="Ver"><i class="fa fa-search-plus"></i></a>
-                                <a href="" class="btn btn-primary pull-right" rel="tooltip" title="Enviar email para o Gestor" data-toggle="modal" data-target="#modal-manager"><i class="fa fa-envelope"></i></a></p>
+                            <p><a href="img/frontend_img/team/gestor_test.png" data-lightbox="photo1" data-title="Gestor do Mercado Novo" class="btn btn-link btn-xs pull-left" rel="tooltip" title="Ver"><i class="fa fa-search-plus"></i></a>
+                                <a href="" class="btn btn-xs btn-link pull-right" rel="tooltip" title="Enviar email para o Gestor" data-toggle="modal" data-target="#modal-manager"><i class="fa fa-envelope"></i></a></p>
                             </div>
                         </div>
                     </div>
                     {{-----------------------------------------------------------}}
                     <div class="col-md-3">
-                        <div class="thumbnail teamThumb">
+                        <div class="thumbnail teamThumb thumbTeam">
                             <img src="img/frontend_img/team/auxiliar_test.png" alt="...">
                             <div class="teamCaption">
 
                                 <h4>Auxiliar Administrativo</h4>
                                 <p>Jacinto Gomes</p>
-                                <hr>
-                                <p><a href="img/frontend_img/team/auxiliar_test.png" data-lightbox="photo1" data-title="Auxiliar Administrativo" class="btn btn-default pull-left" rel="tooltip" title="Ver"><i class="fa fa-search-plus"></i></a>
-                                    <a href="" class="btn btn-primary pull-right" rel="tooltip" title="Enviar email para o Auxiliar Administrativo" data-toggle="modal" data-target="#modal-auxiliar"><i class="fa fa-envelope"></i></a></p>
+                                <p><a href="img/frontend_img/team/auxiliar_test.png" data-lightbox="photo1" data-title="Auxiliar Administrativo" class="btn btn-xs btn-link pull-left" rel="tooltip" title="Ver"><i class="fa fa-search-plus"></i></a>
+                                    <a href="" class="btn btn-xs btn-link pull-right" rel="tooltip" title="Enviar email para o Auxiliar Administrativo" data-toggle="modal" data-target="#modal-auxiliar"><i class="fa fa-envelope"></i></a></p>
                                 </div>
                             </div>
                         </div>
 
                     </div>
                 </div>
+
+
 
                 {{------------------------Modals Diretor-----------------------------------}}
                 <div id="modal-director" class="modal fade" role="dialog" tabindex="-1" data-width="760">

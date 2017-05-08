@@ -393,7 +393,7 @@ export default{
         checkSuperPermition: function() {
             var roles = this.auth.roles;
             for (var rol in roles) {
-                if (roles[rol].name == 'super-admin') {
+                if (roles[rol].name == 'super-admin' || roles[rol].name == 'admin') {
                     return true;
                 }
             }
@@ -460,12 +460,8 @@ export default{
 
         },
 
-
         restoreTrashedTaxation: function(id) {
-
-
             this.$http.get('/api/v1/restoreTrashedTaxation/'+ id).then((response) => {
-                // $('#trashedTaxation').modal('hide');
                 if (response.status == 200) {
                     this.fetchTaxation(this.pagination.current_Page, this.showRow, this.typeData);
                     this.alert('Registo Restaurado com sucesso', 'success');

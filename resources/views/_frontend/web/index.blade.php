@@ -51,15 +51,6 @@
             <p>...</p>
             <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a></p>
         </div>
-
-
-        {{-- <div class="page-header">
-            <div class="container">
-                <h1 class="text-center">Portal de Notícia do Concelho de Santa Catarina</h1>
-                <h5 class="text-center">Corração da Ilha de Santiago</h5>
-
-            </div>
-        </div> --}}
         @include('_frontend.master.partials.caroucelNews')
     </div>
     <br>
@@ -97,15 +88,6 @@ Panel content
 <section  class="container-fluid">
     <div class="row">
         <section  class="posts col-md-9">
-            <div class="miga-de-pan">
-                <ol  class="breadcrumb">
-                    <li class=""><a href="#">Home</a></li>
-                    <li class=""><a href="#">Categprias</a></li>
-                    <li class="">Disenho Web</li>
-                </ol>
-            </div>
-
-
             @foreach ($articles as $article)
                 <article class="post clearfix">
                     {{-- <a href="{{ route('front.view.article', $article->slug) }}" class="thumb pull-left"> --}}

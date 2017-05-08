@@ -285,14 +285,23 @@ export default{
             });
         },
 
-        // canDeleteAll: function() {
-        //     var us = this.users;
-        //     for (var u in us) {
-        //         if (us[u].employees.length > 0) {
-        //             return true;
-        //         }
-        //     }
-        // },
+
+        authUser: function() {
+            this.$http.get('http://localhost:8000/api/v1/authUser').then((response) => {
+                this.$set('auth', response.data);
+            }, (response) => {
+                console.log("Ocorreu um erro na operação");
+            });
+        },
+
+        canDeleteAll: function() {
+            var us = this.users;
+            for (var u in us) {
+                if (us[u].status == true) {
+                    return true;
+                }
+            }
+        },
 
         getThisUser: function(id){
             var self = this;
@@ -414,13 +423,6 @@ export default{
             });
         },
 
-        authUser: function() {
-            this.$http.get('http://localhost:8000/api/v1/authUser').then((response) => {
-                this.$set('auth', response.data);
-            }, (response) => {
-                console.log("Ocorreu um erro na operação");
-            });
-        },
 
 
         // --------------------------------------------------------------------------------------------

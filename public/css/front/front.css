@@ -560,6 +560,24 @@ header,
 .post .thumb img{
     margin-top: 20px;
     width: 100%;
+
+}
+
+
+
+.post .image-art{
+    margin-right: 10px;
+    width: 15%;
+
+}
+
+.post .image-art img{
+    margin-top: 20px;
+    width: 100%;
+
+    border: 3px #dadada solid;
+    border-radius: 4px;
+
 }
 
 .post .contenedor-botones{

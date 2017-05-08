@@ -147,7 +147,7 @@ class UsersController extends Controller
     public function updatePassword(Request $request)
     {
         $rules = [
-            'old_password' => 'required|exists:users,password',
+            'old_password' => 'exists:users,password',
             'new_password' => 'required|min:3|different:old_password|confirmed',
             'new_password_confirmation' => 'required',
         ];

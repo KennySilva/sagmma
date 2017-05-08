@@ -153,7 +153,7 @@
                 @include('_backend.master.partials.painelCalendar')
             </div>
         </div>
-        @role(['super-admin', 'admin', 'dpel', 'administrative-assistant'])
+        @role(['super-admin', 'admin', 'dpel', 'manager', 'administrative-assistant'])
         <div class="row">
             <div class="col-md-12">
                 <div class="panel with-nav-tabs panel-default">
@@ -207,4 +207,6 @@
     <script src="/bower_components/fullcalendar/dist/fullcalendar.js" charset="utf-8"></script>
     <script src="/bower_components/fullcalendar/dist/locale/pt.js" charset="utf-8"></script>
     <script src="/js/back/calendarEvents.js" charset="utf-8"></script>
+    <script src="/bower_components/jquery.maskedinput/dist/jquery.maskedinput.min.js" charset="utf-8"></script>
+
 @endpush

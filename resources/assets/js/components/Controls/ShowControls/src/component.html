@@ -64,13 +64,35 @@
 		</div>
 
 		<div class="btn-group">
-			<button class="btn btn-primary btn-flat btn-outline pull-left" name="button"><i class="fa fa-plus"></i> Enviar</button>
+			<button data-toggle="modal" data-target = "#send-email" class="btn btn-primary btn-flat btn-outline pull-left" name="button"><i class="fa fa-envelope-o"></i> Enviar</button>
 		</div>
 	</div>
 
 	<div class="col-md-4">
 		<div class="btn-group pull-right">
 			<button data-toggle="modal" data-target="#deleteAllControls"  v-if="deleteMultIten.length > 0" class="btn btn-danger btn-flat btn-outline"  type="button" name="button"><i class="fa fa-trash-o"></i> Apagar Todos</button>
+		</div>
+	</div>
+
+	<div id="send-email" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-sm">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+						<h5 class="modal-title"><i class="fa fa-send faa-flash animated faa-slow text-success"></i></h5>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+						<label for="">Email</label>
+						<input v-model="sendEmployee" type="email" class="form-control" id="" placeholder="Introduza o email">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type='submit' class='btn btn-sm btn-primary '><i class="fa fa-send"></i></button>
+				</div>
+			</div>
 		</div>
 	</div>
 
@@ -119,6 +141,7 @@
 						</th>
 
 						<th v-if="checkPermition()" class="text-center" colspan="3"><i class="fa fa-cogs"></i> <span class=" text-primary">Operações</span></th>
+						<th v-if="!checkPermition()" class="text-center"><i class="fa fa-cogs"></i> <span class=" text-primary">Operações</span></th>
 					</tr>
 				</thead>
 				<tbody>

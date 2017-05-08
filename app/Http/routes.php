@@ -191,8 +191,8 @@ Route::group(['namespace' => 'ApiControllers'], function()
 // ###############################################################################################################
 Route::group(['namespace' => 'Admin'], function()
 {
-    Route::group(['prefix' => 'user', 'middleware' => ['auth', 'permission:backend-access']], function () {
-        Route::group(['middleware' => ['role:super-admin|admin|dpel', 'permission:manage-users']], function () {
+    Route::group(['prefix' => 'user', 'middleware' => ['auth']], function () {
+        Route::group(['middleware' => ['role:super-admin|admin|dpel', 'permission:manage-users|backend-access']], function () {
             Route::resource('users', 'UsersController');
             // ----------------------------------------------------------
             Route::resource('roles', 'RolesController');

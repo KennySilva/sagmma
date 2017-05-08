@@ -253,7 +253,6 @@
 									<div class="col-md-12">
 										<div class="form-group {{ errors.name ? ' has-error' : '' }} has-feedback">
 											<input type="text" class="form-control" name="name" placeholder="Nome" v-model="newProduct.name"/>
-											<span class="fa fa-shopping-basket form-control-feedback"></span>
 											<p v-if="errors.name" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.name }}</p>
 										</div>
 									</div>
@@ -266,7 +265,6 @@
 									<div class="col-md-12">
 										<div class="form-group {{ errors.price ? ' has-error' : '' }} has-feedback">
 											<input type="number" class="form-control" name="price" placeholder="Preço" v-model="newProduct.price"/>
-											<span class="fa fa-usd form-control-feedback">00</span>
 											<p v-if="errors.price" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.price }}</p>
 										</div>
 									</div>
@@ -328,8 +326,6 @@
 									<div class="col-md-12">
 										<div class="form-group has-feedback">
 											<input type="text" class="form-control" name="name" placeholder="Nome" v-model="newProduct.name"/>
-											<span class="fa fa-shopping-basket form-control-feedback"></span>
-
 										</div>
 									</div>
 								</div>
@@ -341,7 +337,6 @@
 									<div class="col-md-12">
 										<div class="form-group has-feedback">
 											<input type="number" class="form-control" name="price" placeholder="Preço" v-model="newProduct.price"/>
-											<span class="fa fa-usd form-control-feedback">00</span>
 										</div>
 									</div>
 								</div>

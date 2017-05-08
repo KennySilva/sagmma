@@ -151,7 +151,7 @@ export default{
                     $('#modal-create-control').modal('hide');
                     this.clearField();
                     this.fetchControl(this.pagination.current_Page, this.showRow);
-                    alert('Registo Criado com sucesso', 'success');
+                    this.alert('Registo Criado com sucesso', 'success');
                     this.$set('errors', '')
                 }
             }, (response) => {

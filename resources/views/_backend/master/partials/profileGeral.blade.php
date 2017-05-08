@@ -140,7 +140,7 @@
 
                                 {{ csrf_field() }}
                                 <div class="form-group">
-                                    <input type="password" name="old_password" id="old_password" class="form-control input-md" required placeholder="Palavra Passe Actual">
+                                    <input type="password" name="old_password" id="old_password" class="form-control input-md" placeholder="Palavra Passe Actual">
                                     @if ($errors->has('old_password'))
                                         <p class="text-help text-danger">{{ $errors->first('old_password') }}</p>
                                     @endif

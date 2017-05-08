@@ -277,13 +277,13 @@
 						<form action="#" methods="POST">
 							<div class="row">
 								<div class="col-md-12">
-									<div class="col-md-12">
+									<div class="col-md-6">
 										<div class="form-group {{ errors.name ? ' has-error' : '' }} has-feedback">
 											<input type="text" class="form-control" name="name" placeholder="Nome" v-model="newPromotion.name"/>
-											<span class="fa fa-user form-control-feedback"></span>
 												<p v-if="errors.name" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.name }}</p>
 										</div>
 									</div>
+
 								</div>
 							</div>
 
@@ -382,7 +382,6 @@
 									<div class="col-md-12">
 										<div class="form-group {{ errors.name ? ' has-error' : '' }} has-feedback">
 											<input type="text" class="form-control" name="name" placeholder="Nome" v-model="newPromotion.name"/>
-											<span class="fa fa-user form-control-feedback"></span>
 											<p v-if="errors.name" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.name }}</p>
 										</div>
 									</div>

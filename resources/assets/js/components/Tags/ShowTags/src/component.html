@@ -8,7 +8,7 @@
 	<div class="col-md-12">
 		<div class="form-inline pull-right">
 			<div class="input-group">
-				<select data-toggle="tooltip" title="A mostrar linhas na tabela" class="form-control" name="" v-model="showRow" @change="fetchTag(1, showRow)">
+				<select data-toggle="tooltip" title="A mostrar linhas na tabela" class="selectpicker show-tick show-menu-arrow" data-style="btn-primary" name="" v-model="showRow" @change="fetchTag(pagination.current_page, showRow)">
 					<option class="" value="5">05</option>
 					<option class="" value="10" selected>10</option>
 					<option class="" value="20">20</option>
@@ -17,14 +17,12 @@
 					<option class="" value="200">200</option>
 				</select>
 			</div>
-			&nbsp;&nbsp;
 			<div class="input-group">
 				<select data-toggle="tooltip" title="Escolhe as colunas a serem filtrados" class="form-control" name="" v-model="columnsTagToFilter" multiple="multiple" v-el:coltag>
 					<option class="" value="name">Nome</option>
 					<option class="" value="description">Descrição</option>
 				</select>
 			</div>
-			&nbsp;&nbsp;
 			<div v-if="columnsTagToFilter.length != 0" class="input-group">
 				<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
 				<input data-toggle="tooltip" title="Escreva o valor a ser procurado na Tabela"
@@ -51,7 +49,10 @@
 
 <hr>
 <div class="col-md-12">
-	<button class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-tag"><i class="fa fa-plus"></i> Novo</button>
+	<div class="input-group">
+
+		<button class="btn btn-primary btn-flat btn-outline pull-left" name="button" data-toggle="modal" data-target="#modal-create-tag"><i class="fa fa-plus"></i> Novo</button>
+	</div>
 </div>
 
 
@@ -84,13 +85,12 @@
 				</tr>
 			</tbody>
 		</table>
-		<div class="row">
-			<div class="col-md-6 pull-left">
-				<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
-			</div>
-			<div class="col-md-6 pull-right">
-				<h6 class="text-right text-help"> Mostrar de <span class="badge">{{pagination.from}}</span>  a <span class="badge">{{pagination.to}}</span>  no total de <span class="badge">{{pagination.total}}</span></h6>
-			</div>
+		<hr>
+		<div class="col-md-6 pull-left">
+			<Pagination :source.sync = "pagination" @navigate="navigate"></Pagination>
+		</div>
+		<div class="col-md-6 pull-right">
+			<h6 class="text-right text-help"> Mostrar de <span class="badge">{{pagination.from}}</span>  a <span class="badge">{{pagination.to}}</span>  no total de <span class="badge">{{pagination.total}}</span></h6>
 		</div>
 	</div>
 

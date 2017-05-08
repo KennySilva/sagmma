@@ -136,7 +136,7 @@ export default{
             var article = this.newArticle;
             // Clear form input
             this.clearField();
-            this.$http.post('http://localhost:8000/api/v1/articles/', article).then((response) => {
+            this.$http.post('/api/v1/articles/', article).then((response) => {
                 if (response.status == 200) {
                     $('#modal-create-article').modal('hide');
                     // this.uploadsImages();
@@ -152,7 +152,7 @@ export default{
 
         fetchArticle: function(page, row) {
             var self = this;
-            self.$http.get('http://localhost:8000/api/v1/allArticles/'+row+'?page='+page).then((response) => {
+            self.$http.get('/api/v1/allArticles/'+row+'?page='+page).then((response) => {
                 self.$set('articles', response.data.data)
                 self.$set('all', response.data.data)
                 self.$set('pagination', response.data)
@@ -166,7 +166,7 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         getThisArticle: function(id){
-            this.$http.get('http://localhost:8000/api/v1/articles/' + id).then((response) => {
+            this.$http.get('/api/v1/articles/' + id).then((response) => {
                 this.newArticle.id          = response.data.id;
                 this.newArticle.title       = response.data.title;
                 this.newArticle.content     = response.data.content;
@@ -187,7 +187,7 @@ export default{
 
             this.clearField();
 
-            this.$http.patch('http://localhost:8000/api/v1/articles/'+ id, article).then((response) => {
+            this.$http.patch('/api/v1/articles/'+ id, article).then((response) => {
                 if (response.status == 200) {
                     $('#modal-edit-article').modal('hide');
                     // console.log(response.data);
@@ -202,7 +202,7 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         deleteArticle: function(id) {
-            this.$http.delete('http://localhost:8000/api/v1/articles/'+ id).then((response) => {
+            this.$http.delete('/api/v1/articles/'+ id).then((response) => {
                 $('#modal-delete-article').modal('hide');
                 if (response.status == 200) {
                     // console.log(response.data);
@@ -215,7 +215,7 @@ export default{
         },
 
         articleTag: function() {
-            this.$http.get('http://localhost:8000/api/v1/articleTag').then((response) => {
+            this.$http.get('/api/v1/articleTag').then((response) => {
                 this.$set('tags', response.data);
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -223,7 +223,7 @@ export default{
         },
 
         articleCategory: function() {
-            this.$http.get('http://localhost:8000/api/v1/articleCategory').then((response) => {
+            this.$http.get('/api/v1/articleCategory').then((response) => {
                 this.$set('categories', response.data);
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -231,7 +231,7 @@ export default{
         },
 
         articleUser: function() {
-            this.$http.get('http://localhost:8000/api/v1/articleUser').then((response) => {
+            this.$http.get('/api/v1/articleUser').then((response) => {
                 this.$set('users', response.data);
             }, (response) => {
                 console.log("Ocorreu um erro na operação");
@@ -253,7 +253,7 @@ export default{
 
         articleStatus: function(articleStatus) {
             var postData = {id: articleStatus};
-            this.$http.post('http://localhost:8000/api/v1/articleStatus/', postData).then((response) => {
+            this.$http.post('/api/v1/articleStatus/', postData).then((response) => {
                 if (response.status == 200) {
                     this.fetchArticle(this.pagination.current_page, this.showRow);
                 }
@@ -262,7 +262,7 @@ export default{
         },
         articleFeatures: function(articleFeatures) {
             var postData = {id: articleFeatures};
-            this.$http.post('http://localhost:8000/api/v1/articleFeatures/', postData).then((response) => {
+            this.$http.post('/api/v1/articleFeatures/', postData).then((response) => {
                 if (response.status == 200) {
                     this.fetchArticle(this.pagination.current_page, this.showRow);
                 }
@@ -307,7 +307,7 @@ export default{
             var data = new FormData();
             data.append('articleimage', files[0]);
 
-            this.$http.post('http://localhost:8000/api/v1/articleImageUpload/', data).then((response) => {
+            this.$http.post('/api/v1/articleImageUpload/', data).then((response) => {
             }, (response) => {
             });
 

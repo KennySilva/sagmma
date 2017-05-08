@@ -226,6 +226,11 @@ return [
             'required' => 'Obrigatório',
         ],
 
+        'age' => [
+            'size' => ':attribute inválida',
+            'digits_between' => ':attribute inválida',
+        ],
+
     ],
 
 
@@ -271,6 +276,7 @@ return [
         'old_password'    => 'Palavra Passe Atual',
         'new_password'    => 'Nova Palavra Passe',
         'new_password_confirmation'    => 'Conformação',
+        'age'    => 'Idade',
     ],
 
 ];

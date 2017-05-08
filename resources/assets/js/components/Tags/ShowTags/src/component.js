@@ -72,7 +72,7 @@ export default{
 
             //Clear form input
             this.clearField();
-            this.$http.post('http://localhost:8000/api/v1/tags/', tag).then((response) => {
+            this.$http.post('/api/v1/tags/', tag).then((response) => {
                 if (response.status == 200) {
                     console.log('chegando aqui');
                     $('#modal-create-tag').modal('hide');
@@ -88,7 +88,7 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         fetchTag: function(page, row) {
-            this.$http.get('http://localhost:8000/api/v1/allTags/'+row+'?page='+page).then((response) => {
+            this.$http.get('/api/v1/allTags/'+row+'?page='+page).then((response) => {
                 this.$set('tags', response.data.data)
                 this.$set('all', response.data.data)
                 this.$set('pagination', response.data)
@@ -100,7 +100,7 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         getThisTag: function(id){
-            this.$http.get('http://localhost:8000/api/v1/tags/' + id).then((response) => {
+            this.$http.get('/api/v1/tags/' + id).then((response) => {
                 this.newTag.id       = response.data.id;
                 this.newTag.name     = response.data.name;
                 this.newTag.location = response.data.location;
@@ -118,7 +118,7 @@ export default{
 
             this.clearField();
 
-            this.$http.patch('http://localhost:8000/api/v1/tags/'+ id, tag).then((response) => {
+            this.$http.patch('/api/v1/tags/'+ id, tag).then((response) => {
                 if (response.status == 200) {
                     $('#modal-edit-tag').modal('hide');
                     // console.log(response.data);
@@ -134,7 +134,7 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         deleteTag: function(id) {
-            this.$http.delete('http://localhost:8000/api/v1/tags/'+ id).then((response) => {
+            this.$http.delete('/api/v1/tags/'+ id).then((response) => {
                 $('#modal-delete-tag').modal('hide');
                 if (response.status == 200) {
                     // console.log(response.data);

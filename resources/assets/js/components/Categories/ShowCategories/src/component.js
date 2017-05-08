@@ -75,7 +75,7 @@ export default{
 
             //Clear form input
             this.clearField();
-            this.$http.post('http://localhost:8000/api/v1/categories/', category).then((response) => {
+            this.$http.post('/api/v1/categories/', category).then((response) => {
                 if (response.status == 200) {
                     console.log('chegando aqui');
                     $('#modal-create-category').modal('hide');
@@ -90,7 +90,7 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         fetchCategory: function(page, row) {
-            this.$http.get('http://localhost:8000/api/v1/allCategories/'+row+'?page='+page).then((response) => {
+            this.$http.get('/api/v1/allCategories/'+row+'?page='+page).then((response) => {
                 this.$set('categories', response.data.data)
                 this.$set('all', response.data.data)
                 this.$set('pagination', response.data)
@@ -102,7 +102,7 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         getThisCategory: function(id){
-            this.$http.get('http://localhost:8000/api/v1/categories/' + id).then((response) => {
+            this.$http.get('/api/v1/categories/' + id).then((response) => {
                 this.newCategory.id       = response.data.id;
                 this.newCategory.name     = response.data.name;
                 this.newCategory.location = response.data.location;
@@ -120,7 +120,7 @@ export default{
 
             this.clearField();
 
-            this.$http.patch('http://localhost:8000/api/v1/categories/'+ id, category).then((response) => {
+            this.$http.patch('/api/v1/categories/'+ id, category).then((response) => {
                 if (response.status == 200) {
                     $('#modal-edit-category').modal('hide');
                     // console.log(response.data);
@@ -135,7 +135,7 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         deleteCategory: function(id) {
-            this.$http.delete('http://localhost:8000/api/v1/categories/'+ id).then((response) => {
+            this.$http.delete('/api/v1/categories/'+ id).then((response) => {
                 $('#modal-delete-category').modal('hide');
                 if (response.status == 200) {
                     // console.log(response.data);
