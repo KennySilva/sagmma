@@ -81,6 +81,17 @@
                         </li>
                         @endpermission
                         @endrole
+
+                        @role(['super-admin'])
+                        @permission(['backend-access'])
+                        <li><a href="{{ url('https://analytics.google.com/analytics/web/#report/defaultid/a93883129w138741580p143061883/') }}" target="_blank"><i class='fa fa-pie-chart'></i> <span>ESTATISTICA DE DO SISTEMA</span></a></li>
+
+                        <li><a href="#"><i class='fa fa-database disabled'></i> <span>BASE DE DADOS</span></a></li>
+
+                        @endpermission
+                        @endrole
+
+
                     </ul>
                 </section>
             </aside>

@@ -13,8 +13,8 @@
     <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Tangerine" rel="stylesheet">
-    <link rel="stylesheet" href="css/front/front.css" media="screen" title="no title">
-    <link rel="stylesheet" href="css/front/front_end.css" media="screen" title="no title">
+    <link rel="stylesheet" href="/css/front/front.css" media="screen" title="no title">
+    <link rel="stylesheet" href="/css/front/front_end.css" media="screen" title="no title">
 
     <link rel="stylesheet" href="/bower_components/flexisel/css/style.css">
 

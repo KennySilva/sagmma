@@ -25,6 +25,8 @@ class UsersRequest extends Request
             'password' => 'min:8|max:120|required',
             'ic' => 'digits:6|required|unique:users,ic,'.$this->id,
             'phone' => 'unique:users,phone,'.$this->id,
+            'age'              => 'size:2',
+            
             // 'phone' =>  ['unique:users,phone,'.$this->id, 'Regex: /^\(\d{3}\)-\d{4}-\d{4}$/']
         ];
     }

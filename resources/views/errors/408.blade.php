@@ -1,10 +1,17 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <title></title>
-    </head>
-    <body>
-        <h1>não ten registo de cobrança nesse dia</h1>
-    </body>
-</html>
+@extends('_backend.master.app')
+
+@section('htmlheader_title')
+    Sem Registo
+@endsection
+@section('contentheader_title')
+@endsection
+@section('main-content')
+    <div class="sagmma_container">
+        <div class="alert alert-info">
+            <h1>Sem Registo nesta Data</h1>
+        </div>
+        <a href="/sagmma/taxations">Voltar</a>
+    </div>
+
+
+@endsection

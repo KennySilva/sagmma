@@ -52,7 +52,7 @@ class PrintController extends Controller
         $total = $taxations->sum('income');
 
         if (count($taxations) > 0) {
-            return view('exportation.printDateReport', compact('taxations', 'date'));
+            return view('exportation.printDateReport', compact('taxations', 'date', 'total'));
         }else {
             return abort(408, 'Unauthorized action.');
         }

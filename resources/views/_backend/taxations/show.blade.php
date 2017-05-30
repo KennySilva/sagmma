@@ -16,6 +16,8 @@
 @section('main-content')
     <div class="sagmma_container">
         <div class="row">
+            @permission(['manage-resources'])
+
             <div class="col-md-6">
                 <div class="box box-default box-solid collapsed-box">
                     <div class="box-header with-border">
@@ -53,6 +55,8 @@
                     </div><!-- /.table-responsive -->
                 </div>
             </div>
+            @endpermission
+            
         </div>
 
         <div class="row">
@@ -93,7 +97,7 @@
 @push('scripts')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.2.0/jquery-confirm.min.js"></script>
     <script src="/bower_components/jquery.maskedinput/dist/jquery.maskedinput.min.js" charset="utf-8"></script>
-    
+
     <script>
 
     $(document).ready(function(){

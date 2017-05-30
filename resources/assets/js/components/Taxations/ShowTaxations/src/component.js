@@ -321,7 +321,7 @@ export default{
         // --------------------------------------------------------------------------------------------
 
         deleteTaxation: function(id) {
-            this.$http.delete('/api/v1/taxations/'+ id).then((response) => {
+            this.$http.delete('/api/v1/taxationsDestroy/'+ id).then((response) => {
                 $('#modal-delete-taxation').modal('hide');
                 if (response.status == 200) {
                     // console.log(response.data);

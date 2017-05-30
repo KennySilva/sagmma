@@ -100,8 +100,6 @@ class ApiTaxationsController extends Controller
 
     public function destroy($id)
     {
-        // $tax = Taxation::find($id);
-        // $tax->delete();
         Taxation::destroy($id);
     }
 

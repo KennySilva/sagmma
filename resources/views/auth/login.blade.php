@@ -23,13 +23,7 @@
 
 
 @if (count($errors) > 0)
-    <div class="alert alert-warning">
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li class="list-unstyled">{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
+    <h2 class="text-center text-danger"><i class="fa fa-exclamation-triangle faa-ring animated"></i></h2>
 @endif
 
 
@@ -40,12 +34,20 @@
         <div class="form-group has-feedback">
             <input type="email" class="form-control" placeholder="Email" name="email"/>
             <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
-
+            @if ($errors->has('email'))
+                <span class="help-block">
+                    <p class="help-block text-danger" style="color: #DD4B39;">{{ $errors->first('email') }}</p>
+                </span>
+            @endif
         </div>
         <div class="form-group has-feedback">
             <input type="password" class="form-control" placeholder="Palavra Passe" name="password"/>
             <span class="glyphicon glyphicon-lock form-control-feedback"></span>
-
+            @if ($errors->has('password'))
+                <span class="help-block">
+                    <p class="help-block text-danger" style="color: #DD4B39;">{{ $errors->first('password') }}</p>
+                </span>
+            @endif
         </div>
         <div class="row">
             <div class="col-xs-8">

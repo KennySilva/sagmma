@@ -435,9 +435,9 @@
 											</div>
 										</div>
 										<div class="col-md-6">
-											<div class="form-group has-feedback">
-												<input type="number" class="form-control" name="age" placeholder="Idade" min="20" max="50" v-model="newUser.age"/>
-												<span class="fa fa-birthday-cake form-control-feedback"></span>
+											<div class="form-group {{ errors.age ? ' has-error' : '' }} has-feedback">
+												<input type="number" class="form-control" name="age" placeholder="Idade" min="18" max="65" v-model="newUser.age"/>
+												<p v-if="errors.age" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.age }}</p>
 											</div>
 										</div>
 									</div>
@@ -685,8 +685,10 @@
 										</div>
 										<div class="col-md-6">
 											<div class="form-group has-feedback">
-												<input type="number" class="form-control" name="age" placeholder="Idade" min="20" max="50" v-model="newUser.age"/>
-												<span class="fa fa-birthday-cake form-control-feedback"></span>
+												<div class="form-group {{ errors.age ? ' has-error' : '' }} has-feedback">
+													<input type="number" class="form-control" name="age" placeholder="Idade" min="18" max="65" v-model="newUser.age"/>
+													<p v-if="errors.age" class="text-danger text-help"><i class="fa fa-times"></i> {{errors.age }}</p>
+
 											</div>
 										</div>
 									</div>

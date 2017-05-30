@@ -146,7 +146,7 @@
 				</thead>
 				<tbody>
 					<tr v-for="control in controls | orderBy sortColumn sortInverse">
-						<td><input :disabled="!control.status" type="checkbox" name="" v-model="deleteMultIten" :value="control.id"></td>
+						<td><input :disabled="!control.status || canDeleteAll()" type="checkbox" name="" v-model="deleteMultIten" :value="control.id"></td>
 						<td v-for="emp in control.employees">{{ emp.name }}</td>
 						<td v-if="moreColumn.author" class="info">{{ control.author }}</td>
 						<!------------------------------------------------------------------------------------------>
